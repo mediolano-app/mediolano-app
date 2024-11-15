@@ -14,7 +14,7 @@ Mediolano offers an innovative platform that empowers content creators, from aut
 
 ## Getting Started
 
-First, install dependencies for Next.js 16 + React 19:
+First, install dependencies for Next.js 15 + React 19:
 
 ```bash
 npm install --force
