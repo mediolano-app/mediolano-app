@@ -14,16 +14,16 @@ Mediolano offers an innovative platform that empowers content creators, from aut
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies for Next.js 16 + React 19:
+
+```bash
+npm install --force
+```
+
+And... run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
