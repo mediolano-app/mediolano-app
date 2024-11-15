@@ -12,15 +12,20 @@ Mediolano offers an innovative platform that empowers content creators, from aut
 
 ---
 
-## Getting Started
+## Getting Started in 3 steps
 
-First, install dependencies for Next.js 15 + React 19:
+1st, clone the repository to your local machine:
+
+```bash
+git clone https://github.com/mediolano-app/mediolano-app.git
+```
+2nd, install dependencies for Next.js 15 + React 19:
 
 ```bash
 npm install --force
 ```
 
-And... run the development server:
+3rd, run the development server:
 
 ```bash
 npm run dev
