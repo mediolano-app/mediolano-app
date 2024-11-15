@@ -24,7 +24,7 @@ Install dependencies for Next.js 15 + React 19:
 ```bash
 npm install --force
 ```
-obs.: --force is (still) required for Next.js 15 components
+// --force required for Next.js 15 components
 
 Run the development server:
 
