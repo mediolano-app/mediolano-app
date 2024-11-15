@@ -1,7 +1,7 @@
 # Mediolano.app
 
 <h4 align="center">
-  <a href="https://mediolano.app">Website</a>
+  <a href="https://mediolano.app">Discover</a>
 </h4>
 
 In today’s ever-evolving digital world, protecting and managing intellectual property (IP) has become a critical challenge. From journalists to art collectors, new technologies are making it safer and more efficient to tokenize IP, enabling licensing, trading, distributing royalties, and more.
@@ -24,6 +24,7 @@ git clone https://github.com/mediolano-app/mediolano-app.git
 ```bash
 npm install --force
 ```
+obs.: --force is (still) required for Next.js 15 components
 
 3rd, run the development server:
 
