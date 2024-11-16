@@ -46,17 +46,62 @@ const templatesIP = () => {
   return (
     <>
 
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 mb-20">
       <main>
 
 
     <h1 className="text-4xl font-bold text-center mb-8">IP Templates</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <div className="rounded-lg shadow-lg">
+        <div className="">
 
-        <Card>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-1xl mb-8">
+          Register with a template:
+        </h2>
+        
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-16">
+          {templates.map((template) => (
+            <Link
+              key={template.name}
+              href={template.href}
+              className="block group"
+            >
+              <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-black p-6">
+                <div className="flex items-center mb-4">
+                  <template.icon className="h-8 w-8 mr-3" />
+                  <h3 className="text-xl font-semibold">{template.name}</h3>
+                </div>
+                <p className="">{template.description}</p>
+                <div className="mt-4 flex items-center text-indigo-600 group-hover:text-indigo-500">
+                  <span className="text-sm font-medium">Open</span>
+                  <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+      </main>
+
+        
+      </div>
+
+
+
+      
+
+
+
+        
+        
+        
+      <div className="text-card-foreground rounded-lg">
+
+      <Card>
         <CardHeader>
           <CardTitle>Create new IP</CardTitle>
           <CardDescription>Easy register your intellectual property with templates.</CardDescription>
@@ -120,48 +165,9 @@ const templatesIP = () => {
           <Button variant="ghost">Need help?</Button>
         </CardFooter>
       </Card>
-      </div>
-
 
 
       
-
-
-
-        
-        
-        
-      <div className="text-card-foreground rounded-lg">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-1xl mb-8">
-          Register with a template:
-        </h2>
-        
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-16">
-          {templates.map((template) => (
-            <Link
-              key={template.name}
-              href={template.href}
-              className="block group"
-            >
-              <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-black p-6">
-                <div className="flex items-center mb-4">
-                  <template.icon className="h-8 w-8 mr-3" />
-                  <h3 className="text-xl font-semibold">{template.name}</h3>
-                </div>
-                <p className="">{template.description}</p>
-                <div className="mt-4 flex items-center text-indigo-600 group-hover:text-indigo-500">
-                  <span className="text-sm font-medium">Open</span>
-                  <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-      </main>
     </div>
 
     </div>
