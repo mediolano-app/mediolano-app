@@ -104,16 +104,11 @@ const templatesIP = () => {
 
       <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
         <CardHeader>
-          <CardTitle>Create new IP</CardTitle>
-          <CardDescription>Easy register your intellectual property with templates.</CardDescription>
+          <CardTitle>Blockchain IP Registration Features</CardTitle>
+          <CardDescription>Secure, transparent, and efficient. Easy register your intellectual property with templates.</CardDescription>
         </CardHeader>
         <CardContent>
       <div>
-
-        <div className="py-2">
-          <h2 className="text-2xl font-semibold mb-2">Blockchain IP Registration Features</h2>
-          <p className="text-muted-foreground mb-4">Secure, transparent, and efficient</p>
-          </div>
         
           <ul className="space-y-6">
             <li className="flex items-start">

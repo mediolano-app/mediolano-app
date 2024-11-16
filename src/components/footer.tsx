@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from "next/image";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -63,8 +64,52 @@ export  function Footer() {
             </Button>
           </div>
           <div className="flex items-center space-x-2">
-            <Input type="email" placeholder="Enter your email" className="max-w-[200px]" />
-            <Button type="submit">Subscribe</Button>
+          
+          <Link href="/" className="flex items-center space-x-2">
+            <div>
+              <Image
+                className="hidden dark:block"
+                src="/mediolano-logo-dark.png"
+                alt="dark-mode-image"
+                width={140}
+                height={33}
+              />
+              <Image
+                className="block dark:hidden"
+                src="/mediolano-logo-light.svg"
+                alt="light-mode-image"
+                width={140}
+                height={33}
+              />
+              </div>
+              
+                <span className="hidden font-bold sm:inline-block">
+                </span>
+          </Link>
+
+          <Link href="/" className="flex items-center space-x-2">
+            <div>
+              <Image
+                className="hidden dark:block"
+                src="/Starknet-Dark.svg"
+                alt="dark-mode-image"
+                width={140}
+                height={33}
+              />
+              <Image
+                className="block dark:hidden"
+                src="/Starknet-Light.svg"
+                alt="light-mode-image"
+                width={140}
+                height={33}
+              />
+              </div>
+              
+                <span className="hidden font-bold sm:inline-block">
+                </span>
+          </Link>
+
+
           </div>
         </div>
         <Separator className="my-8" />

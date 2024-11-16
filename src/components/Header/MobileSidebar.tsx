@@ -21,33 +21,32 @@ const navigationItems = [
   {
     title: 'Register',
     items: [
-      { title: 'Patents', href: '/register/patents', icon: Copyright },
-      { title: 'Trademarks', href: '/register/trademarks', icon: FileText },
-      { title: 'Copyrights', href: '/register/copyrights', icon: BookOpen },
+      { title: 'Register', href: '/register', icon: Copyright },
+      { title: 'Templates', href: '/register/templates', icon: FileText },
+      { title: 'FAQ', href: '/register/faq', icon: BookOpen },
     ],
   },
   {
     title: 'Manage',
     items: [
-      { title: 'Portfolio', href: '/manage/portfolio', icon: FileText },
-      { title: 'Licenses', href: '/manage/licenses', icon: FileText },
-      { title: 'Renewals', href: '/manage/renewals', icon: FileText },
+      { title: 'Portfolio', href: '/portfolio', icon: FileText },
+      { title: 'Licensing', href: '/licensing', icon: FileText },
+      { title: 'Listing', href: '/listing', icon: FileText },
     ],
   },
   {
     title: 'Monetize',
     items: [
-      { title: 'Marketplace', href: '/monetize/marketplace', icon: Banknote },
-      { title: 'Licensing', href: '/monetize/licensing', icon: FileText },
-      { title: 'Valuation', href: '/monetize/valuation', icon: Banknote },
+      { title: 'Marketplace', href: '/marketplace', icon: Banknote },
+      { title: 'Licensing', href: '/licensing', icon: FileText },
+      { title: 'Listing', href: '/listing', icon: Banknote },
     ],
   },
   {
-    title: 'About',
+    title: 'Mediolano',
     items: [
-      { title: 'Our Company', href: '/about/company', icon: Users },
-      { title: 'Team', href: '/about/team', icon: Users },
-      { title: 'Contact', href: '/about/contact', icon: Phone },
+      { title: 'Learn more', href: 'https://mediolano.app', icon: Users },
+      { title: 'Support', href: '/support', icon: Users },
     ],
   },
 ]
@@ -90,6 +89,22 @@ export function MobileSidebar() {
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
         <nav className="flex flex-col space-y-4 mt-4">
+
+
+        <div className='mt-10'>
+          <Button
+              variant="outline"
+              size="lg"
+              className="w-full justify-start"
+              onClick={handleWalletConnect}
+            >
+              <Wallet className="mr-2 h-5 w-5" />
+              {isWalletConnected ? 'Disconnect Wallet' : 'Connect Wallet'}
+            </Button>
+            </div>
+
+
+
           <Accordion type="single" collapsible className="w-full">
             {navigationItems.map((section, index) => (
               <AccordionItem value={`item-${index}`} key={section.title}>
@@ -111,7 +126,11 @@ export function MobileSidebar() {
             ))}
           </Accordion>
 
-          <Separator className="my-4" />
+          
+
+          
+
+            
 
           <div>
             <h2 className="mb-2 font-semibold text-lg">Account</h2>
@@ -154,15 +173,7 @@ export function MobileSidebar() {
             >
               Register Your IP
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full justify-start"
-              onClick={handleWalletConnect}
-            >
-              <Wallet className="mr-2 h-5 w-5" />
-              {isWalletConnected ? 'Disconnect Wallet' : 'Connect Wallet'}
-            </Button>
+            
           </div>
         </nav>
       </SheetContent>
