@@ -42,6 +42,7 @@ const templatesIP = () => {
     { name: 'Custom', icon: Coins, href: '/register/templates/custom', description: 'General Assets Template' },
   ]
 
+
   
   return (
     <>
@@ -68,7 +69,7 @@ const templatesIP = () => {
               href={template.href}
               className="block group"
             >
-              <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-black p-6">
+              <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground p-6 ">
                 <div className="flex items-center mb-4">
                   <template.icon className="h-8 w-8 mr-3" />
                   <h3 className="text-xl font-semibold">{template.name}</h3>
@@ -101,7 +102,7 @@ const templatesIP = () => {
         
       <div className="text-card-foreground rounded-lg">
 
-      <Card>
+      <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
         <CardHeader>
           <CardTitle>Create new IP</CardTitle>
           <CardDescription>Easy register your intellectual property with templates.</CardDescription>
