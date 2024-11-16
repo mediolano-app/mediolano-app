@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import Image from "next/image";
-import ImprovedAnimatedBackground from '@/components/ImprovedAnimatedBackground'
+import AnimatedBackground from '@/components/AnimatedBackground'
 
 export const metadata: Metadata = {
   title: "Mediolano.app",
@@ -27,7 +27,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
         <StarknetProvider>
-        <ImprovedAnimatedBackground />
+        <AnimatedBackground />
         <Header />
         
         {children}

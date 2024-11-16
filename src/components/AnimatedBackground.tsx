@@ -4,9 +4,10 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { motion } from "motion/react"
 
-export default function ImprovedAnimatedBackground() {
+export default function AnimatedBackground() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
+  {/*
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
@@ -17,7 +18,7 @@ export default function ImprovedAnimatedBackground() {
     return () => {
       window.removeEventListener('mousemove', updateMousePosition)
     }
-  }, [])
+  }, [])*/}
 
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden">
@@ -51,13 +52,13 @@ export default function ImprovedAnimatedBackground() {
         }}
       />
 
-      {/* Mouse-following radial gradient */}
+      {/* Mouse-following radial gradient 
       <motion.div
         className="absolute inset-0"
         animate={{
           background: `radial-gradient(600px at ${mousePosition.x}px ${mousePosition.y}px, rgba(29, 78, 216, 0.15), transparent 80%)`,
         }}
-      />
+      />*/}
 
       {/* Noise texture overlay */}
       <div

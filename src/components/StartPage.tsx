@@ -13,15 +13,14 @@ export default function StartPage() {
     return (
         <>
 
-<section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
+<section className="w-full py-12 md:py-24 lg:py-32 xl:py-42">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+                <h1 className="text-3xl tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
                 Your gateway to own intellectual properties
                 </h1>
-                <br></br>
-                <h3 className="text-3xl font-bold tracking-tighter sm:text-2xl md:text-3xl lg:text-4xl/none">
+                <h3 className="text-2xl font-bold tracking-tighter sm:text-2xl md:text-3xl lg:text-4xl/none pb-10">
                 Powered by Starknet 
                 </h3>
                 <p className="mx-auto max-w-[700px]">
@@ -89,7 +88,7 @@ export default function StartPage() {
                 <CardContent>
                   <p>Trade or transfer your digital assets.</p>
                   <Button className="mt-4 rounded p-5" variant="outline" >
-                    <Link href="/monetize">Open Trade </Link>
+                    <Link href="/monetize">View</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -101,19 +100,19 @@ export default function StartPage() {
                 <CardContent>
                   <p>Access and download important documents and resources.</p>
                   <Button className="mt-4 rounded p-5" variant="outline" >
-                    <Link href="https://docs.mediolano.app">Visit </Link>
+                    <Link href="https://docs.mediolano.app">Open</Link>
                   </Button>
                 </CardContent>
               </Card>
               <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
                 <CardHeader>
                   <MessageSquare className="h-6 w-6 mb-2" />
-                  <CardTitle>Support</CardTitle>
+                  <CardTitle>Learn More</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>Get help and support for all your IP-related queries.</p>
+                  <p>Intellectual property tokenization with blockchain technology.</p>
                   <Button className="mt-4 rounded p-5" variant="outline" >
-                    <Link href="/support">Open</Link>
+                    <Link href="https://mediolano.app">Visit</Link>
                   </Button>
                 </CardContent>
               </Card>
