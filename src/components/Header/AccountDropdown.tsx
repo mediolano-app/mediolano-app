@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { User, Copyright, Award, Settings, Briefcase } from 'lucide-react'
+import { User, Copyright, Award, Settings, Briefcase, HelpCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ const userMenuItems = [
   { title: 'My IP\'s', href: '/portfolio', icon: Copyright },
   { title: 'Rewards', href: '/rewards', icon: Award },
   { title: 'Settings', href: '/settings', icon: Settings },
+  { title: 'Support', href: '/support', icon: HelpCircle },
   { title: 'Business', href: '/business', icon: Briefcase },
 ]
 

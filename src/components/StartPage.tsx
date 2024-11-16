@@ -1,15 +1,10 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, BookOpen, Download, HeartHandshake, List, MessageSquare, ShieldCheck } from 'lucide-react';
 import Link from "next/link";
-import { useAccount } from "@starknet-react/core";
 
 export default function StartPage() {
-
-    const connectedAddress = useAccount();
-
+  
     return (
         <>
 
