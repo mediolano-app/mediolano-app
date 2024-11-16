@@ -86,7 +86,7 @@ export default function StartPage() {
                   <CardTitle>Monetize</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>Trade or transfer your digital assets.</p>
+                  <p>Sell, trade and other monetization options for your digital assets.</p>
                   <Button className="mt-4 rounded p-5" variant="outline" >
                     <Link href="/monetize">View</Link>
                   </Button>
