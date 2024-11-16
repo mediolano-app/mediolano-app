@@ -31,7 +31,7 @@ const templatesIP = () => {
   const { address: connectedAddress, isConnected, isConnecting } = useAccount();
 
   const templates = [
-    { name: 'Art', icon: Palette, href: '/registerArt', description: 'Tokenize your Artwork' },
+    { name: 'Art', icon: Palette, href: '/register/art', description: 'Tokenize your Artwork' },
     { name: 'Documents', icon: File, href: '/registerDocument', description: 'Safeguard Documents On-Chain' },  
     { name: 'Films', icon: Film, href: '/registerFilm', description: 'Protect your cinematic creations' }, 
     { name: 'Music', icon: Music, href: '/registerMusic', description: 'Copyright Compositions' },
