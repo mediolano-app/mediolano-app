@@ -32,14 +32,14 @@ const templatesIP = () => {
 
   const templates = [
     { name: 'Art', icon: Palette, href: '/register/art', description: 'Tokenize your Artwork' },
-    { name: 'Documents', icon: File, href: '/registerDocument', description: 'Safeguard Documents On-Chain' },  
-    { name: 'Films', icon: Film, href: '/registerFilm', description: 'Protect your cinematic creations' }, 
-    { name: 'Music', icon: Music, href: '/registerMusic', description: 'Copyright Compositions' },
-    { name: 'Patents', icon: ScrollText, href: '/registerPatent', description: 'Secure Inventions and Innovations' },
-    { name: 'Publications', icon: Book, href: '/registerPublication', description: 'Protect your Written Works' },
-    { name: 'RWA', icon: Globe2, href: '/registerRWA', description: 'Tokenize Real World Assets' },
-    { name: 'Software', icon: FileCode, href: '/registerSoftware', description: 'Safeguard your Code' },
-    { name: 'Custom', icon: Coins, href: '/templatesIP', description: 'Edit Your Template' },
+    { name: 'Documents', icon: File, href: '/register/document', description: 'Safeguard Documents On-Chain' },  
+    { name: 'Movies', icon: Film, href: '/register/movies', description: 'Protect your cinematic creations' }, 
+    { name: 'Music', icon: Music, href: '/register/music', description: 'Copyright Compositions' },
+    { name: 'Patents', icon: ScrollText, href: '/register/patent', description: 'Secure Inventions and Innovations' },
+    { name: 'Publications', icon: Book, href: '/register/publication', description: 'Protect your Written Works' },
+    { name: 'RWA', icon: Globe2, href: '/register/rwa', description: 'Tokenize Real World Assets' },
+    { name: 'Software', icon: FileCode, href: '/register/software', description: 'Safeguard your Code' },
+    { name: 'Custom', icon: Coins, href: '/register/custom', description: 'Create Your Template' },
   ]
 
   
@@ -51,7 +51,6 @@ const templatesIP = () => {
 
 
     <h1 className="text-4xl font-bold text-center mb-8">IP Templates</h1>
-  
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 

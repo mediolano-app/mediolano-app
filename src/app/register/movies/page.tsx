@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, PaintbrushIcon as PaintBrush, Camera, ImageIcon, CuboidIcon as Cube, DollarSign, Shield, Award, Globe, Palette, Feather, Aperture, Scissors, Shapes, Layers, Zap, Search, BarChart, Lock } from 'lucide-react'
+import { ArrowLeft, Film, Video, Tv, Globe, Shield, DollarSign, Award, Zap, BarChart, Lock, Search, Clapperboard, Camera, Music } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,13 +11,14 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-export default function ArtRegistrationPage() {
+export default function FilmsRegistrationPage() {
   const [formData, setFormData] = useState({
     title: '',
-    artistName: '',
-    medium: '',
-    dimensions: '',
-    yearCreated: new Date().getFullYear(),
+    director: '',
+    filmType: '',
+    releaseDate: '',
+    duration: '',
+    genre: '',
     description: '',
     price: '',
   })
@@ -29,21 +30,21 @@ export default function ArtRegistrationPage() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSelectChange = (value: string) => {
-    setFormData(prev => ({ ...prev, medium: value }))
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log(formData)
     console.log(file)
-    alert('Art registration submitted successfully!')
+    alert('Film registration submitted successfully!')
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Art Registration</h1>
+        <h1 className="text-3xl font-bold">Movie Registration</h1>
         <Link
           href="/templates"
           className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
@@ -56,78 +57,94 @@ export default function ArtRegistrationPage() {
       <div className="grid gap-8 lg:grid-cols-2">
         <Card className="w-full max-w-2xl mx-auto lg:max-w-none">
           <CardHeader>
-            <CardTitle>Artwork Details</CardTitle>
-            <CardDescription>Please provide information about your artwork.</CardDescription>
+            <CardTitle>Film Details</CardTitle>
+            <CardDescription>Please provide information about your film.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Artwork Title</Label>
+                <Label htmlFor="title">Film Title</Label>
                 <Input
                   id="title"
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  placeholder="Enter the title of your artwork"
+                  placeholder="Enter the title of your film"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="artistName">Artist Name</Label>
+                <Label htmlFor="director">Director</Label>
                 <Input
-                  id="artistName"
-                  name="artistName"
-                  value={formData.artistName}
+                  id="director"
+                  name="director"
+                  value={formData.director}
                   onChange={handleChange}
-                  placeholder="Enter your name or pseudonym"
+                  placeholder="Enter the director's name"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="medium">Medium</Label>
-                <Select onValueChange={handleSelectChange} value={formData.medium}>
+                <Label htmlFor="filmType">Film Type</Label>
+                <Select onValueChange={(value) => handleSelectChange('filmType', value)} value={formData.filmType}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a medium" />
+                    <SelectValue placeholder="Select a film type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="oil">Oil Painting</SelectItem>
-                    <SelectItem value="acrylic">Acrylic Painting</SelectItem>
-                    <SelectItem value="watercolor">Watercolor</SelectItem>
-                    <SelectItem value="digital">Digital Art</SelectItem>
-                    <SelectItem value="sculpture">Sculpture</SelectItem>
-                    <SelectItem value="photography">Photography</SelectItem>
-                    <SelectItem value="mixed">Mixed Media</SelectItem>
+                    <SelectItem value="feature">Feature Film</SelectItem>
+                    <SelectItem value="short">Short Film</SelectItem>
+                    <SelectItem value="documentary">Documentary</SelectItem>
+                    <SelectItem value="animation">Animation</SelectItem>
+                    <SelectItem value="series">TV Series</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="dimensions">Dimensions</Label>
+                <Label htmlFor="releaseDate">Release Date</Label>
                 <Input
-                  id="dimensions"
-                  name="dimensions"
-                  value={formData.dimensions}
+                  id="releaseDate"
+                  name="releaseDate"
+                  type="date"
+                  value={formData.releaseDate}
                   onChange={handleChange}
-                  placeholder="e.g., 24 x 36 inches"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="yearCreated">Year Created</Label>
+                <Label htmlFor="duration">Duration (minutes)</Label>
                 <Input
-                  id="yearCreated"
-                  name="yearCreated"
+                  id="duration"
+                  name="duration"
                   type="number"
-                  value={formData.yearCreated}
+                  value={formData.duration}
                   onChange={handleChange}
-                  min={1800}
-                  max={new Date().getFullYear()}
+                  min={1}
                   required
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="genre">Genre</Label>
+                <Select onValueChange={(value) => handleSelectChange('genre', value)} value={formData.genre}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a genre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="action">Action</SelectItem>
+                    <SelectItem value="comedy">Comedy</SelectItem>
+                    <SelectItem value="drama">Drama</SelectItem>
+                    <SelectItem value="scifi">Science Fiction</SelectItem>
+                    <SelectItem value="horror">Horror</SelectItem>
+                    <SelectItem value="romance">Romance</SelectItem>
+                    <SelectItem value="thriller">Thriller</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -137,7 +154,7 @@ export default function ArtRegistrationPage() {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Describe your artwork"
+                  placeholder="Provide a brief description of your film"
                   required
                 />
               </div>
@@ -157,11 +174,11 @@ export default function ArtRegistrationPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="artworkImage">Artwork Image</Label>
+                <Label htmlFor="filmFile">Upload Film File or Trailer</Label>
                 <Input
-                  id="artworkImage"
+                  id="filmFile"
                   type="file"
-                  accept="image/*"
+                  accept="video/*"
                   onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) setFile(file)
@@ -170,7 +187,7 @@ export default function ArtRegistrationPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full">Register Artwork</Button>
+              <Button type="submit" className="w-full">Register Film</Button>
             </form>
           </CardContent>
         </Card>
@@ -178,13 +195,13 @@ export default function ArtRegistrationPage() {
         <div className="space-y-8">
           <Card>
             <CardHeader>
-              <CardTitle>Why Register Your Art?</CardTitle>
+              <CardTitle>Why Register Your Film?</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-4">
                 <li className="flex items-center">
                   <Globe className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Global exposure to art collectors</span>
+                  <span>Global exposure to audiences and distributors</span>
                 </li>
                 <li className="flex items-center">
                   <Shield className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
@@ -192,11 +209,11 @@ export default function ArtRegistrationPage() {
                 </li>
                 <li className="flex items-center">
                   <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Monetize your creations</span>
+                  <span>Monetize your cinematic creations</span>
                 </li>
                 <li className="flex items-center">
                   <Award className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Gain recognition in the art world</span>
+                  <span>Gain recognition in the film industry</span>
                 </li>
                 <li className="flex items-center">
                   <Zap className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
@@ -204,11 +221,11 @@ export default function ArtRegistrationPage() {
                 </li>
                 <li className="flex items-center">
                   <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Track sales and analytics</span>
+                  <span>Track viewership and revenue analytics</span>
                 </li>
                 <li className="flex items-center">
                   <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Secure blockchain-based ownership records</span>
+                  <span>Secure blockchain-based copyright protection</span>
                 </li>
               </ul>
             </CardContent>
@@ -216,49 +233,41 @@ export default function ArtRegistrationPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Accepted Art Types</CardTitle>
+              <CardTitle>Accepted Film Types</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="grid grid-cols-2 gap-4">
                 <li className="flex items-center">
-                  <PaintBrush className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Paintings</span>
+                  <Film className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Feature Films</span>
+                </li>
+                <li className="flex items-center">
+                  <Video className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Short Films</span>
+                </li>
+                <li className="flex items-center">
+                  <Clapperboard className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Documentaries</span>
+                </li>
+                <li className="flex items-center">
+                  <Tv className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>TV Series</span>
                 </li>
                 <li className="flex items-center">
                   <Camera className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Photography</span>
+                  <span>Animations</span>
                 </li>
                 <li className="flex items-center">
-                  <ImageIcon className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Digital Art</span>
+                  <Music className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Music Videos</span>
                 </li>
                 <li className="flex items-center">
-                  <Cube className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Sculptures</span>
+                  <Video className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Web Series</span>
                 </li>
                 <li className="flex items-center">
-                  <Palette className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Mixed Media</span>
-                </li>
-                <li className="flex items-center">
-                  <Feather className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Illustrations</span>
-                </li>
-                <li className="flex items-center">
-                  <Aperture className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Prints</span>
-                </li>
-                <li className="flex items-center">
-                  <Scissors className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Collages</span>
-                </li>
-                <li className="flex items-center">
-                  <Shapes className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Installations</span>
-                </li>
-                <li className="flex items-center">
-                  <Layers className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Textile Art</span>
+                  <Clapperboard className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Experimental Films</span>
                 </li>
               </ul>
             </CardContent>
@@ -272,23 +281,23 @@ export default function ArtRegistrationPage() {
               <ul className="space-y-4">
                 <li className="flex items-center">
                   <Search className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Advanced artwork search and discovery</span>
+                  <span>Advanced film search and discovery</span>
                 </li>
                 <li className="flex items-center">
                   <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Sales analytics and performance tracking</span>
+                  <span>Viewership and revenue analytics</span>
                 </li>
                 <li className="flex items-center">
                   <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Secure blockchain-based ownership records</span>
+                  <span>Secure blockchain-based copyright protection</span>
                 </li>
                 <li className="flex items-center">
                   <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Integrated payment processing</span>
+                  <span>Integrated royalty management</span>
                 </li>
                 <li className="flex items-center">
                   <Globe className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Global marketplace access</span>
+                  <span>Global distribution network</span>
                 </li>
               </ul>
             </CardContent>
