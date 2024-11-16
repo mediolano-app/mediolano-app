@@ -35,11 +35,11 @@ const templatesIP = () => {
     { name: 'Documents', icon: File, href: '/register/document', description: 'Safeguard Documents On-Chain' },  
     { name: 'Movies', icon: Film, href: '/register/movies', description: 'Protect your cinematic creations' }, 
     { name: 'Music', icon: Music, href: '/register/music', description: 'Copyright Compositions' },
-    { name: 'Patents', icon: ScrollText, href: '/register/patent', description: 'Secure Inventions and Innovations' },
+    { name: 'Patents', icon: ScrollText, href: '/register/patents', description: 'Secure Inventions and Innovations' },
     { name: 'Publications', icon: Book, href: '/register/publication', description: 'Protect your Written Works' },
     { name: 'RWA', icon: Globe2, href: '/register/rwa', description: 'Tokenize Real World Assets' },
     { name: 'Software', icon: FileCode, href: '/register/software', description: 'Safeguard your Code' },
-    { name: 'Custom', icon: Coins, href: '/register/custom', description: 'Create Your Template' },
+    { name: 'Custom', icon: Coins, href: '/register/custom', description: 'General Assets Template' },
   ]
 
   
