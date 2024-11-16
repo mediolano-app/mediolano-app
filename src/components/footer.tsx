@@ -16,30 +16,30 @@ export  function Footer() {
             <p className="text-muted-foreground">Revolutionizing intellectual property management with blockchain technology. Powered by Starknet.</p>
           </div>
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Dapp Services</h3>
+            <h3 className="text-lg font-semibold">Services</h3>
             <ul className="space-y-2">
-              <li><Link href="#" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2" /> Register</Link></li>
-              <li><Link href="#" className="flex items-center hover:underline"><Coins className="w-4 h-4 mr-2" /> Monetize</Link></li>
-              <li><Link href="#" className="flex items-center hover:underline"><Wallet2 className="w-4 h-4 mr-2" /> Marketplace</Link></li>
-              <li><Link href="#" className="flex items-center hover:underline"><ListChecks className="w-4 h-4 mr-2" /> Listing</Link></li>
-              <li><Link href="#" className="flex items-center hover:underline"><ShieldCheck className="w-4 h-4 mr-2" /> License</Link></li>
-              <li><Link href="#" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2" /> Manage</Link></li>
+              <li><Link href="/register" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2" /> Register</Link></li>
+              <li><Link href="/monetize" className="flex items-center hover:underline"><Coins className="w-4 h-4 mr-2" /> Monetize</Link></li>
+              <li><Link href="/marketplace" className="flex items-center hover:underline"><Wallet2 className="w-4 h-4 mr-2" /> Marketplace</Link></li>
+              <li><Link href="/listing" className="flex items-center hover:underline"><ListChecks className="w-4 h-4 mr-2" /> Listing</Link></li>
+              <li><Link href="/licensing" className="flex items-center hover:underline"><ShieldCheck className="w-4 h-4 mr-2" /> License</Link></li>
+              <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2" /> Portfolio</Link></li>
             </ul>
           </div>
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Mediolano</h3>
+            <h3 className="text-lg font-semibold">IP Templates</h3>
             <ul className="space-y-2">
-              <li><Link href="#" className="hover:underline">About Us</Link></li>
-              <li><Link href="#" className="hover:underline">Team</Link></li>
-              <li><Link href="#" className="hover:underline">Careers</Link></li>
-              <li><Link href="#" className="hover:underline">Contact</Link></li>
+              <li><Link href="/register/art" className="hover:underline">Fine Art</Link></li>
+              <li><Link href="/register/movies" className="hover:underline">Movies</Link></li>
+              <li><Link href="/register/publication" className="hover:underline">Publication</Link></li>
+              <li><Link href="/register/rwa" className="hover:underline">Real World Assets</Link></li>
+              <li><Link href="/register/custom" className="hover:underline">Custom</Link></li>
             </ul>
           </div>
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Resources</h3>
             <ul className="space-y-2">
-              <li><Link href="#" className="hover:underline">News</Link></li>
-              <li><Link href="#" className="hover:underline">Whitepaper</Link></li>
+              <li><Link href="#" className="hover:underline">Support</Link></li>
               <li><Link href="#" className="hover:underline">Documentation</Link></li>
               <li><Link href="#" className="hover:underline">FAQs</Link></li>
             </ul>
@@ -50,7 +50,7 @@ export  function Footer() {
           <div className="flex space-x-4">
             <Button variant="ghost" size="icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-twitter"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-              <span className="sr-only">Twitter</span>
+              <span className="sr-only">X</span>
             </Button>
             <Button variant="ghost" size="icon">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-linkedin"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
