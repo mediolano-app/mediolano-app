@@ -16,7 +16,7 @@ const navigationItems = [
     title: 'Register',
     items: [
       { title: 'Register', href: '/register', icon: Copyright },
-      { title: 'Templates', href: '/templates', icon: FileText },
+      { title: 'Templates', href: '/register/templates', icon: FileText },
       { title: 'FAQ', href: '/register/faq', icon: BookOpen },
     ],
   },

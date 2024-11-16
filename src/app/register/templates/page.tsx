@@ -31,15 +31,15 @@ const templatesIP = () => {
   const { address: connectedAddress, isConnected, isConnecting } = useAccount();
 
   const templates = [
-    { name: 'Art', icon: Palette, href: '/register/art', description: 'Tokenize your Artwork' },
-    { name: 'Documents', icon: File, href: '/register/document', description: 'Safeguard Documents On-Chain' },  
-    { name: 'Movies', icon: Film, href: '/register/movies', description: 'Protect your cinematic creations' }, 
-    { name: 'Music', icon: Music, href: '/register/music', description: 'Copyright Compositions' },
-    { name: 'Patents', icon: ScrollText, href: '/register/patents', description: 'Secure Inventions and Innovations' },
-    { name: 'Publications', icon: Book, href: '/register/publication', description: 'Protect your Written Works' },
-    { name: 'RWA', icon: Globe2, href: '/register/rwa', description: 'Tokenize Real World Assets' },
-    { name: 'Software', icon: FileCode, href: '/register/software', description: 'Safeguard your Code' },
-    { name: 'Custom', icon: Coins, href: '/register/custom', description: 'General Assets Template' },
+    { name: 'Art', icon: Palette, href: '/register/templates/art', description: 'Tokenize your Artwork' },
+    { name: 'Documents', icon: File, href: '/register/templates/document', description: 'Safeguard Documents On-Chain' },  
+    { name: 'Movies', icon: Film, href: '/register/templates/movies', description: 'Protect your cinematic creations' }, 
+    { name: 'Music', icon: Music, href: '/register/templates/music', description: 'Copyright Compositions' },
+    { name: 'Patents', icon: ScrollText, href: '/register/templates/patents', description: 'Secure Inventions and Innovations' },
+    { name: 'Publications', icon: Book, href: '/register/templates/publication', description: 'Protect your Written Works' },
+    { name: 'RWA', icon: Globe2, href: '/register/templates/rwa', description: 'Tokenize Real World Assets' },
+    { name: 'Software', icon: FileCode, href: '/register/templates/software', description: 'Safeguard your Code' },
+    { name: 'Custom', icon: Coins, href: '/register/templates/custom', description: 'General Assets Template' },
   ]
 
   

@@ -29,11 +29,12 @@ export  function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">IP Templates</h3>
             <ul className="space-y-2">
-              <li><Link href="/register/art" className="hover:underline">Fine Art</Link></li>
-              <li><Link href="/register/movies" className="hover:underline">Movies</Link></li>
-              <li><Link href="/register/publication" className="hover:underline">Publication</Link></li>
-              <li><Link href="/register/rwa" className="hover:underline">Real World Assets</Link></li>
-              <li><Link href="/register/custom" className="hover:underline">Custom</Link></li>
+              <li><Link href="/register/templates/art" className="hover:underline">Fine Art</Link></li>
+              <li><Link href="/register/templates/movies" className="hover:underline">Movies</Link></li>
+              <li><Link href="/register/templates/nft" className="hover:underline">NFT</Link></li>
+              <li><Link href="/register/templates/publication" className="hover:underline">Publication</Link></li>
+              <li><Link href="/register/templates/rwa" className="hover:underline">Real World Assets</Link></li>
+              <li><Link href="/register/templates/custom" className="hover:underline">Custom</Link></li>
             </ul>
           </div>
           <div className="space-y-4">
