@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Book, Coins, FileCheck, ListChecks, ShieldCheck, Wallet2 } from 'lucide-react'
+import { Book, BookIcon, BookMarked, Coins, FileCheck, FileCode, FileIcon, FileLock, Film, Globe2, ListChecks, Palette, ScrollText, ShieldCheck, ShieldQuestion, UserRoundCheck, Wallet2 } from 'lucide-react'
 
 export  function Footer() {
   return (
@@ -25,25 +25,27 @@ export  function Footer() {
               <li><Link href="/listing" className="flex items-center hover:underline"><ListChecks className="w-4 h-4 mr-2" /> Listing</Link></li>
               <li><Link href="/licensing" className="flex items-center hover:underline"><ShieldCheck className="w-4 h-4 mr-2" /> License</Link></li>
               <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2" /> Portfolio</Link></li>
+              
             </ul>
           </div>
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">IP Templates</h3>
             <ul className="space-y-2">
-              <li><Link href="/register/templates/art" className="hover:underline">Fine Art</Link></li>
-              <li><Link href="/register/templates/movies" className="hover:underline">Movies</Link></li>
-              <li><Link href="/register/templates/nft" className="hover:underline">NFT</Link></li>
-              <li><Link href="/register/templates/publication" className="hover:underline">Publication</Link></li>
-              <li><Link href="/register/templates/rwa" className="hover:underline">Real World Assets</Link></li>
-              <li><Link href="/register/templates/custom" className="hover:underline">Custom</Link></li>
-            </ul>
+              <li><Link href="/register/templates/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2" /> Art</Link></li>
+              <li><Link href="/register/templates/document" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2" /> Document</Link></li>
+              <li><Link href="/register/templates/movies" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2" /> Movies</Link></li>
+              <li><Link href="/register/templates/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2" /> NFT</Link></li>
+              <li><Link href="/register/templates/patent" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2" /> Patent</Link></li>
+              <li><Link href="/register/templates/publication" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2" /> Publication</Link></li>
+              <li><Link href="/register/templates/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2" /> Real World Assets</Link></li> 
+              <li><Link href="/software" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2" /> Software</Link></li>           </ul>
           </div>
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Resources</h3>
             <ul className="space-y-2">
-              <li><Link href="/support" className="hover:underline">Support</Link></li>
-              <li><Link href="/" className="hover:underline">Documentation</Link></li>
-              <li><Link href="/faq" className="hover:underline">FAQs</Link></li>
+              <li><Link href="/support" className="flex items-center hover:underline"><UserRoundCheck className="w-4 h-4 mr-2" /> Support</Link></li>
+              <li><Link href="/" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2" /> Documentation</Link></li>
+              <li><Link href="/faq" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2" /> FAQs</Link></li>
             </ul>
           </div>
         </div>

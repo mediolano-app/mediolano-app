@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import type { NextPage } from "next";
 import { useAccount } from "@starknet-react/core";
 import { useState, FormEvent, useRef} from "react";
-import { FilePlus, Lock, FileText, Coins, Shield, Globe, BarChart, Book, Music, Film, FileCode, Palette, File, ScrollText, Clock, ArrowRightLeft, ShieldCheck, Banknote, Globe2 } from 'lucide-react'
+import { FilePlus, Lock, FileText, Coins, Shield, Globe, BarChart, Book, Music, Film, FileCode, Palette, File, ScrollText, Clock, ArrowRightLeft, ShieldCheck, Banknote, Globe2, FileLock } from 'lucide-react'
 import Link from 'next/link'
 
 import { Button } from "@/components/ui/button"
@@ -35,7 +35,7 @@ const templatesIP = () => {
     { name: 'Documents', icon: File, href: '/register/templates/document', description: 'Preserve documents on-chain' },  
     { name: 'Movies', icon: Film, href: '/register/templates/movies', description: 'Protect your cinematic creations' }, 
     { name: 'Music', icon: Music, href: '/register/templates/music', description: 'Copyright compositions' },
-    { name: 'NFT', icon: Music, href: '/register/templates/nft', description: 'NFT oriented design' },
+    { name: 'NFT', icon: FileLock, href: '/register/templates/nft', description: 'NFT oriented design' },
     { name: 'Patents', icon: ScrollText, href: '/register/templates/patents', description: 'Secure inventions and innovations' },
     { name: 'Publications', icon: Book, href: '/register/templates/publication', description: 'Protect your written works' },
     { name: 'RWA', icon: Globe2, href: '/register/templates/rwa', description: 'Tokenize Real World Assets' },
