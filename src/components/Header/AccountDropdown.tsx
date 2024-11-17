@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const userMenuItems = [
-  { title: 'My Account', href: '/profile', icon: User },
+  { title: 'My Account', href: '/account', icon: User },
   { title: 'My IP\'s', href: '/portfolio', icon: Copyright },
   { title: 'Rewards', href: '/rewards', icon: Award },
   { title: 'Settings', href: '/settings', icon: Settings },

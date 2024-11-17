@@ -31,15 +31,15 @@ const templatesIP = () => {
   const { address: connectedAddress, isConnected, isConnecting } = useAccount();
 
   const templates = [
-    { name: 'Art', icon: Palette, href: '/register/templates/art', description: 'Tokenize your Artwork' },
-    { name: 'Documents', icon: File, href: '/register/templates/document', description: 'Safeguard Documents On-Chain' },  
+    { name: 'Art', icon: Palette, href: '/register/templates/art', description: 'Tokenize your artwork' },
+    { name: 'Documents', icon: File, href: '/register/templates/document', description: 'Preserve documents on-chain' },  
     { name: 'Movies', icon: Film, href: '/register/templates/movies', description: 'Protect your cinematic creations' }, 
-    { name: 'Music', icon: Music, href: '/register/templates/music', description: 'Copyright Compositions' },
-    { name: 'Patents', icon: ScrollText, href: '/register/templates/patents', description: 'Secure Inventions and Innovations' },
-    { name: 'Publications', icon: Book, href: '/register/templates/publication', description: 'Protect your Written Works' },
+    { name: 'Music', icon: Music, href: '/register/templates/music', description: 'Copyright compositions' },
+    { name: 'NFT', icon: Music, href: '/register/templates/nft', description: 'NFT oriented design' },
+    { name: 'Patents', icon: ScrollText, href: '/register/templates/patents', description: 'Secure inventions and innovations' },
+    { name: 'Publications', icon: Book, href: '/register/templates/publication', description: 'Protect your written works' },
     { name: 'RWA', icon: Globe2, href: '/register/templates/rwa', description: 'Tokenize Real World Assets' },
-    { name: 'Software', icon: FileCode, href: '/register/templates/software', description: 'Safeguard your Code' },
-    { name: 'Custom', icon: Coins, href: '/register/templates/custom', description: 'General Assets Template' },
+    { name: 'Software', icon: FileCode, href: '/register/templates/software', description: 'Safeguard your code' },
   ]
 
 
