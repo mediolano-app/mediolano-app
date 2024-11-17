@@ -41,9 +41,9 @@ export  function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Resources</h3>
             <ul className="space-y-2">
-              <li><Link href="#" className="hover:underline">Support</Link></li>
-              <li><Link href="#" className="hover:underline">Documentation</Link></li>
-              <li><Link href="#" className="hover:underline">FAQs</Link></li>
+              <li><Link href="/support" className="hover:underline">Support</Link></li>
+              <li><Link href="/" className="hover:underline">Documentation</Link></li>
+              <li><Link href="/faq" className="hover:underline">FAQs</Link></li>
             </ul>
           </div>
         </div>
