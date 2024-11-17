@@ -50,11 +50,11 @@ export default function NFTRegistrationPage() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">NFT Registration</h1>
         <Link
-          href="/"
+          href="/register/templates"
           className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Marketplace
+          Back to Templates
         </Link>
       </div>
 

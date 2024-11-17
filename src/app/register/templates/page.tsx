@@ -87,18 +87,9 @@ const templatesIP = () => {
         </div>
 
       </main>
-
-        
       </div>
 
 
-
-      
-
-
-
-        
-        
         
       <div className="text-card-foreground rounded-lg">
 
