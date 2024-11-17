@@ -97,31 +97,17 @@ const RegisterIP = () => {
 
 
 
-
-  const templates = [
-    { name: 'Art', icon: Palette, href: '/registerArt', description: 'Tokenize your Artwork' },
-    { name: 'Documents', icon: File, href: '/registerDocument', description: 'Safeguard Documents On-Chain' },  
-    { name: 'Films', icon: Film, href: '/registerFilm', description: 'Protect your cinematic creations' }, 
-    { name: 'Music', icon: Music, href: '/registerMusic', description: 'Copyright Compositions' },
-    { name: 'Patents', icon: ScrollText, href: '/registerPatent', description: 'Secure Inventions and Innovations' },
-    { name: 'Publications', icon: Book, href: '/registerPublication', description: 'Protect your Written Works' },
-    { name: 'RWA', icon: Globe2, href: '/registerRWA', description: 'Tokenize Real World Assets' },
-    { name: 'Software', icon: FileCode, href: '/registerSoftware', description: 'Safeguard your Code' },
-    { name: 'Custom', icon: Coins, href: '/registerIP', description: 'Edit Your Template' },
-  ];
-
-
   return (
     <>
-    <div className="grid items-center justify-items-center min-h-screen p-4 pb-20 gap-8 sm:p-10]">
-    <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-     
-    <h1 className="text-4xl font-bold text-center mb-8">Intellectual Property Registration</h1>
+    <div className="grid items-center justify-items-center min-h-screen p-4 pb-20 gap-4 sm:p-10]">
+    <main className="flex flex-col gap-4 row-start-2 items-center sm:items-start">
+    
+    <h1 className="text-3xl font-bold text-center mb-4">Intellectual Property Registration</h1>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2">
 
     <div className="rounded-lg">
-    <Card>
+    <Card className='bg-background/95 text-foreground'>
     <CardHeader>
       <CardTitle>Create new IP</CardTitle>
       <CardDescription>Register your intellectual property on Starknet blockchain.</CardDescription>
@@ -305,16 +291,14 @@ const RegisterIP = () => {
     
 
 
-  <Card>
+  <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
         <CardHeader>
-          <CardTitle>Why Use Blockchain for IP?</CardTitle>
+          <CardTitle>Blockchain IP Registration Features</CardTitle>
+          <CardDescription>Secure, transparent, and efficient. Register your intellectual property on Starknet blockchain.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
 
-        <div className="py-2">
-      <h2 className="text-2xl font-semibold mb-2">Blockchain IP Registration Features</h2>
-      <p className="text-muted-foreground mb-4">Secure, transparent, and efficient</p>
-      </div>
+       
     
       <ul className="space-y-6">
         <li className="flex items-start">
