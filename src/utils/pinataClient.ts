@@ -1,4 +1,3 @@
-// import { PinataSDK } from "pinata";
 import { PinataSDK } from "pinata-web3";
 
 export const pinataClient = new PinataSDK({
