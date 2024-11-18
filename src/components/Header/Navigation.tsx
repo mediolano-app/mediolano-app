@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List } from 'lucide-react'
+import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List, GalleryVerticalEnd, ScrollText, ArrowLeftRight, BriefcaseBusiness, Globe, LayoutGrid } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -23,19 +23,19 @@ const navigationItems = [
   {
     title: 'Manage',
     items: [
-      { title: 'Portfolio', href: '/portfolio', icon: FileText },
-      { title: 'Licensing', href: '/licensing', icon: FileText },
-      { title: 'Transfers', href: '/transfers', icon: FileText },
+      { title: 'Portfolio', href: '/portfolio', icon: GalleryVerticalEnd },
+      { title: 'Licensing', href: '/licensing', icon: ScrollText },
+      { title: 'Transfers', href: '/transfers', icon: ArrowLeftRight },
     ],
   },
   {
     title: 'Monetize',
     items: [
       { title: 'Monetize', href: '/monetize', icon: Banknote },
-      { title: 'Listing', href: '/listing', icon: List },
-      { title: 'Marketplace', href: '/marketplace', icon: Grid2X2 },
-      { title: 'Sell', href: '/sell', icon: FileText },
-      { title: 'Business', href: '/business', icon: Banknote },
+      { title: 'Listing', href: '/listing', icon: Globe },
+      { title: 'Marketplace', href: '/marketplace', icon: LayoutGrid },
+      { title: 'Sell', href: '/sell', icon: ArrowLeftRight },
+      { title: 'Business', href: '/business', icon: BriefcaseBusiness },
     ],
   },
   

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Book, BookIcon, BookMarked, Coins, FileCheck, FileCode, FileIcon, FileLock, Film, Globe2, ListChecks, Palette, ScrollText, ShieldCheck, ShieldQuestion, UserRoundCheck, Wallet2 } from 'lucide-react'
+import { ArrowLeftRight, Book, BookIcon, BookMarked, Coins, FileCheck, FileCode, FileIcon, FileLock, Film, Globe, Globe2, LayoutGrid, ListChecks, Palette, ScrollText, ShieldCheck, ShieldQuestion, UserRoundCheck, Wallet2 } from 'lucide-react'
 
 export  function Footer() {
   return (
@@ -17,15 +17,16 @@ export  function Footer() {
             <p className="text-muted-foreground">Revolutionizing intellectual property management with blockchain technology. Powered by Starknet.</p>
           </div>
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Services</h3>
+            <h3 className="text-lg font-semibold">Dapp Services</h3>
             <ul className="space-y-2">
               <li><Link href="/register" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2" /> Register</Link></li>
               <li><Link href="/monetize" className="flex items-center hover:underline"><Coins className="w-4 h-4 mr-2" /> Monetize</Link></li>
-              <li><Link href="/marketplace" className="flex items-center hover:underline"><Wallet2 className="w-4 h-4 mr-2" /> Marketplace</Link></li>
-              <li><Link href="/listing" className="flex items-center hover:underline"><ListChecks className="w-4 h-4 mr-2" /> Listing</Link></li>
+              <li><Link href="/listing" className="flex items-center hover:underline"><Globe className="w-4 h-4 mr-2" /> Listing</Link></li>
               <li><Link href="/licensing" className="flex items-center hover:underline"><ShieldCheck className="w-4 h-4 mr-2" /> License</Link></li>
               <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2" /> Portfolio</Link></li>
-              
+              <li><Link href="/sell" className="flex items-center hover:underline"><ArrowLeftRight className="w-4 h-4 mr-2" /> Sell</Link></li>
+              <li><Link href="/marketplace" className="flex items-center hover:underline"><LayoutGrid className="w-4 h-4 mr-2" /> Marketplace</Link></li>
+
             </ul>
           </div>
           <div className="space-y-4">
