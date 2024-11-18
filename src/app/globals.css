@@ -22,6 +22,14 @@
   }
 */}
 
+.background-image {
+  background: './background.jpg';
+}
+
+.bg-modal {
+  backdrop-filter: blur(7.449999809265137px);
+}
+
 @layer base {
   :root {
 
