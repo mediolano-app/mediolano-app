@@ -40,8 +40,11 @@ const Licensing = () => {
     <>
     <div className="grid items-center justify-items-center min-h-screen p-4 pb-20 gap-8 sm:p-10]">
     <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+    
     <div className="max-w-6xl mx-auto">
+        
         <h1 className="text-3xl font-bold mb-6">License Intellectual Property</h1>
+        
         <div className="bg-blue-100 dark:bg-blue-900 border-l-4 border-blue-400 p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
@@ -56,7 +59,10 @@ const Licensing = () => {
             </div>
           </div>
         </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          
           <div>
             <h4 className="text-xl font-semibold mb-4">Select Intellectual Property</h4>
             <div className="mb-4">
@@ -71,6 +77,7 @@ const Licensing = () => {
                 <Search className="absolute left-3 top-2.5" />
               </div>
             </div>
+            
             <div className="space-y-4">
               {filteredItems.map(item => (
                 <div
@@ -86,6 +93,10 @@ const Licensing = () => {
               ))}
             </div>
           </div>
+          
+          
+          
+          
           <div className='bg-med shadow rounded p-5 bg-white dark:bg-black'>
             <h2 className="text-xl font-semibold mb-4">License Details</h2>
             

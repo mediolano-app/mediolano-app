@@ -22,6 +22,9 @@ export interface IP{
 
 export default function RegisterIP() {
 
+
+  
+
   const { address } = useAccount();
   const { chain } = useNetwork();
   const { contract } = useContract({ 
@@ -152,7 +155,14 @@ export default function RegisterIP() {
     handleMintItem();
   }, [ipfsHash]);
 
+
+
+
+
+
+
   return (
+
   <div className="container mx-auto px-4 py-8 mt-10 mb-20">
     <h1 className="text-4xl font-bold text-center mb-8">Intellectual Property Registration</h1>
 
