@@ -153,13 +153,13 @@ export default function RegisterIP() {
   }, [ipfsHash]);
 
   return (
-  <div className="container mx-auto px-4 py-8">
+  <div className="container mx-auto px-4 py-8 mt-10 mb-20">
     <h1 className="text-4xl font-bold text-center mb-8">Intellectual Property Registration</h1>
 
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
     
-    <div className="w-screen bg-card text-card-foreground rounded-lg shadow-lg">
+    <div className="text-card-foreground">
     <Card>
     <CardHeader>
       <CardTitle>Create new IP</CardTitle>
@@ -233,12 +233,11 @@ export default function RegisterIP() {
   </Card>
   </div>
 
-</div>
 
 
-<div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+<div className="bg-card text-card-foreground rounded-lg shadow-lg">
 
-<Card>
+  <Card>
   <div className="text-card-foreground rounded-lg p-6">
 
 
@@ -295,57 +294,10 @@ export default function RegisterIP() {
     </div>
     </Card>
 
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Why Use Blockchain for IP Transfers?</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <ArrowRightLeft className="w-8 h-8 " />
-            <div>
-              <h3 className="font-semibold">Seamless Transfers</h3>
-              <p>Quick and efficient ownership transfers with blockchain verification</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <ShieldCheck className="w-8 h-8 " />
-            <div>
-              <h3 className="font-semibold">Secure Transactions</h3>
-              <p>Cryptographically secured transfers prevent fraud and disputes</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Banknote className="w-8 h-8 " />
-            <div>
-              <h3 className="font-semibold">Transparent Pricing</h3>
-              <p>Clear and immutable record of sale prices and terms</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Transfer/Sale Process</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ol className="list-decimal list-inside space-y-2">
-            <li>Select the IP you want to transfer or sell</li>
-            <li>Choose the transaction type and set terms</li>
-            <li>Enter the recipient's blockchain wallet address</li>
-            <li>Set the price (for sales) or transfer conditions</li>
-            <li>Confirm the transaction with your digital signature</li>
-            <li>Buyer makes payment and claims digital assets</li>
-            <li>Blockchain records the transfer of ownership</li>
-          </ol>
-        </CardContent>
-      </Card>
     </div>
-
-
-
   </div>
+
 </div>
+
   )
 }

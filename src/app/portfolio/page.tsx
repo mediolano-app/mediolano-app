@@ -113,10 +113,12 @@ const MyIPs: NextPage = () => {
   }, [totalBalance, connectedAddress]);  
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-grid">
+      <main className="container mx-auto px-4 py-8">
       {tokenIds.map((tokenId, index) => (
         <NFTCard key={index} tokenId={tokenId} status={"teste"}/>
       ))}
+      </main>
     </div>
   );
 };

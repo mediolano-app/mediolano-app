@@ -66,7 +66,8 @@ export default function AccountPage() {
           
         </div>
         <div className="grid gap-6">
-          <Card>
+         
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
             <CardHeader>
               <CardTitle>Blockchain Identity</CardTitle>
               <CardDescription>Your decentralized identity and profile</CardDescription>
@@ -86,7 +87,7 @@ export default function AccountPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
             <CardHeader>
               <CardTitle>IP Assets</CardTitle>
               <CardDescription>Your registered and pending intellectual properties on the blockchain</CardDescription>
@@ -113,7 +114,7 @@ export default function AccountPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
             <CardHeader>
               <CardTitle>Blockchain Transactions</CardTitle>
               <CardDescription>Recent activities related to your IP assets</CardDescription>
@@ -146,7 +147,7 @@ export default function AccountPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
             <CardHeader>
               <CardTitle>Reputation</CardTitle>
               <CardDescription>Your address reputation @ Mediolano</CardDescription>
@@ -183,7 +184,7 @@ export default function AccountPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
             <CardHeader>
               <CardTitle>Account Settings</CardTitle>
               <CardDescription>Manage your account preferences and security</CardDescription>
