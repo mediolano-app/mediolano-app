@@ -46,11 +46,11 @@ export default function NFTRegistrationPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-10 mb-20">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">NFT Registration</h1>
         <Link
-          href="/"
+          href="/register/templates"
           className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -183,7 +183,7 @@ export default function NFTRegistrationPage() {
         </Card>
 
         <div className="space-y-8">
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
               <CardTitle>Why Create NFTs?</CardTitle>
             </CardHeader>
@@ -217,7 +217,7 @@ export default function NFTRegistrationPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
               <CardTitle>Popular NFT Categories</CardTitle>
             </CardHeader>
@@ -259,7 +259,7 @@ export default function NFTRegistrationPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
               <CardTitle>Platform Features</CardTitle>
             </CardHeader>

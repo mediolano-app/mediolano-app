@@ -53,16 +53,16 @@ export default function MusicRegistration() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-10 mb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <Link href="/" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-8">
+        <Link href="/register/templates" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-8">
           <ArrowLeft className="h-5 w-5 mr-2" />
           Back to Templates
         </Link>
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-8">Music Registration</h1>
+        <h1 className="text-3xl font-extrabold  mb-8">Music Registration</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white shadow-md rounded-lg p-6">
+          <div className="bg-card shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Register New Music</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -74,7 +74,7 @@ export default function MusicRegistration() {
                   value={formData.title}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -86,7 +86,7 @@ export default function MusicRegistration() {
                   value={formData.artist}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -97,7 +97,7 @@ export default function MusicRegistration() {
                   name="album"
                   value={formData.album}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -109,7 +109,7 @@ export default function MusicRegistration() {
                   value={formData.releaseDate}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -121,7 +121,7 @@ export default function MusicRegistration() {
                   value={formData.genre}
                   onChange={handleChange}
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -132,7 +132,7 @@ export default function MusicRegistration() {
                   name="composer"
                   value={formData.composer}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -143,7 +143,7 @@ export default function MusicRegistration() {
                   name="band"
                   value={formData.band}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -154,7 +154,7 @@ export default function MusicRegistration() {
                   name="recordLabel"
                   value={formData.recordLabel}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -165,7 +165,7 @@ export default function MusicRegistration() {
                   name="location"
                   value={formData.location}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -176,7 +176,7 @@ export default function MusicRegistration() {
                   name="copyright"
                   value={formData.copyright}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -187,7 +187,7 @@ export default function MusicRegistration() {
                   value={formData.terms}
                   onChange={handleChange}
                   rows={3}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 ></textarea>
               </div>
               <div>
@@ -198,7 +198,7 @@ export default function MusicRegistration() {
                   name="fileLink"
                   value={formData.fileLink}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
               <div>
@@ -209,7 +209,7 @@ export default function MusicRegistration() {
                   value={formData.lyrics}
                   onChange={handleChange}
                   rows={4}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md  shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 ></textarea>
               </div>
               <button
@@ -221,7 +221,7 @@ export default function MusicRegistration() {
             </form>
           </div>
 
-          <div className="bg-white shadow-md rounded-lg p-6">
+          <div className="rounded-lg p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
             <h2 className="text-xl font-semibold mb-4">Registered Music</h2>
             <ul className="space-y-4">
               {mockData.map((item) => (

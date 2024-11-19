@@ -8,6 +8,7 @@ const mockData = [
   { id: 1, title: 'Annual Financial Report 2023', author: 'Finance Department', date: '2023-12-31', type: 'Financial', accessLevel: 'Confidential' },
   { id: 2, title: 'Employee Handbook v2.1', author: 'HR Department', date: '2023-06-15', type: 'Policy', accessLevel: 'Internal' },
   { id: 3, title: 'Product Roadmap Q3 2023', author: 'Product Team', date: '2023-07-01', type: 'Strategy', accessLevel: 'Restricted' },
+  { id: 4, title: 'Notes: Music Gear', author: 'Me', date: '2024-11-01', type: 'Personal', accessLevel: 'Internal' },
 ]
 
 export default function DocumentRegistration() {
@@ -65,9 +66,9 @@ export default function DocumentRegistration() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-10 mb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <Link href="/" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-8">
+        <Link href="/register/templates" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-8">
           <ArrowLeft className="h-5 w-5 mr-2" />
           Back to Templates
         </Link>
@@ -315,7 +316,7 @@ export default function DocumentRegistration() {
           </div>
 
           <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Registered Documents</h2>
+            <h2 className="text-xl font-semibold mb-10">Your Registered Documents</h2>
             <ul className="space-y-4">
               {mockData.map((item) => (
                 <li key={item.id} className="border-b pb-4 last:border-b-0 last:pb-0">

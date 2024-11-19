@@ -42,7 +42,7 @@ export default function PatentsRegistrationPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-10 mb-20">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Patent Registration</h1>
         <Link
@@ -187,7 +187,7 @@ export default function PatentsRegistrationPage() {
         </Card>
 
         <div className="space-y-8">
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
               <CardTitle>Why Register Your Patent?</CardTitle>
             </CardHeader>
@@ -225,7 +225,7 @@ export default function PatentsRegistrationPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
               <CardTitle>Accepted Patent Types</CardTitle>
             </CardHeader>
@@ -267,7 +267,7 @@ export default function PatentsRegistrationPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
               <CardTitle>App Features</CardTitle>
             </CardHeader>

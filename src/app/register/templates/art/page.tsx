@@ -41,7 +41,7 @@ export default function ArtRegistrationPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-10">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Art Registration</h1>
         <Link
@@ -53,7 +53,7 @@ export default function ArtRegistrationPage() {
         </Link>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2 mb-20">
         <Card className="w-full max-w-2xl mx-auto lg:max-w-none">
           <CardHeader>
             <CardTitle>Artwork Details</CardTitle>

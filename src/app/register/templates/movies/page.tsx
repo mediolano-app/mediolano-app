@@ -42,7 +42,7 @@ export default function FilmsRegistrationPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-10 mb-20">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">Movie Registration</h1>
         <Link
@@ -193,7 +193,7 @@ export default function FilmsRegistrationPage() {
         </Card>
 
         <div className="space-y-8">
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
             <CardHeader>
               <CardTitle>Why Register Your Film?</CardTitle>
             </CardHeader>
@@ -231,7 +231,7 @@ export default function FilmsRegistrationPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
             <CardHeader>
               <CardTitle>Accepted Film Types</CardTitle>
             </CardHeader>
@@ -273,7 +273,7 @@ export default function FilmsRegistrationPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
             <CardHeader>
               <CardTitle>App Features</CardTitle>
             </CardHeader>

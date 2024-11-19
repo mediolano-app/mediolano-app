@@ -69,7 +69,7 @@ const templatesIP = () => {
               href={template.href}
               className="block group"
             >
-              <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground p-6 ">
+              <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground p-6 ">
                 <div className="flex items-center mb-4">
                   <template.icon className="h-8 w-8 mr-3" />
                   <h3 className="text-xl font-semibold">{template.name}</h3>

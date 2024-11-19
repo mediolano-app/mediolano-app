@@ -63,16 +63,16 @@ export default function SoftwareRegistration() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-10 mb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <Link href="/" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-8">
+        <Link href="/register/templates" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-8">
           <ArrowLeft className="h-5 w-5 mr-2" />
           Back to Templates
         </Link>
         <h1 className="text-3xl font-extrabold text-gray-900 mb-8">Software Registration</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-white shadow-md rounded-lg p-6">
+          <div className="bg-card shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Register New Software</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -286,8 +286,8 @@ export default function SoftwareRegistration() {
             </form>
           </div>
 
-          <div className="bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Registered Software</h2>
+          <div className="rounded-lg p-6 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
+            <h2 className="text-xl font-semibold mb-4">Your Registered Software</h2>
             <ul className="space-y-4">
               {mockData.map((item) => (
                 <li key={item.id} className="border-b pb-4 last:border-b-0 last:pb-0">
