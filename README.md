@@ -1,4 +1,8 @@
-# Mediolano.app
+# Mediolano Dapp
+
+Welcome to a sneak peek of Mediolano, a cutting-edge decentralized application (dapp) poised to revolutionize intellectual property services on the Web3. With Mediolano you can seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets. By integrating ERC721 and IPFS technology, Mediolano ensures decentralization, interoperability and sovereignty to your assets.
+
+## Intellectual Property On-Chain
 
 In today’s ever-evolving digital world, protecting and managing intellectual property (IP) has become a critical challenge. From journalists to art collectors, new technologies are making it safer and more efficient to tokenize IP, enabling licensing, trading, distributing royalties, and more.
 
@@ -15,6 +19,12 @@ Mediolano offers an innovative platform that empowers content creators, from aut
 ---
 
 ### Getting Started
+
+Dapp requirements:
+- Next.js 15
+- React 19
+- Node.js 18.18 or later.
+- macOS, Windows (including WSL), and Linux are supported.
 
 Clone the repository to your local machine:
 
