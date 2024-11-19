@@ -20,11 +20,11 @@ const transfersIP: NextPage = () => {
 
   const allTransfers = [
     { id: 1, type: 'incoming', item: 'AI Algorithm', from: '0x1234...5678', to: '0xabcd...efgh', amount: 50, date: '2023-06-05' },
-    { id: 2, type: 'outgoing', item: 'Eco-Packaging Design', from: '0xabcd...efgh', to: '0x9876...5432', amount: 25, date: '2023-06-04' },
+    { id: 2, type: 'outgoing', item: 'Batman Movie Critic', from: '0xabcd...efgh', to: '0x9876...5432', amount: 25, date: '2023-06-04' },
     { id: 3, type: 'incoming', item: 'Biotech Patent', from: '0x2468...1357', to: '0xabcd...efgh', amount: 100, date: '2023-06-03' },
     { id: 4, type: 'outgoing', item: 'Smart Home System', from: '0xabcd...efgh', to: '0x3698...7412', amount: 75, date: '2023-06-02' },
     { id: 5, type: 'incoming', item: 'Renewable Energy Tech', from: '0x9876...5432', to: '0xabcd...efgh', amount: 150, date: '2023-06-01' },
-    // Add more transfers as needed
+    { id: 6, type: 'outgoing', item: 'Eco-Packaging Design', from: '0xabcd...efgh', to: '0x9876...5432', amount: 25, date: '2023-06-04' },
   ]
 
   const filteredTransfers = allTransfers.filter(transfer => 
@@ -42,13 +42,13 @@ const transfersIP: NextPage = () => {
     <>
      
      
-     <div className="min-h-screen py-10 mb-20 px-4 sm:px-6 lg:px-8">
+     <div className="py-10 mb-20 px-4 sm:px-6 lg:px-8">
 
-         
+     <h1 className="text-2xl font-bold mb-8">Recent IP Transfers</h1>
 
-      <div>
-      <h1 className="text-3xl font-bold mb-8">Recent IP Transfers</h1>
-      <div className="mb-4 flex justify-between items-center">
+      <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/25 rounded text-foreground p-6">
+      
+      <div className="mb-4 flex justify-between items-center ">
         <div >
           <label htmlFor="filter" className="mr-2">Filter:</label>
           <select
@@ -67,7 +67,7 @@ const transfersIP: NextPage = () => {
           Advanced Filters
         </button>
       </div>
-      <div className="overflow-x-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/76 rounded text-foreground">
+      <div className="overflow-x-auto bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 rounded text-foreground">
         <table className="min-w-full bg-base-300">
           <thead>
             <tr className="  uppercase text-sm leading-normal">
@@ -75,7 +75,7 @@ const transfersIP: NextPage = () => {
               <th className="py-3 px-6 text-left">Item</th>
               <th className="py-3 px-6 text-left">From</th>
               <th className="py-3 px-6 text-left">To</th>
-              <th className="py-3 px-6 text-left">Amount (ETH)</th>
+              <th className="py-3 px-6 text-left">Value (ETH)</th>
               <th className="py-3 px-6 text-left">Date</th>
             </tr>
           </thead>

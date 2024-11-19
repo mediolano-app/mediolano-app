@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextRequest, NextResponse } from 'next/server';
-import { pinataClient } from '../../../utils/pinataClient';
+import { pinataClient } from '@/utils/pinataClient';
 
 // export const config = {
 //   api: {

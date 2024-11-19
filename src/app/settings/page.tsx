@@ -1,164 +1,340 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Mail, Lock, Bell, CreditCard, Shield, Info } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Bell, Globe, Key, Lock, Settings, Shield, User, Zap, CheckCircle } from 'lucide-react'
 
-export default function Settings() {
-  const [activeTab, setActiveTab] = useState('profile')
+// Mockup data
+const mockUser = {
+  name: 'Alice Johnson',
+  email: 'alice@example.com',
+  username: 'alice_ip_creator',
+  language: 'en',
+  twoFactorEnabled: false,
+  notificationsEnabled: true,
+  ipProtectionLevel: 'standard',
+  networkType: 'testnet',
+  gasPrice: 'medium',
+  autoRegistration: true,
+  notificationTypes: {
+    ipUpdates: true,
+    blockchainEvents: false,
+    accountActivity: true
+  },
+  dataRetention: 180
+}
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'profile':
-        return (
-          <form className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm mb-1">Full Name</label>
-              <input type="text" id="name" name="name" className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm mb-1">Email Address</label>
-              <input type="email" id="email" name="email" className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-            <div>
-              <label htmlFor="bio" className="block text-sm mb-1">Bio</label>
-              <textarea id="bio" name="bio" rows={3} className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-            </div>
-            <button type="submit" className="px-4 py-2 rounded-md hover:bg-blue transition-colors duration-300">
-              Save Changes
-            </button>
-          </form>
-        )
-      case 'security':
-        return (
-          <form className="space-y-4">
-            <div>
-              <label htmlFor="current-password" className="block text-sm   mb-1">Current Password</label>
-              <input type="password" id="current-password" name="current-password" className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-            <div>
-              <label htmlFor="new-password" className="block text-sm   mb-1">New Password</label>
-              <input type="password" id="new-password" name="new-password" className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-            <div>
-              <label htmlFor="confirm-password" className="block text-sm   mb-1">Confirm New Password</label>
-              <input type="password" id="confirm-password" name="confirm-password" className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary" />
-            </div>
-            <div>
-              <label className="flex items-center">
-                <input type="checkbox" className="form-checkbox text-primary" />
-                <span className="ml-2 text-sm ">Enable two-factor authentication</span>
-              </label>
-            </div>
-            <button type="submit" className="px-4 py-2 rounded-md hover:bg-blue transition-colors duration-300">
-              Update Security Settings
-            </button>
-          </form>
-        )
-      case 'notifications':
-        return (
-          <form className="space-y-4">
-            <div>
-              <label className="flex items-center">
-                <input type="checkbox" className="form-checkbox text-primary" />
-                <span className="ml-2 text-sm ">Email notifications for new messages</span>
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center">
-                <input type="checkbox" className="form-checkbox text-primary" />
-                <span className="ml-2 text-sm ">Email notifications for IP updates</span>
-              </label>
-            </div>
-            <div>
-              <label className="flex items-center">
-                <input type="checkbox" className="form-checkbox text-primary" />
-                <span className="ml-2 text-sm ">Push notifications for new offers</span>
-              </label>
-            </div>
-            <button type="submit" className="px-4 py-2 rounded-md hover:bg-blue transition-colors duration-300">
-              Save Notification Preferences
-            </button>
-          </form>
-        )
-      case 'billing':
-        return (
-          <div className="space-y-4">
-            <div className=" p-4 rounded-md shadow">
-              <h3 className="font-semibold mb-2">Current Plan</h3>
-              <p>Pro Plan - $49.99/month</p>
-              <button className="mt-2 text-primary hover:underline">Upgrade Plan</button>
-            </div>
-            <div className=" p-4 rounded-md shadow">
-              <h3 className="font-semibold mb-2">Payment Method</h3>
-              <p>Visa ending in 1234</p>
-              <button className="mt-2 text-primary hover:underline">Update Payment Method</button>
-            </div>
-            <div className=" p-4 rounded-md shadow">
-              <h3 className="font-semibold mb-2">Billing History</h3>
-              <ul className="space-y-2">
-                <li>May 1, 2023 - $49.99</li>
-                <li>April 1, 2023 - $49.99</li>
-                <li>March 1, 2023 - $49.99</li>
-              </ul>
-              <button className="mt-2 text-primary hover:underline">View Full History</button>
-            </div>
-          </div>
-        )
-      default:
-        return null
-    }
+export default function SettingsPage() {
+  const [user, setUser] = useState(mockUser)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
+
+  const updateUser = (key: string, value: any) => {
+    setUser(prevUser => ({ ...prevUser, [key]: value }))
+  }
+
+  const updateNotificationType = (type: string, checked: boolean) => {
+    setUser(prevUser => ({
+      ...prevUser,
+      notificationTypes: {
+        ...prevUser.notificationTypes,
+        [type]: checked
+      }
+    }))
+  }
+
+  const handleSave = () => {
+    setSaveStatus('saving')
+    // Simulating an API call
+    setTimeout(() => {
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus('idle'), 2000)
+    }, 1000)
   }
 
   return (
-      <div className="max-w-6xl mx-auto mt-10 mb-20">
-        <h1 className="text-3xl font-bold mb-6">Dapp Settings</h1>
-        <div className="shadow-md rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground p-6 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <Info className="h-5 w-5 text-blue-400" />
+    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold mb-8">Settings</h1>
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <User className="mr-2" /> Account Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={user.name}
+                onChange={(e) => updateUser('name', e.target.value)}
+              />
             </div>
-            <div className="ml-3">
-              <p className="text-sm text-blue-700">
-                Your settings are securely stored and managed using blockchain technology, ensuring the highest level of data integrity and protection.
-              </p>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={user.email}
+                onChange={(e) => updateUser('email', e.target.value)}
+              />
             </div>
-          </div>
-        </div>
-        <div className="shadow-md rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground p-6">
-          <div className="flex border-b">
-            <button
-              className={`flex-1 py-4 px-6 text-center ${activeTab === 'profile' ? 'text-primary' : 'hover:bg-blue-500'}`}
-              onClick={() => setActiveTab('profile')}
-            >
-              <User className="w-5 h-5 mx-auto mb-1" />
-              Profile
-            </button>
-            <button
-              className={`flex-1 py-4 px-6 text-center ${activeTab === 'security' ? 'text-primary' : 'hover:bg-blue-500'}`}
-              onClick={() => setActiveTab('security')}
-            >
-              <Lock className="w-5 h-5 mx-auto mb-1" />
-              Security
-            </button>
-            <button
-              className={`flex-1 py-4 px-6 text-center ${activeTab === 'notifications' ? 'text-primary' : 'hover:bg-blue-500'}`}
-              onClick={() => setActiveTab('notifications')}
-            >
-              <Bell className="w-5 h-5 mx-auto mb-1" />
-              Notifications
-            </button>
-            <button
-              className={`flex-1 py-4 px-6 text-center ${activeTab === 'billing' ? 'text-primary' : 'hover:bg-blue-500'}`}
-              onClick={() => setActiveTab('billing')}
-            >
-              <CreditCard className="w-5 h-5 mx-auto mb-1" />
-              Billing
-            </button>
-          </div>
-          <div className="p-6">
-            {renderTabContent()}
-          </div>
-        </div>
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                value={user.username}
+                onChange={(e) => updateUser('username', e.target.value)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Shield className="mr-2" /> IP Management
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="ip-protection">IP Protection Level</Label>
+              <Select
+                value={user.ipProtectionLevel}
+                onValueChange={(value) => updateUser('ipProtectionLevel', value)}
+              >
+                <SelectTrigger id="ip-protection">
+                  <SelectValue placeholder="Select Protection Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="basic">Basic</SelectItem>
+                  <SelectItem value="standard">Standard</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="auto-registration"
+                checked={user.autoRegistration}
+                onCheckedChange={(checked) => updateUser('autoRegistration', checked)}
+              />
+              <Label htmlFor="auto-registration">Automatic IP Registration</Label>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Bell className="mr-2" /> Notifications
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="notifications-enabled"
+                checked={user.notificationsEnabled}
+                onCheckedChange={(checked) => updateUser('notificationsEnabled', checked)}
+              />
+              <Label htmlFor="notifications-enabled">Enable Notifications</Label>
+            </div>
+            <div className="space-y-2">
+              <Label>Notification Types</Label>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="ip-updates"
+                    checked={user.notificationTypes.ipUpdates}
+                    onCheckedChange={(checked) => updateNotificationType('ipUpdates', checked)}
+                  />
+                  <Label htmlFor="ip-updates">IP Updates</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="blockchain-events"
+                    checked={user.notificationTypes.blockchainEvents}
+                    onCheckedChange={(checked) => updateNotificationType('blockchainEvents', checked)}
+                  />
+                  <Label htmlFor="blockchain-events">Blockchain Events</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="account-activity"
+                    checked={user.notificationTypes.accountActivity}
+                    onCheckedChange={(checked) => updateNotificationType('accountActivity', checked)}
+                  />
+                  <Label htmlFor="account-activity">Account Activity</Label>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Lock className="mr-2" /> Security
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="two-factor"
+                checked={user.twoFactorEnabled}
+                onCheckedChange={(checked) => updateUser('twoFactorEnabled', checked)}
+              />
+              <Label htmlFor="two-factor">Two-Factor Authentication</Label>
+            </div>
+            <div>
+              <Label htmlFor="password">Change Password</Label>
+              <Input id="password" type="password" placeholder="New Password" className="mb-2" />
+              <Input id="password-confirm" type="password" placeholder="Confirm New Password" className="mb-2" />
+              <Button className="w-full">Update Password</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Globe className="mr-2" /> Network Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="network-type">Network Type</Label>
+              <Select
+                value={user.networkType}
+                onValueChange={(value) => updateUser('networkType', value)}
+              >
+                <SelectTrigger id="network-type">
+                  <SelectValue placeholder="Select Network Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mainnet">Mainnet</SelectItem>
+                  <SelectItem value="testnet">Testnet</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="gas-price">Gas Price Preference</Label>
+              <Select
+                value={user.gasPrice}
+                onValueChange={(value) => updateUser('gasPrice', value)}
+              >
+                <SelectTrigger id="gas-price">
+                  <SelectValue placeholder="Select Gas Price" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Settings className="mr-2" /> Advanced Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="api-key">API Key</Label>
+              <div className="flex space-x-2">
+                <Input id="api-key" type="password" value="••••••••••••••••" readOnly className="flex-grow" />
+                <Button>Regenerate</Button>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="data-retention">Data Retention (days)</Label>
+              <Input
+                id="data-retention"
+                type="number"
+                value={user.dataRetention}
+                onChange={(e) => updateUser('dataRetention', parseInt(e.target.value))}
+                min={30}
+                max={365}
+              />
+            </div>
+            <div>
+              <Button variant="destructive" className="w-full">Delete Account</Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      <div className="flex justify-end mb-8">
+        <Button onClick={handleSave} disabled={saveStatus === 'saving'}>
+          {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save Changes'}
+        </Button>
+      </div>
+
+      {saveStatus === 'saved' && (
+        <Alert className="mb-8">
+          <CheckCircle className="h-4 w-4" />
+          <AlertTitle>Success</AlertTitle>
+          <AlertDescription>Your settings have been saved successfully.</AlertDescription>
+        </Alert>
+      )}
+
+      <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Zap className="mr-2" /> Benefits of Decentralized IP Management
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-4">
+            <li className="flex items-start">
+              <CheckCircle className="mr-2 h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong>Secure Registration:</strong> Immutable blockchain records ensure tamper-proof IP registration.
+              </div>
+            </li>
+            <li className="flex items-start">
+              <CheckCircle className="mr-2 h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong>Enhanced Protection:</strong> Decentralized storage and cryptographic techniques provide robust security for your intellectual property.
+              </div>
+            </li>
+            <li className="flex items-start">
+              <CheckCircle className="mr-2 h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong>Streamlined Licensing:</strong> Smart contracts automate and enforce licensing agreements, reducing administrative overhead.
+              </div>
+            </li>
+            <li className="flex items-start">
+              <CheckCircle className="mr-2 h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong>Efficient Monetization:</strong> Tokenization enables fractional ownership and new revenue streams for your IP assets.
+              </div>
+            </li>
+            <li className="flex items-start">
+              <CheckCircle className="mr-2 h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong>Global Commercialization:</strong> Blockchain technology facilitates borderless transactions and broader market access for your intellectual property.
+              </div>
+            </li>
+            <li className="flex items-start">
+              <CheckCircle className="mr-2 h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <strong>Transparent Tracking:</strong> Real-time visibility into IP usage, licensing, and royalty distributions.
+              </div>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
