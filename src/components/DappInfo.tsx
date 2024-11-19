@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerFooter } from "@/components/ui/drawer"
 import { HelpCircle, Moon, Sun, X } from 'lucide-react'
+import { Badge } from "@/components/ui/badge"
 import { useTheme } from "next-themes"
 
 export default function DappInfo() {
@@ -18,8 +19,8 @@ export default function DappInfo() {
   // Mockup data for app information
   const appInfo = {
     name: "Mediolano",
-    version: "0.1.0 Preview",
-    description: "A dapp designed to be the intellectual property provider service of the web3, built on Starknet.",
+    version: "0.1.0 Alpha",
+    description: "This is a preview of the Mediolano, a dapp designed to be the intellectual property provider service of the web3.",
     features: [
       "Powered by Starknet",
       "Open-Source",
@@ -59,7 +60,11 @@ export default function DappInfo() {
         <DrawerContent>
           <div className="mx-auto w-full max-w-sm">
             <DrawerHeader>
-              <DrawerTitle className="text-2xl font-bold">{appInfo.name}</DrawerTitle>
+              <DrawerTitle className="text-2xl font-bold">
+              {appInfo.name}
+              <Badge variant="secondary" className="mt-2">Dapp Preview</Badge>
+                
+                </DrawerTitle>
               <Button
                 variant="ghost"
                 size="icon"
