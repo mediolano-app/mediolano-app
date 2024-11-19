@@ -6,10 +6,16 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ArrowLeftRight, Book, BookIcon, BookMarked, Coins, FileCheck, FileCode, FileIcon, FileLock, Film, Globe, Globe2, LayoutGrid, ListChecks, Palette, ScrollText, ShieldCheck, ShieldQuestion, UserRoundCheck, Wallet2 } from 'lucide-react'
+import DappInfo from './DappInfo';
+
+
 
 export  function Footer() {
   return (
+    <>
+    <DappInfo/>
     <footer className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
+      
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
@@ -126,5 +132,6 @@ export  function Footer() {
         </div>
       </div>
     </footer>
+    </>
   )
 }
