@@ -20,7 +20,7 @@ export default function DappInfo() {
   const appInfo = {
     name: "Mediolano",
     version: "0.1.0 Alpha",
-    description: "This is a preview of the Mediolano, a dapp designed to be the intellectual property provider service of the web3.",
+    description: "This is a preview of the Mediolano, a dapp designed to be the intellectual property provider service of the web3. In the current version of the application, it is possible to tokenize intellectual property using Starknet's unique high speed and low cost, which, combined with IPFS technology, guarantees sovereignty, decentralization, security, transparency and contractual intelligence for digital assets. The other features and content function as a preview of our Dapp development roadmap as per the documentation provided.",
     features: [
       "Powered by Starknet",
       "Open-Source",
