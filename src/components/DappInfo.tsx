@@ -58,7 +58,7 @@ export default function DappInfo() {
           </Button>
         </DrawerTrigger>
         <DrawerContent>
-          <div className="mx-auto w-full max-w-sm">
+          <div className="mx-auto w-full max-w-4xl">
             <DrawerHeader>
               <DrawerTitle className="text-2xl font-bold">
               {appInfo.name}
@@ -78,20 +78,18 @@ export default function DappInfo() {
             <div className="p-4 pb-0">
               <p className="text-muted-foreground"><strong>Version:</strong> {appInfo.version}</p>
               <p className="mt-4">{appInfo.description}</p>
-              <div className="mt-6">
-                <h3 className="font-semibold">Features:</h3>
-                <ul className="mt-2 space-y-2">
+              <div className="mt-2">
+                <span className="text-sm">Features:</span>
+                
                   {appInfo.features.map((feature, index) => (
-                    <li key={index} className="flex items-center">
-                      <div className="mr-2 h-1.5 w-1.5 rounded-full bg-primary" />
-                      {feature}
-                    </li>
+                    <Badge className='p-2 m-2' key={index} variant="outline">{feature}</Badge>
+                    
                   ))}
-                </ul>
+               
               </div>
             </div>
             <DrawerFooter>
-              <Button className="w-full" onClick={() => setIsOpen(false)}>Close</Button>
+               {/*<Button className="w-full" onClick={() => setIsOpen(false)}>Close</Button>*/}
             </DrawerFooter>
           </div>
         </DrawerContent>
