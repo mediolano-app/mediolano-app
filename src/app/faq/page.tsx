@@ -82,7 +82,7 @@ export default function Component() {
       
 
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-8xl mx-auto">
           <Card className="mb-8 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
             <CardHeader>
               <CardTitle>Frequently Asked Questions</CardTitle>

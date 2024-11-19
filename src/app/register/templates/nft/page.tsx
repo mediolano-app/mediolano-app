@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Image, Music, Video, FileText, Globe, Shield, DollarSign, Zap, BarChart, Lock, Search, Palette, Camera, Headphones, Film, Code, GamepadIcon as Gamepad } from 'lucide-react'
+import { ArrowLeft, Image, Music, Video, FileText, Globe, Shield, DollarSign, Zap, BarChart, Lock, Search, Palette, Camera, Headphones, Film, Code, Gamepad } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -50,11 +50,11 @@ export default function NFTRegistrationPage() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold">NFT Registration</h1>
         <Link
-          href="/register/templates"
+          href="/"
           className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Templates
+          Back to Marketplace
         </Link>
       </div>
 
