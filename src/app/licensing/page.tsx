@@ -38,7 +38,7 @@ const Licensing = () => {
 
   return (
     <>
-    <div className="grid items-center justify-items-center min-h-screen p-4 pb-20 gap-8 sm:p-10]">
+    <div className="grid items-center justify-items-center min-h-screen p-4 py-10 mb-20 sm:p-10]">
     <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
     
     <div className="max-w-6xl mx-auto">

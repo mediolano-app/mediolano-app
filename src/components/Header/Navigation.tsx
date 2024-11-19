@@ -25,6 +25,7 @@ const navigationItems = [
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: GalleryVerticalEnd },
       { title: 'Licensing', href: '/licensing', icon: ScrollText },
+      { title: 'Listing', href: '/listing', icon: Globe },
       { title: 'Transfers', href: '/transfers', icon: ArrowLeftRight },
     ],
   },
@@ -32,7 +33,6 @@ const navigationItems = [
     title: 'Monetize',
     items: [
       { title: 'Monetize', href: '/monetize', icon: Banknote },
-      { title: 'Listing', href: '/listing', icon: Globe },
       { title: 'Marketplace', href: '/marketplace', icon: LayoutGrid },
       { title: 'Sell', href: '/sell', icon: ArrowLeftRight },
       { title: 'Business', href: '/business', icon: BriefcaseBusiness },

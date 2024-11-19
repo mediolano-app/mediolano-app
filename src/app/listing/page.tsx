@@ -21,14 +21,14 @@ const mockIPs = [
 export default function Component() {
   return (
     <div className="container mx-auto p-4 mt-10 mb-20">
-      <h1 className="text-4xl font-bold mb-10 text-center">IP Listing</h1>
+      <h1 className="text-3xl font-bold mb-10 text-center">IP Listing</h1>
       <div className="grid lg:grid-cols-2 gap-8 mb-12">
         {/* Left column: List of previously registered IPs */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Your Intellectual Property Listings</h2>
+          <h2 className="text-1xl font-semibold mb-4">Your Intellectual Property Listings</h2>
           <div className="space-y-4">
             {mockIPs.map((ip) => (
-              <Card key={ip.id} className="hover:shadow-lg transition-shadow duration-300">
+              <Card key={ip.id} className="hover:shadow-lg transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
                 <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                   <CardTitle className="text-lg">{ip.name}</CardTitle>
                   <DropdownMenu>
@@ -77,10 +77,10 @@ export default function Component() {
 
         {/* Right column: Form to register new IP */}
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Create New Listing</h2>
+          <h2 className="text-1xl font-semibold mb-4">Create New Listing</h2>
           <Card>
             <CardHeader>
-              <CardTitle>NFT Details</CardTitle>
+              <CardTitle>Listing Details</CardTitle>
               <CardDescription>Enter the details of your intellectual property to create an NFT.</CardDescription>
             </CardHeader>
             <CardContent>

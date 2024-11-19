@@ -81,7 +81,7 @@ export default function Component() {
     <div className="min-h-screen ">
       
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-10 mb-20">
         <div className="max-w-8xl mx-auto">
           <Card className="mb-8 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
             <CardHeader>
@@ -106,7 +106,7 @@ export default function Component() {
             </CardContent>
           </Card>
 
-          <div className="space-y-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground p-6 round">
+          <div className="rounded space-y-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground p-6 round">
             {filteredFAQ.map((item, index) => (
               <Accordion type="single" collapsible key={index}>
                 <AccordionItem value={`item-${index}`}>
@@ -115,7 +115,7 @@ export default function Component() {
                       <Badge variant="outline" className="p-1">
                         {categoryIcons[item.category]}
                       </Badge>
-                      <span>{item.question}</span>
+                      <span className='text-1xl'>{item.question}</span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
