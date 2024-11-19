@@ -93,12 +93,12 @@ export default function IPLicensingForm() {
 
 
   const listIPs = [{
-    label: "IP I",
-    value: "IP I"
+    label: "The Batman Movie Critic",
+    value: "The Batman Movie Critic"
   },
   {
-    label: "IP II",
-    value: "IP II"
+    label: "Intellectual Property Title",
+    value: "Intellectual Property Title"
   },
 ] as const;
 

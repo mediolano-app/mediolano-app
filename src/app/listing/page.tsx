@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,6 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Book, Copyright, FileText, Image, Music, Video, DollarSign, Clock, Gavel, Users, Lock, Cpu, LinkIcon, MoreVertical, Eye, Copy, FileSignature } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 // Mock data for previously registered IPs
 const mockIPs = [
@@ -18,7 +21,15 @@ const mockIPs = [
   { id: 5, name: "Short Film: Beyond the Stars", type: "Video", status: "Listed", price: "3 ETH", image: "/background.jpg" },
 ]
 
-export default function Component() {
+export default function ListingIP() {
+
+  const router = useRouter()
+
+  const handleNavigation = (id: string) => {
+    router.push('/assets/1')
+  }
+
+
   return (
     <div className="container mx-auto p-4 mt-10 mb-20">
       <h1 className="text-3xl font-bold mb-10 text-center">IP Listing</h1>
@@ -41,7 +52,7 @@ export default function Component() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem>
                         <Eye className="mr-2 h-4 w-4" />
-                        <span>View Details</span>
+                        <Button  key={ip.id} onClick={() => handleNavigation(ip.id)}>View Details</Button>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Copy className="mr-2 h-4 w-4" />

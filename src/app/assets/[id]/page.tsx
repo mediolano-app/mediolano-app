@@ -45,15 +45,8 @@ const viewIP: NextPage = () => {
      
      <div className="min-h-screen py-10 mb-20 px-4 sm:px-6 lg:px-8">
 
-      
-         
-
           <div className="max-w-6xl mx-auto">
-            <Link href="/portfolio" className="inline-flex items-center btn mb-6">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Portfolio
-            </Link>
-    
+            
             <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground rounded-lg overflow-hidden">
               <div className="md:flex">
                 <div className="md:flex-shrink-0">
@@ -166,6 +159,7 @@ const viewIP: NextPage = () => {
               </div>
             </div>
     
+            {/* 
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href={`/ip/${mockIP.id}/new-license`} className="flex items-center px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition duration-300">
                 <Plus className="w-5 h-5 mr-2" />
@@ -180,7 +174,7 @@ const viewIP: NextPage = () => {
                 Transfer IP
               </Link>
             </div>
-      
+              */}
           </div>
 
     </div>  
