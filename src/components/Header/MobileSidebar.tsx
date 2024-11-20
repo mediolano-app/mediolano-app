@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import {
   Sheet,
   SheetContent,
+  SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
@@ -17,6 +18,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import dynamic from 'next/dynamic';
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
 const WalletBar = dynamic(() => import('@/components/Header/WalletBar'), { ssr: false })
 
@@ -83,6 +85,11 @@ export function MobileSidebar() {
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
+      <VisuallyHidden.Root>
+        <SheetTitle>
+          Dapp Menu
+        </SheetTitle>
+      </VisuallyHidden.Root>
         <nav className="flex flex-col space-y-4 mt-4">
 
 
@@ -159,7 +166,7 @@ export function MobileSidebar() {
 
           <Separator className="my-4" />
 
-          <div className="space-y-4">
+          <div className="space-y-4 mb-20">
             <h2 className="font-semibold text-xl">Get Started</h2>
             <Button
               variant="default"
