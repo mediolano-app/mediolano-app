@@ -22,9 +22,6 @@ export interface IP{
 
 export default function RegisterIP() {
 
-
-  
-
   const { address } = useAccount();
   const { chain } = useNetwork();
   const { contract } = useContract({ 
@@ -93,6 +90,7 @@ export default function RegisterIP() {
   const handleMintItem = async () => {
     try {
       send();
+      console.log("passei pela send")
     }
     catch(error){
       console.error("Mint error:", mintError); 
@@ -142,6 +140,7 @@ export default function RegisterIP() {
       
       const data = await response.json();
       const ipfs = data.uploadData.IpfsHash as string;
+      console.log(ipfs);
       setIpfsHash(ipfs);
       
     } catch (err) {
@@ -153,6 +152,7 @@ export default function RegisterIP() {
 
   useEffect(()=> {
     handleMintItem();
+    console.log("entrei no mint");
   }, [ipfsHash]);
 
 
