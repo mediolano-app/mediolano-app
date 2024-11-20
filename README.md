@@ -1,6 +1,11 @@
+![Mediolano.app](https://mediolano.app/wp-content/uploads/2024/09/mediolano-logo-dark-1.svg)
+
 # Mediolano Dapp
 
 Welcome to a sneak peek of Mediolano, a cutting-edge decentralized application (dapp) poised to revolutionize intellectual property services on the Web3. With Mediolano you can seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets. By integrating ERC721 and IPFS technology, Mediolano ensures decentralization, interoperability and sovereignty to your assets.
+
+> [!IMPORTANT]
+> Mediolano dapp is in constant development and the current version runs on Starknet's Sepolia devnet. Use for testing purposes only. 
 
 ## Intellectual Property On-Chain
 
@@ -8,15 +13,11 @@ In today’s ever-evolving digital world, protecting and managing intellectual p
 
 Mediolano offers an innovative platform that empowers content creators, from authors to journalists and publishers, to participate in the global information marketplace. Our mission is to transform the industry by providing transparency, immutability, security, optimization, and a range of innovative features to build, manage, and monetize IP.
 
-### Powered by Starknet
-
 [![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
 
-<h4 align="center">
+<h2 align="center">
   <a href="https://mediolano.app">Learn more</a>
-</h4>
-
----
+</h2>
 
 ### Getting Started
 
