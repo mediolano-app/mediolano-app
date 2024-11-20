@@ -1,18 +1,3 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "next/typescript",
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "plugins": [
-    "@typescript-eslint"
-  ],
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  },
-  "rules": {
-    // Add any additional rules you want to customize
-  }
+  "extends": ["next/core-web-vitals", "next/typescript"]
 }
