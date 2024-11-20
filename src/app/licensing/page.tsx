@@ -50,7 +50,7 @@ const Licensing = () => {
 
   const router = useRouter()
 
-  const handleNavigation = (id: string) => {
+  const handleNavigation = (name: string) => {
     router.push('/licensing/view/1')
   }
 
@@ -101,7 +101,7 @@ const Licensing = () => {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem>
                         <Eye className="mr-2 h-4 w-4" />
-                        <Button variant="ghost"  key={ip.id} onClick={() => handleNavigation(ip.id)}>View Details</Button>
+                        <Button variant="ghost"  key={ip.id} onClick={() => handleNavigation(ip.name)}>View Details</Button>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Copy className="mr-2 h-4 w-4" />

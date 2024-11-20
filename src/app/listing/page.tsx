@@ -52,7 +52,7 @@ export default function ListingIP() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem>
                         <Eye className="mr-2 h-4 w-4" />
-                        <Button  key={ip.id} onClick={() => handleNavigation(ip.id)}>View Details</Button>
+                        <Button  key={ip.id} onClick={() => handleNavigation(ip.name)}>View Details</Button>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Copy className="mr-2 h-4 w-4" />

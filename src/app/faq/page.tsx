@@ -113,7 +113,7 @@ export default function Component() {
                   <AccordionTrigger className="text-left">
                     <div className="flex items-center space-x-2">
                       <Badge variant="outline" className="p-1">
-                        {categoryIcons[item.category]}
+                        {/*categoryIcons[item.category]*/}
                       </Badge>
                       <span className='text-1xl'>{item.question}</span>
                     </div>
