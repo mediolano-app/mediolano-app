@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Logo } from '@/components/Header/Logo'
 import { Navigation } from '@/components/Header/Navigation'
-import { WalletConnect } from '@/components/Header/WalletConnect'
 import { AccountDropdown } from '@/components/Header/AccountDropdown'
 import { MobileSidebar } from '@/components/Header/MobileSidebar'
 import { ModeToggle } from '@/components/Header/ThemeSwitch'

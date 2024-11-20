@@ -16,10 +16,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import dynamic from 'next/dynamic';
+
+const WalletBar = dynamic(() => import('@/components/Header/WalletBar'), { ssr: false })
 
 const navigationItems = [
   {
-    title: 'Register',
+    title: 'Intellectual Property',
     items: [
       { title: 'Register', href: '/register', icon: Copyright },
       { title: 'Templates', href: '/register/templates', icon: FileText },
@@ -38,22 +41,14 @@ const navigationItems = [
     title: 'Monetize',
     items: [
       { title: 'Marketplace', href: '/marketplace', icon: Banknote },
-      { title: 'Licensing', href: '/licensing', icon: FileText },
       { title: 'Listing', href: '/listing', icon: Banknote },
-    ],
-  },
-  {
-    title: 'Mediolano',
-    items: [
-      { title: 'Learn more', href: 'https://mediolano.app', icon: Users },
-      { title: 'Support', href: '/support', icon: Users },
     ],
   },
 ]
 
 const userMenuItems = [
   { title: 'My Account', href: '/account', icon: User },
-  { title: 'My IP\'s', href: '/my-ips', icon: Copyright },
+  { title: 'My IP\'s', href: '/portfolio', icon: Copyright },
   { title: 'Rewards', href: '/rewards', icon: Award },
   { title: 'Settings', href: '/settings', icon: Settings },
   { title: 'Business', href: '/business', icon: Briefcase },
@@ -92,7 +87,7 @@ export function MobileSidebar() {
 
 
         <div className='mt-10'>
-          <Button
+          {/*<Button
               variant="outline"
               size="lg"
               className="w-full justify-start"
@@ -100,8 +95,9 @@ export function MobileSidebar() {
             >
               <Wallet className="mr-2 h-5 w-5" />
               {isWalletConnected ? 'Disconnect Wallet' : 'Connect Wallet'}
-            </Button>
-            </div>
+            </Button>*/}
+            <WalletBar />
+        </div>
 
 
 

@@ -1,5 +1,5 @@
 import { useConnect, useDisconnect, useAccount } from '@starknet-react/core';
-import { LogOut, LogOutIcon, Wallet } from 'lucide-react';
+import { LogOut, LogOutIcon, LucideLogOut, Wallet } from 'lucide-react';
 
 const WalletBar: React.FC = () => {
   const { connect, connectors } = useConnect();
@@ -16,7 +16,7 @@ const WalletBar: React.FC = () => {
               onClick={() => connect({ connector })}
               className="rounded shadow text-sm py-2 px-4 hover:bg-blue/10"
             >
-              Connect {connector.id}
+              Connect {/*connector.id*/}
             </button>
           ))}
         </div>
@@ -26,9 +26,9 @@ const WalletBar: React.FC = () => {
             
             <button
             onClick={() => disconnect()}
-            className="py-2 px-2"
+            className="py-2 px-2 flex items-center justify-center"
           >
-            {address.slice(0, 6)}...{address.slice(-4)} | Logout
+            {address.slice(0, 6)}...{address.slice(-4)} &nbsp; <LucideLogOut className='h-4 w-4'/>
           </button>
           </div>
           
