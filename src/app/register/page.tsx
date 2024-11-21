@@ -17,6 +17,8 @@ export interface IP{
   authors: string[] | string,
   ipType: IPType,
   uploadFile?: File,
+  media: string,
+  version: string,
 }
 
 
@@ -44,24 +46,14 @@ export default function RegisterIP() {
     description: '',
     authors: [],
     ipType: '',
+    media: '',
+    version: '',
     });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
 
-
-  const templates = [
-      { name: 'Art', icon: Palette, href: '/registerArt', description: 'Tokenize your Artwork' },
-      { name: 'Documents', icon: File, href: '/registerDocument', description: 'Safeguard Documents On-Chain' },  
-      { name: 'Films', icon: Film, href: '/registerFilm', description: 'Protect your cinematic creations' }, 
-      { name: 'Music', icon: Music, href: '/registerMusic', description: 'Copyright Compositions' },
-      { name: 'Patents', icon: ScrollText, href: '/registerPatent', description: 'Secure Inventions and Innovations' },
-      { name: 'Publications', icon: Book, href: '/registerPublication', description: 'Protect your Written Works' },
-      { name: 'RWA', icon: Globe2, href: '/registerRWA', description: 'Tokenize Real World Assets' },
-      { name: 'Software', icon: FileCode, href: '/registerSoftware', description: 'Safeguard your Code' },
-      { name: 'Custom', icon: Coins, href: '/registerIP', description: 'Edit Your Template' },
-    ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = e.target;
@@ -90,10 +82,10 @@ export default function RegisterIP() {
   const handleMintItem = async () => {
     try {
       send();
-      console.log("passei pela send")
+      console.log("Mint sent")
     }
     catch(error){
-      console.error("Mint error:", mintError); 
+      console.error("Mint error: ", mintError); 
     }    
   };
 
@@ -117,6 +109,9 @@ export default function RegisterIP() {
       }
       
     submitData.append('ipType', ipData.ipType);
+
+    submitData.append('media', ipData.media);
+    submitData.append('version', ipData.version);
     
     if (file) {
       submitData.set('uploadFile', file);
@@ -152,7 +147,7 @@ export default function RegisterIP() {
 
   useEffect(()=> {
     handleMintItem();
-    console.log("entrei no mint");
+    console.log("Mint item: ");
   }, [ipfsHash]);
 
 
@@ -183,10 +178,11 @@ export default function RegisterIP() {
       <input 
         type="text" 
         id="title" 
-        name="title" 
+        name="title"
+        placeholder='Intellectual Property Title'
         value={ipData.title}
         onChange={handleChange}
-        className="w-full rounded block bordered border" 
+        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
         required 
       />
       </div>
@@ -195,9 +191,10 @@ export default function RegisterIP() {
       <textarea 
         id="description" 
         name="description" 
+        placeholder='Intellectual Property Content/Description'
         value={ipData.description}
         onChange={handleChange}
-        className="w-full rounded input input-bordered border" 
+        className="w-full rounded input input-bordered border  bg-white dark:bg-black p-2" 
         rows={4}
         required
       ></textarea>
@@ -208,14 +205,15 @@ export default function RegisterIP() {
         type="text" 
         id="authors" 
         name="authors"
+        placeholder='Author(s)'
         value={ipData.authors}
         onChange={handleChange} 
-        className="w-full rounded input input-bordered border" 
+        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
         required 
       />
       </div>
     <div>
-      <label htmlFor="type" className="block mb-1 font-medium">IP Type</label>
+      <label htmlFor="type" className="block mb-1 font-medium">Type</label>
       <select 
         id="type" 
         name="type" 
@@ -224,16 +222,42 @@ export default function RegisterIP() {
           setIpData((prev) => ({ ...prev, "ipType": e.target.value }));
           console.log(e);
         }}
-        className="w-full input-bordered rounded border"
+        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2"
       >
+        <option value="copyright">Copyright</option>
         <option value="patent">Patent</option>
         <option value="trademark">Trademark</option>
-        <option value="copyright">Copyright</option>
         <option value="trade_secret">Trade Secret</option>
+        <option value="trade_secret">Other</option>
       </select>
     </div>
+    <div>
+      <label htmlFor="media" className="block mb-1 font-medium">Media URL</label>
+      <input 
+        type="text" 
+        id="media" 
+        name="media"
+        placeholder='https://your-media-address'
+        value={ipData.media}
+        onChange={handleChange} 
+        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
+        required 
+      />
+      </div>
+      <div>
+      <label htmlFor="version" className="block mb-1 font-medium">Version</label>
+      <input 
+        type="text" 
+        id="version" 
+        name="version"
+        placeholder='IP Version (Optional)'
+        value={ipData.media}
+        onChange={handleChange} 
+        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2"  
+      />
+      </div>
     
-    <button type="submit" className="px-6 py-4 flex items-center justify-center w-full rounded input input-bordered">
+    <button type="submit" className="px-6 py-4 flex items-center justify-center w-full rounded input input-bordered bg-blue-600">
       <FilePlus className="h-5 w-5 mr-2" /> Register IP
     </button>
   </form>
@@ -245,9 +269,9 @@ export default function RegisterIP() {
 
 
 
-<div className="bg-card text-card-foreground rounded-lg shadow-lg">
+<div>
 
-  <Card>
+  <Card  className="rounded-lg shadow-lg bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
   <div className="text-card-foreground rounded-lg p-6">
 
 

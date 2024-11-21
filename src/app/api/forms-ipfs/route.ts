@@ -25,6 +25,8 @@ export async function POST(request: NextRequest){
       const authors = data.getAll('authors');
       const ipType = data.get('ipType') as string;
       const uploadFile = data.get('uploadFile') as File | null;
+      const media = data.get('media') as unknown as string;
+      const version = data.get('version') as unknown as string;
   
       //const file: File | null = data.get("file") as unknown as File;
 
@@ -38,6 +40,8 @@ export async function POST(request: NextRequest){
         authors,
         ipType,
         uploadFile: uploadFile ? uploadFile.name : null,
+        media,
+        version,
       };
 
       const uploadData = await pinataClient.upload.json(userObject);
