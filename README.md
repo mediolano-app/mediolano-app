@@ -17,6 +17,7 @@ Mediolano offers an innovative platform that empowers content creators, from aut
 
 <h2 align="center">
   <a href="https://mediolano.app">Learn more</a>
+  <a href="https://ip.mediolano.app">Open Dapp</a>
 </h2>
 
 ### Getting Started
