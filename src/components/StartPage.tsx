@@ -13,13 +13,13 @@ export default function StartPage() {
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                Your gateway to own intellectual properties
+                Your gateway to own intellectual property on-chain
                 </h1>
                 <h3 className="text-2xl font-bold tracking-tighter sm:text-2xl md:text-3xl lg:text-4xl/none pb-10">
                 Powered by Starknet 
                 </h3>
                 <p className="mx-auto max-w-[700px]">
-                  Register, license, and market your ntellectual property with ease. Secure your ideas and innovations today.
+                  Register, license, and market your ntellectual property. Secure your ideas and innovations today.
                 </p>
               </div>
               <div className="space-x-4">
