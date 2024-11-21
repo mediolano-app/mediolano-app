@@ -251,7 +251,7 @@ export default function RegisterIP() {
         id="version" 
         name="version"
         placeholder='IP Version (Optional)'
-        value={ipData.media}
+        value={ipData.version}
         onChange={handleChange} 
         className="w-full rounded input input-bordered border bg-white dark:bg-black p-2"  
       />
