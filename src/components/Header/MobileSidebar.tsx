@@ -20,7 +20,7 @@ import {
 import dynamic from 'next/dynamic';
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 
-const WalletBar = dynamic(() => import('@/components/Header/WalletBar'), { ssr: false })
+const WalletBarM = dynamic(() => import('@/components/Header/WalletBarM'), { ssr: false })
 
 const navigationItems = [
   {
@@ -103,7 +103,7 @@ export function MobileSidebar() {
               <Wallet className="mr-2 h-5 w-5" />
               {isWalletConnected ? 'Disconnect Wallet' : 'Connect Wallet'}
             </Button>*/}
-            <WalletBar />
+            <WalletBarM />
         </div>
 
 

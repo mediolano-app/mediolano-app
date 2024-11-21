@@ -19,6 +19,7 @@ import { ModeToggle } from '@/components/Header/ThemeSwitch'
 
 const WalletBar = dynamic(() => import('@/components/Header/WalletBar'), { ssr: false })
 
+
 export function Header() {
   const { theme, setTheme } = useTheme()
 
