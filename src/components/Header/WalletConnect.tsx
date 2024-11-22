@@ -40,10 +40,10 @@ export function WalletConnect() {
               MetaMask
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleWalletConnect}>
-              WalletConnect
+              Braavos
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleWalletConnect}>
-              Coinbase Wallet
+              Argent
             </DropdownMenuItem>
           </>
         )}

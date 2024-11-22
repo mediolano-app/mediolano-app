@@ -28,7 +28,7 @@ const navigationItems = [
     items: [
       { title: 'Register', href: '/register', icon: Copyright },
       { title: 'Templates', href: '/register/templates', icon: FileText },
-      { title: 'FAQ', href: '/register/faq', icon: BookOpen },
+      { title: 'FAQ', href: '/faq', icon: BookOpen },
     ],
   },
   {
@@ -44,6 +44,7 @@ const navigationItems = [
     items: [
       { title: 'Marketplace', href: '/marketplace', icon: Banknote },
       { title: 'Listing', href: '/listing', icon: Banknote },
+      { title: 'Business', href: '/business', icon: Briefcase },
     ],
   },
 ]
@@ -53,7 +54,7 @@ const userMenuItems = [
   { title: 'My IP\'s', href: '/portfolio', icon: Copyright },
   { title: 'Rewards', href: '/rewards', icon: Award },
   { title: 'Settings', href: '/settings', icon: Settings },
-  { title: 'Business', href: '/business', icon: Briefcase },
+  
 ]
 
 const appFeatures = [
@@ -153,10 +154,10 @@ export function MobileSidebar() {
           <Separator className="my-4" />
 
           <div>
-            <h2 className="mb-4 font-semibold text-xl">App Features</h2>
+            <h3 className="mb-4 font-semibold">Dapp Features</h3>
             <div className="space-y-4">
               {appFeatures.map((feature, index) => (
-                <div key={index} className="bg-secondary p-4 rounded-lg">
+                <div key={index} className="bg-blue-100 dark:bg-blue-900 p-4 rounded-lg">
                   <h3 className="font-semibold mb-2">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground">{feature.description}</p>
                 </div>
@@ -176,7 +177,14 @@ export function MobileSidebar() {
             >
               Register Your IP
             </Button>
-            
+            <Button
+              variant="default"
+              size="lg"
+              className="w-full"
+              onClick={() => handleNavigation('/portfolio')}
+            >
+              Open Portfolio
+            </Button>
           </div>
         </nav>
       </SheetContent>

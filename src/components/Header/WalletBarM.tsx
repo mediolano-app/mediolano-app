@@ -14,7 +14,7 @@ const WalletBarM: React.FC = () => {
             <button
               key={connector.id}
               onClick={() => connect({ connector })}
-              className="rounded shadow text-sm py-2 px-4 hover:bg-blue/10"
+              className="rounded shadow text-sm py-4 px-4 bg-blue-500 rounded-lg"
             >
               Connect {connector.id}
             </button>
@@ -26,9 +26,9 @@ const WalletBarM: React.FC = () => {
             
             <button
             onClick={() => disconnect()}
-            className="py-2 px-2 flex items-center justify-center"
+            className="py-4 px-4 flex items-center justify-center bg-blue-900 rounded-lg"
           >
-            {address.slice(0, 6)}...{address.slice(-4)} &nbsp; <LucideLogOut className='h-4 w-4'/>
+           Account: {address.slice(0, 6)}...{address.slice(-4)} &nbsp; <LucideLogOut className='h-4 w-4'/>
           </button>
           </div>
           
