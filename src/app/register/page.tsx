@@ -25,11 +25,14 @@ export interface IP{
 export default function RegisterIP() {
 
   const { address } = useAccount();
+  console.log("esse eh o endereco", address);
   const { chain } = useNetwork();
   const { contract } = useContract({ 
     abi: abi as Abi, 
     address: "0x07e39e39ddee958c8a9221d82f639aa9112d6789259ccf09f2a7eb8e021c051c", 
   }); 
+
+  const myAddress = "0x04d9e99204dbfe644fc5ed7529d983ed809b7a356bf0c84daade57bcbb9c0c77"
    
 
   const gateway = "https://violet-rainy-shrimp-423.mypinata.cloud/ipfs/";
@@ -53,7 +56,7 @@ export default function RegisterIP() {
   const [error, setError] = useState<string | null>(null);
 
   const [file, setFile] = useState<File | null>(null);
-
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const {name, value} = e.target;
@@ -88,6 +91,17 @@ export default function RegisterIP() {
       console.error("Mint error: ", mintError); 
     }    
   };
+
+  // async function mintItem(){
+  //   try {
+  //     console.log("entrei no try do mint")
+  //     const tokenId = await contract.mint_item(myAddress, ipfsHash);
+  //     console.log(tokenId);
+  //   }
+  //   catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 
   const handleSubmit = async (event: React.FormEvent) => {
     console.log(ipData);
@@ -147,7 +161,7 @@ export default function RegisterIP() {
 
   useEffect(()=> {
     handleMintItem();
-    console.log("Mint item: ");
+    // mintItem();
   }, [ipfsHash]);
 
 
