@@ -17,7 +17,7 @@ export interface IP{
   authors: string[] | string,
   ipType: IPType,
   uploadFile?: File,
-  media: string,
+  image: string,
   version: string,
 }
 
@@ -49,7 +49,7 @@ export default function RegisterIP() {
     description: '',
     authors: [],
     ipType: '',
-    media: '',
+    image: '',
     version: '',
     });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -124,7 +124,7 @@ export default function RegisterIP() {
       
     submitData.append('ipType', ipData.ipType);
 
-    submitData.append('media', ipData.media);
+    submitData.append('image', ipData.image);
     submitData.append('version', ipData.version);
     
     if (file) {
@@ -246,13 +246,13 @@ export default function RegisterIP() {
       </select>
     </div>
     <div>
-      <label htmlFor="media" className="block mb-1 font-medium">Media URL</label>
+      <label htmlFor="image" className="block mb-1 font-medium">Image Preview URL</label>
       <input 
         type="text" 
-        id="media" 
-        name="media"
-        placeholder='https://your-media-address'
-        value={ipData.media}
+        id="image" 
+        name="image"
+        placeholder='https://your-image-address'
+        value={ipData.image}
         onChange={handleChange} 
         className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
         required 
