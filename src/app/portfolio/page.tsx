@@ -12,8 +12,7 @@ const MyIPs: NextPage = () => {
   const { address } = useAccount();
   //const { address: connectedAddress, isConnected, isConnecting } = useAccount();
   const contractAddress = '0x03afbbb4d6530b36e65a1dd2e7a26d21834ab3eb013c998a2eac18235f6b18e8';
-  const accountAddress = address;//'0x04d9e99204dbfe644fc5ed7529d983ed809b7a356bf0c84daade57bcbb9c0c77';
-
+  
   const [tokenIds, setTokenIds] = useState<BigInt[]>([]);
 
   const { contract } = useContract({ 
@@ -34,7 +33,7 @@ const MyIPs: NextPage = () => {
 
   async function getTokenId(tokenIndex: number){
     try{
-      const tokenId = await contract.token_of_owner_by_index(accountAddress, tokenIndex);
+      const tokenId = await contract.token_of_owner_by_index(address, tokenIndex);
       console.log(tokenId);
       console.log(typeof tokenId);
       return tokenId; //acho que eh isso mas tem que testar

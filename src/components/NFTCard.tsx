@@ -43,8 +43,7 @@ interface NFTCardProps {
 }
 
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
-	const contract =
-		"0x07e39e39ddee958c8a9221d82f639aa9112d6789259ccf09f2a7eb8e021c051c";
+	const contract = "0x03afbbb4d6530b36e65a1dd2e7a26d21834ab3eb013c998a2eac18235f6b18e8";
 	const [metadata, setMetadata] = useState<IP | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -71,7 +70,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 
 			try {
 				setIsLoading(true);
-        console.log(tokenURI)
+        		console.log(tokenURI);
 				const response = await pinataClient.gateways.get(tokenURI);
 
 				let parsedData: any;
