@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { FilePlus, Lock, FileText, Coins, Shield, Globe, BarChart, Book, Music, Film, FileCode, Palette, File, ScrollText, Clock, ArrowRightLeft, ShieldCheck, Banknote, Globe2 } from 'lucide-react'
-import Link from 'next/link'
+import { FilePlus, Lock, FileText, Coins, Shield, Globe, BarChart } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useRouter } from 'next/navigation'
 import { useAccount, useNetwork, useContract, useSendTransaction } from '@starknet-react/core'
@@ -12,13 +11,14 @@ import { abi } from '@/abis/abi'
 export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 
 export interface IP{
-  title: string,
+  name: string,
   description: string,
   authors: string[] | string,
   ipType: IPType,
   uploadFile?: File,
   image: string,
   version: string,
+  external_url: string,
 }
 
 
@@ -45,12 +45,13 @@ export default function RegisterIP() {
 
   const [loading, setLoading] = useState(false);
   const [ipData, setIpData] = useState<IP>({
-    title: '',
+    name: '',
     description: '',
     authors: [],
     ipType: '',
     image: '',
     version: '',
+    external_url: '',
     });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +113,7 @@ export default function RegisterIP() {
 
     const submitData = new FormData();
     
-    submitData.append('title', ipData.title);
+    submitData.append('name', ipData.name);
     submitData.append('description', ipData.description);
     if (Array.isArray(ipData.authors)) {
         ipData.authors.forEach((author, index) => {
@@ -126,6 +127,7 @@ export default function RegisterIP() {
 
     submitData.append('image', ipData.image);
     submitData.append('version', ipData.version);
+    submitData.append('external_url', ipData.external_url);
     
     if (file) {
       submitData.set('uploadFile', file);
@@ -188,13 +190,13 @@ export default function RegisterIP() {
  
   <form onSubmit={handleSubmit} className="space-y-6">
     <div>
-      <label htmlFor="title" className="block mb-1 font-medium">Title</label>
+      <label htmlFor="name" className="block mb-1 font-medium">Title</label>
       <input 
         type="text" 
-        id="title" 
-        name="title"
-        placeholder='Intellectual Property Title'
-        value={ipData.title}
+        id="name" 
+        name="name"
+        placeholder='Intellectual Property Name'
+        value={ipData.name}
         onChange={handleChange}
         className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
         required 
@@ -256,6 +258,18 @@ export default function RegisterIP() {
         onChange={handleChange} 
         className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
         required 
+      />
+      </div>
+      <div>
+      <label htmlFor="external_url" className="block mb-1 font-medium">External Link URL</label>
+      <input 
+        type="text" 
+        id="external_url" 
+        name="external_url"
+        placeholder='https://your-link-address'
+        value={ipData.external_url}
+        onChange={handleChange} 
+        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
       />
       </div>
       <div>

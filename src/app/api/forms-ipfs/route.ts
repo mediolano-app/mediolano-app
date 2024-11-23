@@ -20,13 +20,15 @@ export async function POST(request: NextRequest){
   
       const data = await request.formData();
 
-      const title = data.get('title') as unknown as string;
+      const name = data.get('name') as unknown as string;
       const description = data.get('description') as unknown as string;
       const authors = data.getAll('authors');
       const ipType = data.get('ipType') as string;
       const uploadFile = data.get('uploadFile') as File | null;
       const image = data.get('image') as unknown as string;
       const version = data.get('version') as unknown as string;
+      const external_url = data.get('external_url') as unknown as string;
+
   
       //const file: File | null = data.get("file") as unknown as File;
 
@@ -35,13 +37,14 @@ export async function POST(request: NextRequest){
       // console.log(mockedUrl);
 
       const userObject = {
-        title,
+        name,
         description,
         authors,
         ipType,
         uploadFile: uploadFile ? uploadFile.name : null,
         image,
         version,
+        external_url,
       };
 
       const uploadData = await pinataClient.upload.json(userObject);
