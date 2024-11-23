@@ -9,9 +9,10 @@ import NFTCard from "@/components/NFTCard";
 import { useEffect } from "react";
 
 const MyIPs: NextPage = () => {
-  const { address: connectedAddress, isConnected, isConnecting } = useAccount();
+  const { address } = useAccount();
+  //const { address: connectedAddress, isConnected, isConnecting } = useAccount();
   const contractAddress = '0x03afbbb4d6530b36e65a1dd2e7a26d21834ab3eb013c998a2eac18235f6b18e8';
-  const accountAddress = '0x04d9e99204dbfe644fc5ed7529d983ed809b7a356bf0c84daade57bcbb9c0c77';
+  const accountAddress = address;//'0x04d9e99204dbfe644fc5ed7529d983ed809b7a356bf0c84daade57bcbb9c0c77';
 
   const [tokenIds, setTokenIds] = useState<BigInt[]>([]);
 
@@ -47,7 +48,7 @@ const MyIPs: NextPage = () => {
     abi: abi as Abi,
     functionName: 'balance_of',
     address: contractAddress as `0x${string}`,
-    args: [connectedAddress],
+    args: [address],
     watch: false,   
   });
   console.log(myTotalBalance);
@@ -56,7 +57,7 @@ const MyIPs: NextPage = () => {
     abi: abi as Abi, 
     functionName: 'token_of_owner_by_index',
     address: contractAddress as `0x${string}`,
-    args: [connectedAddress, 0],
+    args: [address, 0],
     watch: false,
   });
   console.log(test);
@@ -110,7 +111,7 @@ const MyIPs: NextPage = () => {
   
       fetchTokenIds(); // Execute the async function
     }
-  }, [totalBalance, connectedAddress]);  
+  }, [totalBalance, address]);  
 
   return (
     <div className="min-h-screen flex flex-grid">
