@@ -13,9 +13,8 @@ export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 export interface IP{
   name: string,
   description: string,
-  authors: string[] | string,
-  ipType: IPType,
-  uploadFile?: File,
+  author: string,
+  type: string,
   image: string,
   version: string,
   external_url: string,
@@ -25,7 +24,7 @@ export interface IP{
 export default function RegisterIP() {
 
   const { address } = useAccount();
-  console.log("esse eh o endereco", address);
+  console.log("URL:", address);
   const { chain } = useNetwork();
   const { contract } = useContract({ 
     abi: abi as Abi, 
@@ -47,8 +46,8 @@ export default function RegisterIP() {
   const [ipData, setIpData] = useState<IP>({
     name: '',
     description: '',
-    authors: [],
-    ipType: '',
+    author: '',
+    type: '',
     image: '',
     version: '',
     external_url: '',
@@ -65,9 +64,9 @@ export default function RegisterIP() {
   };
 
   const handleAuthorChange = (index: number, value: string) => {
-    const newAuthors = [...ipData.authors]
-    newAuthors[index] = value
-    setIpData(prev => ({ ...prev, authors: newAuthors }))
+    const newauthor = [...ipData.author]
+    newauthor[index] = value
+    setIpData(prev => ({ ...prev, author: newauthor }))
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,15 +114,15 @@ export default function RegisterIP() {
     
     submitData.append('name', ipData.name);
     submitData.append('description', ipData.description);
-    if (Array.isArray(ipData.authors)) {
-        ipData.authors.forEach((author, index) => {
-          submitData.append(`authors[${index}]`, author)
+    if (Array.isArray(ipData.author)) {
+        ipData.author.forEach((author, index) => {
+          submitData.append(`author[${index}]`, author)
         })
       } else {
-        submitData.append('authors', ipData.authors);
+        submitData.append('author', ipData.author);
       }
       
-    submitData.append('ipType', ipData.ipType);
+    submitData.append('type', ipData.type);
 
     submitData.append('image', ipData.image);
     submitData.append('version', ipData.version);
@@ -216,13 +215,13 @@ export default function RegisterIP() {
       ></textarea>
     </div>
     <div>
-      <label htmlFor="authors" className="block mb-1 font-medium">Author</label>
+      <label htmlFor="author" className="block mb-1 font-medium">Author</label>
       <input 
         type="text" 
-        id="authors" 
-        name="authors"
+        id="author" 
+        name="author"
         placeholder='Author(s)'
-        value={ipData.authors}
+        value={ipData.author}
         onChange={handleChange} 
         className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
         required 
@@ -233,9 +232,9 @@ export default function RegisterIP() {
       <select 
         id="type" 
         name="type" 
-        value={ipData.ipType}
+        value={ipData.type}
         onChange={ (e:any) => {
-          setIpData((prev) => ({ ...prev, "ipType": e.target.value }));
+          setIpData((prev) => ({ ...prev, "type": e.target.value }));
           console.log(e);
         }}
         className="w-full rounded input input-bordered border bg-white dark:bg-black p-2"

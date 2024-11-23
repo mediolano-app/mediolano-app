@@ -13,8 +13,8 @@ export async function POST(request: NextRequest){
       // const mockedData = {
       //     title: 'mocktitle',
       //     description: 'mockdescription',
-      //     authors: 'mockauthors',
-      //     ipType: 'mockiptype',
+      //     author: 'mockauthor',
+      //     type: 'mocktype',
       //     uploadFile:''
       // };
   
@@ -22,9 +22,9 @@ export async function POST(request: NextRequest){
 
       const name = data.get('name') as unknown as string;
       const description = data.get('description') as unknown as string;
-      const authors = data.getAll('authors');
-      const ipType = data.get('ipType') as string;
-      const uploadFile = data.get('uploadFile') as File | null;
+      const author = data.get('author') as unknown as string;
+      const type = data.get('type') as unknown as string;
+     // const uploadFile = data.get('uploadFile') as File | null;
       const image = data.get('image') as unknown as string;
       const version = data.get('version') as unknown as string;
       const external_url = data.get('external_url') as unknown as string;
@@ -39,9 +39,9 @@ export async function POST(request: NextRequest){
       const userObject = {
         name,
         description,
-        authors,
-        ipType,
-        uploadFile: uploadFile ? uploadFile.name : null,
+        author,
+        type,
+        //uploadFile: uploadFile ? uploadFile.name : null,
         image,
         version,
         external_url,
