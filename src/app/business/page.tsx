@@ -52,9 +52,9 @@ export default function BusinessPage() {
                 </CardHeader>
                 <CardContent>
                   <ul className="list-disc list-inside space-y-2 text-sm">
-                    <li>Automated royalty payments</li>
+                    <li>Royalty payments</li>
                     <li>Fractional ownership</li>
-                    <li>Secondary market support</li>
+                    <li>Secondary markets</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -62,7 +62,7 @@ export default function BusinessPage() {
                 <CardHeader>
                   <List className="h-6 w-6 mb-2" />
                   <CardTitle>Listing</CardTitle>
-                  <CardDescription>List your IP assets on our decentralized marketplace.</CardDescription>
+                  <CardDescription>List your IP assets on decentralized marketplaces.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="list-disc list-inside space-y-2 text-sm">
@@ -80,9 +80,9 @@ export default function BusinessPage() {
                 </CardHeader>
                 <CardContent>
                   <ul className="list-disc list-inside space-y-2 text-sm">
-                    <li>Automated compliance</li>
+                    <li>Automated contracts</li>
                     <li>Flexible terms</li>
-                    <li>Real-time tracking</li>
+                    <li>Monetize Assets</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -94,9 +94,9 @@ export default function BusinessPage() {
                 </CardHeader>
                 <CardContent>
                   <ul className="list-disc list-inside space-y-2 text-sm">
-                    <li>Centralized dashboard</li>
+                    <li>On-chain Portfolio</li>
                     <li>Analytics and reporting</li>
-                    <li>Renewal reminders</li>
+                    <li>Smart functions</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -110,7 +110,7 @@ export default function BusinessPage() {
                   <ul className="list-disc list-inside space-y-2 text-sm">
                     <li>Blockchain verification</li>
                     <li>Infringement alerts</li>
-                    <li>Dispute resolution support</li>
+                    <li>Automated support</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -126,7 +126,7 @@ export default function BusinessPage() {
                 <CardHeader>
                   <Building className="h-6 w-6 mb-2" />
                   <CardTitle>Asset Tokenization</CardTitle>
-                  <CardDescription>Convert your intellectual property into tradable digital assets.</CardDescription>
+                  <CardDescription>Convert intellectual property into tradable digital assets.</CardDescription>
                 </CardHeader>
               </Card>
               <Card>
@@ -181,8 +181,8 @@ export default function BusinessPage() {
               <Card>
                 <CardHeader>
                   <Layers className="h-6 w-6 mb-2" />
-                  <CardTitle>Blockchain-based IP Exchange</CardTitle>
-                  <CardDescription>Facilitate secure and transparent IP transactions on our decentralized exchange.</CardDescription>
+                  <CardTitle>Blockchain-based IP Marketplace</CardTitle>
+                  <CardDescription>Facilitate secure and transparent IP transactions on our decentralized marktplace.</CardDescription>
                 </CardHeader>
               </Card>
             </div>
@@ -263,7 +263,7 @@ export default function BusinessPage() {
                   <ul className="list-disc list-inside space-y-2 text-sm">
                     <li>Custom smart contract development</li>
                     <li>Metadata optimization</li>
-                    <li>Multi-chain support</li>
+                    <li>Descentralized file system</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -276,9 +276,9 @@ export default function BusinessPage() {
                 <CardContent>
                   <Badge className="mb-2">Marketing</Badge>
                   <ul className="list-disc list-inside space-y-2 text-sm">
-                    <li>Community building</li>
+                    <li>Community dapp</li>
                     <li>Whitelist management</li>
-                    <li>Cross-platform promotion</li>
+                    <li>Token Gated Promotion</li>
                   </ul>
                 </CardContent>
               </Card>

@@ -11,9 +11,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ambrosia.com.br',
-        port: '',
-        pathname: '/**',
+        hostname: '*',
       },
     ],
   },

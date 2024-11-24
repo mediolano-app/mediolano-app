@@ -163,7 +163,7 @@ export default function RegisterIP() {
 
       toast({
         title: "IP Protected",
-        description: "Your intellectual property has been successfully registered on the Starknet blockchain. You can manage your registrations through the ‘Portfolio’ area of ​​the Mediolano dapp.",
+        description: "Finalize your intellectual property registration by approving the asset creation on the Starknet blockchain. Visit Portfolio to manage your digital assets.",
         action: (
           <ToastAction altText="OK">OK</ToastAction>
         ),
@@ -173,7 +173,7 @@ export default function RegisterIP() {
         setError('Failed submitting or minting IP. Please try again.');
         toast({
           title: "Error",
-          description: "Registration failed. Please contact our support team.",
+          description: "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
           action: (
             <ToastAction altText="OK">OK</ToastAction>
           ),
