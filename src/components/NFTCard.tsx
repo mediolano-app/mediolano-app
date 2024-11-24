@@ -72,7 +72,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				setIsLoading(true);
         		console.log(tokenURI);
 				const response = await pinataClient.gateways.get(tokenURI);
-
+				console.log(response);
 				let parsedData: any;
 				try {
 					parsedData =
@@ -89,6 +89,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				}
 
 				setMetadata(parsedData);
+				console.log(parsedData);
 				setError(null);
 			} catch (err) {
 				setError(
@@ -107,9 +108,8 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		return (
 			data &&
 			typeof data === "object" &&
-			"title" in data &&
-			"description" in data &&
-			"ipType" in data
+			"name" in data &&
+			"description" in data
 		);
 	};
 
@@ -130,17 +130,17 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 			<CardHeader className="p-0">
 				<Image
 					src={metadata.image || "/background.jpg"} // Add fallback image
-					alt={metadata.title}
+					alt={metadata.name}
 					width={400}
 					height={400}
 					className="w-full h-48 object-cover"
 				/>
 			</CardHeader>
 			<CardContent className="p-4">
-				<CardTitle className="line-clamp-1 mb-2">{metadata.title}</CardTitle>
+				<CardTitle className="line-clamp-1 mb-2">{metadata.name}</CardTitle>
 				<div className="flex justify-between items-center mb-2">
-					<Badge variant="secondary">{metadata.ipType}</Badge>
-					<span className="font-semibold">{metadata.price || "N/A"} ETH</span>
+					<Badge variant="secondary">{metadata.type}</Badge>
+					<span className="font-semibold">{metadata.name || "N/A"} ETH</span>
 				</div>
 				<Badge
 					variant={
@@ -157,11 +157,11 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 			<CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
 				<Button variant="outline" size="sm">
 					<Eye className="h-4 w-4 mr-2" />
-					View Details
+					View
 				</Button>
 				<Button variant="outline" size="sm">
 					<FileText className="h-4 w-4 mr-2" />
-					License IP
+					License
 				</Button>
 				<Button variant="outline" size="sm">
 					<DollarSign className="h-4 w-4 mr-2" />
@@ -182,7 +182,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 						</DropdownMenuItem>
 						<DropdownMenuItem>
 							<Zap className="h-4 w-4 mr-2" />
-							Promote
+							Sell
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

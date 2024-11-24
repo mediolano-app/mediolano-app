@@ -9,5 +9,19 @@ const nextConfig: NextConfig = {
   },
 };
 
+module.exports = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ambrosia.com.br',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
+}
+
+
 
 export default nextConfig;
