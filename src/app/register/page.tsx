@@ -165,22 +165,23 @@ export default function RegisterIP() {
         title: "IP Protected",
         description: "Your intellectual property has been successfully registered on the Starknet blockchain. You can manage your registrations through the ‘Portfolio’ area of ​​the Mediolano dapp.",
         action: (
-          <ToastAction altText="Open Portfolio">View</ToastAction>
+          <ToastAction altText="OK">OK</ToastAction>
         ),
       });
       
     } catch (err) {
         setError('Failed submitting or minting IP. Please try again.');
+        toast({
+          title: "Error",
+          description: "Registration failed. Please contact our support team.",
+          action: (
+            <ToastAction altText="OK">OK</ToastAction>
+          ),
+        });
 
     } finally {
         setIsSubmitting(false);
-        toast({
-          title: "Failer",
-          description: "Registration failed. Please contact our support team.",
-          action: (
-            <ToastAction altText="Open Portfolio">View</ToastAction>
-          ),
-        });
+        
     }
   };
 
