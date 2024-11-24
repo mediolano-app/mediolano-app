@@ -6,6 +6,7 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import Image from "next/image";
 import AnimatedBackground from '@/components/AnimatedBackground'
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: "Mediolano.app",
@@ -31,6 +32,7 @@ export default function RootLayout({
         <Header />
         
         {children}
+        <Toaster />
         <Footer />
         </StarknetProvider>
         </ThemeProvider>

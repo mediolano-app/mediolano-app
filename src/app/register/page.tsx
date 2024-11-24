@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation'
 import { useAccount, useNetwork, useContract, useSendTransaction } from '@starknet-react/core'
 import { type Abi } from "starknet"
 import { abi } from '@/abis/abi'
+import { Toaster } from "@/components/ui/toaster";
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
 
 export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 
@@ -22,6 +26,10 @@ export interface IP{
 
 
 export default function RegisterIP() {
+  const pinataGateway = 'lavender-quickest-reptile-91.mypinata.cloud';
+  
+  const { toast } = useToast()
+
 
   const { address } = useAccount();
   console.log("URL:", address);
@@ -152,11 +160,27 @@ export default function RegisterIP() {
       const ipfs = data.uploadData.IpfsHash as string;
       console.log(ipfs);
       setIpfsHash(ipfs);
+
+      toast({
+        title: "IP Protected",
+        description: "Your intellectual property has been successfully registered on the Starknet blockchain. You can manage your registrations through the ‘Portfolio’ area of ​​the Mediolano dapp.",
+        action: (
+          <ToastAction altText="Open Portfolio">View</ToastAction>
+        ),
+      });
       
     } catch (err) {
         setError('Failed submitting or minting IP. Please try again.');
+
     } finally {
         setIsSubmitting(false);
+        toast({
+          title: "Failer",
+          description: "Registration failed. Please contact our support team.",
+          action: (
+            <ToastAction altText="Open Portfolio">View</ToastAction>
+          ),
+        });
     }
   };
 
@@ -175,7 +199,6 @@ export default function RegisterIP() {
 
   <div className="container mx-auto px-4 py-8 mt-10 mb-20">
     <h1 className="text-4xl font-bold text-center mb-8">Intellectual Property Registration</h1>
-
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
     
