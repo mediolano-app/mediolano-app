@@ -28,6 +28,7 @@ import {
 	List,
 	FileText,
 	Zap,
+	Globe,
 } from "lucide-react";
 import Image from "next/image";
 import { abi } from "../../src/abis/abi";
@@ -166,10 +167,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 					<FileText className="h-4 w-4 mr-2" />
 					License
 				</Button>
-				<Button variant="outline" size="sm">
-					<DollarSign className="h-4 w-4 mr-2" />
-					Monetize
-				</Button>
+				
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="outline" size="sm">
@@ -179,6 +177,14 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 					<DropdownMenuContent>
 						<DropdownMenuLabel>More Actions</DropdownMenuLabel>
 						<DropdownMenuSeparator />
+						<DropdownMenuItem>
+							<DollarSign className="h-4 w-4 mr-2" />
+							Monetize
+						</DropdownMenuItem>
+						<DropdownMenuItem>
+							<Globe className="h-4 w-4 mr-2" />
+							Listing
+						</DropdownMenuItem>
 						<DropdownMenuItem>
 							<Send className="h-4 w-4 mr-2" />
 							Transfer

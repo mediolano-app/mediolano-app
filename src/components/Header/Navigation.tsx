@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List, GalleryVerticalEnd, ScrollText, ArrowLeftRight, BriefcaseBusiness, Globe, LayoutGrid } from 'lucide-react'
+import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List, GalleryVerticalEnd, ScrollText, ArrowLeftRight, BriefcaseBusiness, Globe, LayoutGrid, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -34,7 +34,7 @@ const navigationItems = [
     items: [
       { title: 'Monetize', href: '/monetize', icon: Banknote },
       { title: 'Marketplace', href: '/marketplace', icon: LayoutGrid },
-      { title: 'Sell', href: '/sell', icon: ArrowLeftRight },
+      { title: 'Sell', href: '/sell', icon: Zap },
       { title: 'Business', href: '/business', icon: BriefcaseBusiness },
     ],
   },
