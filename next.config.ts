@@ -7,9 +7,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-};
-
-module.exports = {
   images: {
     remotePatterns: [
       {
@@ -20,8 +17,7 @@ module.exports = {
       },
     ],
   },
-}
-
+};
 
 
 export default nextConfig;

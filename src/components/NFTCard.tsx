@@ -42,11 +42,15 @@ interface NFTCardProps {
 	status: string;
 }
 
+
+
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 	const contract = "0x03afbbb4d6530b36e65a1dd2e7a26d21834ab3eb013c998a2eac18235f6b18e8";
 	const [metadata, setMetadata] = useState<IP | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+
+	status = 'Listed';
 
 	// Get tokenURI from contract
 	const {
@@ -137,10 +141,9 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				/>
 			</CardHeader>
 			<CardContent className="p-4">
-				<CardTitle className="line-clamp-1 mb-2">{metadata.name}</CardTitle>
+				<CardTitle className="mb-2">{metadata.name}</CardTitle>
 				<div className="flex justify-between items-center mb-2">
 					<Badge variant="secondary">{metadata.type}</Badge>
-					<span className="font-semibold">{metadata.name || "N/A"} ETH</span>
 				</div>
 				<Badge
 					variant={
