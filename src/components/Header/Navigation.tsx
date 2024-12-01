@@ -25,7 +25,7 @@ const navigationItems = [
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: GalleryVerticalEnd },
       { title: 'Licensing', href: '/licensing', icon: ScrollText },
-      { title: 'Listing', href: '/listing', icon: Globe },
+      { title: 'Transfer', href: '/transaction', icon: Zap },
       { title: 'Transfers', href: '/transfers', icon: ArrowLeftRight },
     ],
   },
@@ -34,7 +34,8 @@ const navigationItems = [
     items: [
       { title: 'Monetize', href: '/monetize', icon: Banknote },
       { title: 'Marketplace', href: '/marketplace', icon: LayoutGrid },
-      { title: 'Sell', href: '/sell', icon: Zap },
+      { title: 'Listing', href: '/listing', icon: Globe },
+      { title: 'Sell', href: '/transaction', icon: Zap },
       { title: 'Business', href: '/business', icon: BriefcaseBusiness },
     ],
   },

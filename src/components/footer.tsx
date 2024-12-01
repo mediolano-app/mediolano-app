@@ -30,7 +30,7 @@ export  function Footer() {
               <li><Link href="/listing" className="flex items-center hover:underline"><Globe className="w-4 h-4 mr-2" /> Listing</Link></li>
               <li><Link href="/licensing" className="flex items-center hover:underline"><ShieldCheck className="w-4 h-4 mr-2" /> License</Link></li>
               <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2" /> Portfolio</Link></li>
-              <li><Link href="/sell" className="flex items-center hover:underline"><Zap className="w-4 h-4 mr-2" /> Sell</Link></li>
+              <li><Link href="/transaction" className="flex items-center hover:underline"><Zap className="w-4 h-4 mr-2" /> Smart Transaction</Link></li>
               <li><Link href="/marketplace" className="flex items-center hover:underline"><LayoutGrid className="w-4 h-4 mr-2" /> Marketplace</Link></li>
 
             </ul>

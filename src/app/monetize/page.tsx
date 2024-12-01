@@ -58,13 +58,13 @@ const monetizeIP: NextPage = () => {
         </Card>
         <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
           <CardHeader>
-            <CardTitle>Selling</CardTitle>
-            <CardDescription>Transfer ownership of your IP</CardDescription>
+            <CardTitle>Smart Transaction</CardTitle>
+            <CardDescription>Sell or transfer ownership of your IP</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="mb-4">Create a sale contract to another address.</p>
             <Button variant="secondary" asChild>
-              <Link href="/sell">Sell IP</Link>
+              <Link href="/transaction">Transaction</Link>
             </Button>
           </CardContent>
         </Card>

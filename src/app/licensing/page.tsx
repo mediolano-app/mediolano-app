@@ -85,7 +85,7 @@ const Licensing = () => {
           
           
           <div>
-            <h4 className="mb-4">Registered Intellectual Property</h4>
+            <h4 className="mb-4">Your Licensings</h4>
             
             
             <div className="space-y-4">

@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowRightLeft, ShieldCheck, Banknote } from "lucide-react"
 import Image from 'next/image'
 import Link from 'next/link'
+import SmartTransactionForm from "@/components/SmartTransactionForm";
 
 
 
@@ -29,52 +30,17 @@ const sellIP: NextPage = () => {
           <div>
 
 <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-6">Sell Your Intellectual Property</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Smart Transaction Form</h1>
+ 
       
       <div className="grid  md:grid-cols-2 gap-8">
         <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
           <CardHeader>
             <CardTitle>Transfer/Sell IP Form</CardTitle>
-            <CardDescription>Create a smart transaction to securely transfer ownership or sell your intellectual property with blockchain technology. After initiating the sales transaction, the Address indicated in the contract will be able to finalize the purchase and claim your digital asset.</CardDescription>
+            <CardDescription>Create a smart transaction to securely sell and transfer intellectual property. After initiating the sales transaction, the Address indicated in the contract will be able to finalize the purchase and claim your digital asset.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4">
-              <div>
-                <Label htmlFor="ip-select">Select IP to Transfer/Sell</Label>
-                <select 
-                  id="type" 
-                  name="type" 
-                  className="w-full input input-bordered rounded bg-base-300">
-                  <option value="patent">Select IP</option>
-                </select>
-              </div>
-              <div>
-                <Label htmlFor="transaction-type">Transaction Type</Label>
-                <select 
-                  id="type" 
-                  name="type" 
-                  className="w-full input input-bordered rounded bg-base-300">
-                  <option value="patent">Sell Type</option>
-                  <option value="patent">Patent</option>
-                  <option value="trademark">Trademark</option>
-                  <option value="copyright">Copyright</option>
-                  <option value="trade_secret">Trade Secret</option>
-                </select>
-              </div>
-              <div>
-                <Label htmlFor="recipient">Recipient Wallet Address</Label>
-                <Input id="recipient" placeholder="Enter recipient's blockchain wallet address" className="w-full input input-bordered rounded bg-base-300" />
-              </div>
-              <div>
-                <Label htmlFor="price">Price (if selling)</Label>
-                <Input id="price" type="number" min="0" step="0.01" placeholder="Enter selling price in ETH" className="w-full input input-bordered rounded bg-base-300" />
-              </div>
-              <div>
-                <Label htmlFor="terms">Additional Terms</Label>
-                <Textarea id="terms" placeholder="Enter any additional terms or conditions" className="w-full input input-bordered rounded bg-base-300" />
-              </div>
-              <Button className="btn-default" type="submit">Initiate Transfer/Sale</Button>
-            </form>
+           <SmartTransactionForm />
           </CardContent>
         </Card>
 

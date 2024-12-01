@@ -186,12 +186,8 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 							Listing
 						</DropdownMenuItem>
 						<DropdownMenuItem>
-							<Send className="h-4 w-4 mr-2" />
-							Transfer
-						</DropdownMenuItem>
-						<DropdownMenuItem>
 							<Zap className="h-4 w-4 mr-2" />
-							Sell
+							Transaction
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

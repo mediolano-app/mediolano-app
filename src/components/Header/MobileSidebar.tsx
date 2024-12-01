@@ -36,7 +36,7 @@ const navigationItems = [
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: FileText },
       { title: 'Licensing', href: '/licensing', icon: FileText },
-      { title: 'Listing', href: '/listing', icon: FileText },
+      { title: 'Transfer', href: '/transaction', icon: FileText },
     ],
   },
   {
@@ -44,7 +44,7 @@ const navigationItems = [
     items: [
       { title: 'Marketplace', href: '/marketplace', icon: Banknote },
       { title: 'Listing', href: '/listing', icon: Banknote },
-      { title: 'Business', href: '/business', icon: Briefcase },
+      { title: 'Sell', href: '/transaction', icon: FileText },
     ],
   },
 ]
@@ -54,6 +54,7 @@ const userMenuItems = [
   { title: 'My IP\'s', href: '/portfolio', icon: Copyright },
   { title: 'Rewards', href: '/rewards', icon: Award },
   { title: 'Settings', href: '/settings', icon: Settings },
+  { title: 'Business', href: '/business', icon: Briefcase },
   
 ]
 
