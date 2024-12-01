@@ -2,9 +2,7 @@
 import {
   useState
 } from "react"
-import {
-  toast
-} from "sonner"
+
 import {
   useForm
 } from "react-hook-form"
@@ -58,6 +56,12 @@ import {
   Input
 } from "@/components/ui/input"
 
+import { Toaster } from "@/components/ui/toaster";
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/hooks/use-toast"
+
+import { useAccount, useNetwork, useContract, useSendTransaction } from '@starknet-react/core'
+
 const formSchema = z.object({
   IPID: z.string(),
   type: z.string(),
@@ -78,16 +82,18 @@ const formSchema = z.object({
 });
 
 export default function IPLicensingForm() {
-  
-  
+
+  const { toast } = useToast()
+  const { address } = useAccount();
+
   const languages = [{
-      label: "English",
-      value: "en"
-    },
-    {
-      label: "French",
-      value: "fr"
-    },
+    label: "English",
+    value: "en"
+  },
+  {
+    label: "French",
+    value: "fr"
+  },
   ] as const;
 
 
@@ -100,420 +106,432 @@ export default function IPLicensingForm() {
     label: "Intellectual Property Title",
     value: "Intellectual Property Title"
   },
-] as const;
+  ] as const;
 
 
 
 
-  const form = useForm < z.infer < typeof formSchema >> ({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
 
   })
 
-  function onSubmit(values: z.infer < typeof formSchema > ) {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       console.log(values);
       console.log("OK");
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+     
+      toast({
+        title: "Licensing started",
+        description: "Finalize your intellectual property registration by approving the asset creation on the Starknet blockchain..",
+        action: (
+          <ToastAction altText="OK">OK</ToastAction>
+        ),
+      });
+
     } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+     
+      toast({
+        title: "Error",
+        description: "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
+        action: (
+          <ToastAction altText="OK">OK</ToastAction>
+        ),
+      });
+
+
     }
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-3xl mx-auto">
-      <div className="">
-        <FormField
-          control={form.control}
-          name="IPID"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Intellectual Property</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        "w-[200px] justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
-                      
-                    >
-                      {field.value
-                        ? listIPs.find(
+        <div className="">
+          <FormField
+            control={form.control}
+            name="IPID"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Intellectual Property</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "w-[200px] justify-between",
+                          !field.value && "text-muted-foreground"
+                        )}
+
+                      >
+                        {field.value
+                          ? listIPs.find(
                             (listIP) => listIP.value === field.value
                           )?.label
-                        : "Select IP"}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
+                          : "Select IP"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search IP..." />
+                      <CommandList>
+                        <CommandEmpty>No IP found.</CommandEmpty>
+                        <CommandGroup>
+                          {listIPs.map((listIP) => (
+                            <CommandItem
+                              value={listIP.label}
+                              key={listIP.value}
+                              onSelect={() => {
+                                form.setValue("IPID", listIP.value);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  listIP.value === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {listIP.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormDescription>Select your registered IP to license</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Type</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a type" />
+                    </SelectTrigger>
                   </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search IP..." />
-                    <CommandList>
-                      <CommandEmpty>No IP found.</CommandEmpty>
-                      <CommandGroup>
-                        {listIPs.map((listIP) => (
-                          <CommandItem
-                            value={listIP.label}
-                            key={listIP.value}
-                            onSelect={() => {
-                              form.setValue("IPID", listIP.value);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                listIP.value === field.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                            {listIP.label}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <FormDescription>Select your registered IP to license</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Sale">Sale</SelectItem>
-                  <SelectItem value="Royalties">Royalties</SelectItem>
-                  <SelectItem value="Auction">Auction</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+                  <SelectContent>
+                    <SelectItem value="Sale">Sale</SelectItem>
+                    <SelectItem value="Royalties">Royalties</SelectItem>
+                    <SelectItem value="Auction">Auction</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormDescription>Choose the type of licensing</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Description"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>Set the licensing description.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <hr className="mt-5 mb-5"></hr>
-        
-        <h4 className="mb-5">Licensing options</h4>
-
-        <FormField
-          control={form.control}
-          name="field"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Field of use</FormLabel>
-              <FormControl>
-                <Input 
-                placeholder="e.g. Film Soundtrack"
-                
-                type=""
-                {...field} />
-              </FormControl>
-              <FormDescription>You can define a field of use.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="geographical"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Geographical area</FormLabel>
-              <FormControl>
-                <Input 
-                placeholder="e.g. Brazil"
-                
-                type=""
-                {...field} />
-              </FormControl>
-              <FormDescription>Define a geographic area for your license.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="startDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Start Date</FormLabel>
-              <FormControl>
-                <Input 
-                placeholder="e.g. 2025"
-                
-                type=""
-                {...field} />
-              </FormControl>
-              <FormDescription>Licensing start date</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="endDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>End Date</FormLabel>
-              <FormControl>
-                <Input 
-                placeholder="e.g. 12/31/2049"
-                
-                type=""
-                {...field} />
-              </FormControl>
-              <FormDescription>Licensing end date</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="termsURL"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Licensing Terms</FormLabel>
-              <FormControl>
-                <Input 
-                placeholder="https://"
-                
-                type=""
-                {...field} />
-              </FormControl>
-              <FormDescription>External link to licensing terms.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-
-        <hr className="mt-5 mb-5"></hr>
-        
-        <h4 className="mb-5">Financial Terms</h4>
-
-
-        
-        <FormField
-          control={form.control}
-          name="financialTerms"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Terms</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
+                  <Textarea
+                    placeholder="Description"
+                    className="resize-none"
+                    {...field}
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Sale">Sale</SelectItem>
-                  <SelectItem value="Auction">Auction</SelectItem>
-                  <SelectItem value="Royalties">Royalties</SelectItem>
-                  <SelectItem value="Crowdfunding">Crowdfunding</SelectItem>
-                  <SelectItem value="Installment">Installment</SelectItem>
-                  <SelectItem value="Advanced">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
+                <FormDescription>Set the licensing description.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <hr className="mt-5 mb-5"></hr>
+
+          <h4 className="mb-5">Licensing options</h4>
+
+          <FormField
+            control={form.control}
+            name="field"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Field of use</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. Film Soundtrack"
+
+                    type=""
+                    {...field} />
+                </FormControl>
+                <FormDescription>You can define a field of use.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="geographical"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Geographical area</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. Brazil"
+
+                    type=""
+                    {...field} />
+                </FormControl>
+                <FormDescription>Define a geographic area for your license.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="startDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Start Date</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. 2025"
+
+                    type=""
+                    {...field} />
+                </FormControl>
+                <FormDescription>Licensing start date</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>End Date</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. 12/31/2049"
+
+                    type=""
+                    {...field} />
+                </FormControl>
+                <FormDescription>Licensing end date</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="termsURL"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Licensing Terms</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="https://"
+
+                    type=""
+                    {...field} />
+                </FormControl>
+                <FormDescription>External link to licensing terms.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+
+          <hr className="mt-5 mb-5"></hr>
+
+          <h4 className="mb-5">Financial Terms</h4>
+
+
+
+          <FormField
+            control={form.control}
+            name="financialTerms"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Terms</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Sale">Sale</SelectItem>
+                    <SelectItem value="Auction">Auction</SelectItem>
+                    <SelectItem value="Royalties">Royalties</SelectItem>
+                    <SelectItem value="Crowdfunding">Crowdfunding</SelectItem>
+                    <SelectItem value="Installment">Installment</SelectItem>
+                    <SelectItem value="Advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormDescription>Choose the financial compensation model</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="financialObs"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Financial observations</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="e.g. Recurring payment for streaming content."
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>You can add notes and extra terms about the financial conditions of the license.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="currency"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Payment Currency</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="financialObs"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Financial observations</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
+                  <Textarea
+                    placeholder="e.g. Recurring payment for streaming content."
+                    className="resize-none"
+                    {...field}
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="ETH">ETH</SelectItem>
-                  <SelectItem value="STRK">STRK</SelectItem>
-                  <SelectItem value="USDC">USDC</SelectItem>
-                  <SelectItem value="JOIN">JOIN</SelectItem>
-                </SelectContent>
-              </Select>
+                <FormDescription>You can add notes and extra terms about the financial conditions of the license.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="currency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Payment Currency</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="ETH">ETH</SelectItem>
+                    <SelectItem value="STRK">STRK</SelectItem>
+                    <SelectItem value="USDC">USDC</SelectItem>
+                    <SelectItem value="JOIN">JOIN</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormDescription>Select which cryptocurrency you want to use in the transaction.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="initpay"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Initial Payment</FormLabel>
-              <FormControl>
-                <Input 
-                placeholder="e.g. 1"
-                
-                type="number"
-                {...field} />
-              </FormControl>
-              <FormDescription>Payment to be made upfront.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="installments"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Number of installments</FormLabel>
-              <FormControl>
-                <Input 
-                placeholder="e.g. 12"
-                
-                type="number"
-                {...field} />
-              </FormControl>
-              <FormDescription>You can set a number of installments.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="recurringPay"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Recurring Payment</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="initpay"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Initial Payment</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
+                  <Input
+                    placeholder="e.g. 1"
+
+                    type="number"
+                    {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Weekly">Weekly</SelectItem>
-                  <SelectItem value="Monthly">Monthly</SelectItem>
-                  <SelectItem value="Quarterly">Quarterly</SelectItem>
-                  <SelectItem value="Annual">Annual</SelectItem>
-                </SelectContent>
-              </Select>
+                <FormDescription>Payment to be made upfront.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="installments"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Number of installments</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. 12"
+
+                    type="number"
+                    {...field} />
+                </FormControl>
+                <FormDescription>You can set a number of installments.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="recurringPay"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Recurring Payment</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Weekly">Weekly</SelectItem>
+                    <SelectItem value="Monthly">Monthly</SelectItem>
+                    <SelectItem value="Quarterly">Quarterly</SelectItem>
+                    <SelectItem value="Annual">Annual</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormDescription>Set the frequency of the recurring payment.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="royaltiesCriteria"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Royalties Criteria</FormLabel>
-              <FormControl>
-                <Input 
-                placeholder="e.g. Sales Profit"
-                
-                type=""
-                {...field} />
-              </FormControl>
-              <FormDescription>Define a criterion for the value of royalties.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="royaltiesvalue"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Royalties Value</FormLabel>
-              <FormControl>
-                <Input 
-                placeholder="e.g. 10%"
-                
-                type="number"
-                {...field} />
-              </FormControl>
-              <FormDescription>Set a value for royalties.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button className="mt-5" type="submit">License Your IP</Button>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="royaltiesCriteria"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Royalties Criteria</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. Sales Profit"
+
+                    type=""
+                    {...field} />
+                </FormControl>
+                <FormDescription>Define a criterion for the value of royalties.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="royaltiesvalue"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Royalties Value</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. 10%"
+
+                    type="number"
+                    {...field} />
+                </FormControl>
+                <FormDescription>Set a value for royalties.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button className="mt-5" type="submit">License Your IP</Button>
 
         </div>
 

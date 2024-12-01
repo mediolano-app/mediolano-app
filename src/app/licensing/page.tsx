@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import { Search, Info, Book, Copyright, FileText, Image, Music, Video, DollarSign, Clock, Gavel, Users, Lock, Cpu, LinkIcon, MoreVertical, Eye, Copy, FileSignature } from 'lucide-react'
 
-import IPLicensingForm from '@/components/IPLicensingForm'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
+
+import IPLicensingForm from '@/components/IPLicensingForm'
 
 type IPItem = {
   id: string;
@@ -24,16 +25,17 @@ const ipItems: IPItem[] = [
 // Mock data for previously registered IPs
 const mockIPs = [
   { id: 1, name: "Novel: The Cosmic Journey", type: "Book", status: "Listed", price: "0.5 ETH", image: "/background.jpg" },
-  { id: 2, name: "Song: Echoes of Tomorrow", type: "Music", status: "Pending", price: "0.2 ETH", image: "/background.jpg" },
+  { id: 2, name: "Song: Echoes of Tomorrow", type: "Music", status: "Sold", price: "0.2 ETH", image: "/background.jpg" },
   { id: 3, name: "Artwork: Nebula Dreams", type: "Image", status: "Listed", price: "1.5 ETH", image: "/background.jpg" },
   { id: 4, name: "Screenplay: The Last Frontier", type: "Text", status: "Draft", price: "N/A", image: "/background.jpg" },
-  { id: 5, name: "Short Film: Beyond the Stars", type: "Video", status: "Listed", price: "3 ETH", image: "/background.jpg" },
+  { id: 5, name: "Short Film: Beyond the Stars", type: "Video", status: "Transfer", price: "3 ETH", image: "/background.jpg" },
 ]
 
 const Licensing = () => {
 
   const [selectedIP, setSelectedIP] = useState<IPItem | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  
   const [formData, setFormData] = useState({
     licenseeCompany: '',
     licenseeEmail: '',
@@ -116,7 +118,7 @@ const Licensing = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center space-x-4">
-                    <img src={ip.image} alt={ip.name} className="w-24 h-24 object-cover rounded-md" />
+                    <img src={ip.image} alt={ip.name} className="w-24 h-24 object-cover rounded-md" width="auto" height="auto" />
                     <div>
                       <p className="text-sm text-muted-foreground mb-1">{ip.type}</p>
                       <p className={`text-sm font-medium ${
