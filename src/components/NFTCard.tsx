@@ -38,7 +38,6 @@ import { pinataClient } from "@/utils/pinataClient";
 import { IP } from "../app/register/page";
 
 interface NFTCardProps {
-	key: number;
 	tokenId: BigInt;
 	status: string;
 }
@@ -46,7 +45,7 @@ interface NFTCardProps {
 
 
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
-	const contract = "0x03afbbb4d6530b36e65a1dd2e7a26d21834ab3eb013c998a2eac18235f6b18e8";
+	const contract = "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0";
 	const [metadata, setMetadata] = useState<IP | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -65,6 +64,8 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		args: [Number(tokenId)],
 		watch: false,
 	});
+
+	console.log("ESSE EH O TOKEN URI", tokenURI);
 
 	// Fetch metadata when tokenURI is available
 	useEffect(() => {

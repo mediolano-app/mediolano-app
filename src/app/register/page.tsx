@@ -32,23 +32,14 @@ export default function RegisterIP() {
 
 
   const { address } = useAccount();
-  console.log("URL:", address);
   const { chain } = useNetwork();
   const { contract } = useContract({ 
     abi: abi as Abi, 
-    address: "0x03afbbb4d6530b36e65a1dd2e7a26d21834ab3eb013c998a2eac18235f6b18e8", 
+    address: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
   }); 
-
-  const myAddress = "0x04d9e99204dbfe644fc5ed7529d983ed809b7a356bf0c84daade57bcbb9c0c77"
-   
-
-  const gateway = "https://violet-rainy-shrimp-423.mypinata.cloud/ipfs/";
-  
   const router = useRouter();  
   const [status, setStatus] = useState("Mint NFT");
   const [ipfsHash, setIpfsHash] = useState("");
-
-  const baseIpfsUrl = "https://ipfs.io/ipfs/";
 
   const [loading, setLoading] = useState(false);
   const [ipData, setIpData] = useState<IP>({
@@ -85,7 +76,7 @@ export default function RegisterIP() {
 
   const { send, error: mintError} = useSendTransaction({ 
     calls: 
-      contract && address 
+      contract && address   
         ? [contract.populate("mint_item", [address, ipfsHash])] 
         : undefined, 
   }); 

@@ -85,7 +85,7 @@ export default function RegisterIP() {
   const { chain } = useNetwork();
   const { contract } = useContract({ 
     abi: abi as Abi, 
-    address: "0x07e39e39ddee958c8a9221d82f639aa9112d6789259ccf09f2a7eb8e021c051c", 
+    address: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
   }); 
    
 

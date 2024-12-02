@@ -6,6 +6,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
+import { type Abi } from "starknet";
+import { abiLic } from '@/abis/abiLic';
+
+const licensingAddress = "0x00e64180c1e71d9d776f6d88f90b7d3143e0c0bda0ea1058cd699ed02b240a95";
 
 import IPLicensingForm from '@/components/IPLicensingForm'
 

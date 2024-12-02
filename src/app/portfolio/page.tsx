@@ -11,13 +11,13 @@ import { useEffect } from "react";
 const MyIPs: NextPage = () => {
   const { address } = useAccount();
   //const { address: connectedAddress, isConnected, isConnecting } = useAccount();
-  const contractAddress = '0x03afbbb4d6530b36e65a1dd2e7a26d21834ab3eb013c998a2eac18235f6b18e8';
-  
+  const contractAddress = '0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0';
+
   const [tokenIds, setTokenIds] = useState<BigInt[]>([]);
 
   const { contract } = useContract({ 
     abi: abi as Abi, 
-    address: contractAddress, 
+    address: contractAddress as `0x${string}`, 
   }); 
 
   // async function getBalance(){
@@ -34,8 +34,6 @@ const MyIPs: NextPage = () => {
   async function getTokenId(tokenIndex: number){
     try{
       const tokenId = await contract.token_of_owner_by_index(address, tokenIndex);
-      console.log(tokenId);
-      console.log(typeof tokenId);
       return tokenId; //acho que eh isso mas tem que testar
     }
     catch(e) {
@@ -81,10 +79,15 @@ const MyIPs: NextPage = () => {
   // console.log(uri2); //ta puxando certo
 
   const totalBalance = myTotalBalance ? parseInt(myTotalBalance.toString()) : 0;
+
+  const menosUm = totalBalance - 1;
+  const TotalBalance = myTotalBalance ? BigInt(menosUm.toString()) : 0n;
+  console.log(TotalBalance);
+
   useEffect(() => {
     if (totalBalance > 0) {
       const fetchTokenIds = async () => {
-        const fetchedTokenIds: number[] = [];  // Changed type from BigInt[] to number[]
+        const fetchedTokenIds: BigInt[] = [];  // Changed type from BigInt[] to number[]
   
         // Use Promise.all to resolve all token ID promises concurrently
         const tokenIdPromises = Array.from({ length: totalBalance }, (_, tokenIndex) => 
