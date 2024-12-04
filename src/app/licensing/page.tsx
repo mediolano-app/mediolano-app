@@ -11,7 +11,8 @@ import { abiLic } from '@/abis/abiLic';
 
 const licensingAddress = "0x00e64180c1e71d9d776f6d88f90b7d3143e0c0bda0ea1058cd699ed02b240a95";
 
-import IPLicensingForm from '@/components/IPLicensingForm'
+  import { IPLicensing } from '@/components/IPLicening';
+  import IPList from '@/components/ux/IPList';
 
 type IPItem = {
   id: string;
@@ -63,99 +64,36 @@ const Licensing = () => {
 
   return (
     <>
-    <div className="grid items-center justify-items-center min-h-screen p-4 py-10 mb-20 sm:p-10]">
-    <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
     
-    <div className="max-w-6xl mx-auto">
-        
-        <h1 className="text-3xl font-bold mb-6">License Intellectual Property</h1>
-        
-        <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground rounded-lg p-6 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <Info className="h-5 w-5" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm">
-                Our blockchain-based licensing system ensures transparent and immutable record-keeping. Smart contracts can be used to automate royalty payments and enforce license terms.
-              </p>
+    <div className="container mx-auto px-4 py-8 mt-10 mb-20">
+    <h1 className="text-4xl font-bold text-center mb-8">Intellectual Property Licensing</h1>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
 
-            </div>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          
-          
-          <div>
-            <h4 className="mb-4">Your Licensings</h4>
-            
-            
-            <div className="space-y-4">
-              {mockIPs.map((ip) => (
-              <Card key={ip.id} className="hover:shadow-lg transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
-                <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-                  <CardTitle className="text-lg">{ip.name}</CardTitle>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0 ml-auto">
-                        <span className="sr-only">Open menu</span>
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Eye className="mr-2 h-4 w-4" />
-                        <Button variant="ghost"  key={ip.id} onClick={() => handleNavigation(ip.name)}>View Details</Button>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Copy className="mr-2 h-4 w-4" />
-                        <span>Create New Listing</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <FileSignature className="mr-2 h-4 w-4" />
-                        <span>Create License</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center space-x-4">
-                    <img src={ip.image} alt={ip.name} className="w-24 h-24 object-cover rounded-md" width="auto" height="auto" />
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">{ip.type}</p>
-                      <p className={`text-sm font-medium ${
-                        ip.status === "Listed" ? "text-green-500" :
-                        ip.status === "Pending" ? "text-yellow-500" :
-                        "text-gray-500"
-                      }`}>
-                        Status: {ip.status}
-                      </p>
-                      <p className="text-sm font-semibold mt-1">{ip.price}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            </div>
-          </div>
-          
-          
-          
-          
-          <div className='bg-med shadow rounded p-5 bg-card'>
-            <h2 className="text-xl font-semibold mb-4">License Details</h2>
-            
-
-            <IPLicensingForm/>
 
 
-          </div>
-        </div>
-      </div>
-      </main>
-      </div>
+
+    <div className="text-card-foreground">
+    <IPLicensing />
+    </div>
+
+
+
+    <div className="text-card-foreground">
+    <IPList />
+    </div>
+
+
+
+
+
+
+
+
+    </div>
+    </div>
+
     </>
   );
 };

@@ -35,11 +35,11 @@ const viewLicense: NextPage = () => {
     <>
      
      
-     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+     <div className="container mx-auto px-4 py-8 mt-10 mb-20">
 
 
 
-          <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto">
         <Link href="/licensing" className="inline-flex items-center btn mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Licensing
