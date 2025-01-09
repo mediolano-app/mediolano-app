@@ -37,9 +37,8 @@ git clone https://github.com/mediolano-app/mediolano-app.git
 Install dependencies for Next.js 15 + React 19:
 
 ```bash
-npm install --force
+npm install
 ```
-( --force required for Next.js 15 components )
 
 Run the development server:
 
