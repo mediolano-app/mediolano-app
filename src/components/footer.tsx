@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeftRight, Book, BookIcon, BookMarked, Coins, FileCheck, FileCode, FileIcon, FileLock, Film, Globe, Globe2, LayoutGrid, ListChecks, Palette, ScrollText, ShieldCheck, ShieldQuestion, UserRoundCheck, Wallet2, Zap } from 'lucide-react'
+import { ArrowLeftRight, Book, BookIcon, BookMarked, Coins, FileCheck, FileCode, FileIcon, FileLock, Film, Globe, Globe2, GlobeIcon, LayoutGrid, ListChecks, Palette, ScrollText, ShieldCheck, ShieldQuestion, UserRoundCheck, Wallet2, Zap } from 'lucide-react'
 import DappInfo from './DappInfo';
 
 
@@ -19,40 +19,40 @@ export  function Footer() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Mediolano.app</h2>
-            <p className="text-muted-foreground">Revolutionizing intellectual property management with blockchain technology. Powered by Starknet.</p>
+            <h2 className="text-2xl font-bold">Mediolano</h2>
+            <p className="text-muted-foreground">Seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets.</p>
           </div>
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Dapp Services</h3>
+            <h3 className="text-lg font-semibold">IP Services</h3>
             <ul className="space-y-2">
-              <li><Link href="/register" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2" /> Register</Link></li>
-              <li><Link href="/monetize" className="flex items-center hover:underline"><Coins className="w-4 h-4 mr-2" /> Monetize</Link></li>
-              <li><Link href="/listing" className="flex items-center hover:underline"><Globe className="w-4 h-4 mr-2" /> Listing</Link></li>
-              <li><Link href="/licensing" className="flex items-center hover:underline"><ShieldCheck className="w-4 h-4 mr-2" /> License</Link></li>
-              <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2" /> Portfolio</Link></li>
-              <li><Link href="/transaction" className="flex items-center hover:underline"><Zap className="w-4 h-4 mr-2" /> Smart Transaction</Link></li>
-              <li><Link href="/marketplace" className="flex items-center hover:underline"><LayoutGrid className="w-4 h-4 mr-2" /> Marketplace</Link></li>
+              <li><Link href="/register" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Register</Link></li>
+              <li><Link href="/licensing" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> License</Link></li>
+              <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> Portfolio</Link></li>
+              <li><Link href="/monetize" className="flex items-center hover:underline"><Coins className="w-4 h-4 mr-2 ml-blue" /> Monetize</Link></li>
+              <li><Link href="/listing" className="flex items-center hover:underline"><Globe className="w-4 h-4 mr-2 ml-blue" /> Listing</Link></li>
+              <li><Link href="/transaction" className="flex items-center hover:underline"><Zap className="w-4 h-4 mr-2 ml-blue" /> Smart Transaction</Link></li>
+              <li><Link href="/marketplace" className="flex items-center hover:underline"><LayoutGrid className="w-4 h-4 mr-2 ml-blue" /> Marketplace</Link></li>
 
             </ul>
           </div>
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">IP Templates</h3>
             <ul className="space-y-2">
-              <li><Link href="/register/templates/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2" /> Art</Link></li>
-              <li><Link href="/register/templates/document" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2" /> Document</Link></li>
-              <li><Link href="/register/templates/movies" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2" /> Movies</Link></li>
-              <li><Link href="/register/templates/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2" /> NFT</Link></li>
-              <li><Link href="/register/templates/patent" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2" /> Patent</Link></li>
-              <li><Link href="/register/templates/publication" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2" /> Publication</Link></li>
-              <li><Link href="/register/templates/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2" /> Real World Assets</Link></li> 
-              <li><Link href="/software" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2" /> Software</Link></li>           </ul>
+              <li><Link href="/register/templates/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Art</Link></li>
+              <li><Link href="/register/templates/document" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
+              <li><Link href="/register/templates/movies" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Movies</Link></li>
+              <li><Link href="/register/templates/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2 ml-blue" /> NFT</Link></li>
+              <li><Link href="/register/templates/patent" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Patent</Link></li>
+              <li><Link href="/register/templates/publication" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2 ml-blue" /> Publication</Link></li>
+              <li><Link href="/register/templates/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2 ml-blue" /> Real World Assets</Link></li> 
+              <li><Link href="/software" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> Software</Link></li>           </ul>
           </div>
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Resources</h3>
             <ul className="space-y-2">
-              <li><Link href="/support" className="flex items-center hover:underline"><UserRoundCheck className="w-4 h-4 mr-2" /> Support</Link></li>
-              <li><Link href="/" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2" /> Documentation</Link></li>
-              <li><Link href="/faq" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2" /> FAQs</Link></li>
+              <li><Link href="/support" className="flex items-center hover:underline"><UserRoundCheck className="w-4 h-4 mr-2 ml-blue" /> Support</Link></li>
+              <li><Link href="/" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2 ml-blue" /> Documentation</Link></li>
+              <li><Link href="/faq" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> FAQs</Link></li>
             </ul>
           </div>
         </div>
@@ -68,6 +68,12 @@ export  function Footer() {
             <Button variant="ghost" size="icon">
             <Link href="https://github.com/mediolano-app" title='Open-Source Repositories' target='_blank'>
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+              <span className="sr-only">GitHub</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" size="icon">
+            <Link href="https://mediolano.app" title='Mediolnao.app Website' target='_blank'>
+              <GlobeIcon className="w-6 h-6" />
               <span className="sr-only">GitHub</span>
               </Link>
             </Button>

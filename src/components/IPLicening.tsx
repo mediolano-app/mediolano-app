@@ -264,7 +264,7 @@ export function IPLicensing() {
           <SelectContent>
             <SelectItem value="exclusive">Exclusive</SelectItem>
             <SelectItem value="non-exclusive">Non-Exclusive</SelectItem>
-            <SelectItem value="sole">Sole</SelectItem>
+            <SelectItem value="sale">Sale</SelectItem>
           </SelectContent>
         </Select>
         {errors.licenseType && <p className="text-sm text-destructive mt-1">{errors.licenseType}</p>}

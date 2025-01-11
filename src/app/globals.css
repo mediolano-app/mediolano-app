@@ -30,6 +30,20 @@
   backdrop-filter: blur(7.449999809265137px);
 }
 
+
+
+.ml-blue {
+  color: blue;
+}
+
+.ml-bg-blue {
+  color: blue;
+}
+
+
+
+
+
 @layer base {
   :root {
 
