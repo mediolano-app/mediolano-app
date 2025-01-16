@@ -3,8 +3,6 @@
 > [!IMPORTANT]
 > Mediolano dapp is in constant development and the current version runs on Starknet's Sepolia devnet. Use for testing purposes only. 
 
-# Mediolano Protocol
-
 ## Unleash Intellectual Potential with Programmable IP 
 
 The digital age has redefined the boundaries of creativity, but traditional IP management systems haven't kept pace. Mediolano Protocol aims to be a cutting-edge permissionless decentralized intellectual property provider for the integrity web.
