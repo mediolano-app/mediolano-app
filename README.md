@@ -18,11 +18,11 @@ Mediolano is tailored for the tokenization and management of intellectual proper
 
 ### Features
 
-- Tokenize Any IP: Transform your creative works into digital assets that can be managed, traded, and monetized. This includes everything from images and music to NFTs and real-world assets.
+- Tokenize Any IP: Transform intelligence works into digital assets that can be managed, traded, and monetized. This includes everything from images, music, NFTs, papers, video and real-world assets.
 
-- Immutable Ownership & Attribution: blockchain ensures clear, verifiable ownership and attribution for every piece of IP, safeguarding against unauthorized use.
+- Immutable Ownership & Attribution: blockchain ensures clear sovereignty, verifiable ownership and attribution for every piece of IP, safeguarding your property.
 
-- Enhanced Control & Protection: Take charge of your creations in the digital realm with immutable and transparent ownership records.
+- Enhanced Registration & Protection: Use templates and smart contracts to take charge of your IP assets in the digital realm with immutable and transparent ownership.
 
 [![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
 
