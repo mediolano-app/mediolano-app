@@ -36,162 +36,48 @@ import { type Abi } from "starknet";
 import { useReadContract } from "@starknet-react/core";
 import { pinataClient } from "@/utils/pinataClient";
 import { IP } from "../app/register/page";
+import { Skeleton } from '@/components/ui/skeleton';
 
-interface NFTCardProps {
-	tokenId: BigInt;
-	status: string;
+export interface NFTCardProps {
+	tokenId: string;
+	imageUrl: string;
+	name: string;
+	owner: string;
 }
 
-
-
-const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
-	const contract = "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0";
-	const [metadata, setMetadata] = useState<IP | null>(null);
+const NFTCard: React.FC<NFTCardProps> = ({ tokenId, imageUrl, name, owner }) => {
 	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
-
-	status = 'Listed';
-
-	// Get tokenURI from contract
-	const {
-		data: tokenURI,
-		isLoading: isContractLoading,
-		error: contractError,
-	} = useReadContract({
-		abi: abi as Abi,
-		functionName: "tokenURI",
-		address: contract as `0x${string}`,
-		args: [Number(tokenId)],
-		watch: false,
-	});
-
-	console.log("ESSE EH O TOKEN URI", tokenURI);
-
-	// Fetch metadata when tokenURI is available
-	useEffect(() => {
-		const fetchMetadata = async () => {
-			if (!tokenURI || typeof tokenURI !== "string") {
-				return;
-			}
-
-			try {
-				setIsLoading(true);
-        		console.log(tokenURI);
-				const response = await pinataClient.gateways.get(tokenURI);
-				console.log(response);
-				let parsedData: any;
-				try {
-					parsedData =
-						typeof response.data === "string"
-							? JSON.parse(response.data)
-							: response.data;
-				} catch (parseError) {
-					throw new Error("Failed to parse metadata");
-				}
-
-				// Validate metadata structure
-				if (!isValidMetadata(parsedData)) {
-					throw new Error("Invalid metadata format");
-				}
-
-				setMetadata(parsedData);
-				console.log(parsedData);
-				setError(null);
-			} catch (err) {
-				setError(
-					err instanceof Error ? err.message : "Failed to fetch metadata",
-				);
-				setMetadata(null);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		fetchMetadata();
-	}, [tokenURI]);
-
-	const isValidMetadata = (data: any): data is IP => {
-		return (
-			data &&
-			typeof data === "object" &&
-			"name" in data &&
-			"description" in data
-		);
-	};
-
-	if (isLoading || isContractLoading) {
-		return <div>Loading...</div>; // Consider using a proper loading component
-	}
-
-	if (error || contractError) {
-		return <div>Error: {error || "Failed to fetch token data"}</div>; // Consider using a proper error component
-	}
-
-	if (!metadata) {
-		return <div>No metadata available</div>;
-	}
 
 	return (
 		<Card className="overflow-hidden">
-			<CardHeader className="p-0">
+			<CardContent className="p-0 relative aspect-square">
+				{isLoading && (
+					<Skeleton className="w-full h-full absolute inset-0" />
+				)}
 				<Image
-					src={metadata.image || "/background.jpg"} // Add fallback image
-					alt={metadata.name}
-					width={400}
-					height={400}
-					className="w-full h-48 object-cover"
+					src={imageUrl}
+					alt={name}
+					fill
+					className="object-cover"
+					onLoad={() => setIsLoading(false)}
+					onError={() => setIsLoading(false)}
 				/>
-			</CardHeader>
-			<CardContent className="p-4">
-				<CardTitle className="mb-2">{metadata.name}</CardTitle>
-				<div className="flex justify-between items-center mb-2">
-					<Badge variant="secondary">{metadata.type}</Badge>
-				</div>
-				<Badge
-					variant={
-						status === "Listed"
-							? "default"
-							: status === "Licensed"
-								? "secondary"
-								: "outline"
-					}
-				>
-					{status}
-				</Badge>
 			</CardContent>
-			<CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
-				<Button variant="outline" size="sm">
-					<Eye className="h-4 w-4 mr-2" />
-					View
-				</Button>
-				<Button variant="outline" size="sm">
-					<FileText className="h-4 w-4 mr-2" />
-					License
-				</Button>
-				
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="outline" size="sm">
-							<MoreHorizontal className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent>
-						<DropdownMenuLabel>More Actions</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>
-							<DollarSign className="h-4 w-4 mr-2" />
-							Monetize
-						</DropdownMenuItem>
-						<DropdownMenuItem>
-							<Globe className="h-4 w-4 mr-2" />
-							Listing
-						</DropdownMenuItem>
-						<DropdownMenuItem>
-							<Zap className="h-4 w-4 mr-2" />
-							Transaction
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+			<CardFooter className="flex flex-col gap-2 p-4">
+				<div className="w-full">
+					<h3 className="font-semibold truncate">{name}</h3>
+					<p className="text-sm text-gray-500 truncate">
+						Token ID: {tokenId}
+					</p>
+					<p className="text-sm text-gray-500 truncate">
+						Owner: {owner.slice(0, 6)}...{owner.slice(-4)}
+					</p>
+				</div>
+				<div className="flex gap-2 w-full">
+					<Button variant="outline" className="w-full">
+						View Details
+					</Button>
+				</div>
 			</CardFooter>
 		</Card>
 	);
