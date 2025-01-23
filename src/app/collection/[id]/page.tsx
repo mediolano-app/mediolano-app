@@ -17,7 +17,7 @@ const collectionData = {
   description: "A groundbreaking collection of quantum computing patents, representing the cutting edge of technological innovation in the field.",
   creator: {
     name: "Quantum Innovations Inc.",
-    avatar: "/placeholder.svg?height=40&width=40"
+    avatar: "/background.jpg"
   },
   stats: {
     items: 50,
@@ -26,19 +26,19 @@ const collectionData = {
     volume: 250
   },
   nfts: [
-    { id: 1, title: "Quantum Entanglement Processor", price: 2.5, image: "/placeholder.svg?height=400&width=400" },
-    { id: 2, title: "Qubit Stabilization Method", price: 1.8, image: "/placeholder.svg?height=400&width=400" },
-    { id: 3, title: "Quantum Error Correction Algorithm", price: 3.2, image: "/placeholder.svg?height=400&width=400" },
-    { id: 4, title: "Quantum-Classical Hybrid Architecture", price: 2.0, image: "/placeholder.svg?height=400&width=400" },
-    { id: 5, title: "Quantum Cryptography Protocol", price: 2.7, image: "/placeholder.svg?height=400&width=400" },
-    { id: 6, title: "Quantum Machine Learning Framework", price: 3.5, image: "/placeholder.svg?height=400&width=400" },
+    { id: 1, title: "Quantum Entanglement Processor", price: 2.5, image: "/background.jpg" },
+    { id: 2, title: "Qubit Stabilization Method", price: 1.8, image: "/background.jpg" },
+    { id: 3, title: "Quantum Error Correction Algorithm", price: 3.2, image: "/background.jpg" },
+    { id: 4, title: "Quantum-Classical Hybrid Architecture", price: 2.0, image: "/background.jpg" },
+    { id: 5, title: "Quantum Cryptography Protocol", price: 2.7, image: "/background.jpg" },
+    { id: 6, title: "Quantum Machine Learning Framework", price: 3.5, image: "/background.jpg" },
     // Add more NFTs as needed
   ]
 }
 
 export default function CollectionPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 mb-20">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-4">{collectionData.name}</h1>
         <div className="flex items-center space-x-4 mb-4">
@@ -55,7 +55,7 @@ export default function CollectionPage() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        <Card>
+        <Card className='bg-background/60'>
           <CardHeader className="py-4">
             <CardTitle className="text-sm font-medium">Items</CardTitle>
           </CardHeader>
@@ -63,7 +63,7 @@ export default function CollectionPage() {
             <p className="text-2xl font-bold">{collectionData.stats.items}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className='bg-background/60'>
           <CardHeader className="py-4">
             <CardTitle className="text-sm font-medium">Owners</CardTitle>
           </CardHeader>
@@ -71,20 +71,20 @@ export default function CollectionPage() {
             <p className="text-2xl font-bold">{collectionData.stats.owners}</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className='bg-background/60'>
           <CardHeader className="py-4">
             <CardTitle className="text-sm font-medium">Floor Price</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{collectionData.stats.floorPrice} ETH</p>
+            <p className="text-2xl font-bold">{collectionData.stats.floorPrice} STRK</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className='bg-background/60'>
           <CardHeader className="py-4">
             <CardTitle className="text-sm font-medium">Volume Traded</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{collectionData.stats.volume} ETH</p>
+            <p className="text-2xl font-bold">{collectionData.stats.volume} STRK</p>
           </CardContent>
         </Card>
       </div>
@@ -97,7 +97,7 @@ export default function CollectionPage() {
           </TabsList>
           <Button variant="outline">
             <Info className="h-4 w-4 mr-2" />
-            Collection Info
+            Create Collection
           </Button>
         </div>
         <TabsContent value="grid">
@@ -116,7 +116,7 @@ export default function CollectionPage() {
                     <CardTitle className="line-clamp-1">{nft.title}</CardTitle>
                   </CardHeader>
                   <CardFooter className="flex justify-between">
-                    <span className="font-bold">{nft.price} ETH</span>
+                    <span className="font-bold">{nft.price} STRK</span>
                     <Button variant="outline" size="sm">View</Button>
                   </CardFooter>
                 </Link>
@@ -138,7 +138,7 @@ export default function CollectionPage() {
                   />
                   <div className="flex-grow">
                     <h3 className="font-semibold">{nft.title}</h3>
-                    <p className="text-muted-foreground">{nft.price} ETH</p>
+                    <p className="text-muted-foreground">{nft.price} STRK</p>
                   </div>
                   <Button variant="outline" size="sm">View</Button>
                 </CardContent>
@@ -148,12 +148,15 @@ export default function CollectionPage() {
         </TabsContent>
       </Tabs>
 
+      {/* Load more button
       <div className="text-center">
         <Button>
           Load More
           <ExternalLink className="ml-2 h-4 w-4" />
         </Button>
-      </div>
+      </div> */}
+
+
     </div>
   )
 }

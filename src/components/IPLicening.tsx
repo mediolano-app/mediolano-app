@@ -241,7 +241,7 @@ export function IPLicensing() {
 
   const renderLicensingDetailsStep = () => (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold mb-4">Set Licensing Details</h2>
+      
       
       {formData.selectedIP && (
         <div className="bg-muted p-4 rounded-md mb-4">
@@ -251,6 +251,8 @@ export function IPLicensing() {
           <p><strong>Description:</strong> {formData.selectedIP.description}</p>
         </div>
       )}
+
+<h2 className="text-xl font-semibold mb-4">Set Licensing Details</h2>
       
       <div className="space-y-2">
         <Label htmlFor="licenseType">License Type <span className="text-destructive">*</span></Label>

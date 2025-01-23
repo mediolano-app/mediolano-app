@@ -88,10 +88,9 @@ export default function ListingIP() {
 
         {/* Right column: Form to register new IP */}
         <div>
-          <h2 className="text-1xl font-semibold mb-4">Create New Listing</h2>
           <Card>
             <CardHeader>
-              <CardTitle>Listing Details</CardTitle>
+              <CardTitle>Create a new listing</CardTitle>
               <CardDescription>Enter the details of your intellectual property to create an NFT.</CardDescription>
             </CardHeader>
             <CardContent>
