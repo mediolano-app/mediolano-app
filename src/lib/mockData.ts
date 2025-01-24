@@ -143,4 +143,3 @@ export const mockCollections: Collection[] = [
     lastUpdated: '2023-06-20'
   }
 ];
-
