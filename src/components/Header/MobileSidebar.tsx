@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase } from 'lucide-react'
+import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -35,6 +35,7 @@ const navigationItems = [
     title: 'Manage',
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: FileText },
+      { title: 'Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
       { title: 'Licensing', href: '/licensing', icon: FileText },
       { title: 'Transfer', href: '/transaction', icon: FileText },
     ],
@@ -44,7 +45,7 @@ const navigationItems = [
     items: [
       { title: 'Marketplace', href: '/marketplace', icon: Banknote },
       { title: 'Listing', href: '/listing', icon: Banknote },
-      { title: 'Sell', href: '/transaction', icon: FileText },
+      { title: 'Smart Transaction', href: '/', icon: FileText },
     ],
   },
 ]

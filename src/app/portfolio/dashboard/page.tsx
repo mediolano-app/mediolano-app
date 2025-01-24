@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react"
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -66,7 +67,7 @@ export default function DashboardPage() {
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{mockPortfolioStats.totalValue} ETH</div>
+              <div className="text-2xl font-bold">{mockPortfolioStats.totalValue} STRK</div>
               <p className="text-xs text-muted-foreground">+20.1% from last month</p>
             </CardContent>
           </Card>
@@ -109,7 +110,7 @@ export default function DashboardPage() {
         <section>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold">Recent Assets</h2>
-            <Button variant="outline">Open Portfolio</Button>
+            <Button variant="outline"><Link href="/portfolio">Open Portfolio</Link></Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {mockNFTs.slice(0, recentAssetsCount).map((nft) => (
@@ -119,7 +120,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <Image
-                    src={nft.image || "/placeholder.svg"}
+                    src={nft.image || "/background.jpg"}
                     alt={nft.name}
                     width={200}
                     height={200}

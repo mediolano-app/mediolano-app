@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List, GalleryVerticalEnd, ScrollText, ArrowLeftRight, BriefcaseBusiness, Globe, LayoutGrid, Zap } from 'lucide-react'
+import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List, GalleryVerticalEnd, ScrollText, ArrowLeftRight, BriefcaseBusiness, Globe, LayoutGrid, Zap, LayoutDashboard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -24,8 +24,7 @@ const navigationItems = [
     title: 'Manage',
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: GalleryVerticalEnd },
-      { title: 'Licensing', href: '/licensing', icon: ScrollText },
-      { title: 'Transfer', href: '/transaction', icon: Zap },
+      { title: 'Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
       { title: 'Transfers', href: '/transfers', icon: ArrowLeftRight },
     ],
   },
@@ -33,10 +32,10 @@ const navigationItems = [
     title: 'Monetize',
     items: [
       { title: 'Monetize', href: '/monetize', icon: Banknote },
+      { title: 'Licensing', href: '/licensing', icon: FileText },
       { title: 'Marketplace', href: '/marketplace', icon: LayoutGrid },
       { title: 'Listing', href: '/listing', icon: Globe },
-      { title: 'Sell', href: '/transaction', icon: Zap },
-      { title: 'Business', href: '/business', icon: BriefcaseBusiness },
+      { title: 'Smart Transaction', href: '/', icon: FileText },
     ],
   },
   
