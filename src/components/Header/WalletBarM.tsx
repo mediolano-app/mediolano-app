@@ -14,7 +14,7 @@ const WalletBarM: React.FC = () => {
             <button
               key={connector.id}
               onClick={() => connect({ connector })}
-              className="rounded shadow text-sm py-4 px-4 bg-blue-500 rounded-lg"
+              className=" shadow text-sm py-4 px-4 bg-blue-500 rounded-lg"
             >
               Connect {connector.id}
             </button>

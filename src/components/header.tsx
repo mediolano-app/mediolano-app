@@ -16,12 +16,21 @@ import { Navigation } from '@/components/Header/Navigation'
 import { AccountDropdown } from '@/components/Header/AccountDropdown'
 import { MobileSidebar } from '@/components/Header/MobileSidebar'
 import { ModeToggle } from '@/components/Header/ThemeSwitch'
+import {connect, disconnect} from  '@argent/get-starknet'
 
 const WalletBar = dynamic(() => import('@/components/Header/WalletBar'), { ssr: false })
 
 
 export function Header() {
   const { theme, setTheme } = useTheme()
+
+  const connectWallet = async () => {
+    let conection =  await connect({webWalletUrl: "https://web.argent.xyz" });
+  }
+
+
+
+
 
   return (
     <header className="sticky top-0 z-50 w-full shadow bg-background/55 backdrop-blur supports-[backdrop-filter]:bg-background/30">
@@ -30,6 +39,8 @@ export function Header() {
         <Navigation />
         <div className="flex items-center space-x-2 ml-auto">
           <WalletBar />
+
+          <button onClick={connectWallet} >connect wallet</button>
           <AccountDropdown />
           <ModeToggle />
           <MobileSidebar />
