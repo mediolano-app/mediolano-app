@@ -28,7 +28,7 @@ const mockActivities = [
   { id: 3, type: 'send', amount: '100 USDC', to: '0x2468...1357', date: '2023-04-25' },
 ]
 
-export default function Component() {
+export default function WalletPanel() {
   const [isConnected, setIsConnected] = useState(false)
   const [address, setAddress] = useState('')
   const [isOpen, setIsOpen] = useState(false)
