@@ -1,6 +1,7 @@
 import { useConnect, useDisconnect, useAccount } from '@starknet-react/core';
 import { LogOut, LogOutIcon, LucideLogOut, Wallet } from 'lucide-react';
 
+
 const WalletBar: React.FC = () => {
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
