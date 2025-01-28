@@ -40,6 +40,12 @@ export default function WalletPanel() {
     }, 1000)
   }
 
+  const  createtWallet = () => {
+    setIsConnected(false)
+    setAddress('')
+  }
+
+
   const disconnectWallet = () => {
     setIsConnected(false)
     setAddress('')
@@ -170,7 +176,7 @@ export default function WalletPanel() {
                 <Button onClick={connectWallet} className="w-full bg-blue-500 hover:bg-blue-600 text-white">
                   <Wallet className="mr-2 h-4 w-4" /> Connect with Starknet
                 </Button>
-                <Button onClick={connectWallet} variant="outline" className="w-full">
+                <Button onClick={createtWallet} variant="outline" className="w-full">
                   <Plus className="mr-2 h-4 w-4" /> Create New Wallet
                 </Button>
               </div>
