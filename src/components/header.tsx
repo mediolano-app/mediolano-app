@@ -21,6 +21,7 @@ import WalletConnectModal from './WalletConnectModal';
 
 const WalletBar = dynamic(() => import('@/components/Header/WalletBar'), { ssr: false })
 
+import WalletPanel from '@/components/Header/WalletPanel'
 
 export function Header() {
   const { theme, setTheme } = useTheme()
@@ -37,7 +38,7 @@ export function Header() {
         <Logo />
         <Navigation />
         <div className="flex items-center space-x-2 ml-auto">
-          <WalletBar />
+          <WalletPanel />
           <AccountDropdown />
           <WalletConnectModal/>
           <ModeToggle />

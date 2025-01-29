@@ -14,7 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Wallet, LogOut, Copy, ExternalLink, ArrowUpRight, ArrowDownLeft, Plus, ShieldCheck } from 'lucide-react'
+import { Wallet, LogOut, Copy, ExternalLink, ArrowUpRight, ArrowDownLeft, Plus, ShieldCheck, LucideLogOut } from 'lucide-react'
+import { useConnect, useDisconnect, useAccount } from '@starknet-react/core';
 
 const mockTokens = [
   { symbol: 'ETH', name: 'Ethereum', profile: '1.5', value: '$3,250.00', icon: '₿' },
@@ -28,21 +29,28 @@ const mockActivities = [
   { id: 3, type: 'send', amount: '100 USDC', to: '0x2468...1357', date: '2023-04-25' },
 ]
 
-export default function Component() {
+const WalletPanel: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false)
-  const [address, setAddress] = useState('')
+  //const [address, setAddress] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  
+  const { connect, connectors } = useConnect();
+  const { disconnect } = useDisconnect();
+  const { address } = useAccount();
 
   const connectWallet = () => {
     setTimeout(() => {
       setIsConnected(true)
-      setAddress('0x1234...5678')
     }, 1000)
   }
 
+  const  createtWallet = () => {
+    setIsConnected(false)
+  }
+
+
   const disconnectWallet = () => {
     setIsConnected(false)
-    setAddress('')
   }
 
   return (
@@ -141,7 +149,7 @@ export default function Component() {
                       </code>
                     </div>
                     <div className="flex justify-end space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(address)}>
+                      <Button variant="outline" size="sm" onClick={() => address}>
                         <Copy className="mr-2 h-4 w-4" /> Copy
                       </Button>
                       <Button variant="outline" size="sm">
@@ -167,12 +175,44 @@ export default function Component() {
                 <p className="text-sm text-gray-600">Your assets are protected by industry-leading security technology .</p>
               </div>
               <div className="grid w-full gap-4">
+                {/*
                 <Button onClick={connectWallet} className="w-full bg-blue-500 hover:bg-blue-600 text-white">
                   <Wallet className="mr-2 h-4 w-4" /> Connect with Starknet
-                </Button>
-                <Button onClick={connectWallet} variant="outline" className="w-full">
+                </Button>*/}
+
+                {!address ? (
+                  <div className="flex flex-wrap justify-center gap-2">
+                    {connectors.map((connector) => (
+                      <button
+                        key={connector.id}
+                        onClick={() => connect({ connector })}
+                        className="rounded shadow text-sm py-2 px-4 hover:bg-blue/10"
+                      >
+                        Connect {connector.id}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <div className="text-sm px-4 rounded">
+                      
+                      <button
+                      onClick={() => disconnect()}
+                      className="py-2 px-2 flex items-center justify-center"
+                    >
+                      {address.slice(0, 6)}...{address.slice(-4)} &nbsp; <LucideLogOut className='h-4 w-4'/>
+                    </button>
+                    </div>
+                    
+                  </div>
+                )}
+
+
+                <Button onClick={createtWallet} variant="outline" className="w-full">
                   <Plus className="mr-2 h-4 w-4" /> Create New Wallet
                 </Button>
+
+
               </div>
               <p className="text-sm text-center text-gray-600">
                 By connecting, you agree to our <a href="#" className="underline text-blue-500">Terms of Service</a> and <a href="#" className="underline text-blue-500">Privacy Policy</a>.
@@ -184,3 +224,5 @@ export default function Component() {
     </div>
   )
 }
+
+export default WalletPanel;
