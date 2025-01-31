@@ -62,7 +62,10 @@ const dashboardData = {
   ],
 }
 
-const recentAssets = nfts.slice(0, 3) // Assuming nfts is imported from mockData
+const recentAssets = nfts.slice(0, 3).map(nft => ({
+  ...nft,
+  categoryLink: `/m-category/${nft.category.toLowerCase()}`, // Add categoryLink property
+}))
 
 export default function Dashboard() {
   const [timeRange, setTimeRange] = useState("7d")
