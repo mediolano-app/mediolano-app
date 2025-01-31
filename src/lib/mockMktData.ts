@@ -49,6 +49,7 @@ export const users = [
       currency: "STRK",
       collection: "Cosmic Dreams",
       category: "Art",
+      categoryLink: "/m-category/art",
     },
     {
       id: "2",
@@ -59,6 +60,7 @@ export const users = [
       currency: "STRK",
       collection: "Pixel Punks",
       category: "Collectibles",
+      categoryLink: "/m-category/collectibles",
     },
     {
       id: "3",
@@ -69,6 +71,7 @@ export const users = [
       currency: "STRK",
       collection: "Cosmic Dreams",
       category: "Photography",
+      categoryLink: "/m-category/photography",
     },
   ]
   
