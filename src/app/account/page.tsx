@@ -118,7 +118,7 @@ export default function UserAccount() {
               {/* Profile Section */}
               <div className="space-y-4">
                 <div className="relative h-40 rounded-lg overflow-hidden mb-8">
-                  <img src={coverPreview || "/placeholder.svg"} alt="Profile cover" className="w-full h-full object-cover" />
+                  <img src={coverPreview || "/background.jpg"} alt="Profile cover" className="w-full h-full object-cover" />
                   <Label htmlFor="cover-upload" className="absolute bottom-2 right-2 cursor-pointer">
                     <Input id="cover-upload" type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'cover')} accept="image/*" />
                     <div className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors">
@@ -129,7 +129,7 @@ export default function UserAccount() {
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="relative">
-                    <img src={avatarPreview || "/placeholder.svg"} alt="Avatar" className="w-20 h-20 rounded-full" />
+                    <img src={avatarPreview || "/background.jpg"} alt="Avatar" className="w-20 h-20 rounded-full" />
                     <Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 cursor-pointer">
                       <Input id="avatar-upload" type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'avatar')} accept="image/*" />
                       <div className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 rounded-full flex items-center justify-center">

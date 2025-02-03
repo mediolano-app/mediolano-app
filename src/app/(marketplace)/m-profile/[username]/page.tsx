@@ -27,7 +27,7 @@ export default function UserProfile({ params }: { params: { username: string } }
     <div className="min-h-screen">
       <div className="relative h-64 md:h-80">
         <Image
-          src={user.coverImage || "/placeholder.svg?height=400&width=1200"}
+          src={user.coverImage || "/background.jpg?height=400&width=1200"}
           alt="Cover Image"
           layout="fill"
           objectFit="cover"
@@ -37,7 +37,7 @@ export default function UserProfile({ params }: { params: { username: string } }
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row items-center md:items-end gap-8 -mt-20 mb-12 relative z-10">
           <Image
-            src={user.avatar || "/placeholder.svg"}
+            src={user.avatar || "/background.jpg"}
             alt={user.name}
             width={200}
             height={200}
@@ -99,7 +99,7 @@ export default function UserProfile({ params }: { params: { username: string } }
                 </CardHeader>
                 <CardContent>
                   <Image
-                    src={collection.coverImage || "/placeholder.svg"}
+                    src={collection.coverImage || "/background.jpg"}
                     alt={collection.name}
                     width={500}
                     height={300}

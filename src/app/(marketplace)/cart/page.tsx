@@ -9,8 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ArrowLeft, Minus, Plus, Trash2 } from 'lucide-react'
 
 const mockCartItems = [
-  { id: 1, title: "Abstract Harmony", price: 0.5, currency: "ETH", quantity: 1, image: "/placeholder.svg?height=100&width=100" },
-  { id: 2, title: "The Future of AI", price: 20, currency: "USD", quantity: 1, image: "/placeholder.svg?height=100&width=100" },
+  { id: 1, title: "Abstract Harmony", price: 0.5, currency: "ETH", quantity: 1, image: "/background.jpg?height=100&width=100" },
+  { id: 2, title: "The Future of AI", price: 20, currency: "USD", quantity: 1, image: "/background.jpg?height=100&width=100" },
 ]
 
 export default function CartPage() {

@@ -58,7 +58,7 @@ const WalletPanel: React.FC = () => {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" className="hover:bg-blue-500">
-            <Wallet className="mr-2 h-4 w-4" /> {isConnected ? '0x...' : 'Connect'}
+            <Wallet className="mr-2 h-4 w-4" /> {isConnected ? '0x...' : '0x...'}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] bg-white dark:bg-black backdrop-blur ">

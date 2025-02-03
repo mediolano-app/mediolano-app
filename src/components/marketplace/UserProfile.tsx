@@ -8,12 +8,12 @@ export function ProfileHeader() {
   return (
     <Card>
       <div className="relative h-48 md:h-64 overflow-hidden rounded-t-lg">
-        <Image src={user.banner || "/placeholder.svg"} alt="Profile banner" layout="fill" objectFit="cover" />
+        <Image src={user.banner || "/background.jpg"} alt="Profile banner" layout="fill" objectFit="cover" />
       </div>
       <CardContent className="pt-0">
         <div className="flex flex-col items-center -mt-12 sm:flex-row sm:items-end sm:space-x-5">
           <div className="relative h-24 w-24 md:h-32 md:w-32 rounded-full overflow-hidden ring-4 ring-background">
-            <Image src={user.avatar || "/placeholder.svg"} alt={user.username} layout="fill" objectFit="cover" />
+            <Image src={user.avatar || "/background.jpg"} alt={user.username} layout="fill" objectFit="cover" />
           </div>
           <div className="mt-4 sm:mt-0 text-center sm:text-left flex-grow">
             <h1 className="text-2xl md:text-3xl font-bold">{user.username}</h1>
