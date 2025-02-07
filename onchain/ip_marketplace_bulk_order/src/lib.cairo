@@ -1,3 +1,5 @@
+use starknet::ContractAddress;
+
 #[starknet::interface]
 trait IMediolanoMarketplace<TState> {
     // Core purchase functions
@@ -27,15 +29,20 @@ trait IMediolanoMarketplace<TState> {
 
 #[starknet::contract]
 mod MediolanoMarketplace {
+    use core::traits::Into;
     use starknet::{
         ContractAddress, get_caller_address, get_block_timestamp, contract_address_const
     };
     use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::security::pausable::PausableComponent;
+    use starknet::storage::{
+        StoragePointerReadAccess, StoragePointerWriteAccess, Vec, VecTrait, MutableVecTrait
+    };
+
+
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: PausableComponent, storage: pausable, event: PausableEvent);
-    use starknet::storage::{StoragePointerWriteAccess, StoragePathEntry, Map};
 
     #[derive(Drop, Serde)]
     struct DigitalAsset {
@@ -85,6 +92,12 @@ mod MediolanoMarketplace {
         price: u256
     }
 
+    #[constructor]
+    fn constructor(ref self: ContractState, initial_owner: ContractAddress) {
+        self.ownable.initializer(initial_owner);
+        self.commission_rate.write(500); // 5% default commission
+    }
+
     #[abi(embed_v0)]
     impl MediolanoMarketplaceImpl of super::IMediolanoMarketplace<ContractState> {
         fn purchase_multiple_assets(
@@ -94,7 +107,7 @@ mod MediolanoMarketplace {
             assert!(self.supported_currencies.read(payment_currency), "Invalid payment currency");
 
             let buyer = get_caller_address();
-            let total_price = self.calculate_total_price(assets);
+            let total_price = self.calculate_total_price(@assets);
 
             self.process_payments(assets, total_price, payment_currency, buyer);
             self.transfer_asset_ownership(assets, buyer);
@@ -148,14 +161,18 @@ mod MediolanoMarketplace {
 
     #[generate_trait]
     impl InternalFunctions of InternalFunctionsTrait {
-        fn calculate_total_price(self: @ContractState, assets: Array<DigitalAsset>) -> u256 {
-            let mut total = 0;
-            for asset in assets
-                .span() {
-                    assert!(self.asset_registered.read(asset.asset_id), "Unregistered asset");
-                    total += asset.price;
+        fn calculate_total_price(self: @ContractState, assets: @Array<DigitalAsset>) -> u256 {
+            let mut total: u256 = 0.into();
+            let mut i = 0;
+            loop {
+                if i >= assets.len() {
+                    break total;
                 }
-            total
+                let asset = assets[i];
+                assert!(self.asset_registered.read(asset.asset_id), "Unregistered asset");
+                total += asset.price;
+                i = i + 1;
+            }
         }
 
         fn process_payments(
@@ -166,42 +183,51 @@ mod MediolanoMarketplace {
             buyer: ContractAddress
         ) {
             let commission_rate = self.commission_rate.read();
-            let commission = total_price * commission_rate / 10000;
+            let commission = (total_price * commission_rate) / 10000;
             let mediolano_address = self.owner.read();
             let currency_contract = IERC20Dispatcher { contract_address: currency };
 
             // Transfer commission to Mediolano
-            currency_contract.transferFrom(buyer, mediolano_address, commission);
+            currency_contract.transfer_from(buyer, mediolano_address, commission);
 
             // Distribute remaining funds to sellers
-            for asset in assets
-                .span() {
-                    let seller_amount = asset.price;
-                    currency_contract.transferFrom(buyer, asset.seller, seller_amount);
-
-                    self
-                        .emit(
-                            AssetPurchased {
-                                asset_id: asset.asset_id,
-                                buyer,
-                                seller: asset.seller,
-                                price: seller_amount
-                            }
-                        );
+            let mut i = 0;
+            loop {
+                if i >= assets.len() {
+                    break ();
                 }
+                let asset = assets[i];
+                currency_contract.transfer_from(buyer, asset.seller, asset.price);
+
+                self
+                    .emit(
+                        AssetPurchased {
+                            asset_id: asset.asset_id,
+                            buyer,
+                            seller: asset.seller,
+                            price: asset.price
+                        }
+                    );
+                i = i + 1;
+            }
         }
 
         fn transfer_asset_ownership(
             ref self: ContractState, assets: Array<DigitalAsset>, buyer: ContractAddress
         ) {
-            for asset in assets
-                .span() {
-                    let current_owner = self.asset_ownership.read(asset.asset_id);
-                    assert!(current_owner == asset.seller, "Invalid asset ownership");
-
-                    // Transfer ownership to buyer
-                    self.asset_ownership.write(asset.asset_id, buyer);
+            let mut i = 0;
+            loop {
+                if i >= assets.len() {
+                    break ();
                 }
+                let asset = assets[i];
+                let current_owner = self.asset_ownership.read(asset.asset_id);
+                assert!(current_owner == asset.seller, "Invalid asset ownership");
+
+                // Transfer ownership to buyer
+                self.asset_ownership.write(asset.asset_id, buyer);
+                i = i + 1;
+            }
         }
     }
 }
