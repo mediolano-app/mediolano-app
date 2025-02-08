@@ -6,7 +6,7 @@ mod VisibilityManagement {
 
     #[storage]
     struct Storage {
-        visibility: Map<(u256, ContractAddress), u8>,
+        visibility: Map<(ContractAddress, u256, ContractAddress), u8>,
     }
 
     #[event]
@@ -17,27 +17,44 @@ mod VisibilityManagement {
 
     #[derive(Drop, starknet::Event)]
     struct VisibilityChanged {
+        token_address: ContractAddress,
         asset_id: u256,
         owner: ContractAddress,
         visibility_status: u8,
     }
 
     #[external(v0)]
-    fn set_visibility(ref self: ContractState, asset_id: u256, visibility_status: u8) {
+    fn set_visibility(
+        ref self: ContractState,
+        token_address: ContractAddress,
+        asset_id: u256,
+        visibility_status: u8,
+    ) {
         assert(visibility_status == 0 || visibility_status == 1, 'Invalid visibility status');
-        
+
         let caller = get_caller_address();
-        self.visibility.write((asset_id, caller), visibility_status);
-        
-        self.emit(Event::VisibilityChanged(VisibilityChanged {
-            asset_id: asset_id,
-            owner: caller,
-            visibility_status: visibility_status
-        }));
+        self.visibility.write((token_address, asset_id, caller), visibility_status);
+
+        self
+            .emit(
+                Event::VisibilityChanged(
+                    VisibilityChanged {
+                        token_address: token_address,
+                        asset_id: asset_id,
+                        owner: caller,
+                        visibility_status: visibility_status,
+                    },
+                ),
+            );
     }
 
     #[external(v0)]
-    fn get_visibility(self: @ContractState, asset_id: u256, owner: ContractAddress) -> u8 {
-        self.visibility.read((asset_id, owner))
+    fn get_visibility(
+        self: @ContractState,
+        token_address: ContractAddress,
+        asset_id: u256,
+        owner: ContractAddress,
+    ) -> u8 {
+        self.visibility.read((token_address, asset_id, owner))
     }
 }
