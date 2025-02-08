@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List, GalleryVerticalEnd, ScrollText, ArrowLeftRight, BriefcaseBusiness, Globe, LayoutGrid, Zap, LayoutDashboard } from 'lucide-react'
+import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List, GalleryVerticalEnd, ScrollText, ArrowLeftRight, BriefcaseBusiness, Globe, LayoutGrid, Zap, LayoutDashboard, Grid, Box } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -13,17 +13,19 @@ import {
 
 const navigationItems = [
   {
-    title: 'Register',
+    title: 'New',
     items: [
-      { title: 'Register', href: '/register', icon: Copyright },
-      { title: 'Templates', href: '/register/templates', icon: FileText },
+      { title: 'Register', href: '/new', icon: Copyright },
+      { title: 'Programmable IP', href: '/new/ip', icon: Box },
+      { title: 'Collection', href: '/new/collection', icon: Grid },
+      { title: 'IP Templates', href: '/register/templates', icon: FileText },
       { title: 'FAQ', href: '/faq', icon: BookOpen },
     ],
   },
   {
-    title: 'Manage',
+    title: 'Portcolio',
     items: [
-      { title: 'Portfolio', href: '/portfolio', icon: GalleryVerticalEnd },
+      { title: 'Manage', href: '/portfolio', icon: GalleryVerticalEnd },
       { title: 'Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
       { title: 'Transfers', href: '/transfers', icon: ArrowLeftRight },
     ],
