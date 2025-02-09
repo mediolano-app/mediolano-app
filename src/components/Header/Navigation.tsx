@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List, GalleryVerticalEnd, ScrollText, ArrowLeftRight, BriefcaseBusiness, Globe, LayoutGrid, Zap, LayoutDashboard, Grid, Box } from 'lucide-react'
+import { ChevronDown, Copyright, FileText, Banknote, BookOpen, Users, Phone, Grid2X2, List, GalleryVerticalEnd, ScrollText, ArrowLeftRight, BriefcaseBusiness, Globe, LayoutGrid, Zap, LayoutDashboard, Grid, Box, FileCode, Coins, Building, CircleDollarSign, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -10,16 +10,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { CubeIcon } from '@radix-ui/react-icons'
 
 const navigationItems = [
   {
     title: 'New',
     items: [
-      { title: 'Register', href: '/new', icon: Copyright },
+      { title: 'Tokenization', href: '/new', icon: Box },
       { title: 'Programmable IP', href: '/new/ip', icon: Box },
-      { title: 'Collection', href: '/new/collection', icon: Grid },
-      { title: 'IP Templates', href: '/register/templates', icon: FileText },
-      { title: 'FAQ', href: '/faq', icon: BookOpen },
+      { title: 'New Collection', href: '/new/collection', icon: Grid },
+      { title: 'From Templates', href: '/register/templates', icon: FileText },
+      { title: 'Licensing', href: '/licensing', icon: FileCode },
+      { title: 'Listing', href: '/listing', icon: Globe },
     ],
   },
   {
@@ -34,10 +36,19 @@ const navigationItems = [
     title: 'Monetize',
     items: [
       { title: 'Monetize', href: '/monetize', icon: Banknote },
-      { title: 'Licensing', href: '/licensing', icon: FileText },
-      { title: 'Marketplace', href: '/marketplace', icon: LayoutGrid },
+      { title: 'Licensing', href: '/licensing', icon: FileCode },
       { title: 'Listing', href: '/listing', icon: Globe },
-      { title: 'Smart Transaction', href: '/', icon: FileText },
+      { title: 'Marketplace', href: '/marketplace', icon: LayoutGrid },
+      { title: 'Smart Transaction', href: '/', icon: Coins },
+    ],
+  },
+  {
+    title: 'More',
+    items: [
+      { title: 'Business', href: '/business', icon: Building },
+      { title: 'Rewards', href: '/rewards', icon: CircleDollarSign },
+      { title: 'FAQ', href: '/faq', icon: BookOpen },
+      { title: 'Support', href: '/support', icon: User },
     ],
   },
   

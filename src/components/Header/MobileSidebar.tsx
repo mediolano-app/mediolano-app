@@ -24,9 +24,11 @@ const WalletBarM = dynamic(() => import('@/components/Header/WalletBarM'), { ssr
 
 const navigationItems = [
   {
-    title: 'Intellectual Property',
+    title: 'Programmable IP',
     items: [
-      { title: 'Register', href: '/register', icon: Copyright },
+      { title: 'Register', href: '/new', icon: Copyright },
+      { title: 'New IP', href: '/new/ip', icon: Copyright },
+      { title: 'New Collection', href: '/new/collection', icon: Copyright },
       { title: 'Templates', href: '/register/templates', icon: FileText },
       { title: 'FAQ', href: '/faq', icon: BookOpen },
     ],
@@ -60,9 +62,9 @@ const userMenuItems = [
 ]
 
 const appFeatures = [
-  { title: 'Blockchain-Powered IP Protection', description: 'Secure your intellectual property with cutting-edge blockchain technology.' },
-  { title: 'Global Marketplace', description: 'Connect with potential buyers and licensees worldwide.' },
-  { title: 'Smart Contract Licensing', description: 'Automate royalty payments and licensing agreements.' },
+  { title: 'Blockchain-Powered', description: 'Secure your intellectual property authorship with blockchain technology.' },
+  { title: 'Global Market', description: 'Connect with potential buyers and licensees worldwide.' },
+  { title: 'Programmable Licensing', description: 'Create permissionless licensing agreements.' },
 ]
 
 export function MobileSidebar() {
