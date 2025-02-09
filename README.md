@@ -5,23 +5,24 @@
 
 ## Unleash Intellectual Potential with Programmable IP 
 
-The digital age has redefined the boundaries of creativity, but traditional IP management systems haven't kept pace. Mediolano Protocol aims to be a cutting-edge permissionless decentralized intellectual property provider for the integrity web.
+The digital age has redefined the boundaries of creativity, but traditional IP management systems haven't kept pace. Mediolano Protocol aims to be a cutting-edge permissionless decentralized intellectual property provider for the integrity web, bringing zero-knowledge proofs and Artificial Intelligence Agents to Programmable IP. 
 
-With Mediolano, anyone can seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets for a groundbreaking solution designed to empower creators on management, sharing, and monetization through advanced blockchain technology. 
+With Mediolano, anyone can seamlessly tokenize Intellectual Property leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets - - a groundbreaking solution to empower creators, collectors and business to protect and monetize their IP assets.
 
-By integrating ERC721 and IPFS technology, Mediolano ensures decentralization, interoperability and sovereignty to your assets.
+By integrating blockchain standards (ERC721, ERC1155), IPFS and ZK-Proofs technology, Mediolano ensures decentralization, interoperability and sovereignty to users.
 
-Mediolano is tailored for the tokenization and management of intellectual property. Whether it’s digital art, AI models, literary works, or any form of creative expression, Mediolano Protocol enables you to register, track, and monetize your IP effortlessly and unlock new revenue streams.
+Mediolano is tailored for the tokenization and management of intellectual property. Whether it’s digital art, AI models, literary works, or any form of creative expression, Mediolano enables anyone in the world to participate in the global market to unlock new revenue streams.
+
 
 ### Key Features
 
-- Tokenize Any IP: Transform intelligence works into digital assets that can be managed, traded, and monetized. This includes everything from images, music, NFTs, papers, video and real-world assets.
+- Programmable IP: Transform intelligence works into digital assets that can be managed, traded, and monetized. This includes everything from images, music, NFTs, papers, video and real-world assets.
 
 - Immutable Ownership & Attribution: blockchain ensures clear sovereignty, verifiable ownership and attribution for every piece of IP, safeguarding your property.
 
 - Enhanced Registration & Protection: Use templates and smart contracts to take charge of your IP assets in the digital realm with immutable and transparent ownership.
 
-- High-Speed & Low-Cost: Leverage Starknet's unparalleled speed and cost-efficiency.
+- High-Speed & Low-Cost: Leverage Starknet's unparalleled speed and cost-efficiency with ZERO FEES on Mediolano Protocol.
 
 [![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
 
