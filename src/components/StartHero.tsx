@@ -66,7 +66,7 @@ function ElegantShape({
             "absolute inset-0",
             "bg-gradient-to-r to-transparent",
             gradient,
-            "backdrop-blur-[2px] border-2 border-white/[0.05]",
+            "backdrop-blur-[2px] border-2 border-blue/[0.05]",
             "shadow-[0_8px_32px_0_rgba(255,255,255,0.1)]",
             "after:absolute after:inset-0 after:rounded-full",
             "after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_70%)]",
@@ -101,7 +101,7 @@ export default function StartHero({
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 blur-3xl" />
+      <div className="absolute inset-0" />
 
       <div className="absolute inset-0 overflow-hidden">
         <ElegantShape
@@ -133,8 +133,8 @@ export default function StartHero({
 
         <ElegantShape
           delay={0.6}
-          width={200}
-          height={200}
+          width={400}
+          height={400}
           rotate={20}
           gradient="from-blue-500/[0.05]"
           className="right-[15%] md:right-[20%] top-[10%] md:top-[15%]"
@@ -142,20 +142,20 @@ export default function StartHero({
 
         <ElegantShape
           delay={0.7}
-          width={150}
-          height={150}
+          width={250}
+          height={250}
           rotate={-25}
           gradient="from-rose-500/[0.05]"
-          className="left-[20%] md:left-[25%] top-[5%] md:top-[10%]"
+          className="left-[20%] md:left-[45%] top-[5%] md:top-[10%]"
         />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 md:px-6">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-4xl mx-auto text-center">
           
 
           <motion.div custom={1} variants={fadeUpVariants} initial="hidden" animate="visible">
-            <h1 className="text-4xl sm:text-4xl md:text-7xl font-bold mb-6 md:mb-8 tracking-tight">
+            <h1 className="text-6xl sm:text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
               <span className="bg-clip-text">{title1}</span>
               <br />
               <span
@@ -171,7 +171,7 @@ export default function StartHero({
 
           <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
             <p className="text-base sm:text-lg md:text-xl mb-8 leading-relaxed font-light tracking-wide max-w-xl mx-auto px-4">
-            Protect, manage and unlock new revenue streams for your Intellectual Property.<br></br> Powered on
+            Protect, manage and unlock new revenue streams for your Intellectual Property. Powered on
             </p>
           </motion.div>
 
