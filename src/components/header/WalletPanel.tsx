@@ -188,7 +188,7 @@ const WalletPanel: React.FC = () => {
                         onClick={() => connect({ connector })}
                         className="rounded shadow py-2 px-4 hover:bg-blue/20"
                       >
-                        Conect {connector.id}
+                        Connect {connector.id}
                       </button>
                     ))}
                   </div>
