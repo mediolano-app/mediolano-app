@@ -48,28 +48,28 @@ export default function UserProfile({ params }: { params: { username: string } }
             <p className="text-xl text-muted-foreground mb-4">@{user.username}</p>
             <div className="flex justify-center md:justify-start space-x-4">
               {user.twitter && (
-                <a href={`https://twitter.com/${user.twitter}`} target="_blank" rel="noopener noreferrer">
+                <Link href={`https://twitter.com/${user.twitter}`} target="_blank" rel="noopener noreferrer">
                   <Button variant="ghost" size="icon">
                     <Twitter className="h-5 w-5" />
                     <span className="sr-only">Twitter</span>
                   </Button>
-                </a>
+                </Link>
               )}
               {user.instagram && (
-                <a href={`https://instagram.com/${user.instagram}`} target="_blank" rel="noopener noreferrer">
+                <Link href={`https://instagram.com/${user.instagram}`} target="_blank" rel="noopener noreferrer">
                   <Button variant="ghost" size="icon">
                     <Instagram className="h-5 w-5" />
                     <span className="sr-only">Instagram</span>
                   </Button>
-                </a>
+                </Link>
               )}
               {user.website && (
-                <a href={user.website} target="_blank" rel="noopener noreferrer">
+                <Link href={user.website} target="_blank" rel="noopener noreferrer">
                   <Button variant="ghost" size="icon">
                     <Globe className="h-5 w-5" />
                     <span className="sr-only">Website</span>
                   </Button>
-                </a>
+                </Link>
               )}
             </div>
           </div>

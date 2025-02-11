@@ -1,4 +1,4 @@
-import { MobileNav } from "@/components/header/MobileNav"
+import { MobileSidebar } from "@/components/header/MobileSidebar"
 import { MainNav } from "@/components/header/MainNav"
 import { WalletConnect } from "@/components/header/WalletConnect"
 import { ThemeToggle } from "@/components/header/ThemeToggle"
@@ -19,7 +19,9 @@ export function Header() {
           <div className="hidden md:block">
             <ThemeToggle />
           </div>
-          <MobileNav />
+          
+          <MobileSidebar />
+          <ThemeToggle />
         </div>
       </div>
     </header>

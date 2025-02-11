@@ -82,7 +82,7 @@ export default function CategoriesPage() {
                 </p>
               </div>
               <Button asChild variant="secondary">
-                <a href={`/nft/${nft.id}`}>View</a>
+                <Link href={`/nft/${nft.id}`}>View</Link>
               </Button>
             </div>
           ))}

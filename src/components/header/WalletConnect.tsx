@@ -38,7 +38,7 @@ export function WalletConnect() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{isConnected ? "Wallet Connected" : "Connect Wallet"}</DialogTitle>
+          <DialogTitle>{isConnected ? "Account" : "Connect"}</DialogTitle>
           <DialogDescription>
             {isConnected
               ? "Your wallet is connected. You can now interact with the Mediolano dApp."
