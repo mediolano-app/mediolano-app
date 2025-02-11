@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { MessageSquare, Phone, Mail, FileText, HelpCircle, Info } from 'lucide-react'
+import Link from 'next/link'
 
 const faqs = [
   {
@@ -86,7 +87,7 @@ export default function Support() {
                 User Guide
               </h3>
               <p className=" mb-2">Comprehensive guide on how to use our platform</p>
-              <a href="#" className=" hover:underline">Download PDF</a>
+              <Link href="#" className=" hover:underline">Download PDF</Link>
             </div>
             <div className=" p-4 rounded-md shadow">
               <h3 className=" mb-2 flex items-center">
@@ -94,7 +95,7 @@ export default function Support() {
                 API Documentation
               </h3>
               <p className=" mb-2">Technical documentation for integrating with our API</p>
-              <a href="#" className=" hover:underline">View Documentation</a>
+              <Link href="#" className=" hover:underline">View Documentation</Link>
             </div>
             <div className=" p-4 rounded-md shadow">
               <h3 className=" mb-2 flex items-center">
@@ -102,7 +103,7 @@ export default function Support() {
                 Legal Information
               </h3>
               <p className=" mb-2">Terms of service, privacy policy, and legal disclaimers</p>
-              <a href="#" className=" hover:underline">Read More</a>
+              <Link href="#" className=" hover:underline">Read More</Link>
             </div>
           </div>
         )

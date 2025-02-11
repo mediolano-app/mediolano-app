@@ -11,6 +11,7 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle } f
 import { Badge } from "@/components/ui/badge"
 import { ExternalLink } from "lucide-react"
 import { Card } from "../ui/card"
+import Link from "next/link"
 
 export default function AssetDashboard({ initialAssets }: { initialAssets: Asset[] }) {
   const [assets, setAssets] = useState(initialAssets)
@@ -100,7 +101,7 @@ export default function AssetDashboard({ initialAssets }: { initialAssets: Asset
             {filteredAssets.map((asset) => (
               <TableRow key={asset.id}>
                 <TableCell className="font-medium">
-                  <a
+                  <Link
                     href={asset.openseaUrl}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -108,19 +109,19 @@ export default function AssetDashboard({ initialAssets }: { initialAssets: Asset
                   >
                     {asset.name}
                     <ExternalLink className="ml-1 h-4 w-4" />
-                  </a>
+                  </Link>
                 </TableCell>
                 <TableCell>{asset.category && <Badge variant="secondary">{asset.category}</Badge>}</TableCell>
                 <TableCell>
                   {asset.collection && (
-                    <a
+                    <Link
                       href={`https://opensea.io/collection/${asset.collection.toLowerCase().replace(/\s+/g, "-")}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:underline"
                     >
                       {asset.collection}
-                    </a>
+                    </Link>
                   )}
                 </TableCell>
                 <TableCell>
@@ -128,14 +129,14 @@ export default function AssetDashboard({ initialAssets }: { initialAssets: Asset
                 </TableCell>
                 <TableCell>
                   {asset.openseaUrl && asset.tokenId && (
-                    <a
+                    <Link
                       href={`https://starkscan.io/token/${asset.openseaUrl.split("/")[5]}?a=${asset.tokenId}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
                     >
                       View on Explorer
-                    </a>
+                    </Link>
                   )}
                 </TableCell>
               </TableRow>

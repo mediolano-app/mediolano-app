@@ -16,6 +16,7 @@ export function ThemeToggle() {
   const { setTheme } = useTheme()
  
   return (
+    <div className="pr-4">
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
@@ -36,5 +37,6 @@ export function ThemeToggle() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    </div>
   )
 }

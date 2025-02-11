@@ -3,6 +3,7 @@ import { user } from "@/lib/dataMktUserProfile"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CalendarIcon, Share2 } from "lucide-react"
+import Link from "next/link"
 
 export function ProfileHeader() {
   return (
@@ -23,7 +24,7 @@ export function ProfileHeader() {
 
           <div className="mt-4 flex justify-center sm:justify-start space-x-4">
           {user.socialLinks.map((link, index) => (
-            <a
+            <Link
               key={index}
               href={link.url}
               target="_blank"
@@ -31,7 +32,7 @@ export function ProfileHeader() {
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <link.icon className="h-5 w-5" />
-            </a>
+            </Link>
           ))}
         </div>
 

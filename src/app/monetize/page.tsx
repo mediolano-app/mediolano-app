@@ -223,7 +223,7 @@ const monetizeIP: NextPage = () => {
                         <td className="py-6 px-4 border-b">{royalty.licensee}</td>
                         <td className="py-6 px-4 border-b">${royalty.amount.toLocaleString()}</td>
                         <td className="py-6 px-4 border-b">{royalty.date}</td>
-                        <td className="py-6 px-4 border-b"><a className="btn">{royalty.contract}</a></td>
+                        <td className="py-6 px-4 border-b">{royalty.contract}</td>
                       </tr>
                     ))}
                   </tbody>

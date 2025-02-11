@@ -103,6 +103,7 @@ export default function StartHero({
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0" />
 
+    {/*}
       <div className="absolute inset-0 overflow-hidden">
         <ElegantShape
           delay={0.3}
@@ -149,6 +150,7 @@ export default function StartHero({
           className="left-[20%] md:left-[45%] top-[5%] md:top-[10%]"
         />
       </div>
+      */}
 
       <div className="relative z-10 container mx-auto px-4 md:px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -196,15 +198,15 @@ export default function StartHero({
                             className="hidden dark:block"
                             src="/Starknet-Dark.svg"
                             alt="dark-mode-image"
-                            width={280}
-                            height={66}
+                            width={200}
+                            height={45}
                           />
                           <Image
                             className="block dark:hidden"
                             src="/Starknet-Light.svg"
                             alt="light-mode-image"
-                            width={280}
-                            height={66}
+                            width={200}
+                            height={45}
                           />
                           </div>
             {/*<span className="text-sm text-white/60 tracking-wide">{badge}</span>*/}
