@@ -88,7 +88,7 @@ mod MediolanoMarketplace {
         self.commission_rate.write(500); // 5% default commission
     }
 
-    #[external(v0)]
+    #[abi(embed_v0)]
     impl MediolanoMarketplaceImpl of super::IMediolanoMarketplace<ContractState> {
         fn purchase_multiple_assets(
             ref self: ContractState, assets: Array<DigitalAsset>, payment_currency: ContractAddress
@@ -162,7 +162,7 @@ mod MediolanoMarketplace {
                 let asset = assets[i];
                 assert!(self.asset_registered.read(asset.asset_id), "Unregistered asset");
                 total += asset.price;
-                i += 1;
+                i = i + 1;
             }
         }
 
@@ -199,7 +199,7 @@ mod MediolanoMarketplace {
                             price: asset.price
                         }
                     );
-                i += 1;
+                i = i + 1;
             }
         }
 
@@ -216,7 +216,7 @@ mod MediolanoMarketplace {
                 assert!(current_owner == asset.seller, "Invalid asset ownership");
 
                 self.asset_ownership.write(asset.asset_id, buyer);
-                i += 1;
+                i = i + 1;
             }
         }
     }
