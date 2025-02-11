@@ -33,7 +33,7 @@ export function WalletConnect() {
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <Wallet className="mr-2 h-4 w-4" />
-          {isConnected ? "Connected" : "Connect Wallet"}
+          {isConnected ? "Account" : "Connect"}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -68,7 +68,7 @@ export function WalletConnect() {
           ) : (
             <>
             <WalletBar />
-            <Button onClick={handleConnect}>Connect</Button>
+            <Button onClick={handleConnect}>Create Account (Demo)</Button>
             </>
           )}
         </div>

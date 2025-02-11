@@ -9,14 +9,14 @@ const WalletBar: React.FC = () => {
 
 
   return (
-    <div className="flex flex-col items-center space-y-4 bg-blue/15 hidden md:flex md:flex-1">
+    <div className="flex flex-col items-center space-y-4 hidden md:flex md:flex-1">
       {!address ? (
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-wrap justify-center gap-4">
           {connectors.map((connector) => (
             <button
               key={connector.id}
               onClick={() => connect({ connector })}
-              className="rounded shadow text-sm py-2 px-4 hover:bg-blue/10"
+              className="rounded-lg bg-blue/20 py-4 px-7 hover:bg-blue/50"
             >
               Connect {connector.id}
             </button>

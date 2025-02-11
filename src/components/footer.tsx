@@ -94,7 +94,7 @@ export function Footer() {
                     >
                       <Link href={feature.link} className="block p-4">
                         <div className="flex items-center space-x-4">
-                          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors duration-300">
+                          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center ml-blue group-hover:bg-primary/20 transition-colors duration-300">
                             {feature.icon}
                           </div>
                           <div>
@@ -134,19 +134,19 @@ export function Footer() {
             <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
 
 
-                <div>
-                <h3 className="mb-6 text-sm font-semibold uppercase">Programmable IP</h3>
+            <div>
+                <h4 className="mb-6 text-sm font-semibold uppercase">Programmable IP</h4>
                 <ul className="space-y-4">
-              <li><Link href="/new/ip" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
-              <li><Link href="/new/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
-              <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> Portfolio</Link></li>
-              <li><Link href="/licensing" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Licensing</Link></li>
-              <li><Link href="/monetize" className="flex items-center hover:underline"><Coins className="w-4 h-4 mr-2 ml-blue" /> Monetize</Link></li>
-              
-              <li><Link href="/transaction" className="flex items-center hover:underline"><Zap className="w-4 h-4 mr-2 ml-blue" /> Smart Transaction</Link></li>
-              <li><Link href="/marketplace" className="flex items-center hover:underline"><LayoutGrid className="w-4 h-4 mr-2 ml-blue" /> Marketplace</Link></li>
+                  <li><Link href="/new/ip" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
+                  <li><Link href="/new/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
+                  <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> Portfolio</Link></li>
+                  <li><Link href="/licensing" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Licensing</Link></li>
+                  <li><Link href="/monetize" className="flex items-center hover:underline"><Coins className="w-4 h-4 mr-2 ml-blue" /> Monetize</Link></li>
+                  
+                  <li><Link href="/transaction" className="flex items-center hover:underline"><Zap className="w-4 h-4 mr-2 ml-blue" /> Smart Transaction</Link></li>
+                  <li><Link href="/marketplace" className="flex items-center hover:underline"><LayoutGrid className="w-4 h-4 mr-2 ml-blue" /> Marketplace</Link></li>
                 </ul>
-                </div>
+            </div>
 
                 <div>
                 <h3 className="mb-6 text-sm font-semibold uppercase">IP Templates</h3>
@@ -186,18 +186,18 @@ export function Footer() {
 
 
             {/* Mediolano */}
-            <div className="space-y-4 lg:col-span-1">
+            <div className="space-y-4 lg:col-span-1 bg-blue-500/10 p-4 rounded-lg">
             <Link href="/" className="flex items-center space-x-2">
                 <motion.span
-                className="text-3xl"
+                className="text-1xl font-bold"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 >
-                Programmable IP
+                Programmable IP for the Integrity Web
                 </motion.span>
             </Link>
-            <p className="text-muted-foreground mr-20">
+            <p className="text-muted-foreground mr-5">
             Seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost (fraction of a cent) and smart contract intelligence for digital assets.
             Mediolano empower creators, collectors and organizations with permissionless Programmable IP services using blockchain and zero-knowledge.
                 proofs.
@@ -268,12 +268,12 @@ export function Footer() {
           <div className="mt-16 grid gap-8 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Follow Us on X/Twitter</CardTitle>
-                <CardDescription>Stay updated with the latest news and announcements from Mediolano.</CardDescription>
+                <CardTitle>Join our community on X</CardTitle>
+                <CardDescription>Interact and stay updated with the latest news and announcements from Mediolano.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-4 mb-4">
-                  <Twitter className="h-8 w-8 text-primary" />
+                  <Twitter className="h-8 w-8 ml-blue" />
                   <div>
                     <h4 className="text-sm font-semibold">@MediolanoApp</h4>
                     <p className="text-xs text-muted-foreground">Official Mediolano Twitter</p>
@@ -290,15 +290,15 @@ export function Footer() {
             {/* GitHub Repository Showcase */}
             <Card>
               <CardHeader>
-                <CardTitle>Mediolano on GitHub</CardTitle>
+                <CardTitle>Open-Source on GitHub</CardTitle>
                 <CardDescription>
-                  Explore our open-source contributions and join our developer community.
+                  Explore our open-source codebase and join our developer community.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <Github className="h-8 w-8" />
+                    <Github className="h-8 w-8 ml-blue" />
                     <div>
                       <h4 className="text-sm font-semibold">mediolano-app</h4>
                       <p className="text-xs text-muted-foreground">Core smart contracts, APIs, dApps</p>
