@@ -9,16 +9,18 @@ pub struct IPAssetData {
     pub expiry_date: u64
 }
 
-#[derive(Debug, Drop, Serde, starknet::Store, Clone, PartialEq)]
+#[derive(Default, Debug, Drop, Serde, starknet::Store, Clone, PartialEq)]
 pub enum AssetType {
+    #[default]
     Patent,
     Trademark,
     Copyright,
     TradeSecret,
 }
 
-#[derive(Debug, Drop, Serde, starknet::Store, Clone, PartialEq)]
+#[derive(Default, Debug, Drop, Serde, starknet::Store, Clone, PartialEq)]
 pub enum LicenseTerms {
+    #[default]
     Standard,
     Premium,
     Exclusive,
