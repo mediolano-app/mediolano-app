@@ -4,8 +4,9 @@ import Image from "next/image";
 
 export function Logo() {
   return (
-    <Link href="/" className="flex items-center space-x-2">
-      <div>
+    <div className="flex items-center space-x-2 ml-10">
+    <Link href="/" className="">
+      
         <Image
           className="hidden dark:block"
           src="/mediolano-logo-dark.png"
@@ -20,10 +21,8 @@ export function Logo() {
           width={140}
           height={33}
         />
-         </div>
          
-          <span className="hidden font-bold sm:inline-block">
-          </span>
     </Link>
+    </div>
   )
 }

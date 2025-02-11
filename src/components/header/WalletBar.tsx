@@ -1,11 +1,12 @@
 import { useConnect, useDisconnect, useAccount } from '@starknet-react/core';
 import { LogOut, LogOutIcon, LucideLogOut, Wallet } from 'lucide-react';
 
-
 const WalletBar: React.FC = () => {
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { address } = useAccount();
+
+
 
   return (
     <div className="flex flex-col items-center space-y-4 bg-blue/15 hidden md:flex md:flex-1">
