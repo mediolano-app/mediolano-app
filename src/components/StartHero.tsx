@@ -67,7 +67,7 @@ function ElegantShape({
             "bg-gradient-to-r to-transparent",
             gradient,
             "backdrop-blur-[2px] border-2 border-blue/[0.05]",
-            "shadow-[0_8px_32px_0_rgba(255,255,255,0.1)]",
+            "shadow-[0_8px_32px_0_rgba(255,255,255,0.05)]",
             "after:absolute after:inset-0 after:rounded-full",
             "after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_70%)]",
           )}
@@ -171,7 +171,14 @@ export default function StartHero({
 
           <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
             <p className="text-base sm:text-lg md:text-xl mb-8 leading-relaxed font-light tracking-wide max-w-xl mx-auto px-4">
-            Protect, manage and unlock new revenue streams for your Intellectual Property. Powered on
+            Protect, manage and unlock new revenue streams for your Intellectual Property.
+            </p>
+          </motion.div>
+
+
+          <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
+            <p className="text-lg mb-0 leading-relaxed font-light tracking-wide">
+            Powered on
             </p>
           </motion.div>
 
