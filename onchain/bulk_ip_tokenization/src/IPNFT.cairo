@@ -51,10 +51,8 @@ pub mod IPNFT {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, name: ByteArray, symbol: ByteArray, token_uri: ByteArray) {
-        let caller = get_caller_address();
-
-        self.ownable.initializer(caller);
+    fn constructor(ref self: ContractState, owner: ContractAddress, name: ByteArray, symbol: ByteArray, token_uri: ByteArray) {
+        self.ownable.initializer(owner);
         self.erc721.initializer(name, symbol, token_uri);
     }
 
