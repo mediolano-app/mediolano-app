@@ -151,14 +151,14 @@ export function Footer() {
                 <div>
                 <h3 className="mb-6 text-sm font-semibold uppercase">IP Templates</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/new/ip" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Default</Link></li>
-                    <li><Link href="/register/templates/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Art</Link></li>
-                    <li><Link href="/register/templates/document" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
-                    <li><Link href="/register/templates/movies" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Movies</Link></li>
-                    <li><Link href="/register/templates/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2 ml-blue" /> NFT</Link></li>
-                    <li><Link href="/register/templates/patent" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Patent</Link></li>
-                    <li><Link href="/register/templates/publication" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2 ml-blue" /> Publication</Link></li>
-                    <li><Link href="/register/templates/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2 ml-blue" /> Real World Assets</Link></li> 
+                    <li><Link href="/new/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Default</Link></li>
+                    <li><Link href="/new/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Art</Link></li>
+                    <li><Link href="/new/document" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
+                    <li><Link href="/new/video" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Video</Link></li>
+                    <li><Link href="/new/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2 ml-blue" /> NFT</Link></li>
+                    <li><Link href="/new/patent" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Patent</Link></li>
+                    <li><Link href="/new/publication" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2 ml-blue" /> Publication</Link></li>
+                    <li><Link href="/new/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2 ml-blue" /> Real World Assets</Link></li> 
                     <li><Link href="/software" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> Software</Link></li>
                 </ul>
                 </div>

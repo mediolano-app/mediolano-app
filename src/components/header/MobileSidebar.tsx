@@ -28,10 +28,10 @@ const navigationItems = [
   {
     title: 'Programmable IP',
     items: [
-      { title: 'Register', href: '/new', icon: Copyright },
+      { title: 'Create', href: '/new', icon: Copyright },
       { title: 'New IP', href: '/new/ip', icon: Copyright },
       { title: 'New Collection', href: '/new/collection', icon: Copyright },
-      { title: 'Templates', href: '/register/templates', icon: FileText },
+      { title: 'Templates', href: '/new/templates', icon: FileText },
       { title: 'FAQ', href: '/faq', icon: BookOpen },
     ],
   },
@@ -40,9 +40,7 @@ const navigationItems = [
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: FileText },
       { title: 'Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
-      { title: 'Licensing', href: '/licensing', icon: FileText },
-      { title: 'Transfer', href: '/transaction', icon: FileText },
-    ],
+      { title: 'Licensing', href: '/licensing', icon: FileText },    ],
   },
   {
     title: 'Monetize',

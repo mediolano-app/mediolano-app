@@ -5,14 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { BookOpen, FolderPlus, Image } from 'lucide-react'
+import { IPTemplates } from '@/components/IPTemplates'
 
 export default function NewContentPage() {
   const router = useRouter()
   const [selectedType, setSelectedType] = useState<string | null>(null)
 
   const contentTypes = [
-    { id: 'ip', name: 'New Programmable IP', icon: BookOpen, route: '/new/ip' },
-    { id: 'collection', name: 'New Collection', icon: FolderPlus, route: '/new/collection' },
+    { id: 'ip', name: 'Create New Programmable IP', icon: BookOpen, route: '/new/ip' },
+    { id: 'collection', name: 'Create New Collection', icon: FolderPlus, route: '/new/collection' },
   ]
 
   const handleSelection = (type: string) => {
@@ -34,6 +35,8 @@ export default function NewContentPage() {
     
     <div className="space-y-6">
       <h1 className="text-3xl font-bold tracking-tight">Create New Asset</h1>
+      
+      
       <Card className='bg-background/60'>
         <CardHeader>
           <CardTitle>Select Content Type</CardTitle>
@@ -62,6 +65,9 @@ export default function NewContentPage() {
           </Button>
         </CardContent>
       </Card>
+
+
+            <IPTemplates />
     </div>
 
     </div>
