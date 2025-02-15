@@ -5,14 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { BookOpen, FolderPlus, Image } from 'lucide-react'
+import { IPTemplates } from '@/components/IPTemplates'
 
 export default function NewContentPage() {
   const router = useRouter()
   const [selectedType, setSelectedType] = useState<string | null>(null)
 
   const contentTypes = [
-    { id: 'ip', name: 'New Programmable IP', icon: BookOpen, route: '/new/ip' },
-    { id: 'collection', name: 'New Collection', icon: FolderPlus, route: '/new/collection' },
+    { id: 'ip', name: 'Create Programmable IP', icon: BookOpen, route: '/new/asset' },
+    { id: 'collection', name: 'Create Collection', icon: FolderPlus, route: '/new/collection' },
   ]
 
   const handleSelection = (type: string) => {
@@ -33,11 +34,17 @@ export default function NewContentPage() {
     <div className="container mx-auto p-4 mt-10 mb-20">
     
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Create New Asset</h1>
-      <Card className='bg-background/60'>
+
+      <h1 className="text-3xl font-bold mb-4 text-center">Create Asset</h1>
+        <p className="text-xl text-center mb-12">
+         Tokenize your property as Programmable IP.
+        </p>
+      
+      
+      <Card className='bg-background/40'>
         <CardHeader>
-          <CardTitle>Select Content Type</CardTitle>
-          <CardDescription>Choose the type of content you want to create</CardDescription>
+          <CardTitle>Start New</CardTitle>
+          <CardDescription>Register a new Programmable IP or a new Collection to organize your digital assets.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
@@ -62,6 +69,9 @@ export default function NewContentPage() {
           </Button>
         </CardContent>
       </Card>
+
+
+            <IPTemplates />
     </div>
 
     </div>
