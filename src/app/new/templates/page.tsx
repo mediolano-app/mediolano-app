@@ -31,15 +31,15 @@ const templatesIP = () => {
   const { address: connectedAddress, isConnected, isConnecting } = useAccount();
 
   const templates = [
-    { name: 'Art', icon: Palette, href: '/register/templates/art', description: 'Tokenize your artwork' },
-    { name: 'Documents', icon: File, href: '/register/templates/document', description: 'Preserve documents on-chain' },  
-    { name: 'Movies', icon: Film, href: '/register/templates/movies', description: 'Protect your cinematic creations' }, 
-    { name: 'Music', icon: Music, href: '/register/templates/music', description: 'Copyright compositions' },
-    { name: 'NFT', icon: FileLock, href: '/register/templates/nft', description: 'NFT oriented design' },
-    { name: 'Patents', icon: ScrollText, href: '/register/templates/patents', description: 'Secure inventions and innovations' },
-    { name: 'Publications', icon: Book, href: '/register/templates/publication', description: 'Protect your written works' },
-    { name: 'RWA', icon: Globe2, href: '/register/templates/rwa', description: 'Tokenize Real World Assets' },
-    { name: 'Software', icon: FileCode, href: '/register/templates/software', description: 'Safeguard your code' },
+    { name: 'Art', icon: Palette, href: '/new/templates/art', description: 'Tokenize your artwork' },
+    { name: 'Documents', icon: File, href: '/new/templates/document', description: 'Preserve documents on-chain' },  
+    { name: 'Movies', icon: Film, href: '/new/templates/movies', description: 'Protect your cinematic creations' }, 
+    { name: 'Music', icon: Music, href: '/new/templates/music', description: 'Copyright compositions' },
+    { name: 'NFT', icon: FileLock, href: '/new/templates/nft', description: 'NFT oriented design' },
+    { name: 'Patents', icon: ScrollText, href: '/new/templates/patents', description: 'Secure inventions and innovations' },
+    { name: 'Publications', icon: Book, href: '/new/templates/publication', description: 'Protect your written works' },
+    { name: 'RWA', icon: Globe2, href: '/new/templates/rwa', description: 'Tokenize Real World Assets' },
+    { name: 'Software', icon: FileCode, href: '/new/templates/software', description: 'Safeguard your code' },
   ]
 
 
