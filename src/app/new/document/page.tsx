@@ -68,7 +68,7 @@ export default function DocumentRegistration() {
   return (
     <div className="min-h-screen py-10 mb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <Link href="/register/templates" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-8">
+        <Link href="/new/templates" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-8">
           <ArrowLeft className="h-5 w-5 mr-2" />
           Back to Templates
         </Link>
