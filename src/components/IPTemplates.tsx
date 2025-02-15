@@ -30,16 +30,18 @@ const templates = [
 
 export function IPTemplates() {
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-background/40">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4 text-center">Start with an IP Template</h1>
+
+        <h2 className="text-3xl font-bold mb-4 text-center">Start with an IP Template</h2>
         <p className="text-xl text-center mb-12">
-          Select a template to tokenize your intellectual property using blockchain technology.
+          Select an IP Template to assist and optimize the intellectual property registration process.
         </p>
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {templates.map((template) => (
             <Link key={template.name} href={template.href} className="group">
-              <Card className="h-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg dark:bg-gray-800 dark:border-gray-700">
+              <Card className="h-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg bg-background/50">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center">

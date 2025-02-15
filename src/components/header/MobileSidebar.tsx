@@ -29,7 +29,7 @@ const navigationItems = [
     title: 'Programmable IP',
     items: [
       { title: 'Create', href: '/new', icon: Copyright },
-      { title: 'New IP', href: '/new/ip', icon: Copyright },
+      { title: 'New IP', href: '/new/asset', icon: Copyright },
       { title: 'New Collection', href: '/new/collection', icon: Copyright },
       { title: 'Templates', href: '/new/templates', icon: FileText },
       { title: 'FAQ', href: '/faq', icon: BookOpen },

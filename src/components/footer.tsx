@@ -137,7 +137,7 @@ export function Footer() {
             <div>
                 <h4 className="mb-6 text-sm font-semibold uppercase">Programmable IP</h4>
                 <ul className="space-y-4">
-                  <li><Link href="/new/ip" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
+                  <li><Link href="/new/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
                   <li><Link href="/new/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
                   <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> Portfolio</Link></li>
                   <li><Link href="/licensing" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Licensing</Link></li>
