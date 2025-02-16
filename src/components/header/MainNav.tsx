@@ -56,10 +56,10 @@ export function MainNav() {
                   <NavigationMenuLink asChild>
                     <Link
                       className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                      href="/"
+                      href="/about"
                     >
                       <Rocket className="h-6 w-6" />
-                      <div className="mb-2 mt-4 text-lg font-medium">Mediolano</div>
+                      <div className="mb-2 mt-4 text-lg font-medium">Discover</div>
                       <p className="text-sm leading-tight text-muted-foreground">
                         Programmable IP for the Integrity Web.
                       </p>
