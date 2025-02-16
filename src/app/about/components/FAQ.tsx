@@ -45,9 +45,9 @@ const faqs = [
 
 export default function FAQ() {
   return (
-    <section className="space-y-6">
-       <h2 className="text-4xl text-center tracking-tighter sm:text-5xl md:text-6xl">FAQ</h2>
-      <Accordion type="single" collapsible className="w-full bg-background/40 p-8 rounded-lg">
+    <section className="space-y-6 bg-background/60 p-8 rounded-lg mt-10">
+       <h2 className="text-2xl text-center tracking-tighter sm:text-3xl md:text-4xl">FAQ</h2>
+      <Accordion type="single" collapsible className="w-full">
         {faqs.map((faq, index) => (
           <AccordionItem key={index} value={`item-${index}`}>
             <AccordionTrigger>{faq.question}</AccordionTrigger>

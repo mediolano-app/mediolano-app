@@ -53,7 +53,7 @@ const features = [
 export default function Features() {
   return (
     <section className="space-y-6">
-      <h2 className="text-4xl text-center tracking-tighter sm:text-5xl md:text-6xl">Features</h2>
+      <h2 className="text-2xl text-center tracking-tighter sm:text-3xl md:text-4xl">Features</h2>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((feature, index) => (
           <Card key={index} className="bg-background/40">
