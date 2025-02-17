@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { BookOpen, FolderPlus, Image } from 'lucide-react'
+import { ArrowRight, BookOpen, FolderPlus, Image, Info } from 'lucide-react'
 import { IPTemplates } from '@/components/IPTemplates'
+import Link from 'next/link'
 
 export default function NewContentPage() {
   const router = useRouter()
@@ -35,9 +36,9 @@ export default function NewContentPage() {
     
     <div className="space-y-6">
 
-      <h1 className="text-3xl font-bold mb-4 text-center">Create Asset</h1>
-        <p className="text-xl text-center mb-12">
-         Tokenize your property as Programmable IP.
+      <h1 className="text-3xl font-bold text-center">Create Asset</h1>
+        <p className="text-lg text-center mb-4">
+         Permissionless intellectual property tokenization.
         </p>
       
       
@@ -69,6 +70,22 @@ export default function NewContentPage() {
           </Button>
         </CardContent>
       </Card>
+
+
+      <section className="space-y-6 mt-10">
+      <div className="bg-background/80 p-8 rounded-lg">
+      <h1 className="text-xl tracking-tighter">Protecting Intellectual Property Onchain</h1>
+      <p className=" mx-auto mt-8">
+      Registering Intellectual Property on Mediolano means the asset is automatically tokenize and protected in 181 countries, according to The Berne Convention for the Protection of Literary and Artistic Works, adopted in 1886, which guarantees recognition of the authorship of IP without the need for registration with WIPO (World Intellectual Property Organization). 
+      </p>
+      <div className="flex space-x-4 mt-10">
+        
+          <Link href="/about"><Button size="lg" variant="outline">
+          Learn more <ArrowRight className="ml-2 h-4 w-4" />
+          </Button></Link>
+      </div>
+      </div>
+    </section>
 
 
             <IPTemplates />
