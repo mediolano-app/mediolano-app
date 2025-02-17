@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export function Logo() {
   return (
-    <div className="flex items-center space-x-2 ml-10">
+    <div className="flex items-center space-x-2 ml-4 md:ml-10">
     <Link href="/">
       
         <Image

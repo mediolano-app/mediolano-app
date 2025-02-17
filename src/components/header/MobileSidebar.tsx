@@ -81,13 +81,16 @@ export function MobileSidebar() {
     setIsWalletConnected(!isWalletConnected)
   }
 
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
+        <div className='pr-4'>
+        <Button variant="outline" size="icon" className="md:hidden">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
         </Button>
+        </div>
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
       <VisuallyHidden.Root>

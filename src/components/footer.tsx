@@ -77,12 +77,14 @@ export function Footer() {
     <footer className="bg-background text-foreground border-t">
       <div className="container mx-auto px-4 py-6 md:py-8 lg:py-10">
         
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8 mt-20">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8 mt-8">
 
             
             
             {/* Start */}
             <div className="lg:col-span-1">
+
+            <h3 className="mb-6 text-sm font-semibold uppercase">Quick Links</h3>
         
                 <div className="space-y-4">
                   {features.map((feature, index) => (

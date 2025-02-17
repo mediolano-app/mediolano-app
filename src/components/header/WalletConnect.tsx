@@ -32,8 +32,7 @@ export function WalletConnect() {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
-          <Wallet className="mr-2 h-4 w-4" />
-          {isConnected ? "Account" : "Connect"}
+          <Wallet className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
