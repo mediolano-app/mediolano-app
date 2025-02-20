@@ -1,375 +1,322 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { FilePlus, Lock, FileText, Coins, Shield, Globe, BarChart } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useRouter } from 'next/navigation'
-import { useAccount, useNetwork, useContract, useSendTransaction } from '@starknet-react/core'
-import { type Abi } from "starknet"
-import { abi } from '@/abis/abi'
-import { Toaster } from "@/components/ui/toaster";
-import { ToastAction } from "@/components/ui/toast"
-import { useToast } from "@/hooks/use-toast"
+import type React from "react"
+
+import { useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+} from "@/components/ui/drawer"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { useToast } from "@/components/ui/use-toast"
+import { TagInput } from "@/components/TagInput"
 
-export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
+// Mockup data
+const assetTypes = [
+  { id: "1", name: "Digital Art" },
+  { id: "2", name: "Music" },
+  { id: "3", name: "Video" },
+  { id: "4", name: "Document" },
+  { id: "5", name: "3D Model" },
+]
 
-export interface IP{
-  name: string,
-  description: string,
-  author: string,
-  type: string,
-  image: string,
-  version: string,
-  external_url: string,
+const licenses = [
+  { id: "1", name: "All Rights Reserved" },
+  { id: "2", name: "Creative Commons" },
+  { id: "3", name: "MIT License" },
+  { id: "4", name: "GNU General Public License" },
+]
+
+// Add mockup data for collections
+const collections = [
+  { id: "1", name: "Digital Art Collection" },
+  { id: "2", name: "Music NFTs" },
+  { id: "3", name: "Video Content" },
+]
+
+interface Asset {
+  title: string
+  description: string
+  assetType: string
+  mediaUrl: string
+  tags: string[]
+  license: string
+  isLimited: boolean
+  totalSupply: number
+  collection: string
+  ipVersion: string
 }
 
+export default function NewAssetPage() {
+  // Add state for new collection input
+  const [newCollection, setNewCollection] = useState("")
+  const [isNewCollection, setIsNewCollection] = useState(false)
 
-export default function RegisterIP() {
-  const pinataGateway = 'lavender-quickest-reptile-91.mypinata.cloud';
-  
+  const [asset, setAsset] = useState<Asset>({
+    title: "",
+    description: "",
+    assetType: "",
+    mediaUrl: "",
+    tags: [],
+    license: "",
+    isLimited: false,
+    totalSupply: 1,
+    collection: "",
+    ipVersion: "",
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const { toast } = useToast()
 
-
-  const { address } = useAccount();
-  const { chain } = useNetwork();
-  const { contract } = useContract({ 
-    abi: abi as Abi, 
-    address: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
-  }); 
-  const router = useRouter();  
-  const [status, setStatus] = useState("Mint NFT");
-  const [ipfsHash, setIpfsHash] = useState("");
-
-  const [loading, setLoading] = useState(false);
-  const [ipData, setIpData] = useState<IP>({
-    name: '',
-    description: '',
-    author: '',
-    type: '',
-    image: '',
-    version: '',
-    external_url: '',
-    });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [file, setFile] = useState<File | null>(null);
-  
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const {name, value} = e.target;
-    setIpData((prev) => ({...prev, [name]: value}));
-  };
-
-
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setFile(e.target.files[0]);
+  // Update the handleInputChange function to include newCollection
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    if (name === "newCollection") {
+      setNewCollection(value)
+    } else {
+      setAsset((prev) => ({ ...prev, [name]: value }))
     }
-  };
+  }
 
-  const { send, error: mintError} = useSendTransaction({ 
-    calls: 
-      contract && address   
-        ? [contract.populate("mint_item", [address, ipfsHash])] 
-        : undefined, 
-  }); 
-
-  const handleMintItem = async () => {
-    try {
-      send();
-      console.log("Mint sent")
+  // Update the handleSelectChange function to handle collection selection
+  const handleSelectChange = (name: string, value: string) => {
+    if (name === "collection" && value === "new") {
+      setIsNewCollection(true)
+      setAsset((prev) => ({ ...prev, collection: "" }))
+    } else {
+      setIsNewCollection(false)
+      setAsset((prev) => ({ ...prev, [name]: value }))
     }
-    catch(error){
-      console.error("Mint error: ", mintError); 
-    }    
-  };
+  }
 
-  // async function mintItem(){
-  //   try {
-  //     console.log("entrei no try do mint")
-  //     const tokenId = await contract.mint_item(myAddress, ipfsHash);
-  //     console.log(tokenId);
-  //   }
-  //   catch (e) {
-  //     console.log(e);
-  //   }
-  // }
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    console.log(ipData);
-    event.preventDefault();
-    
-    setIsSubmitting (true);
-    setError(null);
-
-    const submitData = new FormData();
-    
-    submitData.append('name', ipData.name);
-    submitData.append('description', ipData.description);
-    if (Array.isArray(ipData.author)) {
-        ipData.author.forEach((author, index) => {
-          submitData.append(`author[${index}]`, author)
-        })
-      } else {
-        submitData.append('author', ipData.author);
-      }
-      
-    submitData.append('type', ipData.type);
-
-    submitData.append('image', ipData.image);
-    submitData.append('version', ipData.version);
-    submitData.append('external_url', ipData.external_url);
-    
-    if (file) {
-      submitData.set('uploadFile', file);
-    }
-
-    for (let pair of submitData.entries()) {
-      console.log(`${pair[0]}: ${pair[1]}`);
-    } //just for checking
+  // Update the handleSubmit function to include the new fields
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
 
     try {
-      const response = await fetch('/api/forms-ipfs', {
-        method: 'POST',
-        body: submitData,
-      });
-      console.log("POST done, waiting for response");
-      if (!response.ok) {
-        throw new Error('Failed to submit IP')
-      }
-      console.log('IP submitted successfully');
+      // Simulating an API call to a smart contract
+      await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      
-      const data = await response.json();
-      const ipfs = data.uploadData.IpfsHash as string;
-      console.log(ipfs);
-      setIpfsHash(ipfs);
+      // If it's a new collection, use the newCollection value
+      const finalCollection = isNewCollection ? newCollection : asset.collection
+
+      // Log the final asset data (replace with actual submission logic)
+      console.log({
+        ...asset,
+        collection: finalCollection,
+      })
+
+      setIsDrawerOpen(true)
+    } catch (error) {
+      console.error("Submission error:", error)
+      toast({
+        title: "Error",
+        description: "Failed to create asset. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleTransactionSign = async () => {
+    try {
+      // Simulating a blockchain transaction
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
       toast({
-        title: "IP Protected",
-        description: "Finalize your intellectual property registration by approving the asset creation on the Starknet blockchain. Visit Portfolio to manage your digital assets.",
-        action: (
-          <ToastAction altText="OK">OK</ToastAction>
-        ),
-      });
-      
-    } catch (err) {
-        setError('Failed submitting or minting IP. Please try again.');
-        toast({
-          title: "Error",
-          description: "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
-          action: (
-            <ToastAction altText="OK">OK</ToastAction>
-          ),
-        });
-
-    } finally {
-        setIsSubmitting(false);
-        
+        title: "Asset Created",
+        description: "Your new asset has been successfully minted as an NFT.",
+      })
+      setIsDrawerOpen(false)
+    } catch (error) {
+      console.error("Transaction error:", error)
+      toast({
+        title: "Transaction Failed",
+        description: "Failed to sign the transaction. Please try again.",
+        variant: "destructive",
+      })
     }
-  };
-
-  useEffect(()=> {
-    handleMintItem();
-    // mintItem();
-  }, [ipfsHash]);
-
-
-
-
-
-
+  }
 
   return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Create New Asset</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Asset Details</CardTitle>
+          <CardDescription>Enter the details of your new Programmable IP NFT</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="title">Title</Label>
+              <Input id="title" name="title" value={asset.title} onChange={handleInputChange} required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={asset.description}
+                onChange={handleInputChange}
+                rows={4}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="assetType">Asset Type</Label>
+              <Select value={asset.assetType} onValueChange={(value) => handleSelectChange("assetType", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select asset type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {assetTypes.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mediaUrl">Media URL</Label>
+              <Input
+                id="mediaUrl"
+                name="mediaUrl"
+                value={asset.mediaUrl}
+                onChange={handleInputChange}
+                placeholder="https://example.com/asset.jpg"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Tags</Label>
+              <TagInput tags={asset.tags} setTags={(newTags) => setAsset((prev) => ({ ...prev, tags: newTags }))} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="license">License</Label>
+              <Select value={asset.license} onValueChange={(value) => handleSelectChange("license", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select license" />
+                </SelectTrigger>
+                <SelectContent>
+                  {licenses.map((license) => (
+                    <SelectItem key={license.id} value={license.id}>
+                      {license.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="collection">Collection</Label>
+              <Select value={asset.collection} onValueChange={(value) => handleSelectChange("collection", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select or create a collection" />
+                </SelectTrigger>
+                <SelectContent>
+                  {collections.map((collection) => (
+                    <SelectItem key={collection.id} value={collection.id}>
+                      {collection.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="new">Create New Collection</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {isNewCollection && (
+              <div className="space-y-2">
+                <Label htmlFor="newCollection">New Collection Name</Label>
+                <Input
+                  id="newCollection"
+                  name="newCollection"
+                  value={newCollection}
+                  onChange={handleInputChange}
+                  placeholder="Enter new collection name"
+                  required
+                />
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="ipVersion">IP Version</Label>
+              <Input
+                id="ipVersion"
+                name="ipVersion"
+                value={asset.ipVersion}
+                onChange={handleInputChange}
+                placeholder="e.g., 1.0"
+                required
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isLimited"
+                checked={asset.isLimited}
+                onCheckedChange={(checked) => setAsset((prev) => ({ ...prev, isLimited: checked }))}
+              />
+              <Label htmlFor="isLimited">Limited Edition</Label>
+            </div>
+            {asset.isLimited && (
+              <div className="space-y-2">
+                <Label htmlFor="totalSupply">Total Supply</Label>
+                <Input
+                  id="totalSupply"
+                  name="totalSupply"
+                  type="number"
+                  min="1"
+                  value={asset.totalSupply}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+            )}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating Asset..." : "Create Asset"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
 
-  <div className="container mx-auto px-4 py-8 mt-10 mb-20">
-    <h1 className="text-4xl font-bold text-center mb-8">Intellectual Property Registration</h1>
-
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-    
-    <div className="text-card-foreground">
-    <Card>
-    <CardHeader>
-      <CardTitle>Create new IP</CardTitle>
-      <CardDescription>Register your intellectual property on Starknet blockchain.</CardDescription>
-    </CardHeader>
-    <CardContent>
- 
-  <form onSubmit={handleSubmit} className="space-y-6">
-    <div>
-      <label htmlFor="name" className="block mb-1 font-medium">Title</label>
-      <input 
-        type="text" 
-        id="name" 
-        name="name"
-        placeholder='Intellectual Property Name'
-        value={ipData.name}
-        onChange={handleChange}
-        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
-        required 
-      />
-      </div>
-    <div>
-      <label htmlFor="description" className="block mb-1 font-medium">Description</label>
-      <textarea 
-        id="description" 
-        name="description" 
-        placeholder='Intellectual Property Content/Description'
-        value={ipData.description}
-        onChange={handleChange}
-        className="w-full rounded input input-bordered border  bg-white dark:bg-black p-2" 
-        rows={4}
-        required
-      ></textarea>
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Sign Transaction</DrawerTitle>
+            <DrawerDescription>Please sign the transaction to mint your new Programmable IP NFT.</DrawerDescription>
+          </DrawerHeader>
+          <div className="p-4 space-y-4">
+            <p>Asset Details:</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Title: {asset.title}</li>
+              <li>Type: {assetTypes.find((t) => t.id === asset.assetType)?.name}</li>
+              <li>License: {licenses.find((l) => l.id === asset.license)?.name}</li>
+              <li>
+                Collection: {isNewCollection ? newCollection : collections.find((c) => c.id === asset.collection)?.name}
+              </li>
+              <li>IP Version: {asset.ipVersion}</li>
+              {asset.isLimited && <li>Total Supply: {asset.totalSupply}</li>}
+            </ul>
+          </div>
+          <DrawerFooter>
+            <Button onClick={handleTransactionSign}>Sign Transaction</Button>
+            <Button variant="outline" onClick={() => setIsDrawerOpen(false)}>
+              Cancel
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </div>
-    <div>
-      <label htmlFor="author" className="block mb-1 font-medium">Author</label>
-      <input 
-        type="text" 
-        id="author" 
-        name="author"
-        placeholder='Author(s)'
-        value={ipData.author}
-        onChange={handleChange} 
-        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
-        required 
-      />
-      </div>
-    <div>
-      <label htmlFor="type" className="block mb-1 font-medium">Type</label>
-      <select 
-        id="type" 
-        name="type" 
-        value={ipData.type}
-        onChange={ (e:any) => {
-          setIpData((prev) => ({ ...prev, "type": e.target.value }));
-          console.log(e);
-        }}
-        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2"
-      >
-        <option value="copyright">Copyright</option>
-        <option value="patent">Patent</option>
-        <option value="trademark">Trademark</option>
-        <option value="trade_secret">Trade Secret</option>
-        <option value="trade_secret">Other</option>
-      </select>
-    </div>
-    <div>
-      <label htmlFor="image" className="block mb-1 font-medium">Image Preview URL</label>
-      <input 
-        type="text" 
-        id="image" 
-        name="image"
-        placeholder='https://your-image-address'
-        value={ipData.image}
-        onChange={handleChange} 
-        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
-        required 
-      />
-      </div>
-      <div>
-      <label htmlFor="external_url" className="block mb-1 font-medium">External Link URL</label>
-      <input 
-        type="text" 
-        id="external_url" 
-        name="external_url"
-        placeholder='https://your-link-address'
-        value={ipData.external_url}
-        onChange={handleChange} 
-        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2" 
-      />
-      </div>
-      <div>
-      <label htmlFor="version" className="block mb-1 font-medium">Version</label>
-      <input 
-        type="text" 
-        id="version" 
-        name="version"
-        placeholder='IP Version (Optional)'
-        value={ipData.version}
-        onChange={handleChange} 
-        className="w-full rounded input input-bordered border bg-white dark:bg-black p-2"  
-      />
-      </div>
-    
-    <button type="submit" className="px-6 py-4 flex items-center justify-center w-full rounded input input-bordered bg-blue-600">
-      <FilePlus className="h-5 w-5 mr-2" /> Register IP
-    </button>
-  </form>
-  </CardContent>
-    <CardFooter className="flex justify-between">
-    </CardFooter>
-  </Card>
-  </div>
-
-
-
-<div>
-
-  <Card  className="rounded-lg shadow-lg bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
-  <div className="text-card-foreground rounded-lg p-6">
-
-
-  
-    <div className="py-2">
-      <h2 className="text-2xl font-semibold mb-2">Blockchain IP Registration Features</h2>
-      <p className="text-muted-foreground mb-4">Secure, transparent, and efficient</p>
-      </div>
-    
-      <ul className="space-y-6">
-        <li className="flex items-start">
-          <Lock className="w-6 h-6 mr-3 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold mb-1">Immutable Protection</h3>
-            <p className="text-sm text-muted-foreground">Your IP is securely stored on the blockchain, providing tamper-proof evidence of ownership and creation date.</p>
-          </div>
-        </li>
-        <li className="flex items-start">
-          <FileText className="w-6 h-6 mr-3 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold mb-1">Smart Licensing</h3>
-            <p className="text-sm text-muted-foreground">Utilize smart contracts for automated licensing agreements, ensuring proper attribution and compensation.</p>
-          </div>
-        </li>
-        <li className="flex items-start">
-          <Coins className="w-6 h-6 mr-3 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold mb-1">Tokenized Monetization</h3>
-            <p className="text-sm text-muted-foreground">Transform your IP into digital assets, enabling fractional ownership and new revenue streams.</p>
-          </div>
-        </li>
-        <li className="flex items-start">
-          <Shield className="w-6 h-6 mr-3 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold mb-1">Enhanced Security</h3>
-            <p className="text-sm text-muted-foreground">Benefit from blockchain's cryptographic security, protecting your IP from unauthorized access and tampering.</p>
-          </div>
-        </li>
-        <li className="flex items-start">
-          <Globe className="w-6 h-6 mr-3 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold mb-1">Global Accessibility</h3>
-            <p className="text-sm text-muted-foreground">Access and manage your IP rights from anywhere in the world, facilitating international collaborations and licensing.</p>
-          </div>
-        </li>
-        <li className="flex items-start">
-          <BarChart className="w-6 h-6 mr-3 flex-shrink-0" />
-          <div>
-            <h3 className="font-semibold mb-1">Analytics and Insights</h3>
-            <p className="text-sm text-muted-foreground">Gain valuable insights into your IP portfolio's performance and market trends through blockchain-powered analytics.</p>
-          </div>
-        </li>
-      </ul>
-    </div>
-    </Card>
-
-    </div>
-  </div>
-
-</div>
-
   )
 }
+
