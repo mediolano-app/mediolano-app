@@ -1,122 +1,102 @@
 #[starknet::contract]
-mod MarketplaceContract {
-    use starknet::ContractAddress;
+mod MarketplaceViewerContract {
+    use starknet::{ContractAddress, contract_address_const};
     use starknet::get_caller_address;
-    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
+    use starknet::syscalls::call_contract_syscall;
+    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess};
+    use core::array::ArrayTrait;
 
     #[storage]
     struct Storage {
         owner: ContractAddress,
-        users: Map::<ContractAddress, User>,
-        assets: Map::<u256, Asset>,
+        asset_contract_addresses: Map::<felt252, ContractAddress>,
+    }
+
+    #[derive(Drop, Serde)]
+    struct AssetDetails {
+        owner: felt252,
+        price: felt252,
     }
 
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
-        UserRegistered: UserRegistered,
-        AssetCreated: AssetCreated,
-        AssetUpdated: AssetUpdated,
-        AssetSold: AssetSold,
+        AssetContractAdded: AssetContractAdded,
     }
 
     #[derive(Drop, starknet::Event)]
-    struct UserRegistered {
-        address: ContractAddress,
-        username: felt252,
+    struct AssetContractAdded {
+        asset_type: felt252,
+        contract_address: ContractAddress,
     }
 
-    #[derive(Drop, starknet::Event)]
-    struct AssetCreated {
-        asset_id: u256,
-        owner: ContractAddress,
-        price: u256,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct AssetUpdated {
-        asset_id: u256,
-        new_price: u256,
-    }
-
-    #[derive(Drop, starknet::Event)]
-    struct AssetSold {
-        asset_id: u256,
-        seller: ContractAddress,
-        buyer: ContractAddress,
-        price: u256,
-    }
-
-    #[derive(Drop, Serde, starknet::Store)]
-    struct User {
-        username: felt252,
-        bio: felt252,
-        social_link: felt252,
-        registered: bool,
-    }
-
-    #[derive(Drop, Serde, starknet::Store)]
-    struct Asset {
-        owner: ContractAddress,
-        price: u256,
-    }
-
-    // ... (constructor and other functions remain the same)
-
-    #[external(v0)]
-    fn create_asset(ref self: ContractState, asset_id: u256, price: u256) {
-        let caller = get_caller_address();
-        let user = self.users.read(caller);
-        assert!(user.registered, "User not registered");
-
-        let new_asset = Asset { owner: caller, price: price };
-        self.assets.write(asset_id, new_asset);
-
-        self.emit(AssetCreated { asset_id: asset_id, owner: caller, price: price });
+    #[constructor]
+    fn constructor(ref self: ContractState, owner: ContractAddress) {
+        self.owner.write(owner);
     }
 
     #[external(v0)]
-    fn update_asset_price(ref self: ContractState, asset_id: u256, new_price: u256) {
-        let caller = get_caller_address();
-        let mut asset = self.assets.read(asset_id);
-        assert!(asset.owner == caller, "Only owner can update price");
-
-        asset.price = new_price;
-        self.assets.write(asset_id, asset);
-
-        self.emit(AssetUpdated { asset_id: asset_id, new_price: new_price });
+    fn add_asset_contract(ref self: ContractState, asset_type: felt252, contract_address: ContractAddress) {
+        assert(get_caller_address() == self.owner.read(), 'Only owner can add');
+        self.asset_contract_addresses.write(asset_type, contract_address);
+        self.emit(AssetContractAdded { asset_type, contract_address });
     }
 
     #[external(v0)]
-    fn buy_asset(ref self: ContractState, asset_id: u256) {
-        let caller = get_caller_address();
-        let buyer = self.users.read(caller);
-        assert!(buyer.registered, "Buyer not registered");
+    fn get_asset_details(self: @ContractState, asset_type: felt252, asset_id: u256) -> AssetDetails {
+        let contract_address = self.asset_contract_addresses.read(asset_type);
+        assert(contract_address != get_caller_address(), 'contract not registered');
 
-        let asset = self.assets.read(asset_id);
-        assert!(asset.owner != caller, "Cannot buy your own asset");
+        // Call the external contract to get asset details
+        let result = call_contract_syscall(
+            contract_address,
+            selector!("get_asset_details"),
+            array![asset_id.try_into().unwrap()].span()
+        ).unwrap();
 
-        // In a real implementation, you'd handle the payment here
+        // Parse the result into AssetDetails
+        assert(result.len() == 2, 'Unexpected result length');
 
-        // Update asset ownership
-        let updated_asset = Asset { owner: caller, price: asset.price };
-        self.assets.write(asset_id, updated_asset);
-
-        self.emit(AssetSold { 
-            asset_id: asset_id, 
-            seller: asset.owner, 
-            buyer: caller, 
-            price: asset.price 
-        });
-    }
-
-    #[external(v0)]
-    fn get_asset_details(self: @ContractState, asset_id: u256) -> Option<Asset> {
-        let asset = self.assets.read(asset_id);
-        if asset.owner == starknet::contract_address_const::<0>() {
-            Option::None
-        } else {
-            Option::Some(asset)
+        let owner_address = *result[0];
+        let price = *result[1];
+    
+        // Create the AssetDetails struct.
+        AssetDetails {
+            owner: owner_address.try_into().unwrap(),
+            price: price.try_into().unwrap(),
         }
+    }
+
+    #[external(v0)]
+    fn get_user_assets(self: @ContractState, asset_type: felt252, user: ContractAddress) -> Array<u256> {
+        let contract_address = self.asset_contract_addresses.read(asset_type);
+        assert(contract_address != get_caller_address(), 'contract not registered');
+
+        // Call the external contract to get user assets
+        let result = call_contract_syscall(
+            contract_address,
+            selector!("get_user_assets"),
+            array![user.into()].span()
+        ).unwrap();
+
+        // Ensure we received an even number of elements (each u256 is two felts).
+        let len = result.len();
+        assert(len % 2 == 0, 'Unexpected result length');
+    
+        // Calculate the number of asset IDs.
+        let num_assets = len / 2;
+    
+        // Initialize an empty array to hold the asset IDs.
+        let mut assets: Array<u256> = ArrayTrait::new();
+
+        let mut i = 0;
+        while i < num_assets {
+            let low: felt252 = *result[2 * i];
+            let high: felt252 = *result[2 * i + 1];
+            assets.append(u256 { low: low.try_into().unwrap(), high: high.try_into().unwrap() });
+            i = i + 1;
+        };
+        assets
+
     }
 }
