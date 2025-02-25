@@ -13,7 +13,7 @@ export function Items() {
             <CardContent className="p-4">
               <div className="aspect-square relative mb-2">
                 <Image
-                  src={item.image || "/placeholder.svg"}
+                  src={item.image || "/background.jpg"}
                   alt={item.name}
                   layout="fill"
                   objectFit="cover"

@@ -25,7 +25,7 @@ const trendingCollections = [
     items: 100,
     floorPrice: "0.5 ETH",
     image: "/background.jpg",
-    creatorAvatar: "/placeholder.svg?height=40&width=40",
+    creatorAvatar: "/background.jpg?height=40&width=40",
     verified: true,
   },
   {
@@ -36,7 +36,7 @@ const trendingCollections = [
     items: 50,
     floorPrice: "500 USD",
     image: "/background.jpg",
-    creatorAvatar: "/placeholder.svg?height=40&width=40",
+    creatorAvatar: "/background.jpg?height=40&width=40",
     verified: true,
   },
   {
@@ -47,7 +47,7 @@ const trendingCollections = [
     items: 75,
     floorPrice: "0.3 ETH",
     image: "/background.jpg",
-    creatorAvatar: "/placeholder.svg?height=40&width=40",
+    creatorAvatar: "/background.jpg?height=40&width=40",
     verified: false,
   },
 ]
@@ -59,7 +59,7 @@ const notableDrops = [
     creator: "TechInnovators",
     date: "Live",
     image: "/background.jpg",
-    creatorAvatar: "/placeholder.svg?height=40&width=40",
+    creatorAvatar: "/background.jpg?height=40&width=40",
   },
   {
     id: 2,
@@ -67,7 +67,7 @@ const notableDrops = [
     creator: "ModernArtists",
     date: "Live",
     image: "/background.jpg",
-    creatorAvatar: "/placeholder.svg?height=40&width=40",
+    creatorAvatar: "/background.jpg?height=40&width=40",
   },
   {
     id: 3,
@@ -75,7 +75,7 @@ const notableDrops = [
     creator: "ScienceDAO",
     date: "Upcoming",
     image: "/background.jpg",
-    creatorAvatar: "/placeholder.svg?height=40&width=40",
+    creatorAvatar: "/background.jpg?height=40&width=40",
   },
 ]
 
@@ -84,21 +84,21 @@ const topCreators = [
     id: 1,
     name: "CryptoArtist",
     volume: "120.5 ETH",
-    avatar: "/placeholder.svg?height=64&width=64",
+    avatar: "/background.jpg?height=64&width=64",
     verified: true,
   },
   {
     id: 2,
     name: "ResearchDAO",
     volume: "89.2 ETH",
-    avatar: "/placeholder.svg?height=64&width=64",
+    avatar: "/background.jpg?height=64&width=64",
     verified: true,
   },
   {
     id: 3,
     name: "FilmMakers United",
     volume: "67.8 ETH",
-    avatar: "/placeholder.svg?height=64&width=64",
+    avatar: "/background.jpg?height=64&width=64",
     verified: false,
   },
 ]

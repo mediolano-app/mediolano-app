@@ -36,7 +36,7 @@ export function NFTCard({
       <CardHeader className="p-0">
         <div className="relative aspect-square">
           <Image
-            src={image || "/placeholder.svg"}
+            src={image || "/background.jpg"}
             alt={name}
             layout="fill"
             objectFit="cover"
@@ -48,7 +48,7 @@ export function NFTCard({
         <CardTitle className="text-lg mb-2 truncate">{name}</CardTitle>
         <p className="text-sm text-muted-foreground mb-1">
           by{" "}
-          <Link href={`/user/${creator}`} className="text-primary hover:underline">
+          <Link href={`/m-profile/${creator}`} className="text-primary hover:underline">
             {creator}
           </Link>
         </p>

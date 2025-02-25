@@ -7,13 +7,14 @@ import { useAccount, useBalance, useBlockNumber, useContract, useReadContract, u
 import { BlockNumber, Contract, RpcProvider } from "starknet";
 import { formatAmount, shortenAddress } from '@/lib/utils';
 import StartPage from "@/components/StartPage";
+import StartHero from "@/components/StartHero";
 
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 gap-16 sm:p-16">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <StartPage />
+    <div className="grid">
+      <main className="flex flex-col row-start-2">
+        <StartHero />
       </main>
     </div>
   );

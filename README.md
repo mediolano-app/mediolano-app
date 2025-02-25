@@ -3,25 +3,26 @@
 > [!IMPORTANT]
 > Mediolano dapp is in constant development and the current version runs on Starknet's Sepolia devnet. Use for testing purposes only. 
 
-## Unleash Intellectual Potential with Programmable IP 
+## Programmable IP for the Integrity Web
 
-The digital age has redefined the boundaries of creativity, but traditional IP management systems haven't kept pace. Mediolano Protocol aims to be a cutting-edge permissionless decentralized intellectual property provider for the integrity web.
+Mediolano provides seamless tokenization services for intellectual property, leveraging Starknet’s unparalleled high-speed, low-cost, and smart contract intelligence for digital assets to empower creators, collectors, and organizations to protect and monetize their IP assets effectively.
 
-With Mediolano, anyone can seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets for a groundbreaking solution designed to empower creators on management, sharing, and monetization through advanced blockchain technology. 
+Registering intellectual property on Mediolano means your asset is automatically tokenized and protected in 181 countries, according to The Berne Convention for the Protection of Literary and Artistic Works, adopted in 1886. Mediolano assets generate Proof of Ownership to guarantee recognition of the authorship of IP without the need for registration with the World Intellectual Property Organization (WIPO).
 
-By integrating ERC721 and IPFS technology, Mediolano ensures decentralization, interoperability and sovereignty to your assets.
+Mediolano offers permissionless services with ZERO FEES for Programmable IP, such as artwork, videos, music, literary works, AI models, software, and other works of authorship. The copyright is immutable time stamped on Starknet public blockchain, and settled on Ethereum, providing Proof of Ownership valid for 50-70 years, in accord with the legal jurisdiction. Tokenizing intellectual property with smart contracts opens the door to countless opportunities, from integrations with communities and games to monetization with AI Agents.
 
-Mediolano is tailored for the tokenization and management of intellectual property. Whether it’s digital art, AI models, literary works, or any form of creative expression, Mediolano Protocol enables you to register, track, and monetize your IP effortlessly and unlock new revenue streams.
+Mediolano aims to serve as the intellectual property provider for the integrity web, a public good to empower programmable IP to anyone. By integrating standards, innovative technology and decentralization, Mediolano ensures interoperability, security and sovereignty. Our platform is tailored for the tokenization and management of intellectual property, enabling you to register, track, license and monetize IP effortlessly, unlocking new revenue streams.
+
 
 ### Key Features
 
-- Tokenize Any IP: Transform intelligence works into digital assets that can be managed, traded, and monetized. This includes everything from images, music, NFTs, papers, video and real-world assets.
+- Programmable IP: Transform intelligence works into digital assets that can be managed, traded, and monetized. This includes everything from images, music, NFTs, papers, video and real-world assets.
 
 - Immutable Ownership & Attribution: blockchain ensures clear sovereignty, verifiable ownership and attribution for every piece of IP, safeguarding your property.
 
 - Enhanced Registration & Protection: Use templates and smart contracts to take charge of your IP assets in the digital realm with immutable and transparent ownership.
 
-- High-Speed & Low-Cost: Leverage Starknet's unparalleled speed and cost-efficiency.
+- High-Speed & Low-Cost: Leverage Starknet's unparalleled speed and cost-efficiency with ZERO FEES on Mediolano Protocol.
 
 [![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
 
@@ -32,7 +33,7 @@ Mediolano is tailored for the tokenization and management of intellectual proper
 </h2>
 
 
-### Getting Started
+## Getting Started
 
 Dapp requirements:
 - Next.js 15

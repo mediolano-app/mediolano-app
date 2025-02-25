@@ -13,7 +13,7 @@ export function Collections() {
             <CardContent className="p-4">
               <div className="aspect-square relative mb-2">
                 <Image
-                  src={collection.image || "/placeholder.svg"}
+                  src={collection.image || "/background.jpg"}
                   alt={collection.name}
                   layout="fill"
                   objectFit="cover"

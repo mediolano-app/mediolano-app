@@ -155,7 +155,7 @@ export default function DashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Image
-                      src={collection.image || "/placeholder.svg"}
+                      src={collection.image || "/background.jpg"}
                       alt={collection.name}
                       width={40}
                       height={40}

@@ -19,7 +19,7 @@ export default function CollectionPage({ params }: { params: { id: string } }) {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <Image
-          src={collection.coverImage || "/placeholder.svg"}
+          src={collection.coverImage || "/background.jpg"}
           alt={collection.name}
           width={1200}
           height={400}
@@ -28,7 +28,7 @@ export default function CollectionPage({ params }: { params: { id: string } }) {
         <h1 className="text-4xl font-bold mb-2">{collection.name}</h1>
         <p className="text-xl mb-4">
           Created by:{" "}
-          <Link href={`/user/${collection.creator}`} className="text-primary hover:underline">
+          <Link href={`/m-profile/${collection.creator}`} className="text-primary hover:underline">
             {collection.creator}
           </Link>
         </p>
