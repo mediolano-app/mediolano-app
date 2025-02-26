@@ -72,7 +72,7 @@ export default function CategoriesPage() {
         <div className="space-y-4">
           {paginatedNFTs.map((nft) => (
             <div key={nft.id} className="flex items-center gap-4 p-4 border rounded-lg">
-              <img src={nft.image || "/placeholder.svg"} alt={nft.name} className="w-24 h-24 object-cover rounded" />
+              <img src={nft.image || "/background.jpg"} alt={nft.name} className="w-24 h-24 object-cover rounded" />
               <div className="flex-1">
                 <h3 className="text-lg font-semibold">{nft.name}</h3>
                 <p className="text-sm text-muted-foreground">by {nft.creator}</p>
@@ -82,7 +82,7 @@ export default function CategoriesPage() {
                 </p>
               </div>
               <Button asChild variant="secondary">
-                <a href={`/nft/${nft.id}`}>View</a>
+                <Link href={`/nft/${nft.id}`}>View</Link>
               </Button>
             </div>
           ))}

@@ -5,6 +5,10 @@ export const users = [
       username: "alice_nft",
       avatar: "/background.jpg",
       bio: "Digital artist and NFT enthusiast",
+      coverImage: "/background.jpg",
+      twitter: "alice_nft",
+      instagram: "alice_nft",
+      website: "https://alicejohnson.com",
     },
     {
       id: "2",
@@ -12,8 +16,13 @@ export const users = [
       username: "bob_collector",
       avatar: "/background.jpg",
       bio: "Passionate NFT collector and trader",
+      coverImage: "/background.jpg",
+      twitter: "bob_collector",
+      instagram: "bob_collector",
+      website: "https://bobsmith.com",
     },
   ]
+
   
   export const collections = [
     {
