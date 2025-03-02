@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { Metadata } from "next"
 import Image from "next/image"
 import {
@@ -25,7 +25,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Header } from "@/components/header"
 import { mockNFTs, mockCollections, mockPortfolioStats } from "@/lib/dashboardData"
+import { useReadContract, useAccount } from '@starknet-react/core';
+import abi from "@/abis/abiLic";
+import { type Abi, Contract, Provider, Result } from "starknet";
 
+
+const provider = new Provider();
+const { address, account} = useAccount();
+
+
+export async function fetchUserAssets(userAddress: string) {
+  const contract = new Contract(abi, "CONTRACT_ADDRESS", provider);
+  const ipCollections = await contract.call("getIPCollections", [userAddress]);
+  const erc1155Tokens = await contract.call("getERC1155Tokens", [userAddress]);
+  const ipLicensings = await contract.call("getIPLicensings", [userAddress]);
+
+  return { ipCollections, erc1155Tokens, ipLicensings };
+}
 
 export default function DashboardPage() {
   const [recentAssetsCount, setRecentAssetsCount] = useState(4)
@@ -33,6 +49,32 @@ export default function DashboardPage() {
   const [userAssetsSearch, setUserAssetsSearch] = useState("")
   const [userAssetsFilter, setUserAssetsFilter] = useState("all")
   const [displayedCollections, setDisplayedCollections] = useState(6)
+
+  const [assets, setAssets] = useState({ ipCollections: [], erc1155Tokens: [], ipLicensings: [] });
+  const [filteredAssets, setFilteredAssets] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCollection, setSelectedCollection] = useState("all");
+
+  useEffect(() => {
+    if (account) {
+      fetchUserAssets(account.address).then(setAssets);
+    }
+  }, [account]);
+
+  // const filteredUserAssets = assets.ipCollections.filter(
+  //   (nft) =>
+  //     nft.name.toLowerCase().includes(userAssetsSearch.toLowerCase()) &&
+  //     (userAssetsFilter === "all" || nft.collection.toLowerCase() === userAssetsFilter.toLowerCase())
+  // )
+
+  // useEffect(() => {
+  //   const filtered = assets.ipCollections.filter((asset) =>
+  //     asset.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+  //     (selectedCollection === "all" || asset.collection === selectedCollection)
+  //   );
+  //   setFilteredAssets(filtered);
+  // }, [searchQuery, selectedCollection, assets]);
+
 
   const filteredUserAssets = mockNFTs.filter(
     (nft) =>
@@ -312,4 +354,8 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+// function setAssets(value: { ipCollections: Result; erc1155Tokens: Result; ipLicensings: Result }): { ipCollections: Result; erc1155Tokens: Result; ipLicensings: Result } | PromiseLike<{ ipCollections: Result; erc1155Tokens: Result; ipLicensings: Result }> {
+//   throw new Error("Function not implemented.")
+// }
 
