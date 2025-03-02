@@ -33,6 +33,7 @@ export const useXVerification = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred")
       setState("error")
+      setUsername(false)
     }
   }, [])
 
