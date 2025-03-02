@@ -15,3 +15,9 @@ export const formatAmount = (hex: string) => {
   const decimal = parseInt(hex, 16);
   return decimal.toString();
 };
+
+// Helper function to truncate long strings
+export const truncateString = (str: string, maxLength: number = 30) => {
+  if (str.length <= maxLength) return str
+  return `${str.substring(0, maxLength)}...`
+}

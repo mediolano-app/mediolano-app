@@ -4,8 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ExternalLink } from "lucide-react"
 import { getCreatorInfo } from "@/lib/mockAssetDashboard"
+interface CreatorInfoProps {
+  nftData: {
+    creator: string
+  }
+}
 
-export function CreatorInfo() {
+export function CreatorInfo({ nftData }: CreatorInfoProps) {
   const creator = getCreatorInfo()
 
   return (
@@ -16,9 +21,9 @@ export function CreatorInfo() {
       <CardContent className="flex flex-col items-center text-center">
         <Avatar className="w-24 h-24 mb-4">
           <AvatarImage src={creator.avatarUrl} alt={creator.name} />
-          <AvatarFallback>{creator.name.charAt(0)}</AvatarFallback>
+          <AvatarFallback>{nftData.creator.charAt(0) || "U"}</AvatarFallback>
         </Avatar>
-        <h3 className="text-xl font-semibold mb-2">{creator.name}</h3>
+        <h3 className="text-xl font-semibold mb-2">{nftData.creator || "Unknown"}</h3>
         <p className="text-sm text-muted-foreground mb-4">{creator.bio}</p>
         <div className="grid grid-cols-3 gap-4 w-full mb-4">
           <div>
