@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import React, { useState } from "react";
+import { useAccount } from "@starknet-react/core";
+import { useSmartContract } from "@/hooks/useSmartContract";
+import { CallData } from "starknet";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Drawer,
   DrawerContent,
@@ -15,11 +16,11 @@ import {
   DrawerTitle,
   DrawerDescription,
   DrawerFooter,
-} from "@/components/ui/drawer"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { useToast } from "@/components/ui/use-toast"
-import { TagInput } from "@/components/TagInput"
+} from "@/components/ui/drawer";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/components/ui/use-toast";
+import { TagInput } from "@/components/TagInput";
 
 // Mockup data
 const assetTypes = [
@@ -28,40 +29,41 @@ const assetTypes = [
   { id: "3", name: "Video" },
   { id: "4", name: "Document" },
   { id: "5", name: "3D Model" },
-]
+];
 
 const licenses = [
   { id: "1", name: "All Rights Reserved" },
   { id: "2", name: "Creative Commons" },
   { id: "3", name: "MIT License" },
   { id: "4", name: "GNU General Public License" },
-]
+];
 
-// Add mockup data for collections
 const collections = [
   { id: "1", name: "Digital Art Collection" },
   { id: "2", name: "Music NFTs" },
   { id: "3", name: "Video Content" },
-]
+];
 
 interface Asset {
-  title: string
-  description: string
-  assetType: string
-  mediaUrl: string
-  tags: string[]
-  license: string
-  isLimited: boolean
-  totalSupply: number
-  collection: string
-  ipVersion: string
+  title: string;
+  description: string;
+  assetType: string;
+  mediaUrl: string;
+  tags: string[];
+  license: string;
+  isLimited: boolean;
+  totalSupply: number;
+  collection: string;
+  ipVersion: string;
 }
 
 export default function NewAssetPage() {
-  // Add state for new collection input
-  const [newCollection, setNewCollection] = useState("")
-  const [isNewCollection, setIsNewCollection] = useState(false)
+  const { account } = useAccount();
+  const contract = useSmartContract();
+  const { toast } = useToast();
 
+  const [newCollection, setNewCollection] = useState("");
+  const [isNewCollection, setIsNewCollection] = useState(false);
   const [asset, setAsset] = useState<Asset>({
     title: "",
     description: "",
@@ -73,82 +75,95 @@ export default function NewAssetPage() {
     totalSupply: 1,
     collection: "",
     ipVersion: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const { toast } = useToast()
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [txHash, setTxHash] = useState<string | null>(null);
 
-  // Update the handleInputChange function to include newCollection
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     if (name === "newCollection") {
-      setNewCollection(value)
+      setNewCollection(value);
     } else {
-      setAsset((prev) => ({ ...prev, [name]: value }))
+      setAsset((prev) => ({ ...prev, [name]: value }));
     }
-  }
+  };
 
-  // Update the handleSelectChange function to handle collection selection
   const handleSelectChange = (name: string, value: string) => {
     if (name === "collection" && value === "new") {
-      setIsNewCollection(true)
-      setAsset((prev) => ({ ...prev, collection: "" }))
+      setIsNewCollection(true);
+      setAsset((prev) => ({ ...prev, collection: "" }));
     } else {
-      setIsNewCollection(false)
-      setAsset((prev) => ({ ...prev, [name]: value }))
+      setIsNewCollection(false);
+      setAsset((prev) => ({ ...prev, [name]: value }));
     }
-  }
+  };
 
-  // Update the handleSubmit function to include the new fields
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    if (!account || !contract) {
+      toast({
+        title: "Error",
+        description: "Please connect your wallet to create an asset.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsSubmitting(true);
 
     try {
-      // Simulating an API call to a smart contract
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // If it's a new collection, use the newCollection value
-      const finalCollection = isNewCollection ? newCollection : asset.collection
-
-      // Log the final asset data (replace with actual submission logic)
-      console.log({
-        ...asset,
+      const finalCollection = isNewCollection ? newCollection : asset.collection;
+      const calldata = CallData.compile({
+        name: asset.title,
+        description: asset.description,
+        asset_type: asset.assetType,
+        media_url: asset.mediaUrl,
+        license: asset.license,
         collection: finalCollection,
-      })
+        ip_version: asset.ipVersion,
+        is_limited: asset.isLimited ? 1 : 0, // Convert boolean to felt
+        total_supply: asset.isLimited ? asset.totalSupply : 0,
+      });
 
-      setIsDrawerOpen(true)
+      const tx = await account.execute({
+        contractAddress: contract.address,
+        entrypoint: "registerIP",
+        calldata,
+      });
+
+      setTxHash(tx.transaction_hash);
+      setIsDrawerOpen(true);
     } catch (error) {
-      console.error("Submission error:", error)
+      console.error("Submission error:", error);
       toast({
         title: "Error",
         description: "Failed to create asset. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleTransactionSign = async () => {
+    if (!account || !txHash) return;
     try {
-      // Simulating a blockchain transaction
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
+      await account.waitForTransaction(txHash);
       toast({
         title: "Asset Created",
-        description: "Your new asset has been successfully minted as an NFT.",
-      })
-      setIsDrawerOpen(false)
+        description: "Your new asset has been successfully registered on Starknet.",
+      });
+      setIsDrawerOpen(false);
+      setTxHash(null);
     } catch (error) {
-      console.error("Transaction error:", error)
+      console.error("Transaction error:", error);
       toast({
         title: "Transaction Failed",
-        description: "Failed to sign the transaction. Please try again.",
+        description: "Failed to confirm the transaction. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -282,7 +297,7 @@ export default function NewAssetPage() {
                 />
               </div>
             )}
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || !account}>
               {isSubmitting ? "Creating Asset..." : "Create Asset"}
             </Button>
           </form>
@@ -293,7 +308,7 @@ export default function NewAssetPage() {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Sign Transaction</DrawerTitle>
-            <DrawerDescription>Please sign the transaction to mint your new Programmable IP NFT.</DrawerDescription>
+            <DrawerDescription>Please sign the transaction to register your new Programmable IP.</DrawerDescription>
           </DrawerHeader>
           <div className="p-4 space-y-4">
             <p>Asset Details:</p>
@@ -307,9 +322,12 @@ export default function NewAssetPage() {
               <li>IP Version: {asset.ipVersion}</li>
               {asset.isLimited && <li>Total Supply: {asset.totalSupply}</li>}
             </ul>
+            {txHash && <p>Transaction Hash: {txHash.slice(0, 6)}...{txHash.slice(-4)}</p>}
           </div>
           <DrawerFooter>
-            <Button onClick={handleTransactionSign}>Sign Transaction</Button>
+            <Button onClick={handleTransactionSign} disabled={!txHash}>
+              Sign Transaction
+            </Button>
             <Button variant="outline" onClick={() => setIsDrawerOpen(false)}>
               Cancel
             </Button>
@@ -317,6 +335,5 @@ export default function NewAssetPage() {
         </DrawerContent>
       </Drawer>
     </div>
-  )
+  );
 }
-
