@@ -11,8 +11,8 @@ import { abiLic } from '@/abis/abiLic';
 
 const licensingAddress = "0x00e64180c1e71d9d776f6d88f90b7d3143e0c0bda0ea1058cd699ed02b240a95";
 
-  import { IPLicensing } from '@/components/IPLicening';
-  import IPList from '@/components/ux/IPList';
+import { IPLicensing } from '@/components/IPLicening';
+import IPList from '@/components/ux/IPList';
 
 type IPItem = {
   id: string;
@@ -40,7 +40,7 @@ const Licensing = () => {
 
   const [selectedIP, setSelectedIP] = useState<IPItem | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  
+
   const [formData, setFormData] = useState({
     licenseeCompany: '',
     licenseeEmail: '',
@@ -64,35 +64,20 @@ const Licensing = () => {
 
   return (
     <>
-    
-    <div className="container mx-auto px-4 py-8 mt-10 mb-20">
-    <h1 className="text-4xl font-bold text-center mb-8">Intellectual Property Licensing</h1>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="container mx-auto px-4 py-8 mt-10 mb-20">
+        <h1 className="text-4xl font-bold text-center mb-8">Intellectual Property Licensing</h1>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-
-
-
-    <div className="text-card-foreground">
-    <IPLicensing />
-    </div>
-
-
-
-    <div className="text-card-foreground">
-    <IPList />
-    </div>
-
-
-
-
-
-
-
-
-    </div>
-    </div>
+          <div className="text-card-foreground">
+            <IPLicensing />
+          </div>
+          <div className="text-card-foreground">
+            <IPList />
+          </div>
+        </div>
+      </div>
 
     </>
   );
