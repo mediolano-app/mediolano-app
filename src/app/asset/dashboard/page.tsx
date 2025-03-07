@@ -1,6 +1,5 @@
 "use client";
 
-import type { Metadata } from "next"
 import { useReadContract } from "@starknet-react/core"
 import { AssetInfo } from "./components/asset-info"
 import { AssetActivity } from "./components/asset-activity"
@@ -9,21 +8,11 @@ import { LicensingSection } from "./components/licensing-section"
 import { ActionButtons } from "./components/action-buttons"
 import { AssetMetadata } from "./components/asset-metadata"
 import { CreatorInfo } from "./components/creator-info"
-import { LicensePreview } from "./components/license-preview"
 import { abi } from "@/abis/abi"
 import { Abi } from "starknet"
 import { CONTRACT_ADDRESS } from "@/lib/constants"
 import { useEffect, useState } from "react"
-
-interface NFTMetadata {
-  name: string;
-  description: string;
-  author: string;
-  type: string;
-  image: string;
-  version: string;
-  external_url: string;
-}
+import { NFTMetadata } from "@/lib/types";
 
 export default function AssetDashboard() {
   // Set token ID to 1 as specified
@@ -79,7 +68,6 @@ export default function AssetDashboard() {
     fetchMetadata();
   }, [tokenURI]);
   
-  // Construct NFT data object to pass to components
   const nftData = {
     title: metadata?.name || nftName || "Unnamed NFT",
     description: metadata?.description || "",
@@ -90,7 +78,7 @@ export default function AssetDashboard() {
     owner: tokenOwner || "",
     tokenStandard: "ERC721",
     collection: nftName || "Collection",
-    creator: metadata?.author || tokenOwner || "",
+    creator: (metadata?.author || tokenOwner || "Unknown").toString(),
     imageUrl: metadata?.image || "/background.jpg",
     blockchain: "Starknet",
     contractAddress: CONTRACT_ADDRESS || "",

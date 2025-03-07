@@ -45,9 +45,11 @@ import {
   LineChart,
   FileText,
   Send,
+  RefreshCw,
 } from "lucide-react"
 import { PortfolioStats } from "./portfolio-stats"
 import { NFTLicensings } from "./nft-licensings"
+import { useBlockchainPortfolio } from "@/hooks/useBlockchainPortfolio"
 
 type SortOption = "price-high" | "price-low" | "name-asc" | "name-desc" | "date-new" | "date-old"
 
@@ -59,15 +61,26 @@ export default function NFTPortfolio() {
   const [sortOption, setSortOption] = useState<SortOption>("price-high")
   const [showStats, setShowStats] = useState(true)
   const [rarityFilter, setRarityFilter] = useState<string>("all")
+  const [useBlockchainData, setUseBlockchainData] = useState(false)
+  
+  // Get blockchain data
+  const { 
+    nfts: blockchainNFTs, 
+    isLoading, 
+    error, 
+    refetch 
+  } = useBlockchainPortfolio()
 
   // Load saved preferences from localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedViewMode = localStorage.getItem("viewMode")
       const savedSortOption = localStorage.getItem("sortOption")
+      const savedUseBlockchain = localStorage.getItem("useBlockchainData")
 
       if (savedViewMode) setViewMode(savedViewMode as "grid" | "list")
       if (savedSortOption) setSortOption(savedSortOption as SortOption)
+      if (savedUseBlockchain) setUseBlockchainData(savedUseBlockchain === "true")
     }
   }, [])
 
@@ -76,16 +89,30 @@ export default function NFTPortfolio() {
     if (typeof window !== "undefined") {
       localStorage.setItem("viewMode", viewMode)
       localStorage.setItem("sortOption", sortOption)
+      localStorage.setItem("useBlockchainData", useBlockchainData.toString())
     }
-  }, [viewMode, sortOption])
+  }, [viewMode, sortOption, useBlockchainData])
 
-  const nfts = getNFTs()
+  // Get mock data as fallback
+  const mockNFTs = getNFTs()
+  
+  // Use either blockchain or mock data based on toggle
+  const nfts = useBlockchainData ? blockchainNFTs : mockNFTs
+  
+  // Create collections list
   const collections = [
     { id: "all", name: "All Collections" },
-    ...Array.from(new Set(nfts.map((nft) => nft.collection))).map((collection) => ({
-      id: collection.id,
-      name: collection.name,
-    })),
+    ...Array.from(
+      new Set(
+        nfts.map((nft) => nft.collection.id)
+      )
+    ).map((collectionId) => {
+      const collection = nfts.find(nft => nft.collection.id === collectionId)?.collection
+      return {
+        id: collectionId,
+        name: collection?.name || "Unknown Collection"
+      }
+    })
   ]
 
   const rarityOptions = [
@@ -138,7 +165,7 @@ export default function NFTPortfolio() {
 
   return (
     <div className="space-y-6">
-      {showStats && <PortfolioStats />}
+      {showStats && <PortfolioStats useBlockchainData={useBlockchainData} />}
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div className="relative w-full sm:w-[350px]">
@@ -164,6 +191,29 @@ export default function NFTPortfolio() {
           <Button variant="outline" size="icon" onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}>
             {viewMode === "grid" ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
           </Button>
+
+          {/* Toggle button between mock & real data */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setUseBlockchainData(!useBlockchainData)}
+            className={cn(useBlockchainData && "bg-muted")}
+            title={useBlockchainData ? "Using blockchain data" : "Using mock data"}
+          >
+            <FileText className="h-4 w-4" />
+          </Button>
+
+          {useBlockchainData && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={refetch}
+              disabled={isLoading}
+              title="Refresh blockchain data"
+            >
+              <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
+            </Button>
+          )}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -238,9 +288,25 @@ export default function NFTPortfolio() {
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
-          {sortedNFTs.length === 0 ? (
+          {useBlockchainData && isLoading ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No NFTs found matching your criteria</p>
+              <p className="text-muted-foreground">Loading blockchain assets...</p>
+            </div>
+          ) : useBlockchainData && error ? (
+            <div className="text-center py-12">
+              <p className="text-red-500">{error}</p>
+              <Button onClick={refetch} className="mt-4">Retry</Button>
+            </div>
+          ) : sortedNFTs.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                {useBlockchainData 
+                  ? "No blockchain assets found. You may not have any NFTs in your wallet." 
+                  : "No NFTs found matching your criteria"}
+              </p>
+              {useBlockchainData && (
+                <Button onClick={refetch} className="mt-4">Refresh</Button>
+              )}
             </div>
           ) : viewMode === "grid" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -249,7 +315,7 @@ export default function NFTPortfolio() {
               ))}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {sortedNFTs.map((nft) => (
                 <NFTListItem key={nft.id} nft={nft} onClick={() => router.push(`/assets/${nft.id}`)} />
               ))}
@@ -258,39 +324,11 @@ export default function NFTPortfolio() {
         </TabsContent>
 
         <TabsContent value="licensings" className="space-y-4">
-          {sortedNFTs.filter((nft) => nft.licensing && nft.licensing.length > 0).length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No NFTs with active licensings found</p>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {sortedNFTs
-                .filter((nft) => nft.licensing && nft.licensing.length > 0)
-                .map((nft) => (
-                  <div key={nft.id} className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
-                        <Image src={nft.image || "/placeholder.svg"} alt={nft.name} fill className="object-cover" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold">{nft.name}</h3>
-                        <p className="text-sm text-muted-foreground">{nft.collection.name}</p>
-                      </div>
-                    </div>
-                    <NFTLicensings licensings={nft.licensing || []} />
-                  </div>
-                ))}
-            </div>
-          )}
+          <NFTLicensings />
         </TabsContent>
       </Tabs>
     </div>
   )
-}
-
-interface NFTCardProps {
-  nft: NFT
-  onClick: () => void
 }
 
 function NFTCard({ nft, onClick }: { nft: NFT; onClick: () => void }) {
@@ -409,4 +447,3 @@ function NFTListItem({ nft, onClick }: { nft: NFT; onClick: () => void }) {
     </div>
   )
 }
-
