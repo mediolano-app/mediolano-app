@@ -29,7 +29,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
       provider={providerFactory}
       connectors={connectors}
       explorer={voyager}
-      defaultChainId={sepolia.id} 
+      defaultChainId={sepolia.id} // Set sepolia as the default chain for testing
     >
       {children}
     </StarknetConfig>

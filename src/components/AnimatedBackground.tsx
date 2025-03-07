@@ -25,17 +25,16 @@ export default function AnimatedBackground() {
       {/* Blurred background image */}
       <Image
         src="/background.jpg"
-        alt="Background"
+        alt="Mediolano Dapp"
         layout="fill"
         objectFit="cover"
         quality={100}
-        className="filter blur-[10px] opacity-10"
-        
+        className="filter blur-[10px] opacity-5" 
       />
 
       {/* Animated gradient overlay */}
       <motion.div
-        className="absolute inset-0 opacity-25"
+        className="absolute inset-0 opacity-10"
         animate={{
           background: [
             'radial-gradient(circle at 5% 20%, #0000FF, transparent 50%)',
