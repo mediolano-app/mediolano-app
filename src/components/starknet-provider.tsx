@@ -17,7 +17,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
     order: "random",
   });
 
-  // Retrieve your custom RPC URL from environment variables.
+  // Retrieve your custom RPC URL from environment variables
   const customRpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
 
   
