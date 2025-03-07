@@ -68,7 +68,6 @@ export default function AssetDashboard() {
     fetchMetadata();
   }, [tokenURI]);
   
-  // Construct NFT data object to pass to components
   const nftData = {
     title: metadata?.name || nftName || "Unnamed NFT",
     description: metadata?.description || "",
@@ -79,7 +78,7 @@ export default function AssetDashboard() {
     owner: tokenOwner || "",
     tokenStandard: "ERC721",
     collection: nftName || "Collection",
-    creator: metadata?.author || tokenOwner || "",
+    creator: (metadata?.author || tokenOwner || "Unknown").toString(),
     imageUrl: metadata?.image || "/background.jpg",
     blockchain: "Starknet",
     contractAddress: CONTRACT_ADDRESS || "",
