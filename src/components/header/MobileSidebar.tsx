@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard } from 'lucide-react'
+import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -29,9 +29,9 @@ const navigationItems = [
     title: 'Programmable IP',
     items: [
       { title: 'Discover', href: '/about', icon: BookOpen },
-      { title: 'New Asset', href: '/new', icon: Copyright },
+      { title: 'New Asset', href: '/new', icon: Box },
       { title: 'Create IP', href: '/new/asset', icon: Copyright },
-      { title: 'Create Collection', href: '/new/collection', icon: Copyright },
+      { title: 'Create Collection', href: '/new/collection', icon: Grid },
       { title: 'Templates', href: '/new/templates', icon: FileText }, 
     ],
   },
