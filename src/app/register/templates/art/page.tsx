@@ -24,10 +24,105 @@ export default function ArtRegistrationPage() {
 
   const [file, setFile] = useState<File | null>(null)
 
+<<<<<<< Updated upstream
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
+=======
+  const { send, error: transactionError } = useSendTransaction({
+    calls:
+      contract && address
+        ? [contract.populate("mint_item", [address, ipfsHash])]
+        : undefined,
+  });
+
+  const handleMintNFT = async () => {
+    if (!ipfsHash) {
+      toast({ title: "Error", description: "Upload image before minting." });
+      return;
+    }
+    try {
+      send();
+      toast({
+        title: "Success",
+        description: "NFT Minting Transaction Sent.",
+      });
+    } catch (error) {
+      console.log("mint error", transactionError);
+      toast({ title: "Error", description: "Minting failed." });
+    }
+  };
+
+  useEffect(() => {
+    if (ipfsHash) {
+      handleMintNFT();
+    }
+  }, [ipfsHash]);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    setIsSubmitting(true);
+    setError(null);
+
+    const submitData = new FormData();
+
+    submitData.append("title", artData.title);
+    submitData.append("artistName", artData.artistName);
+    submitData.append("medium", artData.medium);
+    submitData.append("dimensions", artData.dimensions);
+    submitData.append("yearCreated", artData.yearCreated.toString());
+    submitData.append("description", artData.description);
+    submitData.append("price", artData.price);
+
+    if (file) {
+      submitData.append("uploadFile", file);
+    }
+
+    try {
+      const response = await fetch("/api/forms-ipfs", {
+        method: "POST",
+        body: submitData,
+      });
+      if (!response.ok) {
+        throw new Error("Failed to submit IP");
+      }
+
+      console.log("IP submitted successfully");
+
+      const data = await response.json();
+      const ipfs = data.uploadData.IpfsHash as string;
+      console.log("IPFS Hash:", ipfs);
+      setIpfsHash(ipfs);
+
+      toast({
+        title: "IP Protected",
+        description:
+          "Finalize your intellectual property registration by approving the asset creation on the Starknet blockchain. Visit Portfolio to manage your digital assets.",
+        action: <ToastAction altText="OK">OK</ToastAction>,
+      });
+    } catch (err) {
+      console.error("Submission Error:", err);
+      setError("Failed submitting or minting IP. Please try again.");
+      toast({
+        title: "Error",
+        description:
+          "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
+        action: <ToastAction altText="OK">OK</ToastAction>,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setArtData((prev) => ({ ...prev, [name]: value }));
+  };
+>>>>>>> Stashed changes
 
   const handleSelectChange = (value: string) => {
     setFormData(prev => ({ ...prev, medium: value }))

@@ -14,7 +14,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
+<<<<<<< Updated upstream:src/components/Header/WalletPanel.tsx
 import { Wallet, LogOut, Copy, ExternalLink, ArrowUpRight, ArrowDownLeft, Plus, ShieldCheck } from 'lucide-react'
+=======
+import { Wallet, LogOut, Copy, ExternalLink, ArrowUpRight, ArrowDownLeft, Plus, ShieldCheck, LucideLogOut } from 'lucide-react'
+import { useConnect, useDisconnect, useAccount } from '@starknet-react/core';
+import Link from 'next/link'
+>>>>>>> Stashed changes:src/components/header/WalletPanel.tsx
 
 const mockTokens = [
   { symbol: 'ETH', name: 'Ethereum', profile: '1.5', value: '$3,250.00', icon: '₿' },
@@ -175,7 +181,7 @@ export default function Component() {
                 </Button>
               </div>
               <p className="text-sm text-center text-gray-600">
-                By connecting, you agree to our <a href="#" className="underline text-blue-500">Terms of Service</a> and <a href="#" className="underline text-blue-500">Privacy Policy</a>.
+                By connecting, you agree to our <Link href="#" className="underline text-blue-500">Terms of Service</Link> and <Link href="#" className="underline text-blue-500">Privacy Policy</Link>.
               </p>
             </div>
           )}

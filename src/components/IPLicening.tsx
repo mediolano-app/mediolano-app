@@ -29,7 +29,15 @@ import {
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import { toast } from "@/hooks/use-toast"
+<<<<<<< Updated upstream
 
+=======
+import { useIPLicensing } from '@/hooks/useIPLicensing'
+import { useAccount } from '@starknet-react/core'
+import { useUserNFTs } from '@/hooks/useUserNft'
+import { type NFT as IP } from '@/hooks/useUserNft'
+import Link from "next/link"
+>>>>>>> Stashed changes
 const steps = ["Select IP", "Licensing Details", "Review & Submit"]
 
 interface IP {
@@ -514,6 +522,46 @@ export function IPLicensing() {
     }
   }
 
+<<<<<<< Updated upstream
+=======
+  const renderDrawerContent = () => (
+    <div className="p-4 space-y-4">
+      {submissionStatus.success && (
+        <>
+          <div>
+            <h3 className="font-semibold">Transaction Details</h3>
+            <p className="text-sm break-all">
+              Transaction Hash: {submissionStatus.txHash}
+            </p>
+            <Link
+              href={`https://starkscan.co/tx/${submissionStatus.txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline text-sm"
+            >
+              View on Starkscan
+            </Link>
+          </div>
+          <div>
+            <h3 className="font-semibold">Selected IP</h3>
+            <p>{formData.selectedIP?.name}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">License Details</h3>
+            <ul className="list-disc list-inside">
+              <li>License Type: {formData.licensingDetails.licenseType}</li>
+              <li>Duration: {formData.licensingDetails.duration}</li>
+              <li>Territory: {formData.licensingDetails.territory}</li>
+              <li>Royalty Rate: {formData.licensingDetails.royaltyRate}</li>
+              <li>Upfront Fee: {formData.licensingDetails.upfrontFee}</li>
+            </ul>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
+>>>>>>> Stashed changes
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader className="px-4 sm:px-6">
