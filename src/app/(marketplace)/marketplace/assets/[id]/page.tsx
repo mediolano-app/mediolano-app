@@ -16,15 +16,15 @@ const nftData = {
   id: "12345",
   title: "Revolutionary AI Patent #42",
   description: "This groundbreaking AI patent represents a significant leap forward in machine learning technology. It covers novel algorithms for natural language processing that dramatically improve accuracy and efficiency.",
-  image: "/placeholder.svg?height=600&width=600",
+  image: "/background.jpg?height=600&width=600",
   creator: {
     name: "Dr. Ada Lovelace",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/background.jpg?height=40&width=40",
     verified: true
   },
   owner: {
     name: "Tech Innovations Inc.",
-    avatar: "/placeholder.svg?height=40&width=40",
+    avatar: "/background.jpg?height=40&width=40",
     verified: true
   },
   price: "5.5 ETH",

@@ -29,38 +29,35 @@ import {
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import { toast } from "@/hooks/use-toast"
-<<<<<<< Updated upstream
-
-=======
 import { useIPLicensing } from '@/hooks/useIPLicensing'
 import { useAccount } from '@starknet-react/core'
 import { useUserNFTs } from '@/hooks/useUserNft'
 import { type NFT as IP } from '@/hooks/useUserNft'
 import Link from "next/link"
->>>>>>> Stashed changes
 const steps = ["Select IP", "Licensing Details", "Review & Submit"]
 
-interface IP {
-  id: number;
-  name: string;
-  type: string;
-  description: string;
-}
+// interface IP {
+//   id: number;
+//   name: string;
+//   type: string;
+//   description: string;
+//   image?: string;
+// }
 
-const mockIPs: IP[] = [
-  { id: 1, name: "Novel: The Blockchain Chronicles", type: "Literary Work", description: "A thrilling novel set in a world where blockchain technology governs society." },
-  { id: 2, name: "Song: Decentralized Harmony", type: "Musical Composition", description: "A groundbreaking musical piece exploring themes of decentralization and digital autonomy." },
-  { id: 3, name: "Painting: Digital Renaissance", type: "Artwork", description: "A stunning digital painting that blends classical art techniques with modern blockchain symbolism." },
-  { id: 4, name: "Software: CryptoAnalyzer Pro", type: "Software", description: "A powerful tool for analyzing cryptocurrency trends and predicting market movements." },
-  { id: 5, name: "Patent: Quantum Blockchain Algorithm", type: "Patent", description: "A revolutionary algorithm that combines quantum computing principles with blockchain technology." },
-  { id: 6, name: "Trademark: CryptoSecure", type: "Trademark", description: "A trusted brand name in the world of cryptocurrency security solutions." },
-  { id: 7, name: "Film: The Decentralized Dream", type: "Cinematographic Work", description: "A documentary exploring the impact of decentralized technologies on society." },
-  { id: 8, name: "Game: Crypto Conquest", type: "Video Game", description: "An immersive strategy game where players build and manage their own blockchain empires." },
-  { id: 9, name: "Sculpture: Blockchain Bust", type: "Artwork", description: "A physical representation of blockchain's impact, crafted in marble and embedded with digital elements." },
-  { id: 10, name: "Algorithm: Neural Crypto Network", type: "Software", description: "An AI-powered algorithm for optimizing cryptocurrency trading strategies." },
-  { id: 11, name: "Logo: Decentralized Future", type: "Trademark", description: "A sleek, modern logo representing the concept of a decentralized future." },
-  { id: 12, name: "Book: Ethereum Enigma", type: "Literary Work", description: "A comprehensive guide to understanding and developing on the Ethereum platform." },
-]
+// const mockIPs: IP[] = [
+//   { id: 1, name: "Novel: The Blockchain Chronicles", type: "Literary Work", description: "A thrilling novel set in a world where blockchain technology governs society." },
+//   { id: 2, name: "Song: Decentralized Harmony", type: "Musical Composition", description: "A groundbreaking musical piece exploring themes of decentralization and digital autonomy." },
+//   { id: 3, name: "Painting: Digital Renaissance", type: "Artwork", description: "A stunning digital painting that blends classical art techniques with modern blockchain symbolism." },
+//   { id: 4, name: "Software: CryptoAnalyzer Pro", type: "Software", description: "A powerful tool for analyzing cryptocurrency trends and predicting market movements." },
+//   { id: 5, name: "Patent: Quantum Blockchain Algorithm", type: "Patent", description: "A revolutionary algorithm that combines quantum computing principles with blockchain technology." },
+//   { id: 6, name: "Trademark: CryptoSecure", type: "Trademark", description: "A trusted brand name in the world of cryptocurrency security solutions." },
+//   { id: 7, name: "Film: The Decentralized Dream", type: "Cinematographic Work", description: "A documentary exploring the impact of decentralized technologies on society." },
+//   { id: 8, name: "Game: Crypto Conquest", type: "Video Game", description: "An immersive strategy game where players build and manage their own blockchain empires." },
+//   { id: 9, name: "Sculpture: Blockchain Bust", type: "Artwork", description: "A physical representation of blockchain's impact, crafted in marble and embedded with digital elements." },
+//   { id: 10, name: "Algorithm: Neural Crypto Network", type: "Software", description: "An AI-powered algorithm for optimizing cryptocurrency trading strategies." },
+//   { id: 11, name: "Logo: Decentralized Future", type: "Trademark", description: "A sleek, modern logo representing the concept of a decentralized future." },
+//   { id: 12, name: "Book: Ethereum Enigma", type: "Literary Work", description: "A comprehensive guide to understanding and developing on the Ethereum platform." },
+// ]
 
 const ITEMS_PER_PAGE = 5
 
@@ -108,11 +105,15 @@ export function IPLicensing() {
     },
   })
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [submissionStatus, setSubmissionStatus] = useState({ success: false, message: "" })
+  const [submissionStatus, setSubmissionStatus] = useState({ success: false, message: "", txHash: "" })
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [errors, setErrors] = useState<FormErrors>({})
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
+
+  const { address } = useAccount();
+  const { mintLicensingNft } = useIPLicensing();
+  const { nfts } = useUserNFTs();
 
   const handleNext = () => {
     if (validateStep()) {
@@ -130,20 +131,94 @@ export function IPLicensing() {
     }
   }
 
-  const confirmSubmission = () => {
-    setIsConfirmDialogOpen(false)
-    // Here you would typically send the data to your backend or blockchain
-    console.log("Form submitted:", JSON.stringify(formData, null, 2))
-    setSubmissionStatus({
-      success: true,
-      message: "Your IP licensing request has been successfully submitted.",
-    })
-    setIsDrawerOpen(true)
-    toast({
-      title: "Success!",
-      description: "Your IP licensing request has been successfully submitted.",
-    })
-  }
+  const confirmSubmission = async () => {
+    if (!address || !formData.selectedIP) {
+      toast({
+        title: "Error",
+        description: "Please connect your wallet and select an IP.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsConfirmDialogOpen(false);
+
+    try {
+      // Create license data JSON
+      const licenseData = JSON.stringify({
+        licenseType: formData.licensingDetails.licenseType,
+        duration: formData.licensingDetails.duration,
+        territory: formData.licensingDetails.territory,
+        royaltyRate: formData.licensingDetails.royaltyRate,
+        upfrontFee: formData.licensingDetails.upfrontFee,
+        sublicensing: formData.licensingDetails.sublicensing,
+        exclusivity: formData.licensingDetails.exclusivity,
+        useRestrictions: formData.licensingDetails.useRestrictions,
+        terminationConditions: formData.licensingDetails.terminationConditions,
+        disputeResolution: formData.licensingDetails.disputeResolution,
+        additionalTerms: formData.licensingDetails.additionalTerms,
+        timestamp: Date.now(),
+        licensee: address
+      });
+
+      // Create metadata for the license NFT
+      const licenseMetadata = JSON.stringify({
+        name: `License for ${formData.selectedIP.name}`,
+        description: `IP License - ${formData.licensingDetails.licenseType}`,
+        image: formData.selectedIP?.image || "/background.jpg",
+        attributes: {
+          ipId: formData.selectedIP.id,
+          licenseType: formData.licensingDetails.licenseType,
+          duration: formData.licensingDetails.duration,
+          territory: formData.licensingDetails.territory,
+          exclusivity: formData.licensingDetails.exclusivity
+        }
+      });
+
+      // Call the smart contract to mint the license NFT
+      const result = await mintLicensingNft(
+        address,
+        BigInt(formData.selectedIP.id), // Convert ID to bigint
+        licenseMetadata,
+        licenseData
+      );
+
+      setSubmissionStatus({
+        success: true,
+        message: "Your IP licensing request has been successfully submitted to the blockchain.",
+        txHash: ""
+      });
+
+      toast({
+        title: "Success!",
+        description: "Your IP license has been created on the blockchain.",
+      });
+
+      // Store transaction hash
+      const txHash = result.transaction_hash;
+      setIsDrawerOpen(true);
+
+      // You might want to add the transaction hash to the submission status
+      setSubmissionStatus(prev => ({
+        ...prev,
+        txHash
+      }));
+
+    } catch (error) {
+      console.error('Error creating license:', error);
+      setSubmissionStatus({
+        success: false,
+        message: "Failed to create license. Please try again.",
+        txHash: ""
+      });
+
+      toast({
+        title: "Error",
+        description: "Failed to create license. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
   const updateFormData = (stepData: Partial<FormData>) => {
     setFormData((prevData) => ({ ...prevData, ...stepData }))
@@ -170,7 +245,7 @@ export function IPLicensing() {
     return Object.keys(stepErrors).length === 0
   }
 
-  const filteredIPs = mockIPs.filter(ip =>
+  const filteredIPs = nfts.filter(ip =>
     ip.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     ip.type.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -193,12 +268,12 @@ export function IPLicensing() {
           className="pl-8"
         />
       </div>
-      <RadioGroup 
-        value={formData.selectedIP?.id.toString()} 
+      <RadioGroup
+        value={formData.selectedIP?.id.toString()}
         onValueChange={(value) => {
-          const selectedIP = mockIPs.find(ip => ip.id.toString() === value)
+          const selectedIP = nfts.find(ip => ip.id.toString() === value);
           if (selectedIP) {
-            updateFormData({ selectedIP })
+            updateFormData({ selectedIP });
           }
         }}
         className="space-y-2"
@@ -249,8 +324,8 @@ export function IPLicensing() {
 
   const renderLicensingDetailsStep = () => (
     <div className="space-y-4">
-      
-      
+
+
       {formData.selectedIP && (
         <div className="bg-muted p-4 rounded-md mb-4">
           <h3 className="font-semibold mb-2">Selected IP Information:</h3>
@@ -260,11 +335,11 @@ export function IPLicensing() {
         </div>
       )}
 
-<h2 className="text-xl font-semibold mb-4">Set Licensing Details</h2>
-      
+      <h2 className="text-xl font-semibold mb-4">Set Licensing Details</h2>
+
       <div className="space-y-2">
         <Label htmlFor="licenseType">License Type <span className="text-destructive">*</span></Label>
-        <Select 
+        <Select
           onValueChange={(value) => updateFormData({ licensingDetails: { ...formData.licensingDetails, licenseType: value } })}
           value={formData.licensingDetails.licenseType}
         >
@@ -338,7 +413,7 @@ export function IPLicensing() {
 
       <div className="space-y-2">
         <Label htmlFor="exclusivity">Exclusivity</Label>
-        <Select 
+        <Select
           onValueChange={(value) => updateFormData({ licensingDetails: { ...formData.licensingDetails, exclusivity: value } })}
           value={formData.licensingDetails.exclusivity}
         >
@@ -379,7 +454,7 @@ export function IPLicensing() {
 
       <div className="space-y-2">
         <Label htmlFor="disputeResolution">Dispute Resolution</Label>
-        <Select 
+        <Select
           onValueChange={(value) => updateFormData({ licensingDetails: { ...formData.licensingDetails, disputeResolution: value } })}
           value={formData.licensingDetails.disputeResolution}
         >
@@ -411,7 +486,7 @@ export function IPLicensing() {
   const renderReviewSubmitStep = () => (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold mb-4">Review and Submit</h2>
-      
+
       <div className="space-y-2">
         <h3 className="text-lg font-medium">Selected Intellectual Property</h3>
         <p>{formData.selectedIP?.name}</p>
@@ -486,8 +561,8 @@ export function IPLicensing() {
           <div className={cn(
             "w-10 h-10 rounded-full flex items-center justify-center",
             index < currentStep ? "bg-primary text-primary-foreground" :
-            index === currentStep ? "bg-primary text-primary-foreground" :
-            "bg-muted text-muted-foreground"
+              index === currentStep ? "bg-primary text-primary-foreground" :
+                "bg-muted text-muted-foreground"
           )}>
             {index === 0 && <List className="h-5 w-5" />}
             {index === 1 && <FileText className="h-5 w-5" />}
@@ -522,8 +597,6 @@ export function IPLicensing() {
     }
   }
 
-<<<<<<< Updated upstream
-=======
   const renderDrawerContent = () => (
     <div className="p-4 space-y-4">
       {submissionStatus.success && (
@@ -561,7 +634,6 @@ export function IPLicensing() {
     </div>
   );
 
->>>>>>> Stashed changes
   return (
     <Card className="w-full max-w-4xl mx-auto">
       <CardHeader className="px-4 sm:px-6">
@@ -589,29 +661,10 @@ export function IPLicensing() {
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>{submissionStatus.success ? "Submission Successful" : "Error"}</DrawerTitle>
+            <DrawerTitle>{submissionStatus.success ? "License Created Successfully" : "Error"}</DrawerTitle>
             <DrawerDescription>{submissionStatus.message}</DrawerDescription>
           </DrawerHeader>
-          {submissionStatus.success && (
-            <div className="p-4 space-y-4">
-              <div>
-                <h3 className="font-semibold">Selected IP</h3>
-                <p>{formData.selectedIP?.name} ({formData.selectedIP?.type})</p>
-              </div>
-              <div>
-                <h3 className="font-semibold">Licensing Details</h3>
-                <ul className="list-disc list-inside">
-                  <li>License Type: {formData.licensingDetails.licenseType}</li>
-                  <li>Duration: {formData.licensingDetails.duration}</li>
-                  <li>Territory: {formData.licensingDetails.territory}</li>
-                  <li>Royalty Rate: {formData.licensingDetails.royaltyRate}</li>
-                  <li>Upfront Fee: {formData.licensingDetails.upfrontFee}</li>
-                  <li>Sublicensing: {formData.licensingDetails.sublicensing ? 'Allowed' : 'Not Allowed'}</li>
-                  <li>Exclusivity: {formData.licensingDetails.exclusivity}</li>
-                </ul>
-              </div>
-            </div>
-          )}
+          {renderDrawerContent()}
           <DrawerFooter>
             <DrawerClose asChild>
               <Button variant="outline">Close</Button>
@@ -636,4 +689,3 @@ export function IPLicensing() {
     </Card>
   )
 }
-

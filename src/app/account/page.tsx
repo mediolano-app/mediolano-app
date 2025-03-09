@@ -1,123 +1,307 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, ChangeEvent } from 'react'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Book, Briefcase, Copyright, DollarSign, Edit, Globe, Key, Lock, Mail, Shield, User, Wallet, RefreshCw, BarChart } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { Upload, RefreshCw, Award, User, Globe, Twitter, Linkedin, Github, Shield, Bell, Eye, Key, Save } from 'lucide-react'
 
-import { useConnect, useDisconnect, useAccount } from '@starknet-react/core';
-
-
-// Mockup data
+// Mock user data
 const mockUser = {
-  name: "0x1a2b...3c4d",
+  address: "0x1a2b...3c4d",
+  name: "Author Name",
+  website: "https://mediolano.app",
+  email: "mediolanoapp@gmail.com",
+  socialMedia: {
+    twitter: "@mediolanoapp",
+    linkedin: "mediolano-app",
+    github: "mediolano-app"
+  },
+  avatarUrl: "/background.jpg?height=100&width=100",
+  coverUrl: "/background.jpg?height=300&width=1000",
   bio: "Decentralized IP enthusiast and blockchain innovator.",
-  ipAssets: [
-    { id: "0x123...456", name: "Novel Manuscript", type: "Copyright", status: "Registered", tokenId: "1234" },
-    { id: "0x789...abc", name: "AI Algorithm", type: "Patent", status: "Pending", tokenId: "5678" },
-    { id: "0xdef...012", name: "Logo Design", type: "Trademark", status: "Licensed", tokenId: "9012" },
-  ],
-  settings: {
-    twoFactor: true,
-    emailNotifications: true,
-    publicProfile: false,
+  preferences: {
+    marketProfile: false,
+    emailNotifications: false,
+    publicProfile: true,
+    dataSharing: "anonymous"
   },
   transactions: [
     { id: "0xtx1", type: "Registration", asset: "Novel Manuscript", date: "2023-05-15", status: "Confirmed" },
     { id: "0xtx2", type: "License", asset: "Logo Design", date: "2023-06-02", status: "Pending" },
     { id: "0xtx3", type: "Royalty", asset: "AI Algorithm", date: "2023-06-10", status: "Confirmed" },
   ],
-  walletBalance: 11.5,
+  stats: {
+    nftAssets: 15,
+    transactions: 47,
+    listingItems: 3,
+    nftCollections: 2,
+    rewards: 500,
+    badges: 7
+  }
 }
 
-export default function AccountPage() {
-
-    const { address } = useAccount();
-
+export default function UserAccount() {
   const [user, setUser] = useState(mockUser)
   const [theme, setTheme] = useState('light')
+  const [avatarPreview, setAvatarPreview] = useState(user.avatarUrl)
+  const [coverPreview, setCoverPreview] = useState(user.coverUrl)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
-  const handleSettingChange = (setting: string) => {
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light')
+  }
+
+  const handlePreferenceChange = (preference: keyof typeof user.preferences, value: any) => {
     setUser(prevUser => ({
       ...prevUser,
-      settings: {
-        ...prevUser.settings,
-        [setting]: !prevUser.settings[setting as keyof typeof prevUser.settings]
+      preferences: {
+        ...prevUser.preferences,
+        [preference]: value
       }
     }))
   }
 
+  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
+    const file = event.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          if (type === 'avatar') {
+            setAvatarPreview(reader.result)
+          } else {
+            setCoverPreview(reader.result)
+          }
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
+  const handleSave = async () => {
+    // Simulate saving to IPFS and blockchain
+    console.log("Saving user data to IPFS and blockchain...")
+    // Here you would typically make API calls to save the data
+    setIsDrawerOpen(true)
+  }
+
+  const handleTransactionSign = async () => {
+    // Simulate transaction signing
+    console.log("Signing transaction...")
+    // Here you would typically interact with the user's wallet
+    setIsDrawerOpen(false)
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="container mx-auto py-10 text-foreground">
+    <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
+      
+      <div className="container mx-auto py-10">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">My Account</h1>
           
         </div>
-        <div className="grid gap-6">
-         
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* User Profile and Preferences */}
+          <Card className="col-span-full bg-background/60">
             <CardHeader>
-              <CardTitle>Blockchain Identity</CardTitle>
-              <CardDescription>Your decentralized identity and profile</CardDescription>
+              <CardTitle>Profile & Preferences</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <Wallet className="w-12 h-12 text-primary" />
-                <div>
-                  <h2 className="text-2xl font-bold">{address}</h2>
-                  <p className="text-muted-foreground">Starknet Address</p>
+            <CardContent className="space-y-6">
+              {/* Profile Section */}
+              <div className="space-y-4">
+                <div className="relative h-40 rounded-lg overflow-hidden mb-8">
+                  <img src={coverPreview || "/background.jpg"} alt="Profile cover" className="w-full h-full object-cover" />
+                  <Label htmlFor="cover-upload" className="absolute bottom-2 right-2 cursor-pointer">
+                    <Input id="cover-upload" type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'cover')} accept="image/*" />
+                    <div className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Change Cover
+                    </div>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <img src={avatarPreview || "/background.jpg"} alt="Avatar" className="w-20 h-20 rounded-full" />
+                    <Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 cursor-pointer">
+                      <Input id="avatar-upload" type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'avatar')} accept="image/*" />
+                      <div className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 rounded-full flex items-center justify-center">
+                        <Upload className="w-4 h-4" />
+                      </div>
+                    </Label>
+                  </div>
+                  <div className="space-y-1">
+                    <h2 className="text-2xl font-bold">{user.name}</h2>
+                    <p className="text-sm text-muted-foreground">{user.address}</p>
+                  </div>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Name</Label>
+                    <div className="relative">
+                      <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input id="name" defaultValue={user.name} className="pl-8" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email (not visible)</Label>
+                    <div className="relative">
+                      <Globe className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input id="email" defaultValue={user.email} className="pl-8" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="website">Website</Label>
+                    <div className="relative">
+                      <Globe className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input id="website" defaultValue={user.website} className="pl-8" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="twitter">X</Label>
+                    <div className="relative">
+                      <Twitter className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input id="twitter" defaultValue={user.socialMedia.twitter} className="pl-8" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="linkedin">LinkedIn</Label>
+                    <div className="relative">
+                      <Linkedin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input id="linkedin" defaultValue={user.socialMedia.linkedin} className="pl-8" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="github">GitHub</Label>
+                    <div className="relative">
+                      <Github className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input id="github" defaultValue={user.socialMedia.github} className="pl-8" />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Bio</Label>
+                  <Textarea id="bio" defaultValue={user.bio} className="resize-none" />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea id="bio" defaultValue={user.bio} className="resize-none" />
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
-            <CardHeader>
-              <CardTitle>IP Assets</CardTitle>
-              <CardDescription>Your registered and pending intellectual properties on the blockchain</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                {user.ipAssets.map(asset => (
-                  <li key={asset.id} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      {asset.type === 'Copyright' && <Book className="text-blue-500 dark:text-blue-400" />}
-                      {asset.type === 'Patent' && <Key className="text-green-500 dark:text-green-400" />}
-                      {asset.type === 'Trademark' && <Copyright className="text-purple-500 dark:text-purple-400" />}
+              {/* Preferences Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Account Preferences</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Shield className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <p className="font-medium">{asset.name}</p>
-                        <p className="text-sm text-muted-foreground">{asset.type} - Token ID: {asset.tokenId}</p>
+                        <Label>Display Public Profile</Label>
+                        <p className="text-sm text-muted-foreground">You can make your profile private by disabling this option.</p>
                       </div>
                     </div>
-                    <Badge variant={asset.status === 'Registered' ? 'default' : 'secondary'}>
-                      {asset.status}
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
+                    <Switch
+                      checked={user.preferences.publicProfile}
+                      onCheckedChange={(checked) => handlePreferenceChange('publicProfile', checked)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Bell className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <Label>Email Notifications</Label>
+                        <p className="text-sm text-muted-foreground">Receive updates about your IP assets and account</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={user.preferences.emailNotifications}
+                      onCheckedChange={(checked) => handlePreferenceChange('emailNotifications', checked)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <Label>Marketplace Profile</Label>
+                        <p className="text-sm text-muted-foreground">Allow others to see your profile and IP portfolio at the Marketplace</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={user.preferences.marketProfile}
+                      onCheckedChange={(checked) => handlePreferenceChange('marketProfile', checked)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Data Sharing</Label>
+                    <Select 
+                      defaultValue={user.preferences.dataSharing}
+                      onValueChange={(value) => handlePreferenceChange('dataSharing', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select data sharing level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                      <SelectItem value="anonymous">Anonymous</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                <DrawerTrigger asChild>
+                  <Button className="w-full" onClick={handleSave}>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Profile & Preferences
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle>Confirm Transaction</DrawerTitle>
+                    <DrawerDescription>
+                      Please review and sign the transaction to save your profile and preferences to the blockchain.
+                    </DrawerDescription>
+                  </DrawerHeader>
+                  <div className="p-4 space-y-4">
+                    <p>Transaction details:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Update profile information</li>
+                      <li>Update account preferences</li>
+                      <li>Upload new images to IPFS</li>
+                    </ul>
+                    <Button onClick={handleTransactionSign} className="w-full">
+                      <Key className="w-4 h-4 mr-2" />
+                      Sign and Submit
+                    </Button>
+                  </div>
+                </DrawerContent>
+              </Drawer>
             </CardContent>
           </Card>
 
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
+          {/* User Stats Widgets */}
+          {Object.entries(user.stats).map(([key, value]) => (
+            <Card key={key}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {key.split(/(?=[A-Z])/).join(" ")}
+                </CardTitle>
+                {key === 'rewards' && <Award className="h-4 w-4 text-muted-foreground" />}
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{value}</div>
+              </CardContent>
+            </Card>
+          ))}
+
+          {/* Recent Transactions */}
+          <Card className="col-span-full">
             <CardHeader>
-              <CardTitle>Blockchain Transactions</CardTitle>
-              <CardDescription>Recent activities related to your IP assets</CardDescription>
+              <CardTitle>Recent Transactions</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
@@ -135,136 +319,11 @@ export default function AccountPage() {
                       <TableCell>{tx.type}</TableCell>
                       <TableCell>{tx.asset}</TableCell>
                       <TableCell>{tx.date}</TableCell>
-                      <TableCell>
-                        <Badge variant={tx.status === 'Confirmed' ? 'default' : 'secondary'}>
-                          {tx.status}
-                        </Badge>
-                      </TableCell>
+                      <TableCell>{tx.status}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
-
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
-            <CardHeader>
-              <CardTitle>Reputation</CardTitle>
-              <CardDescription>Your address reputation @ Mediolano</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-            <div className="space-y-2">
-                <Label>Reputation:</Label>
-                <Slider defaultValue={[20]} max={100} step={1} />
-              </div>
-              <div className="flex items-center justify-between">
-                
-                <div>
-                  <p className="font-medium">Value</p>
-                  <p className="text-2xl font-bold">{user.walletBalance}</p>
-                </div>
-                <Button variant="outline">
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Refresh
-                </Button>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Network</Label>
-                <Select defaultValue="mainnet">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select network" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mainnet">Starknet Mainnet</SelectItem>
-                    <SelectItem value="sepolia">Sepolia Testnet</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
-            <CardHeader>
-              <CardTitle>Account Settings</CardTitle>
-              <CardDescription>Manage your account preferences and security</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="security">
-                <TabsList>
-                  <TabsTrigger value="security">Security</TabsTrigger>
-                  <TabsTrigger value="notifications">Notifications</TabsTrigger>
-                  <TabsTrigger value="privacy">Privacy</TabsTrigger>
-                </TabsList>
-                <TabsContent value="security" className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Two-Factor Authentication</Label>
-                      <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
-                    </div>
-                    <Switch
-                      checked={user.settings.twoFactor}
-                      onCheckedChange={() => handleSettingChange('twoFactor')}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Backup Phrase</Label>
-                    <p className="text-sm text-muted-foreground">Securely store your wallet's recovery phrase</p>
-                    <Button variant="outline">View Recovery Phrase</Button>
-                  </div>
-                </TabsContent>
-                <TabsContent value="notifications" className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Email Notifications</Label>
-                      <p className="text-sm text-muted-foreground">Receive updates about your IP assets and account</p>
-                    </div>
-                    <Switch
-                      checked={user.settings.emailNotifications}
-                      onCheckedChange={() => handleSettingChange('emailNotifications')}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Notification Preferences</Label>
-                    <Select defaultValue="all">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select notification type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Notifications</SelectItem>
-                        <SelectItem value="important">Important Only</SelectItem>
-                        <SelectItem value="none">None</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </TabsContent>
-                <TabsContent value="privacy" className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label>Public Profile</Label>
-                      <p className="text-sm text-muted-foreground">Allow others to see your profile and IP portfolio</p>
-                    </div>
-                    <Switch
-                      checked={user.settings.publicProfile}
-                      onCheckedChange={() => handleSettingChange('publicProfile')}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Data Sharing</Label>
-                    <p className="text-sm text-muted-foreground">Choose how your data is shared on the blockchain</p>
-                    <Select defaultValue="minimal">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select data sharing level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="full">Full Transparency</SelectItem>
-                        <SelectItem value="minimal">Minimal Sharing</SelectItem>
-                        <SelectItem value="anonymous">Anonymous</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </TabsContent>
-              </Tabs>
             </CardContent>
           </Card>
         </div>

@@ -4,13 +4,12 @@ import { StarknetProvider } from "@/components/starknet-provider";
 import { ThemeProvider } from "@/components/theme-provider"
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import Image from "next/image";
 import AnimatedBackground from '@/components/AnimatedBackground'
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: "Mediolano.app",
-  description: "Powered by Starknet",
+  title: "Mediolano Dapp",
+  description: "Programmable IP for the Integrity Web. Powered by Starknet",
 };
 
 export default function RootLayout({
@@ -30,7 +29,6 @@ export default function RootLayout({
         <StarknetProvider>
         <AnimatedBackground />
         <Header />
-        
         {children}
         <Toaster />
         <Footer />

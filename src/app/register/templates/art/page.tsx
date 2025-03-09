@@ -1,35 +1,81 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { ArrowLeft, PaintbrushIcon as PaintBrush, Camera, ImageIcon, CuboidIcon as Cube, DollarSign, Shield, Award, Globe, Palette, Feather, Aperture, Scissors, Shapes, Layers, Zap, Search, BarChart, Lock } from 'lucide-react'
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  PaintbrushIcon as PaintBrush,
+  Camera,
+  ImageIcon,
+  CuboidIcon as Cube,
+  DollarSign,
+  Shield,
+  Award,
+  Globe,
+  Palette,
+  Feather,
+  Aperture,
+  Scissors,
+  Shapes,
+  Layers,
+  Zap,
+  Search,
+  BarChart,
+  Lock,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  useAccount,
+  useContract,
+  useSendTransaction,
+} from "@starknet-react/core";
+import { Abi } from "starknet";
+import { abi } from "@/abis/abi";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 
 export default function ArtRegistrationPage() {
-  const [formData, setFormData] = useState({
-    title: '',
-    artistName: '',
-    medium: '',
-    dimensions: '',
+  const [artData, setArtData] = useState({
+    title: "",
+    artistName: "",
+    medium: "",
+    dimensions: "",
     yearCreated: new Date().getFullYear(),
-    description: '',
-    price: '',
-  })
+    description: "",
+    price: "",
+  });
+  const [file, setFile] = useState<File | null>(null);
+  const [ipfsHash, setIpfsHash] = useState("");
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [file, setFile] = useState<File | null>(null)
+  const { address } = useAccount();
+  const { contract } = useContract({
+    abi: abi as Abi,
+    address:
+      "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
+  });
 
-<<<<<<< Updated upstream
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
-=======
   const { send, error: transactionError } = useSendTransaction({
     calls:
       contract && address
@@ -93,9 +139,9 @@ export default function ArtRegistrationPage() {
 
       const data = await response.json();
       const ipfs = data.uploadData.IpfsHash as string;
-      console.log("IPFS Hash:", ipfs);
       setIpfsHash(ipfs);
-
+      console.log("IPFS Hash:", ipfs);
+      
       toast({
         title: "IP Protected",
         description:
@@ -122,18 +168,10 @@ export default function ArtRegistrationPage() {
     const { name, value } = e.target;
     setArtData((prev) => ({ ...prev, [name]: value }));
   };
->>>>>>> Stashed changes
 
   const handleSelectChange = (value: string) => {
-    setFormData(prev => ({ ...prev, medium: value }))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log(formData)
-    console.log(file)
-    alert('Art registration submitted successfully!')
-  }
+    setArtData((prev) => ({ ...prev, medium: value }));
+  };
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -152,7 +190,9 @@ export default function ArtRegistrationPage() {
         <Card className="w-full max-w-2xl mx-auto lg:max-w-none">
           <CardHeader>
             <CardTitle>Artwork Details</CardTitle>
-            <CardDescription>Please provide information about your artwork.</CardDescription>
+            <CardDescription>
+              Please provide information about your artwork.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -161,7 +201,7 @@ export default function ArtRegistrationPage() {
                 <Input
                   id="title"
                   name="title"
-                  value={formData.title}
+                  value={artData.title}
                   onChange={handleChange}
                   placeholder="Enter the title of your artwork"
                   required
@@ -173,7 +213,7 @@ export default function ArtRegistrationPage() {
                 <Input
                   id="artistName"
                   name="artistName"
-                  value={formData.artistName}
+                  value={artData.artistName}
                   onChange={handleChange}
                   placeholder="Enter your name or pseudonym"
                   required
@@ -182,7 +222,10 @@ export default function ArtRegistrationPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="medium">Medium</Label>
-                <Select onValueChange={handleSelectChange} value={formData.medium}>
+                <Select
+                  onValueChange={handleSelectChange}
+                  value={artData.medium}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a medium" />
                   </SelectTrigger>
@@ -204,7 +247,7 @@ export default function ArtRegistrationPage() {
                 <Input
                   id="dimensions"
                   name="dimensions"
-                  value={formData.dimensions}
+                  value={artData.dimensions}
                   onChange={handleChange}
                   placeholder="e.g., 24 x 36 inches"
                   required
@@ -217,7 +260,7 @@ export default function ArtRegistrationPage() {
                   id="yearCreated"
                   name="yearCreated"
                   type="number"
-                  value={formData.yearCreated}
+                  value={artData.yearCreated}
                   onChange={handleChange}
                   min={1800}
                   max={new Date().getFullYear()}
@@ -230,7 +273,7 @@ export default function ArtRegistrationPage() {
                 <Textarea
                   id="description"
                   name="description"
-                  value={formData.description}
+                  value={artData.description}
                   onChange={handleChange}
                   placeholder="Describe your artwork"
                   required
@@ -243,7 +286,7 @@ export default function ArtRegistrationPage() {
                   id="price"
                   name="price"
                   type="number"
-                  value={formData.price}
+                  value={artData.price}
                   onChange={handleChange}
                   min={0}
                   step={0.01}
@@ -258,14 +301,16 @@ export default function ArtRegistrationPage() {
                   type="file"
                   accept="image/*"
                   onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) setFile(file)
+                    const file = e.target.files?.[0];
+                    if (file) setFile(file);
                   }}
                   required
                 />
               </div>
 
-              <Button type="submit" className="w-full">Register Artwork</Button>
+              <Button type="submit" className="w-full">
+                Register Artwork
+              </Button>
             </form>
           </CardContent>
         </Card>
@@ -391,5 +436,5 @@ export default function ArtRegistrationPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
