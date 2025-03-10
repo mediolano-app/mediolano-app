@@ -1,4 +1,4 @@
-![Mediolano.app](https://mediolano.app/wp-content/uploads/2024/09/mediolano-logo-dark-1.svg)
+![Mediolano.app](https://mediolano.app/wp-content/uploads/2025/03/Mediolano-Dapp-20250310alpha.png)
 
 > [!IMPORTANT]
 > Mediolano dapp is in constant development and the current version runs on Starknet's Sepolia devnet. Use for testing purposes only. 
@@ -13,8 +13,6 @@ Mediolano offers permissionless services with ZERO FEES for Programmable IP, suc
 
 Mediolano aims to serve as the intellectual property provider for the integrity web, a public good to empower programmable IP to anyone. By integrating standards, innovative technology and decentralization, Mediolano ensures interoperability, security and sovereignty. Our platform is tailored for the tokenization and management of intellectual property, enabling you to register, track, license and monetize IP effortlessly, unlocking new revenue streams.
 
-![Mediolano.app](https://mediolano.app/wp-content/uploads/2025/03/Mediolano-Dapp-20250310alpha.png)
-
 
 ### Key Features
 
@@ -28,11 +26,11 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 [![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
 
-<h2 align="center">
+<h3 align="center">
   <a href="https://mediolano.app">Learn more</a>
   &nbsp; | &nbsp;
   <a href="https://ip.mediolano.app">Open Dapp</a>
-</h2>
+</h3>
 
 
 ## Getting Started
