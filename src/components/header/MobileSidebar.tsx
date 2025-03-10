@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid } from 'lucide-react'
+import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid, Gem } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -26,13 +26,11 @@ const WalletBarM = dynamic(() => import('@/components/header/WalletBarM'), { ssr
 
 const navigationItems = [
   {
-    title: 'Programmable IP',
+    title: 'Start',
     items: [
       { title: 'Discover', href: '/about', icon: BookOpen },
-      { title: 'New Asset', href: '/new', icon: Box },
-      { title: 'Create IP', href: '/new/asset', icon: Copyright },
-      { title: 'Create Collection', href: '/new/collection', icon: Grid },
-      { title: 'Templates', href: '/new/templates', icon: FileText }, 
+      { title: 'Create IP', href: '/new', icon: Box },
+      { title: 'IP Templates', href: '/new/templates', icon: FileText }, 
     ],
   },
   {
@@ -40,31 +38,31 @@ const navigationItems = [
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: FileText },
       { title: 'Assets Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
-      { title: 'Licensing', href: '/licensing', icon: FileText },    ],
+      { title: 'Licensing', href: '/licensing', icon: FileText },
+      { title: 'Listings', href: '/listing', icon: Banknote },
+    ],
   },
   {
-    title: 'Monetize',
+    title: 'Monetization',
     items: [
+      { title: 'Monetize', href: '/monetize', icon: Gem },
       { title: 'Marketplace', href: '/marketplace', icon: Banknote },
-      { title: 'Listing', href: '/listing', icon: Banknote },
       { title: 'Smart Transaction', href: '/', icon: FileText },
+      { title: 'Business', href: '/business', icon: Briefcase },
     ],
   },
 ]
 
 const userMenuItems = [
   { title: 'My Account', href: '/account', icon: User },
-  { title: 'My IP\'s', href: '/portfolio', icon: Copyright },
   { title: 'Rewards', href: '/rewards', icon: Award },
   { title: 'Settings', href: '/settings', icon: Settings },
-  { title: 'Business', href: '/business', icon: Briefcase },
-  
 ]
 
 const appFeatures = [
-  { title: 'Blockchain-Powered', description: 'Secure your intellectual property authorship with blockchain technology.' },
+  { title: 'Protection', description: 'Secure your intellectual property authorship in 181 countries.' },
   { title: 'Global Market', description: 'Connect with potential buyers and licensees worldwide.' },
-  { title: 'Programmable Licensing', description: 'Create permissionless licensing agreements.' },
+  { title: 'Programmable IP', description: 'Create permissionless licensing agreements.' },
 ]
 
 export function MobileSidebar() {
@@ -101,17 +99,7 @@ export function MobileSidebar() {
         <nav className="flex flex-col space-y-4 mt-4">
 
 
-        <div className='mt-10'>
-          {/*<Button
-              variant="outline"
-              size="lg"
-              className="w-full justify-start"
-              onClick={handleWalletConnect}
-            >
-              <Wallet className="mr-2 h-5 w-5" />
-              {isWalletConnected ? 'Disconnect Wallet' : 'Connect Wallet'}
-            </Button>*/}
-            
+        <div className='mt-2'>
             <WalletBarM />
         </div>
 
@@ -120,7 +108,7 @@ export function MobileSidebar() {
           <Accordion type="single" collapsible className="w-full">
             {navigationItems.map((section, index) => (
               <AccordionItem value={`item-${index}`} key={section.title}>
-                <AccordionTrigger className="text-lg font-semibold">{section.title}</AccordionTrigger>
+                <AccordionTrigger className="font-semibold">{section.title}</AccordionTrigger>
                 <AccordionContent>
                   {section.items.map((item) => (
                     <Button
@@ -145,7 +133,7 @@ export function MobileSidebar() {
             
 
           <div>
-            <h2 className="mb-2 font-semibold text-lg">Account</h2>
+          
             {userMenuItems.map((item) => (
               <Button
                 key={item.href}
@@ -162,7 +150,7 @@ export function MobileSidebar() {
           <Separator className="my-4" />
 
           <div>
-            <h3 className="mb-4 font-semibold">Dapp Features</h3>
+            <h3 className="mb-4">Dapp Features</h3>
             <div className="space-y-4">
               {appFeatures.map((feature, index) => (
                 <div key={index} className="bg-blue-100/40 dark:bg-blue-900/40 p-4 rounded-lg">
@@ -176,7 +164,7 @@ export function MobileSidebar() {
           <Separator className="my-4" />
 
           <div className="space-y-4 mb-20">
-            <h2 className="font-semibold text-xl">Get Started</h2>
+            <h2 className="">Get Started</h2>
             <Button
               variant="default"
               size="lg"

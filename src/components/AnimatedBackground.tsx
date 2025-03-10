@@ -38,9 +38,9 @@ export default function AnimatedBackground() {
         animate={{
           background: [
             'radial-gradient(circle at 5% 20%, #0000FF, transparent 50%)',
-            'radial-gradient(circle at 20% 10%,rgb(255, 0, 100), transparent 50%)',
+            'radial-gradient(circle at 60% 80%,rgb(255, 0, 100), transparent 50%)',
             'radial-gradient(circle at 0% 50%, #0000FF, transparent 50%)',
-            'radial-gradient(circle at 10% 80%,rgb(255, 0, 100), transparent 50%)',
+            'radial-gradient(circle at 80% 80%,rgb(255, 0, 100), transparent 50%)',
             'radial-gradient(circle at 5% 20%, #0000FF, transparent 50%)',
           ],
         }}
