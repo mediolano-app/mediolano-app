@@ -1,35 +1,35 @@
 "use client";
 import React from "react";
- 
 import { sepolia, mainnet } from "@starknet-react/chains";
 import {
   StarknetConfig,
-  publicProvider,
   argent,
   braavos,
   useInjectedConnectors,
-  voyager
+  voyager,
 } from "@starknet-react/core";
- 
+import { RpcProvider } from "starknet"; 
+
 export function StarknetProvider({ children }: { children: React.ReactNode }) {
   const { connectors } = useInjectedConnectors({
-    // Show these connectors if the user has no connector installed.
-    recommended: [
-      argent(),
-      braavos(),
-    ],
-    // Hide recommended connectors if the user has any connector installed.
+    recommended: [argent(), braavos()],
     includeRecommended: "onlyIfNoConnectors",
-    // Randomize the order of the connectors.
-    order: "random"
+    order: "random",
   });
- 
+
+  // Retrieve your custom RPC URL from environment variables
+  const customRpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
+
+  
+  const providerFactory = (chain: any) => new RpcProvider({ nodeUrl: customRpcUrl || "" });
+
   return (
     <StarknetConfig
       chains={[mainnet, sepolia]}
-      provider={publicProvider()}
+      provider={providerFactory}
       connectors={connectors}
       explorer={voyager}
+      defaultChainId={sepolia.id} // Set sepolia as the default chain for testing
     >
       {children}
     </StarknetConfig>

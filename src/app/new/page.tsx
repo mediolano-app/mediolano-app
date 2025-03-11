@@ -13,8 +13,8 @@ export default function NewContentPage() {
   const [selectedType, setSelectedType] = useState<string | null>(null)
 
   const contentTypes = [
-    { id: 'ip', name: 'Create Programmable IP', icon: BookOpen, route: '/new/asset' },
-    { id: 'collection', name: 'Create Collection', icon: FolderPlus, route: '/new/collection' },
+    { id: 'ip', name: 'Create New IP', icon: BookOpen, route: '/new/asset' },
+    { id: 'collection', name: 'Create New Collection', icon: FolderPlus, route: '/new/collection' },
   ]
 
   const handleSelection = (type: string) => {
@@ -36,13 +36,9 @@ export default function NewContentPage() {
     
     <div className="space-y-6">
 
-      <h1 className="text-3xl font-bold text-center">Create Asset</h1>
-        <p className="text-lg text-center mb-4">
-         Permissionless intellectual property tokenization.
-        </p>
+      <h1 className="text-3xl font-bold text-center">Create Programmable IP</h1>
       
-      
-      <Card className='bg-background/40'>
+      <Card className='bg-background/30'>
         <CardHeader>
           <CardTitle>Start New</CardTitle>
           <CardDescription>Register a new Programmable IP or a new Collection to organize your digital assets.</CardDescription>
@@ -56,7 +52,7 @@ export default function NewContentPage() {
                 className="h-24 flex flex-col items-center justify-center"
                 onClick={() => handleSelection(type.id)}
               >
-                <type.icon className="h-8 w-8 mb-2" />
+                <type.icon className="w-6 h-6 mr-2 text-blue-600" />
                 {type.name}
               </Button>
             ))}
@@ -72,8 +68,12 @@ export default function NewContentPage() {
       </Card>
 
 
+
+      <IPTemplates />
+
+
       <section className="space-y-6 mt-10">
-      <div className="bg-background/80 p-8 rounded-lg">
+      <div className="bg-background/80 p-8 rounded-lg shadow">
       <h1 className="text-xl tracking-tighter">Protecting Intellectual Property Onchain</h1>
       <p className=" mx-auto mt-8">
       Registering Intellectual Property on Mediolano means the asset is automatically tokenize and protected in 181 countries, according to The Berne Convention for the Protection of Literary and Artistic Works, adopted in 1886, which guarantees recognition of the authorship of IP without the need for registration with WIPO (World Intellectual Property Organization). 
@@ -88,7 +88,7 @@ export default function NewContentPage() {
     </section>
 
 
-            <IPTemplates />
+            
     </div>
 
     </div>

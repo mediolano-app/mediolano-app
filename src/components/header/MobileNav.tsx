@@ -42,11 +42,11 @@ const navigationItems = [
     title: "Manage",
     icon: Briefcase,
     items: [
-      { title: "Portfolio", href: "/manage/portfolio", icon: Briefcase },
-      { title: "Assets Dashboard", href: "/manage/assets", icon: BarChart3 },
-      { title: "Licensings", href: "/manage/licensings", icon: FileSignature },
-      { title: "Listings", href: "/manage/listings", icon: Tags },
-      { title: "Public Profile", href: "/manage/profile", icon: User },
+      { title: "Portfolio", href: "/portfolio", icon: Briefcase },
+      { title: "Assets Dashboard", href: "/portfolio/dashboard", icon: BarChart3 },
+      { title: "Licensings", href: "/licensings", icon: FileSignature },
+      { title: "Listings", href: "/listings", icon: Tags },
+      { title: "Public Profile", href: "/profile", icon: User },
     ],
   },
 ]
