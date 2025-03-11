@@ -57,3 +57,49 @@ export interface SocialLink {
   url: string
 }
 
+export interface Collection {
+  id: string
+  name: string
+  description?: string
+  floorPrice?: number
+}
+
+export interface NFT {
+  id: string
+  name: string
+  description: string
+  image: string
+  tokenId: string
+  collection: Collection
+  price: number
+  rarity?: string
+  attributes?: {
+    trait_type: string
+    value: string
+  }[]
+  createdAt: string
+  lastSale?: {
+    price: number
+    date: string
+  }
+  licensing?: Licensing[]
+}
+
+export interface Licensing {
+  id: string
+  type: "Commercial" | "Personal" | "Exclusive"
+  licensee: string
+  startDate: string
+  endDate: string
+  terms: string
+}
+
+export interface NFTMetadata {
+  name: string;
+  description: string;
+  author: string;
+  type: string;
+  image: string;
+  version: string;
+  external_url: string;
+}

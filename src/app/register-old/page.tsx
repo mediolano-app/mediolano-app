@@ -149,7 +149,7 @@ export default function RegisterIP() {
       
       const data = await response.json();
       const ipfs = data.uploadData.IpfsHash as string;
-      console.log(ipfs);
+      console.log("IPFS Hash:", ipfs);
       setIpfsHash(ipfs);
 
       toast({

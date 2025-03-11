@@ -1,185 +1,249 @@
-"use client";
+import Image from "next/image"
+import Link from "next/link"
+import { getNFTById } from "@/lib/mockupPortfolioData"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft, ExternalLink, Share2, Heart, Clock, Tag, Sparkles } from "lucide-react"
+import { RelatedNFTs } from "@/app/portfolio/components/related-nfts"
 
-import type { NextPage } from "next";
-import { useAccount } from "@starknet-react/core";
-import { useState } from "react";
+export default function NFTDetailPage({ params }: { params: { id: string } }) {
+  const nft = getNFTById(params.id)
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { ArrowLeft, Plus, LinkIcon, ArrowRight, DollarSign, Shield, Globe, Clock, File, Users, Activity } from 'lucide-react'
-
-const mockIP = {
-  id: 1,
-  name: 'Intellectual Property Title',
-  type: 'Copyright',
-  description: 'Intellectual property description.',
-  thumbnailUrl: '/background.jpg',
-  filingDate: '2024-09-15',
-  grantDate: '2024-09-20',
-  expirationDate: '2025-09-20',
-  owner: 'Stark',
-  tags: ['Review', 'Art'],
-  patentNumber: 'US 12345678',
-  status: 'Active',
-  licenses: [
-    { id: 1, name: 'EV Manufacturing License', licensee: 'ElectroCar Corp', value: 1000000, currency: 'USD', type: 'Exclusive' },
-    { id: 2, name: 'Grid Storage License', licensee: 'PowerGrid Solutions', value: 750000, currency: 'USD', type: 'Non-exclusive' },
-  ],
-  activity: [
-    { date: '2023-08-15', action: 'License granted to ElectroCar Corp' },
-    { date: '2023-09-01', action: 'License granted to PowerGrid Solutions' },
-    { date: '2023-10-10', action: 'Maintenance fee paid' },
-    { date: '2023-11-05', action: 'Citation by new patent application' },
-  ]
-}
-
-
-
-const viewIP: NextPage = () => {
-  const { address: connectedAddress, isConnected, isConnecting } = useAccount();
-  
+  if (!nft) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center gap-2 mb-6">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold">NFT Not Found</h1>
+        </div>
+        <p>The NFT you're looking for doesn't exist or has been removed.</p>
+      </div>
+    )
+  }
 
   return (
-    <>
-     
-     
-     <div className="min-h-screen py-10 mb-20 px-4 sm:px-6 lg:px-8">
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex items-center gap-2 mb-6">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+        <h1 className="text-2xl font-bold">{nft.name}</h1>
+      </div>
 
-          <div className="max-w-6xl mx-auto">
-            
-            <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground rounded-lg overflow-hidden">
-              <div className="md:flex">
-                <div className="md:flex-shrink-0">
-                  <Image
-                    src={mockIP.thumbnailUrl}
-                    alt={mockIP.name}
-                    width={600}
-                    height={400}
-                    className="h-48 w-full object-cover md:h-full "
-                  />
-                </div>
-                <div className="p-8">
-                  <div className="uppercase tracking-wide text-sm text-blue-500 font-semibold">{mockIP.type}</div>
-                  <h1 className="mt-1 text-3xl font-bold">{mockIP.name}</h1>
-                  <p className="mt-2  ">{mockIP.description}</p>
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          <div className="relative aspect-square rounded-xl overflow-hidden border group">
+            <Image
+              src={nft.image || "/placeholder.svg"}
+              alt={nft.name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            {nft.rarity && (
+              <div className="absolute top-4 left-4">
+                <Badge className="px-3 py-1 text-sm bg-background/80 backdrop-blur-sm">
+                  <Sparkles className="h-4 w-4 mr-1" />
+                  {nft.rarity}
+                </Badge>
               </div>
-    
-              <div className="border-t border-gray-200 dark:border-gray-700">
-                <dl>
-                  <div className="  px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium  ">License Number</dt>
-                    <dd className="mt-1 text-sm  sm:mt-0 sm:col-span-2">{mockIP.patentNumber}</dd>
-                  </div>
-                  <div className="bg-base-100  px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium  ">Status</dt>
-                    <dd className="mt-1 text-sm  sm:mt-0 sm:col-span-2">{mockIP.status}</dd>
-                  </div>
-                  <div className="  px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium  ">Owner</dt>
-                    <dd className="mt-1 text-sm  sm:mt-0 sm:col-span-2">{mockIP.owner}</dd>
-                  </div>
-                  <div className="bg-base-100  px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium  ">tags</dt>
-                    <dd className="mt-1 text-sm  sm:mt-0 sm:col-span-2">{mockIP.tags.join(', ')}</dd>
-                  </div>
-                  <div className="  px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium  ">Filing Date</dt>
-                    <dd className="mt-1 text-sm  sm:mt-0 sm:col-span-2">{mockIP.filingDate}</dd>
-                  </div>
-                  <div className="bg-base-100  px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium  ">Grant Date</dt>
-                    <dd className="mt-1 text-sm  sm:mt-0 sm:col-span-2">{mockIP.grantDate}</dd>
-                  </div>
-                  <div className="  px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium  ">Expiration Date</dt>
-                    <dd className="mt-1 text-sm  sm:mt-0 sm:col-span-2">{mockIP.expirationDate}</dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-    
-            <div className="mt-8 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground rounded-lg overflow-hidden">
-              <div className="px-4 py-5 sm:px-6">
-                <h2 className="text-lg font-medium ">Licenses</h2>
-                <p className="mt-1 max-w-2xl text-sm  ">Details of current licenses for this intellectual property.</p>
-              </div>
-              <div className="border-t border-gray-200 dark:border-gray-700">
-                <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {mockIP.licenses.map((license) => (
-                    <li key={license.id} className="px-4 py-4 sm:px-6">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-blue-600 truncate">{license.name}</p>
-                        <div className="ml-2 flex-shrink-0 flex">
-                          <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {license.type}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-2 sm:flex sm:justify-between">
-                        <div className="sm:flex">
-                          <p className="flex items-center text-sm  ">
-                            <Users className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
-                            {license.licensee}
-                          </p>
-                        </div>
-                        <div className="mt-2 flex items-center text-sm   sm:mt-0">
-                          <DollarSign className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
-                          <p>
-                            {license.value.toLocaleString()} {license.currency}
-                          </p>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-    
-            <div className="mt-8 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground rounded-lg overflow-hidden">
-              <div className="px-4 py-5 sm:px-6">
-                <h2 className="text-lg font-medium ">Activity</h2>
-                <p className="mt-1 max-w-2xl text-sm  ">Recent activity related to this intellectual property.</p>
-              </div>
-              <div className="border-t border-gray-200 dark:border-gray-700">
-                <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {mockIP.activity.map((item, index) => (
-                    <li key={index} className="px-4 py-4 sm:px-6">
-                      <div className="flex items-center">
-                        <Activity className="flex-shrink-0 mr-3 h-5 w-5 text-gray-400" aria-hidden="true" />
-                        <p className="text-sm ">{item.action}</p>
-                      </div>
-                      <div className="mt-2 flex items-center text-sm  ">
-                        <Clock className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" aria-hidden="true" />
-                        <p>{item.date}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-    
-            {/* 
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link href={`/ip/${mockIP.id}/new-license`} className="flex items-center px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition duration-300">
-                <Plus className="w-5 h-5 mr-2" />
-                New License
-              </Link>
-              <Link href={`/ip/${mockIP.id}/licenses`} className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition duration-300">
-                <LinkIcon className="w-5 h-5 mr-2" />
-                All Licenses
-              </Link>
-              <Link href={`/ip/${mockIP.id}/transfer`} className="flex items-center px-4 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition duration-300">
-                <ArrowRight className="w-5 h-5 mr-2" />
-                Transfer IP
-              </Link>
-            </div>
-              */}
+            )}
           </div>
 
-    </div>  
-    </>
-  );
-};
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-3">Properties</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {nft.attributes?.map((attr, index) => (
+                  <div key={index} className="border rounded-lg p-3 text-center hover:border-primary transition-colors">
+                    <p className="text-xs text-primary uppercase font-medium">{attr.trait_type}</p>
+                    <p className="font-medium truncate">{attr.value}</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-export default viewIP;
+        <div className="space-y-6">
+          <div>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-bold">{nft.name}</h2>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-muted-foreground">{nft.collection.name}</p>
+                  <Badge variant="outline">{nft.tokenId}</Badge>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="icon">
+                  <Heart className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon">
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <p className="mt-4 text-muted-foreground">{nft.description}</p>
+          </div>
+
+          <Tabs defaultValue="price">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="price">Price</TabsTrigger>
+              <TabsTrigger value="history">History</TabsTrigger>
+              <TabsTrigger value="details">Details</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="price" className="space-y-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Current Price</p>
+                      <p className="text-3xl font-bold">{nft.price} ETH</p>
+                      <p className="text-sm text-muted-foreground">≈ ${(nft.price * 3500).toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <Button className="px-8">Buy Now</Button>
+                    </div>
+                  </div>
+
+                  {nft.lastSale && (
+                    <div className="mt-4 pt-4 border-t">
+                      <p className="text-sm text-muted-foreground">Last Sale</p>
+                      <p className="font-medium">{nft.lastSale.price} ETH</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(nft.lastSale.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-3">Price History</h3>
+                  <div className="h-[200px] flex items-center justify-center bg-muted/50 rounded-lg">
+                    <p className="text-muted-foreground">Price chart visualization</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="history">
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-3">Transaction History</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-2 border-b">
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-primary" />
+                        <div>
+                          <p className="font-medium">Listed for sale</p>
+                          <p className="text-sm text-muted-foreground">by 0x1a92...3e56</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">{nft.price} ETH</p>
+                        <p className="text-sm text-muted-foreground flex items-center justify-end">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {new Date().toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    {nft.lastSale && (
+                      <div className="flex items-center justify-between py-2 border-b">
+                        <div className="flex items-center gap-2">
+                          <Tag className="h-4 w-4 text-green-500" />
+                          <div>
+                            <p className="font-medium">Sold</p>
+                            <p className="text-sm text-muted-foreground">to 0x7b43...9f21</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">{nft.lastSale.price} ETH</p>
+                          <p className="text-sm text-muted-foreground flex items-center justify-end">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {new Date(nft.lastSale.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between py-2 border-b">
+                      <div className="flex items-center gap-2">
+                        <Tag className="h-4 w-4 text-blue-500" />
+                        <div>
+                          <p className="font-medium">Minted</p>
+                          <p className="text-sm text-muted-foreground">by 0x3f67...8c12</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">-</p>
+                        <p className="text-sm text-muted-foreground flex items-center justify-end">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {new Date(nft.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="details">
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold mb-3">Details</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <p className="text-muted-foreground">Contract Address</p>
+                      <p className="font-medium flex items-center">
+                        0x1a92...3e56
+                        <ExternalLink className="ml-1 h-3 w-3" />
+                      </p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-muted-foreground">Token ID</p>
+                      <p className="font-medium">{nft.tokenId.replace("#", "")}</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-muted-foreground">Token Standard</p>
+                      <p className="font-medium">ERC-721</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-muted-foreground">Chain</p>
+                      <p className="font-medium">Ethereum</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-muted-foreground">Created</p>
+                      <p className="font-medium">{new Date(nft.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-muted-foreground">Creator Royalty</p>
+                      <p className="font-medium">2.5%</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-6">More from this collection</h2>
+        <RelatedNFTs collectionId={nft.collection.id} currentNftId={nft.id} />
+      </div>
+    </div>
+  )
+}
+

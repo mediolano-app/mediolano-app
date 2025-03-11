@@ -45,7 +45,7 @@ const faqs = [
 
 export default function FAQ() {
   return (
-    <section className="space-y-6 bg-background/60 p-8 rounded-lg mt-10">
+    <section className="space-y-6 bg-background/60 p-8 shadow-lg rounded-lg mt-10">
        <h2 className="text-2xl text-center tracking-tighter sm:text-3xl md:text-4xl">FAQ</h2>
       <Accordion type="single" collapsible className="w-full">
         {faqs.map((faq, index) => (
