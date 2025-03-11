@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 
 const templates = [
-  { name: "Default", icon: FileText, href: "/new/asset" },
+  { name: "Custom", icon: FileText, href: "/new/asset" },
   { name: "Art", icon: Image, href: "/new/art" },
   { name: "Document", icon: FileIcon, href: "/new/document" },
   { name: "Video", icon: Film, href: "/new/video" },
@@ -30,10 +30,10 @@ const templates = [
 
 export function IPTemplates() {
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-background/40">
+    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-background/30 rounded-lg shadow">
       <div className="max-w-7xl mx-auto">
 
-        <h2 className="text-3xl font-bold mb-4 text-center">Start with an IP Template</h2>
+        <h2 className="text-3xl font-bold text-center">Start with an IP Template</h2>
         <p className="text-xl text-center mb-12">
           Select an IP Template to assist and optimize the intellectual property registration process.
         </p>
@@ -45,7 +45,7 @@ export function IPTemplates() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <template.icon className="w-6 h-6 mr-2 text-primary" />
+                      <template.icon className="w-6 h-6 mr-2 text-blue-600" />
                       <span>{template.name}</span>
                     </div>
                     <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary transition-colors duration-300" />

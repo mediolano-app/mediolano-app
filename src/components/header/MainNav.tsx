@@ -34,6 +34,9 @@ import {
   Gem,
   Blocks,
   Coins,
+  BoxIcon,
+  FileCode2,
+  Gauge,
 } from "lucide-react"
 import { Logo } from "@/components/header/Logo"
 
@@ -45,8 +48,9 @@ export function MainNav() {
       </Link>
       <NavigationMenu>
         <NavigationMenuList>
+          
           <NavigationMenuItem>
-            <NavigationMenuTrigger>
+            <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
               <Rocket className="mr-2 h-4 w-4" />
               Start
             </NavigationMenuTrigger>
@@ -115,7 +119,7 @@ export function MainNav() {
           
 
           <NavigationMenuItem>
-            <NavigationMenuTrigger>
+            <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
               <Layers className="mr-2 h-4 w-4" />
               Manage
             </NavigationMenuTrigger>
@@ -124,11 +128,11 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/new/templates"
+                    href="/portfolio"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <Layers className="mr-2 h-4 w-4" />
-                      Assets Dashboard
+                      My Portfolio
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
                       Total control over your assets onchain.
@@ -138,14 +142,28 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/new"
+                    href="/portfolio/dashboard"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Create New
+                      Assets Dashboard
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Register a Programmable IP or Collection.
+                      Advanced assets management.
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/new"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <BoxIcon className="mr-2 h-4 w-4" />
+                      New Asset
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Create a new Programmable IP or Collection.
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -155,25 +173,11 @@ export function MainNav() {
                     href="/licensing"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <FileText className="mr-2 h-4 w-4" />
+                      <FileCode2 className="mr-2 h-4 w-4" />
                       Licensing
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Create and manage smart licenses for your IP.
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/monetize"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <Gem className="mr-2 h-4 w-4" />
-                      Monetize
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Monetization services and opportunities.
+                      Create new licensing agreements.
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -212,12 +216,26 @@ export function MainNav() {
          
          
           <NavigationMenuItem>
-            <NavigationMenuTrigger>
+            <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
               <Gem className="mr-2 h-4 w-4" />
               Monetize
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+              <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/monetize"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Gem className="mr-2 h-4 w-4" />
+                      IP Monetization
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Permissionless services to monetize Programmable IP.
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
@@ -228,7 +246,7 @@ export function MainNav() {
                       Marketplace
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Buy and sell Programmable IP.
+                      Buy and trade Intellectual Property onchain.
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -242,7 +260,7 @@ export function MainNav() {
                       Smart Transaction
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Create custom agreements to transact your IP.
+                      Create custom agreements.
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -274,6 +292,20 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Gauge className="mr-2 h-4 w-4" />
+                      Financial Dashboard
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Mediolano token rewards.
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
                 
               </div>
             </NavigationMenuContent>
@@ -281,14 +313,7 @@ export function MainNav() {
 
 
 
-          <NavigationMenuItem>
-            <Link href="/support" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                <UserCircle className="mr-2 h-4 w-4" />
-                Support
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
+          
         </NavigationMenuList>
       </NavigationMenu>
     </div>

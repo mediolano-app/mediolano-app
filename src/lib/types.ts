@@ -94,3 +94,12 @@ export interface Licensing {
   terms: string
 }
 
+export interface NFTMetadata {
+  name: string;
+  description: string;
+  author: string;
+  type: string;
+  image: string;
+  version: string;
+  external_url: string;
+}

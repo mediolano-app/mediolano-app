@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Mail, MessageSquare, Twitter, Github } from "lucide-react"
+import Link from "next/link"
 
 const connectOptions = [
   {
@@ -51,9 +52,9 @@ export default function Connect() {
             <CardContent>
               <CardDescription>{option.description}</CardDescription>
               <Button className="mt-4" variant="outline" asChild>
-                <a href={option.link} target="_blank" rel="noopener noreferrer">
+                <Link href={option.link} target="_blank" rel="noopener noreferrer">
                   {option.action}
-                </a>
+                </Link>
               </Button>
             </CardContent>
           </Card>
