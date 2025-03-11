@@ -33,6 +33,7 @@ import { useIPLicensing } from '@/hooks/useIPLicensing'
 import { useAccount } from '@starknet-react/core'
 import { useUserNFTs } from '@/hooks/useUserNft'
 import { type NFT as IP } from '@/hooks/useUserNft'
+import Link from "next/link"
 const steps = ["Select IP", "Licensing Details", "Review & Submit"]
 
 // interface IP {
@@ -605,14 +606,14 @@ export function IPLicensing() {
             <p className="text-sm break-all">
               Transaction Hash: {submissionStatus.txHash}
             </p>
-            <a
+            <Link
               href={`https://starkscan.co/tx/${submissionStatus.txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-500 hover:underline text-sm"
             >
               View on Starkscan
-            </a>
+            </Link>
           </div>
           <div>
             <h3 className="font-semibold">Selected IP</h3>
@@ -688,4 +689,3 @@ export function IPLicensing() {
     </Card>
   )
 }
-

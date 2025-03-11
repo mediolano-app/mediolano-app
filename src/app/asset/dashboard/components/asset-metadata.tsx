@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { truncateString } from "@/lib/utils"
+import Link from "next/link"
 
 interface AssetMetadataProps {
   nftData: {
@@ -38,7 +39,7 @@ export function AssetMetadata({ nftData }: AssetMetadataProps) {
               <dt className="text-sm font-medium text-muted-foreground">{key}</dt>
               <dd className="text-sm font-semibold">
                 {key === "Token URI" && value !== "Not available" ? (
-                  <a
+                  <Link
                     href={value}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -46,7 +47,7 @@ export function AssetMetadata({ nftData }: AssetMetadataProps) {
                     title={value}
                   >
                     {truncateString(value)}
-                  </a>
+                  </Link>
                 ) : (
                   value
                 )}

@@ -140,7 +140,8 @@ export default function ArtRegistrationPage() {
       const data = await response.json();
       const ipfs = data.uploadData.IpfsHash as string;
       setIpfsHash(ipfs);
-
+      console.log("IPFS Hash:", ipfs);
+      
       toast({
         title: "IP Protected",
         description:
