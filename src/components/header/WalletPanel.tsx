@@ -14,18 +14,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-<<<<<<< HEAD:src/components/Header/WalletPanel.tsx
-<<<<<<< Updated upstream:src/components/Header/WalletPanel.tsx
-import { Wallet, LogOut, Copy, ExternalLink, ArrowUpRight, ArrowDownLeft, Plus, ShieldCheck } from 'lucide-react'
-=======
+
 import { Wallet, LogOut, Copy, ExternalLink, ArrowUpRight, ArrowDownLeft, Plus, ShieldCheck, LucideLogOut } from 'lucide-react'
 import { useConnect, useDisconnect, useAccount } from '@starknet-react/core';
 import Link from 'next/link'
->>>>>>> Stashed changes:src/components/header/WalletPanel.tsx
-=======
-import { Wallet, LogOut, Copy, ExternalLink, ArrowUpRight, ArrowDownLeft, Plus, ShieldCheck, LucideLogOut } from 'lucide-react'
-import { useConnect, useDisconnect, useAccount } from '@starknet-react/core';
->>>>>>> main:src/components/header/WalletPanel.tsx
 
 const mockTokens = [
   { symbol: 'ETH', name: 'Ethereum', profile: '1.5', value: '$3,250.00', icon: '₿' },
