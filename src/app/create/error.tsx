@@ -38,7 +38,7 @@ export default function Error({
             <AlertTriangle className="h-5 w-5 text-destructive" />
             <CardTitle>Something went wrong</CardTitle>
           </div>
-          <CardDescription>An error occurred while trying to create your IP registration.</CardDescription>
+          <CardDescription>An error occurred. Please contact our support channel.</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
@@ -51,7 +51,7 @@ export default function Error({
             Try again
           </Button>
           <Button asChild>
-            <Link href="/">Go to Home</Link>
+            <Link href="/support">Go to Support</Link>
           </Button>
         </CardFooter>
       </Card>

@@ -22,6 +22,7 @@ import {
     Search,
     BarChart,
     Lock,
+    Grid,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -354,7 +355,8 @@ export default function ArtRegistrationPage() {
                                 <li className="flex items-center">
                                     <Shield className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
                                     <span>
-                                        Protect your intellectual property
+                                        Protected in 181 countries by the
+                                        Berne Convention
                                     </span>
                                 </li>
                                 <li className="flex items-center">
@@ -390,7 +392,7 @@ export default function ArtRegistrationPage() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Accepted Art Types</CardTitle>
+                            <CardTitle>Art Types</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <ul className="grid grid-cols-2 gap-4">
@@ -447,29 +449,28 @@ export default function ArtRegistrationPage() {
                                 <li className="flex items-center">
                                     <Search className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
                                     <span>
-                                        Advanced artwork search and discovery
+                                     Decentralized Authorship
                                     </span>
                                 </li>
                                 <li className="flex items-center">
                                     <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
                                     <span>
-                                        Sales analytics and performance tracking
+                                    Smart Contract Licensing
                                     </span>
                                 </li>
                                 <li className="flex items-center">
                                     <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
                                     <span>
-                                        Secure blockchain-based ownership
-                                        records
+                                    Proof of Ownership
                                     </span>
                                 </li>
                                 <li className="flex items-center">
                                     <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                                    <span>Integrated payment processing</span>
+                                    <span>Monetization services</span>
                                 </li>
                                 <li className="flex items-center">
-                                    <Globe className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                                    <span>Global marketplace access</span>
+                                    <Grid className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                                    <span>Portfolio manager</span>
                                 </li>
                             </ul>
                         </CardContent>

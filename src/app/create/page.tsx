@@ -92,21 +92,17 @@ const fileTypeIcons = {
 
 // Mock collections data
 const collections = [
-  { id: "1", name: "Digital Art Collection" },
-  { id: "2", name: "Music NFTs" },
-  { id: "3", name: "Video Content" },
-  { id: "4", name: "Literary Works" },
-  { id: "5", name: "Software Projects" },
+  { id: "1", name: "Programmable IP" },
 ]
 
 // Mock blockchain data
 const mockBlockchainData = {
   gas: 0.000342,
-  gasPrice: "0.00000004 ETH",
-  totalFee: "0.00001368 ETH",
+  gasPrice: "0.01 STRK",
+  totalFee: "0.01 STRK",
   network: "Starknet",
   contractAddress: "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b",
-  estimatedConfirmationTime: "< 1 minute",
+  estimatedConfirmationTime: "< 10 seconds",
   walletAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
 }
 
@@ -572,8 +568,8 @@ export default function CreateIPPage() {
             <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="assets">Assets</TabsTrigger>
-                <TabsTrigger value="rights">Rights & Licensing</TabsTrigger>
+                <TabsTrigger value="assets">Media</TabsTrigger>
+                <TabsTrigger value="rights">Licensing</TabsTrigger>
               </TabsList>
 
               {/* Details Tab */}
