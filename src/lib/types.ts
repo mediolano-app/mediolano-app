@@ -103,3 +103,25 @@ export interface NFTMetadata {
   version: string;
   external_url: string;
 }
+
+
+export interface Asset {
+  id: string
+  name: string
+  description: string
+  image: string
+  tokenId: string
+  collection: Collection
+  price: number
+  rarity?: string
+  attributes?: {
+    trait_type: string
+    value: string
+  }[]
+  createdAt: string
+  lastSale?: {
+    price: number
+    date: string
+  }
+  licensing?: Licensing[]
+}
