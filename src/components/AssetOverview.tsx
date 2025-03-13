@@ -21,7 +21,7 @@ export function AssetOverview({ asset }: { asset: Asset }) {
               <span>Rarity: {asset.rarity}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-blue-500" />
+              <Zap className="h-5 w-5 text-blue-600" />
               <span>Utility Score: {utilityScore}%</span>
             </div>
             <div className="flex items-center gap-2">

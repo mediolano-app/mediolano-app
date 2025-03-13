@@ -188,7 +188,7 @@ export function Footer() {
 
 
             {/* Mediolano */}
-            <div className="space-y-4 lg:col-span-1 bg-blue-500/10 p-4 rounded-lg">
+            <div className="space-y-4 lg:col-span-1 bg-blue-600/10 p-4 rounded-lg">
             <Link href="/" className="flex items-center space-x-2">
                 <motion.span
                 className="text-1xl font-bold"
