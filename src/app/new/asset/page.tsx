@@ -1,29 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import {
-  ArrowLeft,
-  PaintbrushIcon as PaintBrush,
-  Camera,
-  ImageIcon,
-  CuboidIcon as Cube,
-  DollarSign,
-  Shield,
-  Award,
-  Globe,
-  Palette,
-  Feather,
-  Aperture,
-  Scissors,
-  Shapes,
-  Layers,
-  Zap,
-  Search,
-  BarChart,
-  Lock,
-} from "lucide-react";
-
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -386,6 +371,36 @@ export default function ArtRegistrationPage() {
           </form>
         </CardContent>
       </Card>
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Sign Transaction</DrawerTitle>
+            <DrawerDescription>Please sign the transaction to register your new Programmable IP.</DrawerDescription>
+          </DrawerHeader>
+          <div className="p-4 space-y-4">
+            <p>Asset Details:</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Title: {asset.title}</li>
+              <li>Type: {assetTypes.find((t) => t.id === asset.assetType)?.name}</li>
+              <li>License: {licenses.find((l) => l.id === asset.license)?.name}</li>
+              <li>
+                Collection: {isNewCollection ? newCollection : collections.find((c) => c.id === asset.collection)?.name}
+              </li>
+              <li>IP Version: {asset.ipVersion}</li>
+              {asset.isLimited && <li>Total Supply: {asset.totalSupply}</li>}
+            </ul>
+            {txHash && <p>Transaction Hash: {txHash.slice(0, 6)}...{txHash.slice(-4)}</p>}
+          </div>
+          <DrawerFooter>
+            <Button onClick={handleTransactionSign} disabled={!txHash}>
+              Sign Transaction
+            </Button>
+            <Button variant="outline" onClick={() => setIsDrawerOpen(false)}>
+              Cancel
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }
