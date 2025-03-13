@@ -577,7 +577,7 @@ export function IPLicensing() {
   const renderIPTypeIcon = (type: string) => {
     switch (type) {
       case "Literary Work":
-        return <BookOpen className="h-5 w-5 text-blue-500" />
+        return <BookOpen className="h-5 w-5 text-blue-600" />
       case "Musical Composition":
         return <Music className="h-5 w-5 text-purple-500" />
       case "Artwork":
@@ -610,7 +610,7 @@ export function IPLicensing() {
               href={`https://starkscan.co/tx/${submissionStatus.txHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-500 hover:underline text-sm"
+              className="text-blue-600 hover:underline text-sm"
             >
               View on Starkscan
             </Link>

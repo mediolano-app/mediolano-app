@@ -59,7 +59,7 @@ const WalletPanel: React.FC = () => {
     <div className="">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="hover:bg-blue-500">
+          <Button variant="outline" className="hover:bg-blue-600">
             <Wallet className="mr-2 h-4 w-4" /> {isConnected ? '0x...' : '0x...'}
           </Button>
         </DialogTrigger>
@@ -178,7 +178,7 @@ const WalletPanel: React.FC = () => {
               </div>
               <div className="grid w-full gap-4">
                 {/*
-                <Button onClick={connectWallet} className="w-full bg-blue-500 hover:bg-blue-600 text-white">
+                <Button onClick={connectWallet} className="w-full bg-blue-600 hover:bg-blue-600 text-white">
                   <Wallet className="mr-2 h-4 w-4" /> Connect with Starknet
                 </Button>*/}
 
@@ -217,7 +217,7 @@ const WalletPanel: React.FC = () => {
 
               </div>
               <p className="text-sm text-center text-gray-600">
-                By connecting, you agree to our <Link href="#" className="underline text-blue-500">Terms of Service</Link> and <Link href="#" className="underline text-blue-500">Privacy Policy</Link>.
+                By connecting, you agree to our <Link href="#" className="underline text-blue-600">Terms of Service</Link> and <Link href="#" className="underline text-blue-600">Privacy Policy</Link>.
               </p>
             </div>
           )}

@@ -180,7 +180,7 @@ export default function NFTDetailPage({ params }: { params: { id: string } }) {
 
                     <div className="flex items-center justify-between py-2 border-b">
                       <div className="flex items-center gap-2">
-                        <Tag className="h-4 w-4 text-blue-500" />
+                        <Tag className="h-4 w-4 text-blue-600" />
                         <div>
                           <p className="font-medium">Minted</p>
                           <p className="text-sm text-muted-foreground">by 0x3f67...8c12</p>
