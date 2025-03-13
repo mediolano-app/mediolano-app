@@ -13,6 +13,8 @@ import {
   Wallet,
 } from "lucide-react"
 import Link from "next/link";
+// import { useAccount } from "@starknet-react/core"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -20,36 +22,50 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // import { ConnectWallet } from "@/components/ConnectWallet"
 import { usePortfolio } from "@/hooks/usePortfolio"
-import { useMIP } from "@/hooks/useMIP";
-import { useRouter } from "next/navigation";
-import NFTCard from "@/components/NFTCard";
 
 export default function DashboardPage() {
-  // const { userAssets, userCollections, portfolioStats, isLoading, account, error, refetch } = usePortfolio();
+  // const { account } = useAccount()
+  const { userAssets, userCollections, portfolioStats, isLoading, account, error, refetch } = usePortfolio();
+  
+  const [recentAssetsCount, setRecentAssetsCount] = useState(4)
+  const [userAssetsPage, setUserAssetsPage] = useState(1)
+  const [userAssetsSearch, setUserAssetsSearch] = useState("")
+  const [userAssetsFilter, setUserAssetsFilter] = useState("all")
+  const [displayedCollections, setDisplayedCollections] = useState(6)
 
-  // const [recentAssetsCount, setRecentAssetsCount] = useState(4)
-  // const [userAssetsPage, setUserAssetsPage] = useState(1)
-  // const [userAssetsSearch, setUserAssetsSearch] = useState("")
-  // const [userAssetsFilter, setUserAssetsFilter] = useState("all")
-  // const [displayedCollections, setDisplayedCollections] = useState(6)
+  // Filter user assets based on search and collection filter
+  const filteredUserAssets = userAssets.filter(
+    (asset) =>
+      asset.name.toLowerCase().includes(userAssetsSearch.toLowerCase()) &&
+      (userAssetsFilter === "all" || asset.collection.toLowerCase() === userAssetsFilter.toLowerCase()),
+  )
 
-  // const filteredUserAssets = userAssets.filter(
-  //   (asset) =>
-  //     asset.name.toLowerCase().includes(userAssetsSearch.toLowerCase()) &&
-  //     (userAssetsFilter === "all" || asset.collection.toLowerCase() === userAssetsFilter.toLowerCase()),
-  // )
+  const paginatedUserAssets = filteredUserAssets.slice((userAssetsPage - 1) * 6, userAssetsPage * 6)
 
-  // const paginatedUserAssets = filteredUserAssets.slice((userAssetsPage - 1) * 6, userAssetsPage * 6)
+  // Reset pagination when filter changes
+  useEffect(() => {
+    setUserAssetsPage(1)
+  }, [userAssetsSearch, userAssetsFilter])
 
-  // useEffect(() => {
-  //   setUserAssetsPage(1)
-  // }, [userAssetsSearch, userAssetsFilter])
 
-  const router = useRouter();
-  const {address, balance, balanceError, tokenIds, tokenIdsError, isLoading} = useMIP();
-  console.log(address);
-  console.log(balance);
-  console.log(tokenIds); 
+
+  // if (!account) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 mt-10 mb-20 flex flex-col items-center justify-center min-h-[60vh]">
+  //       <Card className="w-full max-w-md">
+  //         <CardHeader>
+  //           <CardTitle className="text-center">Connect Your Wallet</CardTitle>
+  //           <CardDescription className="text-center">
+  //             Please connect your wallet to view your portfolio
+  //           </CardDescription>
+  //         </CardHeader>
+  //         <CardContent className="flex justify-center pb-6">
+  //           <ConnectWallet />
+  //         </CardContent>
+  //       </Card>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="container mx-auto px-4 py-8 mt-10 mb-20">
@@ -57,7 +73,7 @@ export default function DashboardPage() {
       <main className="p-4 space-y-6">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">Onchain Assets Dashboard</h1>
-          {/* <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2">
             <Input 
               type="search" 
               placeholder="Search assets..." 
@@ -71,9 +87,7 @@ export default function DashboardPage() {
             <Button variant="outline" size="icon">
               <ListFilter className="h-4 w-4" />
             </Button>
-          </div> */}
-
-          {/* put this back later */}
+          </div>
         </div>
 
         {/* Portfolio Stats Section */}
@@ -85,7 +99,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {/* futuramente calcular o valor do portfolio */}
+                {account && isLoading? "Loading..." : `${portfolioStats.totalValue.toFixed(2)} STRK`}
               </div>
               <p className="text-xs text-muted-foreground">Your total portfolio value</p>
             </CardContent>
@@ -97,7 +111,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {address && isLoading ? "Loading..." : balanceError ? "Error" : balance.toString()}
+                {account && isLoading ? "Loading..." : portfolioStats.totalNFTs}
               </div>
               <p className="text-xs text-muted-foreground">Total assets in your portfolio</p>
             </CardContent>
@@ -109,11 +123,10 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {address && isLoading ? "Loading..." : "No collections yet"}
-                {/* implementar as collections e voltar aqui */}
+                {account && isLoading ? "Loading..." : (portfolioStats.topCollection.name || "No collections")}
               </div>
               <p className="text-xs text-muted-foreground">
-                {address && isLoading ? "" : "Add assets to your portfolio"}
+                {account && isLoading ? "" : (portfolioStats.topCollection.name ? `Value: ${portfolioStats.topCollection.value.toFixed(2)} STRK` : "Add assets to your portfolio")}
               </p>
             </CardContent>
           </Card>
@@ -124,16 +137,14 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {address && isLoading ? "Loading..." 
-                  // : (portfolioStats.recentActivity.length > 0 
-                  // ? portfolioStats.recentActivity[0].item 
-                  : "No recent activity"}
+                {account && isLoading ? "Loading..." : (portfolioStats.recentActivity.length > 0 
+                  ? portfolioStats.recentActivity[0].item 
+                  : "No recent activity")}
               </div>
               <p className="text-xs text-muted-foreground">
-                {address && isLoading ? "" 
-                  // : (portfolioStats.recentActivity.length > 0 
-                  // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
-                  : "No transactions yet"}
+                {account && isLoading ? "" : (portfolioStats.recentActivity.length > 0 
+                  ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
+                  : "No transactions yet")}
               </p>
             </CardContent>
           </Card>
@@ -143,28 +154,20 @@ export default function DashboardPage() {
         <section>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold">Recent Assets</h2>
-            <Button
-            onClick={() => router.push('/portfolio')} 
-            variant="outline"
-            >
-              Open portfolio
-            </Button>
+            <Button variant="outline"><Link href="/portfolio">Open Portfolio</Link></Button>
           </div>
-          {address && isLoading ? (
+          {account && isLoading ? (
             <div className="text-center py-8">Loading your assets...</div>
-          ) : tokenIdsError ? (
-            <div className="text-center py-8 text-red-500">{tokenIdsError.message}</div>          
-          ) : balance === 0n ? (
+          ) : error ? (
+            <div className="text-center py-8 text-red-500">{error}</div>
+          ) : userAssets.length === 0 ? (
             <div className="text-center py-8">
               <p>You don&apos;t have any assets yet.</p>
+              <Button className="mt-4" onClick={refetch}>Refresh</Button>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {tokenIds.map((tokenId, index) => (
-                <NFTCard key={index} tokenId={tokenId} status={"teste"}/>
-              ))}
-                {/*                 
                 {userAssets.slice(0, recentAssetsCount).map((asset) => (
                   <Card key={asset.id} className="bg-background/80">
                     <CardHeader>
@@ -187,21 +190,21 @@ export default function DashboardPage() {
                       </span>
                     </CardFooter>
                   </Card>
-                ))} */}
+                ))}
               </div>
-              {/* {recentAssetsCount < userAssets.length && (
+              {recentAssetsCount < userAssets.length && (
                 <div className="mt-4 text-center">
                   <Button onClick={() => setRecentAssetsCount((prev) => Math.min(prev + 4, userAssets.length))}>
                     Load More
                   </Button>
                 </div>
-              )} */}
+              )}
             </>
           )}
         </section>
 
         {/* Top Collections Section */}
-        {/* <section>
+        <section>
           <h2 className="text-2xl font-semibold mb-4">Your Collections</h2>
           {account && isLoading ? (
             <div className="text-center py-8">Loading your collections...</div>
@@ -253,10 +256,10 @@ export default function DashboardPage() {
               )}
             </>
           )}
-        </section> */}
+        </section>
 
         {/* Recent Activity Section */}
-        {/* <section>
+        <section>
           <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
           <Card className="bg-background/80">
             <CardHeader>
@@ -305,10 +308,10 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-        </section> */}
+        </section>
 
         {/* User Assets Section */}
-        {/* <section>
+        <section>
           <h2 className="text-2xl font-semibold mb-4">Your Assets</h2>
           <Card className="bg-background/80">
             <CardHeader>
@@ -394,7 +397,7 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-        </section> */}
+        </section>
       </main>
     </div>
   )

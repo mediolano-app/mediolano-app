@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAccount } from "@starknet-react/core";
 import { Contract, Abi, num } from "starknet";
-import { collectAbi } from "@/app/portfolio/IPCollectionAbi";
+import { abi } from "@/abis/abi";
 import { NFT, Collection } from "@/lib/types";
 
 const contractAddress = process.env.NEXT_PUBLIC_IP_COLLECTION_ADDRESS || "";
@@ -90,7 +90,7 @@ export function useBlockchainPortfolio() {
     
     try {
       const ipContract = new Contract(
-        collectAbi as Abi,
+        abi as Abi,
         contractAddress as `0x${string}`,
         account
       );

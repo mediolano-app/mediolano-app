@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, ExternalLink, Share2, Heart, Clock, Tag, Sparkles } from "lucide-react"
-import { RelatedNFTs } from "@/app/portfolio/components/related-nfts"
+import { RelatedNFTs } from "@/components/related-nfts"
 
 export default function NFTDetailPage({ params }: { params: { id: string } }) {
   const nft = getNFTById(params.id)

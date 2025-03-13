@@ -35,7 +35,7 @@ export default function RegisterIP() {
   const { chain } = useNetwork();
   const { contract } = useContract({ 
     abi: abi as Abi, 
-    address: process.env.CONTRACT_ADDRESS_MIP as `0x${string}`, 
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`, 
   }); 
   const router = useRouter();  
   const [status, setStatus] = useState("Mint NFT");

@@ -371,7 +371,7 @@ export default function ArtRegistrationPage() {
           </form>
         </CardContent>
       </Card>
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      {/* <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Sign Transaction</DrawerTitle>
@@ -400,7 +400,7 @@ export default function ArtRegistrationPage() {
             </Button>
           </DrawerFooter>
         </DrawerContent>
-      </Drawer>
+      </Drawer> */}
     </div>
   );
 }
