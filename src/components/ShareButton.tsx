@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Share2, Twitter, Facebook, Linkedin, Instagram, MessageCircle, Video } from "lucide-react"
+import Link from "next/link"
 
 export function ShareButton() {
   const shareUrl = typeof window !== "undefined" ? window.location.href : ""
@@ -27,10 +28,10 @@ export function ShareButton() {
       <DropdownMenuContent align="end">
         {shareNetworks.map((network) => (
           <DropdownMenuItem key={network.name} asChild>
-            <a href={network.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+            <Link href={network.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
               <network.icon className="mr-2 h-4 w-4" />
               <span>Share on {network.name}</span>
-            </a>
+            </Link>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

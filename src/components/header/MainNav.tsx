@@ -43,9 +43,9 @@ import { Logo } from "@/components/header/Logo"
 export function MainNav() {
   return (
     <div className="mr-4 hidden md:flex items-center space-x-4">
-      <Link href="/" className="mr-6 flex items-center space-x-2">
+      
         <Logo />
-      </Link>
+
       <NavigationMenu>
         <NavigationMenuList>
           
