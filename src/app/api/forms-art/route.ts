@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
       "yearCreated",
       "description",
       "price",
-      "mediaURL",
     ];
 
     for (const field of requiredFields) {
@@ -32,7 +31,6 @@ export async function POST(request: NextRequest) {
     const yearCreated = parseInt(data.get("yearCreated") as string, 10);
     const description = data.get("description") as string;
     const price = data.get("price") as string;
-    const mediaURL = data.get("mediaURL") as string;
 
     let fileIpfsHash: string | undefined = undefined;
     if (data.has("uploadFile")) {
@@ -51,7 +49,6 @@ export async function POST(request: NextRequest) {
       yearCreated,
       description,
       price,
-      mediaURL,
     };
 
     if (fileIpfsHash) {
