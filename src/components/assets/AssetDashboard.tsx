@@ -133,7 +133,7 @@ export default function AssetDashboard({ initialAssets }: { initialAssets: Asset
                       href={`https://starkscan.io/token/${asset.openseaUrl.split("/")[5]}?a=${asset.tokenId}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
+                      className="text-blue-600 hover:underline"
                     >
                       View on Explorer
                     </Link>

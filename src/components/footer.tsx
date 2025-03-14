@@ -74,7 +74,7 @@ export function Footer() {
     <>
     <DappInfo/>
 
-    <footer className="bg-background text-foreground border-t">
+    <footer className="bg-background text-foreground">
       <div className="container mx-auto px-4 py-6 md:py-8 lg:py-10">
         
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8 mt-8">
@@ -188,7 +188,7 @@ export function Footer() {
 
 
             {/* Mediolano */}
-            <div className="space-y-4 lg:col-span-1 bg-blue-500/10 p-4 rounded-lg">
+            <div className="space-y-4 lg:col-span-1 bg-blue-600/10 p-4 rounded-lg">
             <Link href="/" className="flex items-center space-x-2">
                 <motion.span
                 className="text-1xl font-bold"

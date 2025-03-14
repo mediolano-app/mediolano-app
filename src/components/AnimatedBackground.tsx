@@ -22,26 +22,26 @@ export default function AnimatedBackground() {
 
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden">
-      {/* Blurred background image */}
+      {/* Blurred background image 
       <Image
         src="/background.jpg"
         alt="Mediolano Dapp"
         layout="fill"
         objectFit="cover"
         quality={100}
-        className="filter blur-[10px] opacity-5" 
-      />
+        className="filter blur-[10px] opacity-0" 
+      />*/}
 
       {/* Animated gradient overlay */}
       <motion.div
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-15"
         animate={{
           background: [
             'radial-gradient(circle at 5% 20%, #0000FF, transparent 50%)',
-            'radial-gradient(circle at 100% 10%, #0000FF, transparent 50%)',
-            'radial-gradient(circle at 20% 100%, #0000FF, transparent 50%)',
+            'radial-gradient(circle at 60% 80%,rgb(255, 0, 100), transparent 50%)',
             'radial-gradient(circle at 0% 50%, #0000FF, transparent 50%)',
-            'radial-gradient(circle at 10% 20%, #0000FF, transparent 50%)',
+            'radial-gradient(circle at 80% 80%,rgb(255, 0, 100), transparent 50%)',
+            'radial-gradient(circle at 5% 20%, #0000FF, transparent 50%)',
           ],
         }}
         transition={{

@@ -9,14 +9,14 @@ export const Navigation = () => {
     <nav className="flex justify-center items-center p-4">
       <Link
         href="/"
-        className={pathname === "/" ? "font-bold mr-4" : "text-blue-500 mr-4"}
+        className={pathname === "/" ? "font-bold mr-4" : "text-blue-600 mr-4"}
       >
         Home
       </Link>
       <Link
         href="/about"
         className={
-          pathname === "/about" ? "font-bold mr-4" : "text-blue-500 mr-4"
+          pathname === "/about" ? "font-bold mr-4" : "text-blue-600 mr-4"
         }
       >
         About
@@ -26,7 +26,7 @@ export const Navigation = () => {
         className={
           pathname.startsWith("/products/1")
             ? "font-bold mr-4"
-            : "text-blue-500 mr-4"
+            : "text-blue-600 mr-4"
         }
       >
         Product 1

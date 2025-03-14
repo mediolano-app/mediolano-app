@@ -6,24 +6,8 @@ import { useAccount } from "@starknet-react/core";
 import { useState, FormEvent, useRef} from "react";
 import { FilePlus, Lock, FileText, Coins, Shield, Globe, BarChart, Book, Music, Film, FileCode, Palette, File, ScrollText, Clock, ArrowRightLeft, ShieldCheck, Banknote, Globe2, FileLock } from 'lucide-react'
 import Link from 'next/link'
-
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select } from "@/components/ui/select"
-
-
-export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
-
-export interface IP{
-  title: string,
-  description: string,
-  authors: string[],
-  ipType: IPType,
-  uploadFile?: File,
-}
-
 
 const templatesIP = () => {
 
@@ -31,15 +15,15 @@ const templatesIP = () => {
   const { address: connectedAddress, isConnected, isConnecting } = useAccount();
 
   const templates = [
-    { name: 'Art', icon: Palette, href: '/new/art', description: 'Tokenize your artwork' },
+    { name: 'Art', icon: Palette, href: '/new/art', description: 'Paintings, Photography, Artworks' },
     { name: 'Documents', icon: File, href: '/new/document', description: 'Preserve documents on-chain' },  
-    { name: 'Movies', icon: Film, href: '/new/movies', description: 'Protect your cinematic creations' }, 
-    { name: 'Music', icon: Music, href: '/new/music', description: 'Copyright compositions' },
-    { name: 'NFT', icon: FileLock, href: '/new/nft', description: 'NFT oriented design' },
+    { name: 'Video', icon: Film, href: '/new/video', description: 'Movies, videocast, shows, video creations' }, 
+    { name: 'Audio', icon: Music, href: '/new/audio', description: 'Music, podcasts, samplers, radio' },
+    { name: 'NFT', icon: FileLock, href: '/new/nft', description: 'NFT oriented asset design' },
     { name: 'Patents', icon: ScrollText, href: '/new/patents', description: 'Secure inventions and innovations' },
-    { name: 'Publications', icon: Book, href: '/new/publication', description: 'Protect your written works' },
+    { name: 'Publications', icon: Book, href: '/new/publication', description: 'Articles, news, research, posts' },
     { name: 'RWA', icon: Globe2, href: '/new/rwa', description: 'Tokenize Real World Assets' },
-    { name: 'Software', icon: FileCode, href: '/new/software', description: 'Safeguard your code' },
+    { name: 'Software', icon: FileCode, href: '/new/software', description: 'Safeguard code ownership' },
   ]
 
 
@@ -55,14 +39,14 @@ const templatesIP = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <div className="">
+        <div className="bg-background/30 backdrop-blur supports-[backdrop-filter]:bg-background/30 text-foreground p-4 rounded-lg">
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-1xl mb-8">
           Register with a template:
         </h2>
         
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-16">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
           {templates.map((template) => (
             <Link
               key={template.name}
@@ -71,10 +55,10 @@ const templatesIP = () => {
             >
               <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground p-6 ">
                 <div className="flex items-center mb-4">
-                  <template.icon className="h-8 w-8 mr-3" />
-                  <h3 className="text-xl font-semibold">{template.name}</h3>
+                  <template.icon className="h-6 w-6 mr-3 text-blue-600" />
+                  <h3 className="text-lg font-semibold">{template.name}</h3>
                 </div>
-                <p className="">{template.description}</p>
+                <p className="text-sm">{template.description}</p>
                 <div className="mt-4 flex items-center text-indigo-600 group-hover:text-indigo-500">
                   <span className="text-sm font-medium">Open</span>
                   <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,20 +70,29 @@ const templatesIP = () => {
           ))}
         </div>
 
+        <div className="flex flex-col items-left">
+          <p className="">Need another format?</p>
+          <Link href="/new/asset" title="Register your custom Programmable IP">
+          <Button variant="outline" className="p-8 bg-blue-600 text-white">Register your custom Programmable IP</Button>
+          </Link>
+          </div>
+
       </main>
+
+          
+
       </div>
 
 
         
-      <div className="text-card-foreground rounded-lg">
+      <div className="bg-background/30 backdrop-blur supports-[backdrop-filter]:bg-background/30 text-foreground p-4 rounded-lg">
 
-      <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
-        <CardHeader>
-          <CardTitle>Blockchain IP Registration Features</CardTitle>
-          <CardDescription>Secure, transparent, and efficient. Easy register your intellectual property with templates.</CardDescription>
-        </CardHeader>
-        <CardContent>
-      <div>
+     
+        
+          <h3 className="text-lg">Programmable IP Features</h3>
+          <h4 className="text-blue-600">Unlock the future of the integrity web</h4>
+
+      <div className="mt-12">
         
           <ul className="space-y-6">
             <li className="flex items-start">
@@ -147,11 +140,8 @@ const templatesIP = () => {
           </ul>
         </div>
       
-      </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="ghost">Need help?</Button>
-        </CardFooter>
-      </Card>
+      
+      
 
 
       
