@@ -126,7 +126,7 @@ export default function ArtRegistrationPage() {
     }
 
     try {
-      const response = await fetch("/api/forms-ipfs", {
+      const response = await fetch("/api/forms-art", {
         method: "POST",
         body: submitData,
       });
