@@ -110,7 +110,7 @@ export default function StartHero({
           width={400}
           height={400}
           rotate={12}
-          gradient="from-blue-500/[0.05]"
+          gradient="from-blue-600/[0.05]"
           className="left-[-10%] md:left-[-5%] top-[15%] md:top-[20%]"
         />
 
@@ -128,7 +128,7 @@ export default function StartHero({
           width={300}
           height={300}
           rotate={-8}
-          gradient="from-blue-500/[0.05]"
+          gradient="from-blue-600/[0.05]"
           className="left-[5%] md:left-[10%] bottom-[5%] md:bottom-[10%]"
         />
 
@@ -137,7 +137,7 @@ export default function StartHero({
           width={400}
           height={400}
           rotate={20}
-          gradient="from-blue-500/[0.05]"
+          gradient="from-blue-600/[0.05]"
           className="right-[15%] md:right-[20%] top-[10%] md:top-[15%]"
         />
 
@@ -162,7 +162,7 @@ export default function StartHero({
               <br />
               <span
                 className={cn(
-                  "bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-rose-500 ",
+                  "bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-rose-500 ",
                   pacifico.className,
                 )}
               >

@@ -45,7 +45,7 @@ interface NFTCardProps {
 
 
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
-	const contract = "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0";
+	const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
 	const [metadata, setMetadata] = useState<IP | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);

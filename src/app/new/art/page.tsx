@@ -22,6 +22,7 @@ import {
     Search,
     BarChart,
     Lock,
+    Grid,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,12 @@ import { abi } from "@/abis/abi";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
+
+
 export default function ArtRegistrationPage() {
+
+    const { toast } = useToast();
+    
     const [artData, setArtData] = useState({
         title: "",
         artistName: "",
@@ -62,18 +68,19 @@ export default function ArtRegistrationPage() {
         yearCreated: new Date().getFullYear(),
         description: "",
         price: "",
+        mediaURL: "",
     });
+
     const [file, setFile] = useState<File | null>(null);
     const [ipfsHash, setIpfsHash] = useState("");
-    const { toast } = useToast();
+    
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const { address } = useAccount();
     const { contract } = useContract({
         abi: abi as Abi,
-        address:
-            "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
+        address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
     });
 
     const { send, error: transactionError } = useSendTransaction({
@@ -87,7 +94,7 @@ export default function ArtRegistrationPage() {
         if (!ipfsHash) {
             toast({
                 title: "Error",
-                description: "Upload image before minting.",
+                description: "Please review your submission.",
             });
             return;
         }
@@ -95,7 +102,7 @@ export default function ArtRegistrationPage() {
             send();
             toast({
                 title: "Success",
-                description: "NFT Minting Transaction Sent.",
+                description: "Transaction Sent for Programmable IP Minting.",
             });
         } catch (error) {
             console.log("mint error", transactionError);
@@ -124,6 +131,7 @@ export default function ArtRegistrationPage() {
         submitData.append("yearCreated", artData.yearCreated.toString());
         submitData.append("description", artData.description);
         submitData.append("price", artData.price);
+        submitData.append("mediaURL", artData.mediaURL);
 
         if (file) {
             submitData.append("uploadFile", file);
@@ -157,7 +165,7 @@ export default function ArtRegistrationPage() {
             toast({
                 title: "Error",
                 description:
-                    "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
+                    "Registration failed. Please contact our support team.",
                 action: <ToastAction altText="OK">OK</ToastAction>,
             });
         } finally {
@@ -185,7 +193,7 @@ export default function ArtRegistrationPage() {
                     className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Templates
+                    Back to IP Templates
                 </Link>
             </div>
 
@@ -316,6 +324,21 @@ export default function ArtRegistrationPage() {
                             </div>
 
                             <div className="space-y-2">
+                                <Label htmlFor="mediaURL">Media URL</Label>
+                                <Input
+                                    id="mediaURL"
+                                    name="mediaURL"
+                                    value={artData.mediaURL}
+                                    onChange={handleChange}
+                                    placeholder="Input a link to your artwork"
+                                    required
+                                />
+                            </div>
+
+
+
+                            {/*}
+                            <div className="space-y-2">
                                 <Label htmlFor="artworkImage">
                                     Artwork Image
                                 </Label>
@@ -330,6 +353,7 @@ export default function ArtRegistrationPage() {
                                     required
                                 />
                             </div>
+                            */}
 
                             <Button type="submit" className="w-full">
                                 Register Artwork
@@ -354,7 +378,8 @@ export default function ArtRegistrationPage() {
                                 <li className="flex items-center">
                                     <Shield className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
                                     <span>
-                                        Protect your intellectual property
+                                        Protected in 181 countries by the
+                                        Berne Convention
                                     </span>
                                 </li>
                                 <li className="flex items-center">
@@ -390,7 +415,7 @@ export default function ArtRegistrationPage() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Accepted Art Types</CardTitle>
+                            <CardTitle>Art Types</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <ul className="grid grid-cols-2 gap-4">
@@ -447,29 +472,28 @@ export default function ArtRegistrationPage() {
                                 <li className="flex items-center">
                                     <Search className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
                                     <span>
-                                        Advanced artwork search and discovery
+                                     Decentralized Authorship
                                     </span>
                                 </li>
                                 <li className="flex items-center">
                                     <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
                                     <span>
-                                        Sales analytics and performance tracking
+                                    Smart Contract Licensing
                                     </span>
                                 </li>
                                 <li className="flex items-center">
                                     <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
                                     <span>
-                                        Secure blockchain-based ownership
-                                        records
+                                    Proof of Ownership
                                     </span>
                                 </li>
                                 <li className="flex items-center">
                                     <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                                    <span>Integrated payment processing</span>
+                                    <span>Monetization services</span>
                                 </li>
                                 <li className="flex items-center">
-                                    <Globe className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                                    <span>Global marketplace access</span>
+                                    <Grid className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                                    <span>Portfolio manager</span>
                                 </li>
                             </ul>
                         </CardContent>

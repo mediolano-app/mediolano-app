@@ -148,7 +148,7 @@ const monetizeIP: NextPage = () => {
                   onClick={() => setActiveTab('opportunities')}
                   className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
                     activeTab === 'opportunities'
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-blue-600 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -158,7 +158,7 @@ const monetizeIP: NextPage = () => {
                   onClick={() => setActiveTab('royalties')}
                   className={`ml-8 py-2 px-4 text-center border-b-2 font-medium text-sm ${
                     activeTab === 'royalties'
-                      ? 'border-blue-500 text-blue-600'
+                      ? 'border-blue-600 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -250,7 +250,7 @@ const monetizeIP: NextPage = () => {
         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground p-4 rounded">
               <h2 className="text-xl font-semibold mb-2 flex items-center">
-                <DollarSign className="h-6 w-6 mr-2 text-blue-500" />
+                <DollarSign className="h-6 w-6 mr-2 text-blue-600" />
                 Monetization Strategies
               </h2>
               <ul className="list-disc pl-5 space-y-2">

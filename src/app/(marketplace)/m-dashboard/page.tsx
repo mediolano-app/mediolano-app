@@ -161,7 +161,7 @@ export default function Dashboard() {
                 <div key={transaction.id} className="flex items-center">
                   {transaction.type === "sale" && <ArrowUpRight className="h-4 w-4 mr-2 text-green-500" />}
                   {transaction.type === "purchase" && <ArrowDownRight className="h-4 w-4 mr-2 text-red-500" />}
-                  {transaction.type === "transfer" && <ArrowLeftRight className="h-4 w-4 mr-2 text-blue-500" />}
+                  {transaction.type === "transfer" && <ArrowLeftRight className="h-4 w-4 mr-2 text-blue-600" />}
                   <div className="flex-1">
                     <p className="font-medium">{transaction.item}</p>
                     <p className="text-sm text-muted-foreground">{transaction.date}</p>
