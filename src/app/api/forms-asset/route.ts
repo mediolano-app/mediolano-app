@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
     const collection = data.get("collection") as string;
     const ipVersion = data.get("ipVersion") as string;
 
+
     let fileIpfsHash: string | undefined = undefined;
     if (data.has("uploadFile")) {
       const file = data.get("uploadFile") as File;
@@ -48,24 +49,33 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const assetObject: Record<string, unknown> = {
-      title,
+    const attributes = [
+      { trait_type: "Asset Type", value: assetType },
+      { trait_type: "License", value: license },
+      { trait_type: "Is Limited", value: isLimited ? "Yes" : "No" },
+      { trait_type: "Total Supply", value: totalSupply.toString() },
+      { trait_type: "Collection", value: collection },
+      { trait_type: "IP Version", value: ipVersion },
+    ];
+
+
+    tags.forEach((tag) => {
+      attributes.push({ trait_type: "Tag", value: tag });
+    });
+
+    const external_url = fileIpfsHash
+      ? `https://gateway.pinata.cloud/ipfs/${fileIpfsHash}`
+      : mediaUrl;
+
+    const formattedAsset = {
+      name: title,
       description,
-      assetType,
-      mediaUrl,
-      tags,
-      license,
-      isLimited,
-      totalSupply,
-      collection,
-      ipVersion,
+      external_url,
+      image: mediaUrl,
+      attributes,
     };
 
-    if (fileIpfsHash) {
-      assetObject.fileIpfsHash = fileIpfsHash;
-    }
-
-    const uploadData = await pinataClient.upload.json(assetObject);
+    const uploadData = await pinataClient.upload.json(formattedAsset);
     return NextResponse.json({ uploadData }, { status: 200 });
   } catch (error) {
     console.error("Error in asset registration:", error);

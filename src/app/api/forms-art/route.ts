@@ -41,21 +41,31 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const artObject: Record<string, unknown> = {
-      title,
-      artistName,
-      medium,
-      dimensions,
-      yearCreated,
+    // If a file was uploaded, create an image URL using the Pinata gateway.
+    const imageUrl = fileIpfsHash
+      ? `https://gateway.pinata.cloud/ipfs/${fileIpfsHash}`
+      : "";
+
+    // Build the attributes array with the art details.
+    const attributes = [
+      { trait_type: "Artist Name", value: artistName },
+      { trait_type: "Medium", value: medium },
+      { trait_type: "Dimensions", value: dimensions },
+      { trait_type: "Year Created", value: yearCreated.toString() },
+      { trait_type: "Price", value: price },
+    ];
+
+    // Build the final JSON object in the desired NFT metadata format.
+    const formattedArt = {
+      name: title,
       description,
-      price,
+      external_url: imageUrl, // you can customize this if needed
+      image: imageUrl,
+      attributes,
     };
 
-    if (fileIpfsHash) {
-      artObject.fileIpfsHash = fileIpfsHash;
-    }
-
-    const uploadData = await pinataClient.upload.json(artObject);
+    // Upload the JSON metadata to Pinata.
+    const uploadData = await pinataClient.upload.json(formattedArt);
     return NextResponse.json({ uploadData }, { status: 200 });
   } catch (error) {
     console.error("Error in art registration:", error);
