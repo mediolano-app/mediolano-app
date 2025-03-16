@@ -34,14 +34,14 @@ export default function AnimatedBackground() {
 
       {/* Animated gradient overlay */}
       <motion.div
-        className="absolute inset-0 opacity-15"
+        className="absolute inset-0"
         animate={{
           background: [
-            'radial-gradient(circle at 5% 20%, #0000FF, transparent 50%)',
-            'radial-gradient(circle at 60% 80%,rgb(255, 0, 100), transparent 50%)',
-            'radial-gradient(circle at 0% 50%, #0000FF, transparent 50%)',
-            'radial-gradient(circle at 80% 80%,rgb(255, 0, 100), transparent 50%)',
-            'radial-gradient(circle at 5% 20%, #0000FF, transparent 50%)',
+            'radial-gradient(circle at 5% 20%,rgba(0, 0, 255, 0.1), transparent 100%)',
+            'radial-gradient(circle at 60% 80%,rgba(255, 0, 100, 0.1), transparent 150%)',
+            'radial-gradient(circle at 0% 50%,rgba(0, 0, 255, 0.1), transparent 50%)',
+            'radial-gradient(circle at 80% 80%,rgba(255, 0, 102, 0.1), transparent 125%)',
+            'radial-gradient(circle at 5% 20%,rgba(0, 0, 255, 0.1), transparent 100%)',
           ],
         }}
         transition={{

@@ -50,7 +50,7 @@ export default function StartFeatureSection() {
   }
 
   return (
-    <section id="features" className="py-20">
+    <section id="features" className="py-20 mb-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <motion.div
@@ -59,7 +59,7 @@ export default function StartFeatureSection() {
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Features</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Your onchain solution</h2>
             <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
               Our platform offers unique advantages for creators and organizations looking to protect and monetize their
               intellectual property.

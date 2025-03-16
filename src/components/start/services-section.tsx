@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileCode, Music, Video, PenTool, Brain, Code } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import Link from "next/link"
 
 export default function StartServicesSection() {
   const assetTypes = [
@@ -71,7 +72,9 @@ export default function StartServicesSection() {
                 <span>Low-cost, high-speed processing</span>
               </li>
             </ul>
-            <Button>Tokenize Your IP</Button>
+            <Link href="/new/templates">
+            <Button>Create Your Programmable IP</Button>
+            </Link>
           </motion.div>
 
           <motion.div
@@ -92,18 +95,20 @@ export default function StartServicesSection() {
               </li>
               <li className="flex items-start">
                 <div className="mr-3 mt-1 text-primary">•</div>
-                <span>Automated royalty distribution</span>
+                <span>Improve your registration process with premade templates</span>
               </li>
               <li className="flex items-start">
                 <div className="mr-3 mt-1 text-primary">•</div>
-                <span>Transparent usage tracking</span>
+                <span>Tamper-proof evidence of ownership</span>
               </li>
               <li className="flex items-start">
                 <div className="mr-3 mt-1 text-primary">•</div>
-                <span>Complete sovereignty over your IP assets</span>
+                <span>Access and manage your IP rights from anywhere in the world</span>
               </li>
             </ul>
-            <Button>Explore Licensing</Button>
+            <Link href="/new/templates">
+            <Button>Explore Templates</Button>
+            </Link>
           </motion.div>
         </div>
 
