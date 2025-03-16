@@ -34,7 +34,7 @@ export default function StartCTASection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-br from-primary/10 via-background to-secondary/10 border border-border p-8 md:p-12 shadow-lg"
+          className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-br from-primary/10 via-background to-secondary/10 border border-border p-8 md:p-12 shadow"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <motion.div
@@ -109,7 +109,7 @@ export default function StartCTASection() {
                       transition={{ duration: 15, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                     >
                       <motion.div
-                        className="w-32 h-32 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full flex items-center justify-center shadow-lg"
+                        className="w-32 h-32 bg-gradient-to-br from-primary/30 to-secondary/30 rounded-full flex items-center justify-center shadow"
                         whileHover={{ scale: 1.1 }}
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}
                       >

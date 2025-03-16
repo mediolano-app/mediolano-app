@@ -48,7 +48,7 @@ export function UserCollectionsSection() {
           userIPs.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {userIPs.map((ip) => (
-                <Card key={ip.id} className="overflow-hidden transition-all duration-300 hover:shadow-lg bg-background/80">
+                <Card key={ip.id} className="overflow-hidden transition-all duration-300 hover:shadow bg-background/80">
                   <div className="relative">
                     <Image
                       src="/background.jpg" // Replace with actual IP media URL if available

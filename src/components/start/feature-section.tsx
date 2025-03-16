@@ -117,7 +117,7 @@ export default function StartFeatureSection() {
             >
               <Card
                 className={`h-full border-border transition-all duration-300 hover:shadow-md ${
-                  activeFeature === index ? "border-primary/50 shadow-lg" : ""
+                  activeFeature === index ? "border-primary/50 shadow" : ""
                 }`}
               >
                 <CardHeader>

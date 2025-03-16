@@ -165,7 +165,7 @@ export default function StartUserShowcaseSection() {
               className="h-full"
             >
               <Card
-                className={`h-full border-border transition-all duration-300 hover:shadow-lg ${
+                className={`h-full border-border transition-all duration-300 hover:shadow ${
                   hoveredUser === user.id ? "border-primary/50" : ""
                 }`}
               >

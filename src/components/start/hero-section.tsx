@@ -173,7 +173,7 @@ export default function StartHeroSection() {
                       transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                       style={{ transformOrigin: "center" }}
                     >
-                      <div className="bg-primary/10 p-2 rounded-lg border border-primary/20 shadow-lg">
+                      <div className="bg-primary/10 p-2 rounded-lg border border-primary/20 shadow">
                         <div className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
                           <svg
                             width="18"
@@ -216,7 +216,7 @@ export default function StartHeroSection() {
                       transition={{ duration: 15, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                       style={{ transformOrigin: "center" }}
                     >
-                      <div className="bg-secondary/10 p-2 rounded-lg border border-secondary/20 shadow-lg">
+                      <div className="bg-secondary/10 p-2 rounded-lg border border-secondary/20 shadow">
                         <div className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
                           <svg
                             width="18"
@@ -260,7 +260,7 @@ export default function StartHeroSection() {
                       transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                       style={{ transformOrigin: "center" }}
                     >
-                      <div className="bg-primary/10 p-2 rounded-lg border border-primary/20 shadow-lg">
+                      <div className="bg-primary/10 p-2 rounded-lg border border-primary/20 shadow">
                         <div className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
                           <svg
                             width="18"
@@ -302,7 +302,7 @@ export default function StartHeroSection() {
                       transition={{ duration: 25, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                       style={{ transformOrigin: "center" }}
                     >
-                      <div className="bg-secondary/10 p-1.5 rounded-lg border border-secondary/20 shadow-lg">
+                      <div className="bg-secondary/10 p-1.5 rounded-lg border border-secondary/20 shadow">
                         <div className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center">
                           <svg
                             width="14"
@@ -343,7 +343,7 @@ export default function StartHeroSection() {
                       transition={{ duration: 18, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                       style={{ transformOrigin: "center" }}
                     >
-                      <div className="bg-primary/10 p-1.5 rounded-lg border border-primary/20 shadow-lg">
+                      <div className="bg-primary/10 p-1.5 rounded-lg border border-primary/20 shadow">
                         <div className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center">
                           <svg
                             width="14"

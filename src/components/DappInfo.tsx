@@ -39,7 +39,7 @@ export default function DappInfo() {
      {/*      <Button
         variant="outline"
         size="icon"
-        className="rounded-full shadow-lg transition-colors hover:bg-card hover:text-primary-foreground"
+        className="rounded-full shadow transition-colors hover:bg-card hover:text-primary-foreground"
         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
       >
         {theme === 'dark' ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
@@ -52,7 +52,7 @@ export default function DappInfo() {
           <Button
             variant="default"
             size="icon"
-            className="rounded-full shadow-lg bg-blue-700 transition-transform hover:scale-110"
+            className="rounded-full shadow bg-blue-700 transition-transform hover:scale-110"
           >
             <HelpCircle className="h-6 w-6" />
             <span className="sr-only">Dapp Info</span>

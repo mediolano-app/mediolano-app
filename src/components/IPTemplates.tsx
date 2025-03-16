@@ -41,7 +41,7 @@ export function IPTemplates() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {templates.map((template) => (
             <Link key={template.name} href={template.href} className="group">
-              <Card className="h-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg bg-background/70">
+              <Card className="h-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow bg-background/70">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center">

@@ -35,11 +35,11 @@ const templatesIP = () => {
       <main>
 
 
-    <h1 className="text-4xl font-bold text-center mb-8">IP Templates</h1>
+    <h1 className="text-2xl font-bold text-center mb-8">IP Templates</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <div className="bg-background/30 backdrop-blur supports-[backdrop-filter]:bg-background/30 text-foreground p-4 rounded-lg">
+        <div className="bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/30 text-foreground p-4 rounded-lg">
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-1xl mb-8">
@@ -85,12 +85,13 @@ const templatesIP = () => {
 
 
         
-      <div className="bg-background/30 backdrop-blur supports-[backdrop-filter]:bg-background/30 text-foreground p-4 rounded-lg">
+      <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground p-8 rounded-lg shadow">
 
      
-        
+        <div className="">
           <h3 className="text-lg">Programmable IP Features</h3>
           <h4 className="text-blue-600">Unlock the future of the integrity web</h4>
+          </div>
 
       <div className="mt-12">
         
@@ -145,7 +146,7 @@ const templatesIP = () => {
 
 
       
-    </div>
+    </Card>
 
     </div>
 

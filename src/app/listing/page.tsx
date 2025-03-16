@@ -39,7 +39,7 @@ export default function ListingIP() {
           <h2 className="text-1xl font-semibold mb-4">Your Intellectual Property Listings</h2>
           <div className="space-y-4">
             {mockIPs.map((ip) => (
-              <Card key={ip.id} className="hover:shadow-lg transition-shadow duration-300 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
+              <Card key={ip.id} className="hover:shadow transition-shadow duration-300 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
                 <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                   <CardTitle className="text-lg">{ip.name}</CardTitle>
                   <DropdownMenu>
@@ -215,7 +215,7 @@ export default function ListingIP() {
       <section className="mt-32">
         <h2 className="text-2xl font-bold mb-10 text-center">Why Tokenize Your Intellectual Property?</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground">
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Copyright className="h-6 w-6 ml-blue" />
@@ -226,7 +226,7 @@ export default function ListingIP() {
               <p>Secure and immutable proof of ownership on the blockchain, enhancing copyright protection.</p>
             </CardContent>
           </Card>
-          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground">
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <DollarSign className="h-6 w-6 ml-blue" />
@@ -237,7 +237,7 @@ export default function ListingIP() {
               <p>Create new revenue streams through NFT sales, licensing, and royalties.</p>
             </CardContent>
           </Card>
-          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground">
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-6 w-6 ml-blue" />
@@ -248,7 +248,7 @@ export default function ListingIP() {
               <p>Reach a global market of collectors and enthusiasts in the growing NFT ecosystem.</p>
             </CardContent>
           </Card>
-          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground">
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Gavel className="h-6 w-6 ml-blue" />
@@ -259,7 +259,7 @@ export default function ListingIP() {
               <p>Choose from various sale methods including fixed price, auctions, and crowdfunding.</p>
             </CardContent>
           </Card>
-          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground">
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-6 w-6 ml-blue" />
@@ -270,7 +270,7 @@ export default function ListingIP() {
               <p>Maintain a transparent and verifiable history of ownership and transactions.</p>
             </CardContent>
           </Card>
-          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground">
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <LinkIcon className="h-6 w-6 ml-blue" />

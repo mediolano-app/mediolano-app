@@ -54,7 +54,7 @@ export default function StartBenefitsSection() {
               viewport={{ once: true, margin: "-50px" }}
               className="snap-center flex-shrink-0 w-[85vw]"
             >
-              <div className="flex flex-col items-center text-center p-6 bg-card rounded-xl border border-border shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+              <div className="flex flex-col items-center text-center p-6 bg-card rounded-xl border border-border shadow-sm transition-all duration-300 hover:shadow hover:-translate-y-1">
                 <motion.div
                   className="mb-6 p-4 rounded-full bg-primary/10"
                   whileHover={{ scale: 1.1, rotate: 5 }}

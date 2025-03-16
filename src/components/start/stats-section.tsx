@@ -126,7 +126,7 @@ function AnimatedStatCard({
       transition={{ duration: 0.5, delay: index * 0.1 }}
       viewport={{ once: true }}
       whileHover={{ scale: 1.03 }}
-      className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+      className="transition-all duration-300 hover:shadow hover:-translate-y-1"
     >
       <Card className="border-border hover:border-primary/30 transition-all duration-300 h-full bg-card/80 backdrop-blur-sm">
         <CardContent className="pt-6 text-center">

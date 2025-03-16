@@ -70,7 +70,7 @@ export default function IPList() {
 
         {/* <div className="space-y-4">
           {filteredNFTs.map((ip) => (
-            <Card key={ip.id} className="hover:shadow-lg transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
+            <Card key={ip.id} className="hover:shadow transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
               <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                 <CardTitle className="text-lg">{ip.name}</CardTitle>
                 <DropdownMenu>
@@ -117,7 +117,7 @@ export default function IPList() {
       </div> */}
         <div className="space-y-4">
           {filteredNFTs.map((ip) => (
-            <Card key={ip.id} className="hover:shadow-lg transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
+            <Card key={ip.id} className="hover:shadow transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
               <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                 <CardTitle className="text-lg">{ip.name}</CardTitle>
                 <DropdownMenu>

@@ -66,7 +66,7 @@ export function LaunchSlider() {
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{ duration: 0.5 }}
               >
-                <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <Card className="overflow-hidden shadow hover:shadow-xl transition-shadow duration-300">
                   <div className="relative aspect-video">
                     <img
                       src={launch.image || "/background.jpg"}

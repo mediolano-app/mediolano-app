@@ -239,7 +239,7 @@ export default function StartFeaturedAssetsSection() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: hoveredAsset === asset.id ? 1 : 0 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center"
+                          className="absolute inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center"
                         >
                           <Button className="active:scale-95 transition-transform">
                             View Details
