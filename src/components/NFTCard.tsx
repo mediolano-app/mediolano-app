@@ -35,7 +35,8 @@ import { abi } from "../../src/abis/abi";
 import { type Abi } from "starknet";
 import { useReadContract } from "@starknet-react/core";
 import { pinataClient } from "@/utils/pinataClient";
-import { IP } from "../app/register/page";
+import { IP } from "@/types/asset";
+import Link from "next/link";
 
 interface NFTCardProps {
 	tokenId: BigInt;
@@ -160,10 +161,13 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				</Badge>
 			</CardContent>
 			<CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
+				
+				<Link href={`/asset/${tokenId}`}>
 				<Button variant="outline" size="sm">
 					<Eye className="h-4 w-4 mr-2" />
 					View
-				</Button>
+				</Button></Link>
+
 				<Button variant="outline" size="sm">
 					<FileText className="h-4 w-4 mr-2" />
 					License

@@ -1,21 +1,24 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
 
 interface FluidParticlesBackgroundProps {
-  title?: string
-  subtitle?: string
   particleCount?: number
   flowIntensity?: number
-  colorScheme?: "rainbow" | "blues" | "purples" | "greens"
-  particleSize?: { min: number; max: number }
+  colorScheme?: "blues" | "purples" | "greens"
   className?: string
+  gradient?: {
+    from: string
+    to: string
+    direction?: "to-r" | "to-l" | "to-t" | "to-b" | "to-tr" | "to-tl" | "to-br" | "to-bl"
+    opacity?: number
+  }
+  zIndex?: number
+  subtle?: boolean
 }
 
-// Simplified Perlin noise implementation
+// Simple noise function
 function createNoise() {
   const permutation = Array.from({ length: 256 }, (_, i) => i)
   for (let i = 255; i > 0; i--) {
@@ -67,26 +70,20 @@ function createNoise() {
   }
 }
 
-// Color schemes
+// Simple color schemes
 const COLOR_SCHEMES = {
-  rainbow: (t: number) => {
-    const r = Math.sin(t * 0.3) * 127 + 128
-    const g = Math.sin(t * 0.3 + 2) * 127 + 128
-    const b = Math.sin(t * 0.3 + 4) * 127 + 128
-    return `rgba(${r}, ${g}, ${b}, 0.7)`
-  },
   blues: (t: number) => {
-    const b = Math.sin(t * 0.2) * 55 + 200
-    return `rgba(100, 150, ${b}, 0.7)`
+    const b = Math.sin(t * 0.2) * 30 + 200
+    return `rgba(100, 150, ${b}, 0.3)`
   },
   purples: (t: number) => {
-    const r = Math.sin(t * 0.2) * 55 + 150
-    const b = Math.sin(t * 0.2 + 2) * 55 + 200
-    return `rgba(${r}, 100, ${b}, 0.7)`
+    const r = Math.sin(t * 0.2) * 30 + 150
+    const b = Math.sin(t * 0.2 + 2) * 30 + 200
+    return `rgba(${r}, 100, ${b}, 0.3)`
   },
   greens: (t: number) => {
-    const g = Math.sin(t * 0.2) * 55 + 200
-    return `rgba(100, ${g}, 150, 0.7)`
+    const g = Math.sin(t * 0.2) * 30 + 200
+    return `rgba(100, ${g}, 150, 0.3)`
   },
 }
 
@@ -103,17 +100,16 @@ interface FluidParticle {
 }
 
 export default function FluidParticlesBackground({
-  title = "Fluid Particles",
-  subtitle = "Dynamic flowing animation",
-  particleCount = 1500,
-  flowIntensity = 0.0015,
-  colorScheme = "rainbow",
-  particleSize = { min: 1, max: 4 },
+  particleCount = 800,
+  flowIntensity = 0.0008,
+  colorScheme = "blues",
   className,
+  gradient,
+  zIndex = -10,
+  subtle = true,
 }: FluidParticlesBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const noise = createNoise()
-  const colorFunc = COLOR_SCHEMES[colorScheme]
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -123,18 +119,15 @@ export default function FluidParticlesBackground({
     if (!ctx) return
 
     const resizeCanvas = () => {
-      const container = canvas.parentElement
-      if (!container) return
-
-      canvas.width = container.clientWidth
-      canvas.height = container.clientHeight
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
     }
 
     resizeCanvas()
 
     // Initialize particles
     const particles: FluidParticle[] = Array.from({ length: particleCount }, () => {
-      const size = Math.random() * (particleSize.max - particleSize.min) + particleSize.min
+      const size = subtle ? 0.5 + Math.random() * 1.5 : 1 + Math.random() * 3
       const life = Math.random() * 100
       const maxLife = 100 + Math.random() * 150
 
@@ -142,9 +135,9 @@ export default function FluidParticlesBackground({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         size,
-        speed: 0.1 + Math.random() * 1.5,
+        speed: subtle ? 0.1 + Math.random() * 0.5 : 0.1 + Math.random() * 1,
         angle: 0,
-        color: colorFunc(Math.random() * 10),
+        color: COLOR_SCHEMES[colorScheme](Math.random() * 10),
         opacity: 0,
         life,
         maxLife,
@@ -155,10 +148,10 @@ export default function FluidParticlesBackground({
     let time = 0
 
     const animate = () => {
-      time += 0.003
+      time += subtle ? 0.001 : 0.002
 
       // Clear with semi-transparent background for trail effect
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)"
+      ctx.fillStyle = subtle ? "rgba(0, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.05)"
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       for (const particle of particles) {
@@ -168,7 +161,7 @@ export default function FluidParticlesBackground({
           particle.life = 0
           particle.x = Math.random() * canvas.width
           particle.y = Math.random() * canvas.height
-          particle.color = colorFunc(time * 10 + Math.random() * 5)
+          particle.color = COLOR_SCHEMES[colorScheme](time * 10 + Math.random() * 5)
         }
 
         // Calculate opacity based on life cycle (fade in and out)
@@ -177,8 +170,6 @@ export default function FluidParticlesBackground({
 
         // Get noise value for this position and time
         const noiseX = noise.perlin2(particle.x * flowIntensity, particle.y * flowIntensity + time)
-
-        const noiseY = noise.perlin2(particle.x * flowIntensity + 100, particle.y * flowIntensity + time + 100)
 
         // Calculate angle from noise
         particle.angle = Math.PI * 2 * noiseX
@@ -193,8 +184,9 @@ export default function FluidParticlesBackground({
         if (particle.y < 0) particle.y = canvas.height
         if (particle.y > canvas.height) particle.y = 0
 
-        // Draw particle
-        ctx.globalAlpha = particle.opacity * 0.7
+        // Draw particle with reduced opacity for subtle effect
+        const finalOpacity = subtle ? particle.opacity * 0.4 : particle.opacity * 0.7
+        ctx.globalAlpha = finalOpacity
         ctx.fillStyle = particle.color
         ctx.beginPath()
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
@@ -215,29 +207,21 @@ export default function FluidParticlesBackground({
       window.removeEventListener("resize", handleResize)
       cancelAnimationFrame(animationId)
     }
-  }, [particleCount, flowIntensity, particleSize, colorFunc, noise])
+  }, [particleCount, flowIntensity, colorScheme, subtle, noise])
 
   return (
-    <div className={cn("relative w-full h-screen overflow-hidden", "bg-white dark:bg-black", className)}>
+    <div className={cn("fixed inset-0 overflow-hidden", "bg-white dark:bg-black", className)} style={{ zIndex }}>
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-      <div className="relative z-10 flex flex-col items-center justify-center w-full h-full">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center space-y-4"
-        >
-          <h1 className="text-6xl md:text-8xl font-bold text-white drop-shadow-lg">{title}</h1>
-          <Link
-            href="https://kokonutui.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xl md:text-2xl font-medium text-white/90 flex items-center justify-center"
-          >
-            {subtitle}
-          </Link>
-        </motion.div>
-      </div>
+      {gradient && (
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(${gradient.direction?.replace("to-", "to ") || "to right"}, ${gradient.from}, ${gradient.to})`,
+            opacity: gradient.opacity || 0.6,
+            zIndex: 1,
+          }}
+        />
+      )}
     </div>
   )
 }

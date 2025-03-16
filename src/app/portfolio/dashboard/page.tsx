@@ -80,26 +80,26 @@ export default function DashboardPage() {
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="bg-background/80">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Portfolio Value</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Collections</CardTitle>
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {/* futuramente calcular o valor do portfolio */}
+                1
               </div>
-              <p className="text-xs text-muted-foreground">Your total portfolio value</p>
+              <p className="text-xs text-muted-foreground">Programmable IP Collection</p>
             </CardContent>
           </Card>
           <Card className="bg-background/80">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total NFTs</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
               <LayoutGrid className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {address && isLoading ? "Loading..." : balanceError ? "Error" : balance.toString()}
               </div>
-              <p className="text-xs text-muted-foreground">Total assets in your portfolio</p>
+              <p className="text-xs text-muted-foreground">Total IPs in your portfolio</p>
             </CardContent>
           </Card>
           <Card className="bg-background/80">
@@ -154,7 +154,7 @@ export default function DashboardPage() {
             <div className="text-center py-8">Loading your assets...</div>
           ) : tokenIdsError ? (
             <div className="text-center py-8 text-red-500">{tokenIdsError.message}</div>          
-          ) : balance === 0n ? (
+          ) : balance === 0 ? (
             <div className="text-center py-8">
               <p>You don&apos;t have any assets yet.</p>
             </div>
