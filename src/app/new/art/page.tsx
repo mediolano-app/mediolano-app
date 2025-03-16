@@ -186,8 +186,9 @@ export default function ArtRegistrationPage() {
 
     return (
         <div className="container mx-auto px-4 py-10">
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold">Art Registration</h1>
+            
+            <div className="flex items-center justify-between mb-4">
+                <h1 className="text-xl md:pl-6 font-bold">Art Registration</h1>
                 <Link
                     href="/new/templates"
                     className="flex items-center text-sm font-medium text-muted-foreground hover:underline"

@@ -54,11 +54,15 @@ interface Asset {
 }
 
 const assetTypes = [
-  { id: "1", name: "Digital Art" },
-  { id: "2", name: "Music" },
-  { id: "3", name: "Video" },
-  { id: "4", name: "Document" },
-  { id: "5", name: "3D Model" },
+  { id: "1", name: "Audio" },
+  { id: "2", name: "Artwork" },
+  { id: "3", name: "Digital Art" },
+  { id: "4", name: "Code" },
+  { id: "5", name: "Document" },
+  { id: "6", name: "Publication" },
+  { id: "7", name: "RWA" },
+  { id: "8", name: "Software" },
+  { id: "9", name: "General" },
 ];
 
 const licenses = [
@@ -69,12 +73,10 @@ const licenses = [
 ];
 
 const collections = [
-  { id: "1", name: "Digital Art Collection" },
-  { id: "2", name: "Music NFTs" },
-  { id: "3", name: "Video Content" },
+  { id: "1", name: "Programmable IP Collection" },
 ];
 
-export default function ArtRegistrationPage() {
+export default function AssetRegistrationPage() {
   const [asset, setAsset] = useState<Asset>({
     title: "",
     description: "",
@@ -87,6 +89,7 @@ export default function ArtRegistrationPage() {
     collection: "",
     ipVersion: "",
   });
+
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
   const [ipfsHash, setIpfsHash] = useState("");
@@ -211,10 +214,10 @@ export default function ArtRegistrationPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Create New Asset</h1>
+      
       <Card>
         <CardHeader>
-          <CardTitle>Asset Details</CardTitle>
+          <CardTitle className="text-xl">Create New Asset</CardTitle>
           <CardDescription>
             Enter the details of your new Programmable IP NFT
           </CardDescription>
@@ -365,8 +368,8 @@ export default function ArtRegistrationPage() {
                 />
               </div>
             )}
-            <Button type="submit" disabled={isSubmitting || !address}>
-              {isSubmitting ? "Creating Asset..." : "Create Asset"}
+            <Button className="bg-blue-600 text-lg p-6" type="submit" disabled={isSubmitting || !address}>
+              {isSubmitting ? "Creating Your Asset..." : "Mint Your Programmable IP"}
             </Button>
           </form>
         </CardContent>
