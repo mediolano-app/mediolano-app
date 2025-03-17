@@ -5,15 +5,22 @@ import { FileCode, Music, Video, PenTool, Brain, Code } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { useState, useEffect } from "react"
 
 export default function DiscoverServicesCTA() {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   const assetTypes = [
-    { icon: <PenTool className="h-8 w-8" />, name: "Artwork" },
-    { icon: <Video className="h-8 w-8" />, name: "Video" },
-    { icon: <Music className="h-8 w-8" />, name: "Music" },
-    { icon: <FileCode className="h-8 w-8" />, name: "Literary Works" },
-    { icon: <Brain className="h-8 w-8" />, name: "AI Models" },
-    { icon: <Code className="h-8 w-8" />, name: "Software" },
+    { icon: <PenTool className="h-8 w-8" />, name: "Artwork", link: "/new/artwork" },
+    { icon: <Video className="h-8 w-8" />, name: "Video", link: "/new/video" },
+    { icon: <Music className="h-8 w-8" />, name: "Music", link: "/new/music" },
+    { icon: <FileCode className="h-8 w-8" />, name: "Literary Works", link: "/new/literary" },
+    { icon: <Brain className="h-8 w-8" />, name: "AI Models", link: "/new/ai-model" },
+    { icon: <Code className="h-8 w-8" />, name: "Software", link: "/new/software" },
   ]
 
   const container = {
@@ -35,7 +42,7 @@ export default function DiscoverServicesCTA() {
     <section id="services" className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Quick Start</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Start Now</h2>
           <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
             Mediolano provides comprehensive services for tokenizing and licensing your intellectual property.
           </p>
@@ -44,12 +51,12 @@ export default function DiscoverServicesCTA() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            animate={isMounted ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true, margin: "-100px" }}
             className="bg-card rounded-2xl p-8 border border-border shadow-sm"
           >
-            <h3 className="text-2xl font-bold mb-6">IP Tokenization</h3>
+            <h3 className="text-2xl font-bold mb-6">Tokenization Services</h3>
             <p className="text-foreground/80 mb-6">
               With Mediolano, anyone can permissionlessly register their Intellectual Property assets. Our platform
               leverages Starknet's technology to provide:
@@ -72,21 +79,20 @@ export default function DiscoverServicesCTA() {
                 <span>Low-cost, high-speed processing</span>
               </li>
             </ul>
-            <Link href="/new/templates">
-            <Button>Create Your Programmable IP</Button>
-            </Link>
+            <Button>Tokenize Your IP</Button>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            animate={isMounted ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true, margin: "-100px" }}
             className="bg-card rounded-2xl p-8 border border-border shadow-sm"
           >
-            <h3 className="text-2xl font-bold mb-6">IP Templates</h3>
+            <h3 className="text-2xl font-bold mb-6">Licensing Services</h3>
             <p className="text-foreground/80 mb-6">
-              Start with our pre-built templates for common IP assets, or create your own custom licensing terms.
+              In addition to tokenization, Mediolano provides comprehensive services for licensing your Programmable IP
+              with:
             </p>
             <ul className="space-y-3 mb-8">
               <li className="flex items-start">
@@ -95,24 +101,22 @@ export default function DiscoverServicesCTA() {
               </li>
               <li className="flex items-start">
                 <div className="mr-3 mt-1 text-primary">•</div>
-                <span>Improve your registration process with premade templates</span>
+                <span>Automated royalty distribution</span>
               </li>
               <li className="flex items-start">
                 <div className="mr-3 mt-1 text-primary">•</div>
-                <span>Tamper-proof evidence of ownership</span>
+                <span>Transparent usage tracking</span>
               </li>
               <li className="flex items-start">
                 <div className="mr-3 mt-1 text-primary">•</div>
-                <span>Access and manage your IP rights from anywhere in the world</span>
+                <span>Complete sovereignty over your IP assets</span>
               </li>
             </ul>
-            <Link href="/new/templates">
-            <Button>Explore Templates</Button>
-            </Link>
+            <Button>Explore Licensing</Button>
           </motion.div>
         </div>
 
-        <div className="text-center mb-10">
+        <div className="text-center mb-20 mt-40">
           <h3 className="text-2xl font-bold mb-4">Supported Asset Types</h3>
           <p className="text-foreground/80 max-w-2xl mx-auto mb-10">
             Mediolano supports a wide range of intellectual property assets, including:
@@ -122,20 +126,22 @@ export default function DiscoverServicesCTA() {
         <motion.div
           variants={container}
           initial="hidden"
-          whileInView="show"
+          animate={isMounted ? "show" : "hidden"}
           viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4"
         >
           {assetTypes.map((asset, index) => (
             <motion.div key={index} variants={item}>
-              <Card className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md h-full">
-                <CardHeader className="pb-2">
-                  <div className="mx-auto">{asset.icon}</div>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <CardTitle className="text-base">{asset.name}</CardTitle>
-                </CardContent>
-              </Card>
+              <Link href={asset.link}>
+                <Card className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md h-full cursor-pointer">
+                  <CardHeader className="pb-2">
+                    <div className="mx-auto">{asset.icon}</div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <CardTitle className="text-base">{asset.name}</CardTitle>
+                  </CardContent>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </motion.div>

@@ -1,60 +1,110 @@
+"use client"
+
+import { motion } from "framer-motion"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { useState, useEffect } from "react"
 
-const faqs = [
-  {
-    question: "What is Mediolano?",
-    answer:
-      "Mediolano is a platform that provides seamless tokenization for Intellectual Property, leveraging Starknet's technology for digital assets. It offers a comprehensive solution for creators, collectors, and organizations to protect and monetize their IP assets.",
-  },
-  {
-    question: "How does Mediolano protect my IP?",
-    answer:
-      "Mediolano automatically tokenizes and protects your IP in 181 countries, according to The Berne Convention for the Protection of Literary and Artistic Works. This creates an immutable record of your IP on the blockchain, providing proof of ownership and timestamp.",
-  },
-  {
-    question: "What types of IP can I register?",
-    answer:
-      "You can register various types of IP assets, including artwork, video, music, literature, AI models, software, and other works of authorship. Mediolano supports a wide range of digital and creative assets.",
-  },
-  {
-    question: "How long is my copyright valid?",
-    answer:
-      "Copyright validity ranges from 50 to 70 years, depending on the legal jurisdiction. Mediolano ensures your IP is protected for the maximum duration allowed by law in each country.",
-  },
-  {
-    question: "Can I license my IP through Mediolano?",
-    answer:
-      "Yes, Mediolano provides services for licensing Programmable IP with countless combinations and total sovereignty. You can create custom licensing terms and automate royalty payments using smart contracts.",
-  },
-  {
-    question: "What is Programmable IP?",
-    answer:
-      "Programmable IP refers to intellectual property assets that are tokenized and managed through smart contracts on the blockchain. This allows for automated licensing, royalty distribution, and other programmable features that enhance the management and monetization of your IP.",
-  },
-  {
-    question: "How does Mediolano use Starknet?",
-    answer:
-      "Mediolano leverages Starknet's high-speed, low-cost, and smart contract capabilities to provide efficient and secure tokenization of IP assets. This enables fast transactions, reduced fees, and advanced programmability for IP management.",
-  },
-  {
-    question: "Is Mediolano open-source?",
-    answer:
-      "Yes, parts of Mediolano's technology are open-source. You can find our public repositories on our GitHub page. We believe in transparency and community collaboration to advance the field of IP protection and management.",
-  },
-]
+export default function DiscoverFAQ() {
+  const [openItem, setOpenItem] = useState<string | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
 
-export default function FAQ() {
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  const faqs = [
+    {
+      question: "What is IP tokenization?",
+      answer:
+        "IP tokenization is the process of creating a digital representation (token) of intellectual property rights on a blockchain. This provides immutable proof of ownership, enables easy transfer of rights, and creates new opportunities for monetization through licensing and royalties.",
+    },
+    {
+      question: "How does Mediolano protect my intellectual property?",
+      answer:
+        "Mediolano uses blockchain technology to create a verifiable, timestamped record of your intellectual property. This serves as proof of ownership and creation date, and provides automatic protection under the Berne Convention in 181 countries.",
+    },
+    {
+      question: "What types of intellectual property can I tokenize?",
+      answer:
+        "You can tokenize various forms of intellectual property including artwork, music, videos, literary works, software, AI models, and more. Our platform is designed to accommodate a wide range of creative and innovative works.",
+    },
+    {
+      question: "How much does it cost to tokenize my IP?",
+      answer:
+        "Tokenization costs vary depending on the type and size of your intellectual property. However, by leveraging Starknet technology, we're able to keep costs significantly lower than traditional IP registration methods. Most tokenizations cost around 0.001 ETH.",
+    },
+    {
+      question: "Can I license my tokenized IP to others?",
+      answer:
+        "Yes! One of the main benefits of Mediolano is the ability to create programmable licensing terms for your intellectual property. You can set up custom licensing agreements including royalty rates, usage restrictions, and duration terms.",
+    },
+    {
+      question: "Is Mediolano's IP protection legally recognized?",
+      answer:
+        "Mediolano's tokenization creates verifiable proof of creation and ownership, which can be used as evidence in legal proceedings. While blockchain records aren't yet universally recognized in all jurisdictions, they provide strong evidence under the Berne Convention principles.",
+    },
+  ]
+
+  const handleAccordionChange = (value: string) => {
+    setOpenItem(value === openItem ? null : value)
+  }
+
   return (
-    <section className="space-y-6 bg-background/90 p-8 shadow rounded-lg mt-10">
-       <h2 className="text-2xl text-center tracking-tighter sm:text-3xl md:text-4xl">FAQ</h2>
-      <Accordion type="single" collapsible className="w-full">
-        {faqs.map((faq, index) => (
-          <AccordionItem key={index} value={`item-${index}`}>
-            <AccordionTrigger>{faq.question}</AccordionTrigger>
-            <AccordionContent>{faq.answer}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+    <section id="faq" className="py-20">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+              Get answers to common questions about intellectual property tokenization and our platform.
+            </p>
+          </motion.div>
+        </div>
+
+        <div className="max-w-3xl mx-auto">
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full"
+            value={openItem || undefined}
+            onValueChange={handleAccordionChange}
+          >
+            {faqs.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                transition={{ duration: 0.3, delay: isMounted ? index * 0.05 : 0 }}
+                viewport={{ once: true }}
+                className="group"
+              >
+                <AccordionItem
+                  value={`item-${index}`}
+                  className="border-b border-border data-[state=open]:bg-muted/30 rounded-md my-2 overflow-hidden transition-all duration-200"
+                >
+                  <AccordionTrigger className="text-left text-lg font-medium p-4 hover:no-underline group-hover:text-primary data-[state=open]:text-primary transition-colors">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-foreground/80 px-4 pb-4 pt-0">
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {faq.answer}
+                    </motion.div>
+                  </AccordionContent>
+                </AccordionItem>
+              </motion.div>
+            ))}
+          </Accordion>
+        </div>
+      </div>
     </section>
   )
 }
