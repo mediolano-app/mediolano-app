@@ -80,7 +80,7 @@ export default function NewContentPage() {
       </p>
       <div className="flex space-x-4 mt-10">
         
-          <Link href="/about"><Button size="lg" variant="outline">
+          <Link href="/discover"><Button size="lg" variant="outline">
           Learn more <ArrowRight className="ml-2 h-4 w-4" />
           </Button></Link>
       </div>

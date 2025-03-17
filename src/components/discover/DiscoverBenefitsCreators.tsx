@@ -4,7 +4,7 @@ import { FileText, Coins, Shield, Globe } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState } from "react"
 
-export default function StartBenefitsSection() {
+export default function DiscoverBenefitsCreators() {
   const benefits = [
     {
       icon: <Shield className="h-12 w-12 text-primary" />,

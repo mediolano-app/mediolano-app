@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import Link from "next/link"
 
-export default function StartServicesSection() {
+export default function DiscoverServicesCTA() {
   const assetTypes = [
     { icon: <PenTool className="h-8 w-8" />, name: "Artwork" },
     { icon: <Video className="h-8 w-8" />, name: "Video" },
