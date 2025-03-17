@@ -34,6 +34,9 @@ import {
   User,
   ArrowRightLeft,
   Cog,
+  Brain,
+  Box,
+  Scroll,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -43,10 +46,10 @@ import Image from "next/image";
 import DappInfo from './DappInfo';
 
 const features = [
-  { icon: <Plus className="h-6 w-6" />, title: "Tokenize IP", description: "Create new Programmable IP", link: "/new" },
-  { icon: <BookMarked className="h-6 w-6" />, title: "Manage Assets", description: "Your portfolio onchain", link: "/portfolio" },
+  { icon: <Brain className="h-6 w-6" />, title: "Discover", description: "IP for the Integrity Web", link: "/discover" },
+  { icon: <Box className="h-6 w-6" />, title: "Tokenize IP", description: "Create New Programmable IP", link: "/new" },
+  { icon: <LayoutGrid className="h-6 w-6" />, title: "Manage Assets", description: "Manage IP onchain", link: "/portfolio" },
   { icon: <ScrollText className="h-6 w-6" />, title: "Licensing Assets", description: "Register new license", link: "/licensing" },
-  { icon: <Coins className="h-6 w-6" />, title: "Monetize", description: "Earn from your IP", link: "/monetize" },
 ]
 
 const formSchema = z.object({
