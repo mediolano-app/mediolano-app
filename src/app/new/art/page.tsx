@@ -68,7 +68,8 @@ export default function ArtRegistrationPage() {
         yearCreated: new Date().getFullYear(),
         description: "",
         price: "",
-        mediaURL: "",
+        mediaUrl: "",
+        externalUrl: "",
     });
 
     const [file, setFile] = useState<File | null>(null);
@@ -131,7 +132,8 @@ export default function ArtRegistrationPage() {
         submitData.append("yearCreated", artData.yearCreated.toString());
         submitData.append("description", artData.description);
         submitData.append("price", artData.price);
-        submitData.append("mediaURL", artData.mediaURL);
+        submitData.append("mediaUrl", artData.mediaUrl);
+        submitData.append("externalUrl", artData.externalUrl);
 
         if (file) {
             submitData.append("uploadFile", file);
@@ -325,13 +327,26 @@ export default function ArtRegistrationPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="mediaURL">Media URL</Label>
+                                <Label htmlFor="mediaUrl">Media URL</Label>
                                 <Input
-                                    id="mediaURL"
-                                    name="mediaURL"
-                                    value={artData.mediaURL}
+                                    id="mediaUrl"
+                                    name="mediaUrl"
+                                    value={artData.mediaUrl}
                                     onChange={handleChange}
-                                    placeholder="Input a link to your artwork"
+                                    placeholder="Input a link to your artwork media"
+                                    required
+                                />
+                            </div>
+
+
+                            <div className="space-y-2">
+                                <Label htmlFor="externalUrl">External URL</Label>
+                                <Input
+                                    id="externalUrl"
+                                    name="externalUrl"
+                                    value={artData.externalUrl}
+                                    onChange={handleChange}
+                                    placeholder="Input a external link to your artwork"
                                     required
                                 />
                             </div>
