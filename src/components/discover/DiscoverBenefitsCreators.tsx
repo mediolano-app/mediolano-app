@@ -32,18 +32,18 @@ export default function DiscoverBenefitsCreators() {
 
   const benefits = [
     {
-      icon: <Shield className="h-12 w-12 text-primary" />,
+      icon: <Shield className="h-12 w-12 text-white" />,
       title: "Protect Your Creations",
       description:
         "Secure your intellectual property with blockchain-based proof of ownership that's recognized globally.",
     },
     {
-      icon: <Coins className="h-12 w-12 text-primary" />,
+      icon: <Coins className="h-12 w-12 text-white" />,
       title: "Monetize Your Assets",
       description: "Create new revenue streams by licensing your IP with flexible, programmable terms.",
     },
     {
-      icon: <FileText className="h-12 w-12 text-primary" />,
+      icon: <FileText className="h-12 w-12 text-white" />,
       title: "Total Sovereignty",
       description: "Maintain complete control over your intellectual property with customizable licensing options.",
     },
@@ -106,7 +106,7 @@ export default function DiscoverBenefitsCreators() {
               onMouseLeave={() => isMounted && setHoveredIndex(null)}
             >
               <motion.div
-                className="mb-6 p-4 rounded-full bg-primary/10"
+                className="mb-6 p-4 rounded-full bg-blue-600"
                 animate={
                   hoveredIndex === index && isMounted
                     ? {

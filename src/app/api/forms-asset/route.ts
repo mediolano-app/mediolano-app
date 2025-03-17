@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
     const requiredFields = [
       "title",
       "description",
+      "externalUrl",
       "assetType",
       "mediaUrl",
       "tags",
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
 
     const title = data.get("title") as string;
     const description = data.get("description") as string;
+    const externalUrl = data.get("externalUrl") as string;
     const assetType = data.get("assetType") as string;
     const mediaUrl = data.get("mediaUrl") as string;
     const tagsString = data.get("tags") as string;
@@ -63,14 +65,17 @@ export async function POST(request: NextRequest) {
       attributes.push({ trait_type: "Tag", value: tag });
     });
 
-    const external_url = fileIpfsHash
+    {/*  external_url = fileIpfsHash
+      onst external_url = fileIpfsHash
       ? `https://gateway.pinata.cloud/ipfs/${fileIpfsHash}`
       : mediaUrl;
+      */}
+
 
     const formattedAsset = {
       name: title,
       description,
-      external_url,
+      external_url: externalUrl,
       image: mediaUrl,
       attributes,
     };

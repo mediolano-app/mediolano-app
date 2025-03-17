@@ -12,11 +12,9 @@ export default function AboutPage() {
     <div className="container mx-auto px-4 py-8 space-y-16">
       <DiscoverHero />
       <DiscoverBenefitsCreators />
-      
       <DiscoverFeatures />      
-      <DiscoverFAQ />
       <DiscoverServicesCTA />
-
+      <DiscoverFAQ />
       <Resources />
     </div>
   )

@@ -20,25 +20,25 @@ export default function DiscoverFeatures() {
 
   const features = [
     {
-      icon: <Zap className="h-10 w-10 text-primary" />,
+      icon: <Zap className="h-10 w-10 text-blue-600" />,
       title: "High-Speed & Low-Cost",
       description:
         "Leverage Starknet's unparalleled performance for fast and affordable tokenization of your intellectual property.",
     },
     {
-      icon: <Globe className="h-10 w-10 text-primary" />,
+      icon: <Globe className="h-10 w-10 text-blue-600" />,
       title: "Global Protection",
       description:
         "Automatically protect your IP in 181 countries according to The Berne Convention for the Protection of Literary and Artistic Works.",
     },
     {
-      icon: <Clock className="h-10 w-10 text-primary" />,
+      icon: <Clock className="h-10 w-10 text-blue-600" />,
       title: "Timestamped Ownership",
       description:
         "Your copyright will be timestamped for proof of ownership, valid for 50-70 years depending on legal jurisdiction.",
     },
     {
-      icon: <Lock className="h-10 w-10 text-primary" />,
+      icon: <Lock className="h-10 w-10 text-blue-600" />,
       title: "Permissionless Registration",
       description: "Anyone can register their Intellectual Property assets without barriers or gatekeepers.",
     },

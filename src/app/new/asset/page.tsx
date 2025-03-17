@@ -43,6 +43,7 @@ import { TagInput } from "@/components/TagInput";
 interface Asset {
   title: string;
   description: string;
+  externalUrl: string;
   assetType: string;
   mediaUrl: string;
   tags: string[];
@@ -80,6 +81,7 @@ export default function AssetRegistrationPage() {
   const [asset, setAsset] = useState<Asset>({
     title: "",
     description: "",
+    externalUrl: "",
     assetType: "",
     mediaUrl: "",
     tags: [],
@@ -125,7 +127,7 @@ export default function AssetRegistrationPage() {
       });
     } catch (error) {
       console.log("mint error", transactionError);
-      toast({ title: "Error", description: "Minting failed." });
+      toast({ title: "Error", description: "Minting failed. Please contact our support." });
     }
   };
 
@@ -138,6 +140,7 @@ export default function AssetRegistrationPage() {
     const submitData = new FormData();
     submitData.append("title", asset.title);
     submitData.append("description", asset.description);
+    submitData.append("externalUrl", asset.externalUrl);
     submitData.append("assetType", asset.assetType);
     submitData.append("mediaUrl", asset.mediaUrl);
     submitData.append("tags", asset.tags.join(","));
@@ -242,6 +245,17 @@ export default function AssetRegistrationPage() {
                 value={asset.description}
                 onChange={handleInputChange}
                 rows={4}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="externalUrl">External Link</Label>
+              <Input
+                id="externalUrl"
+                name="externalUrl"
+                value={asset.externalUrl}
+                onChange={handleInputChange}
+                placeholder="https://mediolano.app"
                 required
               />
             </div>
