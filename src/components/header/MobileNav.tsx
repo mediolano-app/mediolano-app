@@ -116,7 +116,7 @@ export function MobileNav() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-            <MobileLink href="/about" onOpenChange={setOpen}>
+            <MobileLink href="/discover" onOpenChange={setOpen}>
               <UserCircle className="mr-2 h-4 w-4" />
               About
             </MobileLink>
