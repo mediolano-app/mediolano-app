@@ -30,11 +30,11 @@ const templates = [
 
 export function IPTemplates() {
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-background/30 rounded-lg shadow">
-      <div className="max-w-7xl mx-auto">
+    <div className="py-4 px-4 bg-background/60 rounded-lg shadow border border-border">
+      <div className="max-w-8xl mx-auto p-4">
 
-        <h2 className="text-3xl font-bold text-center">Start with an IP Template</h2>
-        <p className="text-xl text-center mb-12">
+        <h2 className="text-xl font-bold">Start with an IP Template</h2>
+        <p className="mb-12 text-sm text-muted-foreground">
           Select an IP Template to assist and optimize the intellectual property registration process.
         </p>
         

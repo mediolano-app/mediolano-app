@@ -37,6 +37,8 @@ import {
   BoxIcon,
   FileCode2,
   Gauge,
+  Brain,
+  LayoutGrid,
 } from "lucide-react"
 import { Logo } from "@/components/header/Logo"
 
@@ -62,7 +64,7 @@ export function MainNav() {
                       className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                       href="/discover"
                     >
-                      <Rocket className="h-6 w-6" />
+                      <Brain className="h-6 w-6 text-blue-600" />
                       <div className="mb-2 mt-4 text-lg font-medium">Discover</div>
                       <p className="text-sm leading-tight text-muted-foreground">
                         Programmable IP for the Integrity Web.
@@ -76,7 +78,7 @@ export function MainNav() {
                     href="/new"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Box className="mr-2 h-4 w-4" />
+                      <Box className="mr-2 h-4 w-4  text-blue-600" />
                       Create Asset
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -90,7 +92,7 @@ export function MainNav() {
                     href="/portfolio"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Grid className="mr-2 h-4 w-4" />
+                      <LayoutGrid className="mr-2 h-4 w-4  text-blue-600" />
                       Portfolio
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -104,7 +106,7 @@ export function MainNav() {
                     href="/new/templates"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <FileCode className="mr-2 h-4 w-4" />
+                      <FileCode className="mr-2 h-4 w-4  text-blue-600" />
                       IP Templates
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -131,7 +133,7 @@ export function MainNav() {
                     href="/portfolio"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Layers className="mr-2 h-4 w-4" />
+                      <Layers className="mr-2 h-4 w-4  text-blue-600" />
                       My Portfolio
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -145,7 +147,7 @@ export function MainNav() {
                     href="/portfolio/dashboard"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <LayoutDashboard className="mr-2 h-4 w-4  text-blue-600" />
                       Assets Dashboard
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -159,7 +161,7 @@ export function MainNav() {
                     href="/new"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <BoxIcon className="mr-2 h-4 w-4" />
+                      <BoxIcon className="mr-2 h-4 w-4  text-blue-600" />
                       New Asset
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -173,7 +175,7 @@ export function MainNav() {
                     href="/licensing"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <FileCode2 className="mr-2 h-4 w-4" />
+                      <FileCode2 className="mr-2 h-4 w-4  text-blue-600" />
                       Licensing
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -187,7 +189,7 @@ export function MainNav() {
                     href="/listing"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Bookmark className="mr-2 h-4 w-4" />
+                      <Bookmark className="mr-2 h-4 w-4  text-blue-600" />
                       Listings
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -201,7 +203,7 @@ export function MainNav() {
                     href="/account"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Shield className="mr-2 h-4 w-4" />
+                      <Shield className="mr-2 h-4 w-4  text-blue-600" />
                       Account
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -228,7 +230,7 @@ export function MainNav() {
                     href="/monetize"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Gem className="mr-2 h-4 w-4" />
+                      <Gem className="mr-2 h-4 w-4  text-blue-600" />
                       IP Monetization
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -242,7 +244,7 @@ export function MainNav() {
                     href="/marketplace"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Rocket className="mr-2 h-4 w-4" />
+                      <Rocket className="mr-2 h-4 w-4  text-blue-600" />
                       Marketplace
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -256,7 +258,7 @@ export function MainNav() {
                     href="/"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <LayoutDashboard className="mr-2 h-4 w-4  text-blue-600" />
                       Smart Transaction
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -270,7 +272,7 @@ export function MainNav() {
                     href="/business"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Blocks className="mr-2 h-4 w-4" />
+                      <Blocks className="mr-2 h-4 w-4  text-blue-600" />
                       Business Services
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -284,7 +286,7 @@ export function MainNav() {
                     href="/rewards"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Coins className="mr-2 h-4 w-4" />
+                      <Coins className="mr-2 h-4 w-4  text-blue-600" />
                       Rewards
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -298,7 +300,7 @@ export function MainNav() {
                     href="/"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Gauge className="mr-2 h-4 w-4" />
+                      <Gauge className="mr-2 h-4 w-4  text-blue-600" />
                       Financial Dashboard
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
