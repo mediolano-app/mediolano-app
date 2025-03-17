@@ -22,7 +22,7 @@ export function HowItWorks() {
           <h2 className="text-3xl md:text-4xl text-center mb-12">How Mediolano Works</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
-              <Card key={index} className="text-center bg-background/60">
+              <Card key={index} className="text-center bg-background/90">
                 <CardHeader>
                   <div className="flex justify-center mb-4">{step.icon}</div>
                   <CardTitle>{step.title}</CardTitle>

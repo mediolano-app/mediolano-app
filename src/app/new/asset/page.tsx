@@ -1,14 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
-import { useAccount } from "@starknet-react/core";
-import { useSmartContract } from "@/hooks/useSmartContract";
-import { CallData } from "starknet";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -17,32 +9,36 @@ import {
   DrawerDescription,
   DrawerFooter,
 } from "@/components/ui/drawer";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  useAccount,
+  useContract,
+  useSendTransaction,
+} from "@starknet-react/core";
+import { Abi } from "starknet";
+import { abi } from "@/abis/abi";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { TagInput } from "@/components/TagInput";
-
-// Mockup data
-const assetTypes = [
-  { id: "1", name: "Digital Art" },
-  { id: "2", name: "Music" },
-  { id: "3", name: "Video" },
-  { id: "4", name: "Document" },
-  { id: "5", name: "3D Model" },
-];
-
-const licenses = [
-  { id: "1", name: "All Rights Reserved" },
-  { id: "2", name: "Creative Commons" },
-  { id: "3", name: "MIT License" },
-  { id: "4", name: "GNU General Public License" },
-];
-
-const collections = [
-  { id: "1", name: "Digital Art Collection" },
-  { id: "2", name: "Music NFTs" },
-  { id: "3", name: "Video Content" },
-];
 
 interface Asset {
   title: string;
@@ -57,13 +53,30 @@ interface Asset {
   ipVersion: string;
 }
 
-export default function NewAssetPage() {
-  const { account } = useAccount();
-  const contract = useSmartContract();
-  const { toast } = useToast();
+const assetTypes = [
+  { id: "1", name: "Audio" },
+  { id: "2", name: "Artwork" },
+  { id: "3", name: "Digital Art" },
+  { id: "4", name: "Code" },
+  { id: "5", name: "Document" },
+  { id: "6", name: "Publication" },
+  { id: "7", name: "RWA" },
+  { id: "8", name: "Software" },
+  { id: "9", name: "General" },
+];
 
-  const [newCollection, setNewCollection] = useState("");
-  const [isNewCollection, setIsNewCollection] = useState(false);
+const licenses = [
+  { id: "1", name: "All Rights Reserved" },
+  { id: "2", name: "Creative Commons" },
+  { id: "3", name: "MIT License" },
+  { id: "4", name: "GNU General Public License" },
+];
+
+const collections = [
+  { id: "1", name: "Programmable IP Collection" },
+];
+
+export default function AssetRegistrationPage() {
   const [asset, setAsset] = useState<Asset>({
     title: "",
     description: "",
@@ -76,9 +89,103 @@ export default function NewAssetPage() {
     collection: "",
     ipVersion: "",
   });
+
+  const { toast } = useToast();
+  const [file, setFile] = useState<File | null>(null);
+  const [ipfsHash, setIpfsHash] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [txHash, setTxHash] = useState<string | null>(null);
+  const [newCollection, setNewCollection] = useState("");
+  const [isNewCollection, setIsNewCollection] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { address } = useAccount();
+  const { contract } = useContract({
+    abi: abi as Abi,
+    address:
+      "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
+  });
+
+  const { send, error: transactionError } = useSendTransaction({
+    calls:
+      contract && address
+        ? [contract.populate("mint_item", [address, ipfsHash])]
+        : undefined,
+  });
+
+  const handleMintNFT = async () => {
+    if (!ipfsHash) {
+      toast({ title: "Error", description: "Upload image before minting." });
+      return;
+    }
+    try {
+      send();
+      toast({
+        title: "Success",
+        description: "NFT Minting Transaction Sent.",
+      });
+    } catch (error) {
+      console.log("mint error", transactionError);
+      toast({ title: "Error", description: "Minting failed." });
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    setIsSubmitting(true);
+    setError(null);
+
+    const submitData = new FormData();
+    submitData.append("title", asset.title);
+    submitData.append("description", asset.description);
+    submitData.append("assetType", asset.assetType);
+    submitData.append("mediaUrl", asset.mediaUrl);
+    submitData.append("tags", asset.tags.join(","));
+    submitData.append("license", asset.license);
+    submitData.append("isLimited", asset.isLimited ? "1" : "0");
+    submitData.append("totalSupply", asset.totalSupply.toString());
+    submitData.append("collection", isNewCollection ? newCollection : asset.collection);
+    submitData.append("ipVersion", asset.ipVersion);
+
+    if (file) {
+      submitData.append("uploadFile", file);
+    }
+
+    try {
+      const response = await fetch("/api/forms-asset", {
+        method: "POST",
+        body: submitData,
+      });
+      if (!response.ok) {
+        throw new Error("Failed to submit IP");
+      }
+
+      console.log("IP submitted successfully");
+
+      const data = await response.json();
+      const ipfs = data.uploadData.IpfsHash as string;
+      setIpfsHash(ipfs);
+      console.log("IPFS Hash:", ipfs);
+
+      toast({
+        title: "IP Protected",
+        description:
+          "Finalize your intellectual property registration by approving the asset creation on the Starknet blockchain. Visit Portfolio to manage your digital assets.",
+        action: <ToastAction altText="OK">OK</ToastAction>,
+      });
+    } catch (err) {
+      console.error("Submission Error:", err);
+      setError("Failed submitting or minting IP. Please try again.");
+      toast({
+        title: "Error",
+        description:
+          "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
+        action: <ToastAction altText="OK">OK</ToastAction>,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -99,85 +206,33 @@ export default function NewAssetPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!account || !contract) {
-      toast({
-        title: "Error",
-        description: "Please connect your wallet to create an asset.",
-        variant: "destructive",
-      });
-      return;
+  useEffect(() => {
+    if (ipfsHash) {
+      handleMintNFT();
     }
-    setIsSubmitting(true);
-
-    try {
-      const finalCollection = isNewCollection ? newCollection : asset.collection;
-      const calldata = CallData.compile({
-        name: asset.title,
-        description: asset.description,
-        asset_type: asset.assetType,
-        media_url: asset.mediaUrl,
-        license: asset.license,
-        collection: finalCollection,
-        ip_version: asset.ipVersion,
-        is_limited: asset.isLimited ? 1 : 0, // Convert boolean to felt
-        total_supply: asset.isLimited ? asset.totalSupply : 0,
-      });
-
-      const tx = await account.execute({
-        contractAddress: contract.address,
-        entrypoint: "registerIP",
-        calldata,
-      });
-
-      setTxHash(tx.transaction_hash);
-      setIsDrawerOpen(true);
-    } catch (error) {
-      console.error("Submission error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create asset. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleTransactionSign = async () => {
-    if (!account || !txHash) return;
-    try {
-      await account.waitForTransaction(txHash);
-      toast({
-        title: "Asset Created",
-        description: "Your new asset has been successfully registered on Starknet.",
-      });
-      setIsDrawerOpen(false);
-      setTxHash(null);
-    } catch (error) {
-      console.error("Transaction error:", error);
-      toast({
-        title: "Transaction Failed",
-        description: "Failed to confirm the transaction. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
+  }, [ipfsHash]);
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Create New Asset</h1>
+      
       <Card>
         <CardHeader>
-          <CardTitle>Asset Details</CardTitle>
-          <CardDescription>Enter the details of your new Programmable IP NFT</CardDescription>
+          <CardTitle className="text-xl">Create New Asset</CardTitle>
+          <CardDescription>
+            Enter the details of your new Programmable IP NFT
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
-              <Input id="title" name="title" value={asset.title} onChange={handleInputChange} required />
+              <Input
+                id="title"
+                name="title"
+                value={asset.title}
+                onChange={handleInputChange}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
@@ -192,7 +247,10 @@ export default function NewAssetPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="assetType">Asset Type</Label>
-              <Select value={asset.assetType} onValueChange={(value) => handleSelectChange("assetType", value)}>
+              <Select
+                value={asset.assetType}
+                onValueChange={(value) => handleSelectChange("assetType", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select asset type" />
                 </SelectTrigger>
@@ -218,11 +276,19 @@ export default function NewAssetPage() {
             </div>
             <div className="space-y-2">
               <Label>Tags</Label>
-              <TagInput tags={asset.tags} setTags={(newTags) => setAsset((prev) => ({ ...prev, tags: newTags }))} />
+              <TagInput
+                tags={asset.tags}
+                setTags={(newTags) =>
+                  setAsset((prev) => ({ ...prev, tags: newTags }))
+                }
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="license">License</Label>
-              <Select value={asset.license} onValueChange={(value) => handleSelectChange("license", value)}>
+              <Select
+                value={asset.license}
+                onValueChange={(value) => handleSelectChange("license", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select license" />
                 </SelectTrigger>
@@ -237,7 +303,10 @@ export default function NewAssetPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="collection">Collection</Label>
-              <Select value={asset.collection} onValueChange={(value) => handleSelectChange("collection", value)}>
+              <Select
+                value={asset.collection}
+                onValueChange={(value) => handleSelectChange("collection", value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select or create a collection" />
                 </SelectTrigger>
@@ -279,7 +348,9 @@ export default function NewAssetPage() {
               <Switch
                 id="isLimited"
                 checked={asset.isLimited}
-                onCheckedChange={(checked) => setAsset((prev) => ({ ...prev, isLimited: checked }))}
+                onCheckedChange={(checked) =>
+                  setAsset((prev) => ({ ...prev, isLimited: checked }))
+                }
               />
               <Label htmlFor="isLimited">Limited Edition</Label>
             </div>
@@ -297,14 +368,13 @@ export default function NewAssetPage() {
                 />
               </div>
             )}
-            <Button type="submit" disabled={isSubmitting || !account}>
-              {isSubmitting ? "Creating Asset..." : "Create Asset"}
+            <Button className="bg-blue-600 text-lg p-6" type="submit" disabled={isSubmitting || !address}>
+              {isSubmitting ? "Creating Your Asset..." : "Mint Your Programmable IP"}
             </Button>
           </form>
         </CardContent>
       </Card>
-
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      {/* <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Sign Transaction</DrawerTitle>
@@ -333,7 +403,7 @@ export default function NewAssetPage() {
             </Button>
           </DrawerFooter>
         </DrawerContent>
-      </Drawer>
+      </Drawer> */}
     </div>
   );
 }

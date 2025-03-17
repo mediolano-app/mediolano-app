@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import NFTPortfolio from "./components/nft-portfolio";
+import NFTPortfolio from "../../components/nft-portfolio";
 import { Skeleton } from "@/components/ui/skeleton";
 // import { useAccount } from "@starknet-react/core";
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

@@ -23,7 +23,7 @@ export function AssetInfo({ nftData }: AssetInfoProps) {
   const tags = nftData.tags || ["Digital Art", "NFT", "Starknet"]
 
   return (
-    <Card className="bg-background/60">
+    <Card className="bg-background/90">
       <CardHeader>
         <CardTitle>Asset Information</CardTitle>
       </CardHeader>

@@ -54,6 +54,61 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 
+
+
+
+import {
+  useAccount,
+  useContract,
+  useSendTransaction,
+} from "@starknet-react/core";
+import { Abi } from "starknet";
+import { abi } from "@/abis/abi";
+import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+
+
+
+
+interface Asset {
+  title: string;
+  description: string;
+  assetType: string;
+  mediaUrl: string;
+  tags: string[];
+  license: string;
+  isLimited: boolean;
+  totalSupply: number;
+  collection: string;
+  ipVersion: string;
+}
+
+const assetTypes = [
+  { id: "1", name: "Audio" },
+  { id: "2", name: "Artwork" },
+  { id: "3", name: "Digital Art" },
+  { id: "4", name: "Code" },
+  { id: "5", name: "Document" },
+  { id: "6", name: "Publication" },
+  { id: "7", name: "RWA" },
+  { id: "8", name: "Software" },
+  { id: "9", name: "General" },
+];
+
+const licenses = [
+  { id: "1", name: "All Rights Reserved" },
+  { id: "2", name: "Creative Commons" },
+  { id: "3", name: "MIT License" },
+  { id: "4", name: "GNU General Public License" },
+];
+
+const collections = [
+  { id: "1", name: "Programmable IP Collection" },
+];
+
+
+
+
 // Define the form schema with zod
 const formSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }).max(100),
@@ -73,6 +128,10 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
+
+
+
+
 // Mock file type icons
 const fileTypeIcons = {
   "image/jpeg": Image,
@@ -90,10 +149,10 @@ const fileTypeIcons = {
   default: FileText,
 }
 
-// Mock collections data
-const collections = [
-  { id: "1", name: "Programmable IP" },
-]
+
+
+
+
 
 // Mock blockchain data
 const mockBlockchainData = {
@@ -110,11 +169,21 @@ const mockBlockchainData = {
 
 
 
+
+
+
+
+
+
 export default function CreateIPPage() {
+
+
+
+
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeTab, setActiveTab] = useState("details")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadProgress, setUploadProgress] = useState(0)
   const [previewUrls, setPreviewUrls] = useState<{ [key: string]: string }>({})
@@ -122,8 +191,173 @@ export default function CreateIPPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [transactionStatus, setTransactionStatus] = useState<"waiting" | "processing" | "success" | "error">("waiting")
   const [useMediaUrl, setUseMediaUrl] = useState(false)
+  {/*}
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [newCollection, setNewCollection] = useState("")
   const [isNewCollection, setIsNewCollection] = useState(false)
+    */}
+
+
+
+
+
+
+
+
+
+
+
+
+
+  const [asset, setAsset] = useState<Asset>({
+    title: "",
+    description: "",
+    assetType: "",
+    mediaUrl: "",
+    tags: [],
+    license: "",
+    isLimited: false,
+    totalSupply: 1,
+    collection: "",
+    ipVersion: "",
+  });
+  
+  const { toast } = useToast();
+  const [file, setFile] = useState<File | null>(null);
+  const [ipfsHash, setIpfsHash] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newCollection, setNewCollection] = useState("");
+  const [isNewCollection, setIsNewCollection] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { address } = useAccount();
+  const { contract } = useContract({
+    abi: abi as Abi,
+    address:
+      "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
+  });
+
+  const { send, error: transactionError } = useSendTransaction({
+    calls:
+      contract && address
+        ? [contract.populate("mint_item", [address, ipfsHash])]
+        : undefined,
+  });
+
+  const handleMintNFT = async () => {
+    if (!ipfsHash) {
+      toast({ title: "Error", description: "Upload image before minting." });
+      return;
+    }
+    try {
+      send();
+      toast({
+        title: "Success",
+        description: "NFT Minting Transaction Sent.",
+      });
+    } catch (error) {
+      console.log("mint error", transactionError);
+      toast({ title: "Error", description: "Minting failed." });
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    setIsSubmitting(true);
+    setError(null);
+
+    const submitData = new FormData();
+    submitData.append("title", asset.title);
+    submitData.append("description", asset.description);
+    submitData.append("assetType", asset.assetType);
+    submitData.append("mediaUrl", asset.mediaUrl);
+    submitData.append("tags", asset.tags.join(","));
+    submitData.append("license", asset.license);
+    submitData.append("isLimited", asset.isLimited ? "1" : "0");
+    submitData.append("totalSupply", asset.totalSupply.toString());
+    submitData.append("collection", isNewCollection ? newCollection : asset.collection);
+    submitData.append("ipVersion", asset.ipVersion);
+
+    if (file) {
+      submitData.append("uploadFile", file);
+    }
+
+    try {
+      const response = await fetch("/api/forms-asset", {
+        method: "POST",
+        body: submitData,
+      });
+      if (!response.ok) {
+        throw new Error("Failed to submit IP");
+      }
+
+      console.log("IP submitted successfully");
+
+      const data = await response.json();
+      const ipfs = data.uploadData.IpfsHash as string;
+      setIpfsHash(ipfs);
+      console.log("IPFS Hash:", ipfs);
+
+      toast({
+        title: "IP Protected",
+        description:
+          "Finalize your intellectual property registration by approving the asset creation on the Starknet blockchain. Visit Portfolio to manage your digital assets.",
+        action: <ToastAction altText="OK">OK</ToastAction>,
+      });
+    } catch (err) {
+      console.error("Submission Error:", err);
+      setError("Failed submitting or minting IP. Please try again.");
+      toast({
+        title: "Error",
+        description:
+          "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
+        action: <ToastAction altText="OK">OK</ToastAction>,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    if (name === "newCollection") {
+      setNewCollection(value);
+    } else {
+      setAsset((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    if (name === "collection" && value === "new") {
+      setIsNewCollection(true);
+      setAsset((prev) => ({ ...prev, collection: "" }));
+    } else {
+      setIsNewCollection(false);
+      setAsset((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  useEffect(() => {
+    if (ipfsHash) {
+      handleMintNFT();
+    }
+  }, [ipfsHash]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // Global error handler for unhandled promise rejections
   useEffect(() => {
@@ -165,6 +399,11 @@ export default function CreateIPPage() {
       window.removeEventListener("error", handleError)
     }
   }, [toast])
+
+
+
+
+
 
   // Initialize form with react-hook-form
   const form = useForm<FormValues>({
@@ -485,7 +724,7 @@ export default function CreateIPPage() {
       // Simulate success message after transaction is processed
       setTimeout(() => {
         try {
-          setIsDrawerOpen(false)
+          //setIsDrawerOpen(false)
 
           toast({
             title: "IP Registration Successful",
@@ -497,7 +736,7 @@ export default function CreateIPPage() {
             // Use a small delay before navigation to ensure state updates are complete
             setTimeout(() => {
               router.push("/portfolio")
-            }, 100)
+            }, 99999)
           } catch (navigationError) {
             console.error("Navigation error:", navigationError)
             // If navigation fails, at least the user has seen the success message
@@ -534,15 +773,15 @@ export default function CreateIPPage() {
 
 
   return (
-    <div className="container mx-auto px-4 py-12 mb-20 bg-background/60 round-lg shadow">
+    <div className="container mx-auto px-4 py-12 mb-20 bg-background/90 round-lg shadow">
      
       <div className="flex items-center gap-2 mb-6">
         <Button variant="outline" size="icon" asChild>
-          <Link href="/">
+          <Link href="/new">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold">Create Programmable IP</h1>
+        <h1 className="text-2xl font-bold">Create Programmable IP</h1>
       </div>
 
       <div className="mb-8">
@@ -1217,6 +1456,7 @@ export default function CreateIPPage() {
               </CardContent>
               <CardFooter>
                 {activeTab === "rights" && (
+                  <>
                   <Button
                     className="w-full"
                     type="button"
@@ -1228,6 +1468,12 @@ export default function CreateIPPage() {
                     <Shield className="h-4 w-4 mr-2" />
                     Register IP Asset
                   </Button>
+
+                    <hr></hr>
+                    <Button type="submit" disabled={isSubmitting || !address}>
+                      {isSubmitting ? "Creating Asset..." : "Create Asset"}
+                    </Button>
+                    </>
                 )}
               </CardFooter>
             </Card>

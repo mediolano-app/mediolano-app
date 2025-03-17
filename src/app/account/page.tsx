@@ -110,7 +110,7 @@ export default function UserAccount() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* User Profile and Preferences */}
-          <Card className="col-span-full bg-background/60">
+          <Card className="col-span-full bg-background/90">
             <CardHeader>
               <CardTitle>Profile & Preferences</CardTitle>
             </CardHeader>

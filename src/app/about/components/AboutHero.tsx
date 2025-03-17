@@ -5,7 +5,7 @@ import Link from "next/link"
 export default function AboutHero() {
   return (
     <section className="space-y-6 mt-10">
-      <div className="bg-background/60 p-8 rounded-lg shadow-lg">
+      <div className="bg-background/90 p-8 rounded-lg shadow">
       <h1 className="text-2xl text-center tracking-tighter sm:text-3xl md:text-4xl">Mediolano Dapp</h1>
       <p className=" mx-auto  mt-8">
       Mediolano provides seamless tokenization for Intellectual Property, leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets - - a groundbreaking solution to empower creators, collectors and organizations to protect and monetize their IP assets.

@@ -22,7 +22,7 @@ export function SocialFeaturesSection() {
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Connect and Collaborate</h2>
           <div className="grid md:grid-cols-2 gap-8">
             {features.map((feature, index) => (
-              <Card className="bg-background/60" key={index}>
+              <Card className="bg-background/90" key={index}>
                 <CardHeader>
                   <CardTitle>{feature.title}</CardTitle>
                 </CardHeader>

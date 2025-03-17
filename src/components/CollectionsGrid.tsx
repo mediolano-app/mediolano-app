@@ -336,7 +336,7 @@ function FeaturedCollectionCard({ collection, nftCount, totalValue, onClick }: C
   const coverImage = nfts.length > 0 ? nfts[0].image : "/placeholder.svg?height=400&width=600"
 
   return (
-    <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow-lg transition-all" onClick={onClick}>
+    <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all" onClick={onClick}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
         <div className="relative h-64 md:h-auto">
           <Image src={coverImage || "/placeholder.svg"} alt={collection.name} fill className="object-cover" />

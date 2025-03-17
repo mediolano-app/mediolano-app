@@ -80,8 +80,7 @@ export default function ArtRegistrationPage() {
     const { address } = useAccount();
     const { contract } = useContract({
         abi: abi as Abi,
-        address:
-            "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
+        address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
     });
 
     const { send, error: transactionError } = useSendTransaction({
@@ -187,8 +186,9 @@ export default function ArtRegistrationPage() {
 
     return (
         <div className="container mx-auto px-4 py-10">
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold">Art Registration</h1>
+            
+            <div className="flex items-center justify-between mb-4">
+                <h1 className="text-xl md:pl-6 font-bold">Art Registration</h1>
                 <Link
                     href="/new/templates"
                     className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
