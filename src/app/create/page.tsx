@@ -75,6 +75,7 @@ interface Asset {
   description: string;
   assetType: string;
   mediaUrl: string;
+  externalUrl: string;
   tags: string[];
   license: string;
   isLimited: boolean;
@@ -118,6 +119,7 @@ const formSchema = z.object({
   collection: z.string().optional(),
   tags: z.array(z.string()).optional().default([]),
   mediaUrl: z.string().url().optional().or(z.literal("")),
+  externalUrl: z.string().url().optional().or(z.literal("")),
   licenseType: z.enum(["all-rights", "creative-commons", "open-source", "custom"]),
   licenseDetails: z.string().optional(),
   ipVersion: z.string().optional(),
@@ -214,6 +216,7 @@ export default function CreateIPPage() {
     description: "",
     assetType: "",
     mediaUrl: "",
+    externalUrl: "",
     tags: [],
     license: "",
     isLimited: false,
@@ -272,6 +275,7 @@ export default function CreateIPPage() {
     submitData.append("description", asset.description);
     submitData.append("assetType", asset.assetType);
     submitData.append("mediaUrl", asset.mediaUrl);
+    submitData.append("externalUrl", asset.externalUrl);
     submitData.append("tags", asset.tags.join(","));
     submitData.append("license", asset.license);
     submitData.append("isLimited", asset.isLimited ? "1" : "0");
@@ -412,6 +416,7 @@ export default function CreateIPPage() {
       title: "",
       author: "",
       description: "",
+      externalUrl: "",
       ipType: "artwork",
       collection: "",
       tags: [],
@@ -559,6 +564,19 @@ export default function CreateIPPage() {
     }
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
   // Handle review submission
   const handleReviewSubmit = async () => {
     try {
@@ -589,6 +607,10 @@ export default function CreateIPPage() {
       })
     }
   }
+
+
+
+
 
   // Navigate to next tab
   const goToNextTab = async () => {
@@ -655,6 +677,14 @@ export default function CreateIPPage() {
     }
   }
 
+
+
+
+
+
+
+
+
   // Handle transaction signing
   const handleSignTransaction = async () => {
     try {
@@ -689,6 +719,7 @@ export default function CreateIPPage() {
         collection: formData.collection,
         tags: formData.tags,
         mediaUrl: formData.mediaUrl,
+        externalUrl: formData.externalUrl,
         licenseType: formData.licenseType,
         licenseDetails: formData.licenseDetails,
         ipVersion: formData.ipVersion || "1.0",
@@ -789,7 +820,7 @@ export default function CreateIPPage() {
         <div className="flex justify-between mt-2 text-sm text-muted-foreground">
           <span>Details</span>
           <span>Assets</span>
-          <span>Rights & Licensing</span>
+          <span>Licensing</span>
         </div>
       </div>
 
@@ -849,6 +880,17 @@ export default function CreateIPPage() {
                     />
                     {form.formState.errors.description && (
                       <p className="text-sm text-destructive">{form.formState.errors.description.message as string}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="externalUrl" className="flex items-center gap-1">
+                      External Url
+                      <span className="text-destructive">*</span>
+                    </Label>
+                    <Input id="externalUrl" placeholder="Enter a external Url link" {...form.register("externalUrl")} />
+                    {form.formState.errors.externalUrl && (
+                      <p className="text-sm text-destructive">{form.formState.errors.externalUrl.message as string}</p>
                     )}
                   </div>
 
@@ -1356,6 +1398,17 @@ export default function CreateIPPage() {
             </div>
           </div>
 
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
           <div>
             <Card className="sticky top-6">
               <CardHeader>
@@ -1480,6 +1533,18 @@ export default function CreateIPPage() {
           </div>
         </div>
       </form>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
