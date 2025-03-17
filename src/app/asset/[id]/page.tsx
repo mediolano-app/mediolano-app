@@ -6,12 +6,12 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, ExternalLink, Sparkles } from "lucide-react"
 import { ShareButton } from "@/components/ShareButton"
-import { AssetTransactionHistory } from "@/components/AssetTransactionHistory"
-import { AssetLicensings } from "@/components/AssetLicensings"
-import { AssetViewer } from "@/components/AssetViewer"
-import { RelatedAssetsCarousel } from "@/components/AssetsRelatedCarousel"
-import { MonetizationOptions } from "@/components/AssetMonetizationOptions"
-import { AssetOverview } from "@/components/AssetOverview"
+import { AssetTransactionHistory } from "@/components/assets/AssetTransactionHistory"
+import { AssetLicensings } from "@/components/assets/AssetLicensings"
+import { AssetViewer } from "@/components/assets/AssetViewer"
+import { RelatedAssetsCarousel } from "@/components/assets/AssetsRelatedCarousel"
+import { MonetizationOptions } from "@/components/assets/AssetMonetizationOptions"
+import { AssetOverview } from "@/components/assets/AssetOverview"
 
 export default function AssetDetailPage({ params }: { params: { id: string } }) {
   const asset = getAssetById(params.id)
