@@ -1,71 +1,161 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield, Zap, Globe, Clock, Lock, Coins, Code, Users } from "lucide-react"
+import { Zap, Globe, Clock, Lock } from "lucide-react"
+import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
 
-const features = [
-  {
-    title: "Global Protection",
-    description:
-      "Automatic protection in 181 countries under The Berne Convention, ensuring your IP is safeguarded worldwide.",
-    icon: Globe,
-  },
-  {
-    title: "Instant Tokenization",
-    description:
-      "Your IP is tokenized immediately upon registration, creating a permanent and immutable record on the blockchain.",
-    icon: Zap,
-  },
-  {
-    title: "Long-term Validity",
-    description:
-      "Copyright valid for 50-70 years, depending on jurisdiction, providing long-lasting protection for your creative works.",
-    icon: Clock,
-  },
-  {
-    title: "Permissionless Registration",
-    description: "Anyone can register their IP assets without restrictions, democratizing access to IP protection.",
-    icon: Lock,
-  },
-  {
-    title: "Diverse Asset Types",
-    description:
-      "Support for a wide range of IP assets including artwork, video, music, literature, AI models, software, and more.",
-    icon: Shield,
-  },
-  {
-    title: "Programmable Licensing",
-    description: "Create flexible and customizable licensing options with total sovereignty over your IP assets.",
-    icon: Coins,
-  },
-  {
-    title: "Smart Contract Integration",
-    description:
-      "Leverage Starknet's smart contract capabilities for advanced IP management and automated royalty distribution.",
-    icon: Code,
-  },
-  {
-    title: "Community-Driven",
-    description:
-      "Join a growing community of creators and innovators, collaborating to shape the future of IP in the digital world.",
-    icon: Users,
-  },
-]
+export default function DiscoverFeatures() {
+  const [isMobile, setIsMobile] = useState(false)
 
-export default function Features() {
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
+
+  const features = [
+    {
+      icon: <Zap className="h-10 w-10 text-primary" />,
+      title: "High-Speed & Low-Cost",
+      description:
+        "Leverage Starknet's unparalleled performance for fast and affordable tokenization of your intellectual property.",
+    },
+    {
+      icon: <Globe className="h-10 w-10 text-primary" />,
+      title: "Global Protection",
+      description:
+        "Automatically protect your IP in 181 countries according to The Berne Convention for the Protection of Literary and Artistic Works.",
+    },
+    {
+      icon: <Clock className="h-10 w-10 text-primary" />,
+      title: "Timestamped Ownership",
+      description:
+        "Your copyright will be timestamped for proof of ownership, valid for 50-70 years depending on legal jurisdiction.",
+    },
+    {
+      icon: <Lock className="h-10 w-10 text-primary" />,
+      title: "Permissionless Registration",
+      description: "Anyone can register their Intellectual Property assets without barriers or gatekeepers.",
+    },
+  ]
+
+  const [activeFeature, setActiveFeature] = useState<number | null>(null)
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  }
+
   return (
-    <section className="space-y-6">
-      <h2 className="text-2xl text-center tracking-tighter sm:text-3xl md:text-4xl">Features</h2>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {features.map((feature, index) => (
-          <Card key={index} className="bg-background/40">
-            <CardHeader>
-              <feature.icon className="h-10 w-10 mb-2 text-primary" />
-              <CardTitle>{feature.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>{feature.description}</CardDescription>
-            </CardContent>
-          </Card>
-        ))}
+    <section id="features" className="py-20 verflow-hidden">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Mediolano's features</h2>
+            <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+              Our platform offers unique advantages for creators and organizations looking to protect and monetize their
+              intellectual property.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Mobile Scrollable Cards */}
+        <div className="md:hidden flex overflow-x-auto snap-x snap-mandatory space-x-4 pb-8 no-scrollbar">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              className="snap-center flex-shrink-0 w-[85vw]"
+              variants={item}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-50px" }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Card className="h-full border-border hover:border-primary/50 transition-colors duration-300 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                <CardHeader>
+                  <motion.div
+                    className="mb-4"
+                    whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {feature.icon}
+                  </motion.div>
+                  <CardTitle>{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-foreground/80 text-base">{feature.description}</CardDescription>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Desktop Grid */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              variants={item}
+              onHoverStart={() => setActiveFeature(index)}
+              onHoverEnd={() => setActiveFeature(null)}
+              whileHover={{ y: -8 }}
+              className="active:scale-95 transition-transform"
+            >
+              <Card
+                className={`h-full border-border transition-all duration-300 hover:shadow-md ${
+                  activeFeature === index ? "border-primary/50 shadow-lg" : ""
+                }`}
+              >
+                <CardHeader>
+                  <motion.div
+                    className="mb-4"
+                    animate={
+                      activeFeature === index
+                        ? {
+                            scale: [1, 1.2, 1],
+                            rotate: [0, -10, 10, -10, 0],
+                          }
+                        : {}
+                    }
+                    transition={{ duration: 0.5 }}
+                  >
+                    {feature.icon}
+                  </motion.div>
+                  <CardTitle>{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-foreground/80 text-base">{feature.description}</CardDescription>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   )

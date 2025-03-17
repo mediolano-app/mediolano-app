@@ -2,10 +2,15 @@
 
 import { motion } from "framer-motion"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
-export default function StartFAQSection() {
+export default function StartFAQ() {
   const [openItem, setOpenItem] = useState<string | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const faqs = [
     {
@@ -50,7 +55,7 @@ export default function StartFAQSection() {
         <div className="text-center mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
@@ -73,8 +78,8 @@ export default function StartFAQSection() {
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
+                animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                transition={{ duration: 0.3, delay: isMounted ? index * 0.05 : 0 }}
                 viewport={{ once: true }}
                 className="group"
               >
@@ -88,7 +93,7 @@ export default function StartFAQSection() {
                   <AccordionContent className="text-foreground/80 px-4 pb-4 pt-0">
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
                     >
                       {faq.answer}

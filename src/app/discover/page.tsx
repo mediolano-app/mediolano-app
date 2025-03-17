@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
-import AboutHero from "@/components/discover/AboutHero"
-import Features from "@/components/discover/DiscoverFeatures"
 import Resources from "@/components/discover/DiscoverResources"
-import FAQ from "@/components/discover/DiscoverFAQ"
 import DiscoverBenefitsCreators from "@/components/discover/DiscoverBenefitsCreators"
 import DiscoverHero from "@/components/discover/DiscoverHero"
+import StartFeatures from "@/components/discover/StartFeatures"
 import DiscoverServicesCTA from "@/components/discover/DiscoverServicesCTA"
+import DiscoverFeatures from "@/components/discover/DiscoverFeatures"
+import DiscoverFAQ from "@/components/discover/DiscoverFAQ"
 
 export default function AboutPage() {
   return (
@@ -13,13 +13,9 @@ export default function AboutPage() {
       <DiscoverHero />
       <DiscoverBenefitsCreators />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">  
-      <AboutHero />
-      <FAQ />
-      </div>
-      
-      <Features />
-
+      <DiscoverFeatures />      
+      <DiscoverFAQ />
+      <DiscoverServicesCTA />
 
       <Resources />
     </div>

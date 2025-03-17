@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
@@ -107,8 +107,13 @@ const activityTypeInfo = {
   },
 }
 
-export default function StartActivityFeedSection() {
+export default function DiscoverFeedSection() {
   const [hoveredActivity, setHoveredActivity] = useState<number | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   return (
     <section className="py-20">
@@ -116,7 +121,7 @@ export default function StartActivityFeedSection() {
         <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
           >
@@ -132,16 +137,16 @@ export default function StartActivityFeedSection() {
             <motion.div
               key={activity.id}
               initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              animate={isMounted ? { opacity: 1, x: 0 } : { opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+              transition={{ duration: 0.5, delay: isMounted ? index * 0.1 : 0 }}
               viewport={{ once: true }}
-              whileHover={{ y: -5 }}
-              onHoverStart={() => setHoveredActivity(activity.id)}
-              onHoverEnd={() => setHoveredActivity(null)}
+              whileHover={isMounted ? { y: -5 } : {}}
+              onHoverStart={() => isMounted && setHoveredActivity(activity.id)}
+              onHoverEnd={() => isMounted && setHoveredActivity(null)}
             >
               <Card
                 className={`border-border transition-all duration-300 hover:shadow-md ${
-                  hoveredActivity === activity.id ? "border-primary/50" : ""
+                  hoveredActivity === activity.id && isMounted ? "border-primary/50" : ""
                 }`}
               >
                 <CardContent className="p-4">
