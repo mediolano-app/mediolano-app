@@ -35,14 +35,23 @@ import { abi } from "../../src/abis/abi";
 import { type Abi } from "starknet";
 import { useReadContract } from "@starknet-react/core";
 import { pinataClient } from "@/utils/pinataClient";
-import { IP } from "../app/register/page";
 
 interface NFTCardProps {
 	tokenId: BigInt;
 	status: string;
 }
 
+export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 
+export interface IP{
+  name: string,
+  description: string,
+  author: string,
+  type: string,
+  image: string,
+  version: string,
+  external_url: string,
+}
 
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 	const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
@@ -89,10 +98,9 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 					throw new Error("Failed to parse metadata");
 				}
 
-				// Validate metadata structure
-				if (!isValidMetadata(parsedData)) {
-					throw new Error("Invalid metadata format");
-				}
+				// if (!isValidMetadata(parsedData)) {
+				// 	throw new Error("Invalid metadata format");
+				// }
 
 				setMetadata(parsedData);
 				console.log(parsedData);
@@ -110,14 +118,14 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		fetchMetadata();
 	}, [tokenURI]);
 
-	const isValidMetadata = (data: any): data is IP => {
-		return (
-			data &&
-			typeof data === "object" &&
-			"name" in data &&
-			"description" in data
-		);
-	};
+	// const isValidMetadata = (data: any): data is IP => {
+	// 	return (
+	// 		data &&
+	// 		typeof data === "object" &&
+	// 		"name" in data &&
+	// 		"description" in data
+	// 	);
+	// };
 
 	if (isLoading || isContractLoading) {
 		return <div>Loading...</div>; // Consider using a proper loading component
@@ -135,7 +143,10 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		<Card className="overflow-hidden">
 			<CardHeader className="p-0">
 				<Image
-					src={metadata.image || "/background.jpg"} // Add fallback image
+					src={
+						metadata.image || 
+						"/background.jpg"
+					} // Add fallback image
 					alt={metadata.name}
 					width={400}
 					height={400}
