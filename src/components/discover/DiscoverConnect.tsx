@@ -34,7 +34,7 @@ const connectOptions = [
   },
 ]
 
-export default function Connect() {
+export default function DiscoverConnect() {
   return (
     <section className="space-y-6">
       <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Connect With Us</h2>

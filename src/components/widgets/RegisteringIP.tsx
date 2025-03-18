@@ -34,7 +34,7 @@ function RegisteringIP() {
             </div>
             <div className="lg:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-6">
               {benefits.map((benefit, index) => (
-                <Card className="bg-background/60" key={index}>
+                <Card className="bg-background/90" key={index}>
                   <CardHeader>
                     <div className="flex items-center space-x-4">
                       {benefit.icon}

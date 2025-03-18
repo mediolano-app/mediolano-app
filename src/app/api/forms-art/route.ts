@@ -13,6 +13,9 @@ export async function POST(request: NextRequest) {
       "yearCreated",
       "description",
       "price",
+      "mediaUrl",
+      "externalUrl",
+      
     ];
 
     for (const field of requiredFields) {
@@ -31,6 +34,8 @@ export async function POST(request: NextRequest) {
     const yearCreated = parseInt(data.get("yearCreated") as string, 10);
     const description = data.get("description") as string;
     const price = data.get("price") as string;
+    const mediaUrl = data.get("mediaUrl") as string;
+    const externalUrl = data.get("externalUrl") as string;
 
     let fileIpfsHash: string | undefined = undefined;
     if (data.has("uploadFile")) {
@@ -56,8 +61,8 @@ export async function POST(request: NextRequest) {
     const formattedArt = {
       name: title,
       description,
-      external_url: imageUrl, 
-      image: imageUrl,
+      external_url: externalUrl,
+      image: mediaUrl,
       attributes,
     };
 

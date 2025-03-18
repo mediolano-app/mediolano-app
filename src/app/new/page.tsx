@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
-import { ArrowRight, BookOpen, FolderPlus, Image, Info } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, Brain, FolderPlus, Image, Info } from 'lucide-react'
 import { IPTemplates } from '@/components/IPTemplates'
 import Link from 'next/link'
 
@@ -36,11 +36,20 @@ export default function NewContentPage() {
     
     <div className="space-y-6">
 
-      <h1 className="text-3xl font-bold text-center">Create Programmable IP</h1>
+    <div className="flex items-center justify-between mb-4">
+                <h1 className="text-xl md:pl-6 font-bold">Create Programmable IP Assets</h1>
+                <Link
+                    href="/discover"
+                    title='Learn more about protecting IP onchain'
+                    className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
+                >
+                    <Brain className="mr-2 h-4 w-4" />
+                </Link>
+            </div>
       
-      <Card className='bg-background/30'>
+      <Card className='bg-background/60'>
         <CardHeader>
-          <CardTitle>Start New</CardTitle>
+          <CardTitle className='text-lg font-semibold'>Start New</CardTitle>
           <CardDescription>Register a new Programmable IP or a new Collection to organize your digital assets.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -73,14 +82,14 @@ export default function NewContentPage() {
 
 
       <section className="space-y-6 mt-10">
-      <div className="bg-background/80 p-8 rounded-lg shadow">
-      <h1 className="text-xl tracking-tighter">Protecting Intellectual Property Onchain</h1>
-      <p className=" mx-auto mt-8">
+      <div className="bg-background/60 p-8 rounded-lg shadow">
+      <h1 className="text-lg font-semibold">Protecting Intellectual Property Onchain</h1>
+      <p className=" mx-auto mt-4">
       Registering Intellectual Property on Mediolano means the asset is automatically tokenize and protected in 181 countries, according to The Berne Convention for the Protection of Literary and Artistic Works, adopted in 1886, which guarantees recognition of the authorship of IP without the need for registration with WIPO (World Intellectual Property Organization). 
       </p>
-      <div className="flex space-x-4 mt-10">
+      <div className="flex space-x-4 mt-6">
         
-          <Link href="/about"><Button size="lg" variant="outline">
+          <Link href="/discover"><Button size="lg" variant="outline">
           Learn more <ArrowRight className="ml-2 h-4 w-4" />
           </Button></Link>
       </div>

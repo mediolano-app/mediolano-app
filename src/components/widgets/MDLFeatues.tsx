@@ -25,7 +25,7 @@ export function MediolanoFeatures() {
           <h2 className="text-3xl md:text-4xl text-center mb-12">Powerful Features for Your IP</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="text-center bg-background/60">
+              <Card key={index} className="text-center bg-background/90">
                 <CardHeader>
                   <div className="flex justify-center">{feature.icon}</div>
                   <CardTitle>{feature.title}</CardTitle>

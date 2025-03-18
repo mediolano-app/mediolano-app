@@ -28,7 +28,7 @@ const navigationItems = [
   {
     title: 'Start',
     items: [
-      { title: 'Discover', href: '/about', icon: BookOpen },
+      { title: 'Discover', href: '/discover', icon: BookOpen },
       { title: 'Create IP', href: '/new', icon: Box },
       { title: 'IP Templates', href: '/new/templates', icon: FileText }, 
     ],

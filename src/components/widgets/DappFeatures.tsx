@@ -14,7 +14,7 @@ export function AppFeatures() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
         >
-          <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+          <Card className="h-full hover:shadow transition-shadow duration-300">
             <CardHeader>
               <div className="flex items-center space-x-4">
                 <div className="p-2 bg-primary/10 rounded-full">

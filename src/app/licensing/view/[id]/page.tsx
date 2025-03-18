@@ -45,7 +45,7 @@ const viewLicense: NextPage = () => {
           Back to Licensing
         </Link>
 
-        <div className="shadow-lg rounded-lg overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
+        <div className="shadow rounded-lg overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground">
           <div className="p-6">
             <h1 className="text-3xl font-bold mb-4">{mockLicense.name}</h1>
             <Link href={`/ip/${mockLicense.ipId}`} className="text-lg text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 mb-4 inline-block">

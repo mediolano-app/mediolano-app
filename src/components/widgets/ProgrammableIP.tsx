@@ -35,7 +35,7 @@ export function ProgrammableIPSection() {
                 alt="Programmable IP Assets Visualization" 
                 width={800} 
                 height={800} 
-                className="rounded-lg shadow-lg"
+                className="rounded-lg shadow"
               />
             </div>
           </div>

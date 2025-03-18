@@ -50,7 +50,7 @@ const features = [
   },
 ]
 
-export default function Features() {
+export default function StartFeatures() {
   return (
     <section className="space-y-6">
       <h2 className="text-2xl text-center tracking-tighter sm:text-3xl md:text-4xl">Features</h2>

@@ -193,7 +193,7 @@ export default function FilmsRegistrationPage() {
         </Card>
 
         <div className="space-y-8">
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground'>
             <CardHeader>
               <CardTitle>Why Register Your Film?</CardTitle>
             </CardHeader>
@@ -231,7 +231,7 @@ export default function FilmsRegistrationPage() {
             </CardContent>
           </Card>
 
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground'>
             <CardHeader>
               <CardTitle>Accepted Film Types</CardTitle>
             </CardHeader>
@@ -273,7 +273,7 @@ export default function FilmsRegistrationPage() {
             </CardContent>
           </Card>
 
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-foreground'>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground'>
             <CardHeader>
               <CardTitle>App Features</CardTitle>
             </CardHeader>
