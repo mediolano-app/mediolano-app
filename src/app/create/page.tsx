@@ -54,9 +54,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 
-
-
-
 import {
   useAccount,
   useContract,
@@ -66,9 +63,6 @@ import { Abi } from "starknet";
 import { abi } from "@/abis/abi";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-
-
-
 
 interface Asset {
   title: string;
@@ -107,9 +101,6 @@ const collections = [
   { id: "1", name: "Programmable IP Collection" },
 ];
 
-
-
-
 // Define the form schema with zod
 const formSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }).max(100),
@@ -130,10 +121,6 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-
-
-
-
 // Mock file type icons
 const fileTypeIcons = {
   "image/jpeg": Image,
@@ -151,11 +138,6 @@ const fileTypeIcons = {
   default: FileText,
 }
 
-
-
-
-
-
 // Mock blockchain data
 const mockBlockchainData = {
   gas: 0.000342,
@@ -167,20 +149,16 @@ const mockBlockchainData = {
   walletAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
 }
 
-
-
-
-
-
-
-
-
-
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+}
 
 export default function CreateIPPage() {
-
-
-
 
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -198,18 +176,6 @@ export default function CreateIPPage() {
   const [newCollection, setNewCollection] = useState("")
   const [isNewCollection, setIsNewCollection] = useState(false)
     */}
-
-
-
-
-
-
-
-
-
-
-
-
 
   const [asset, setAsset] = useState<Asset>({
     title: "",
@@ -264,103 +230,11 @@ export default function CreateIPPage() {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    setIsSubmitting(true);
-    setError(null);
-
-    const submitData = new FormData();
-    submitData.append("title", asset.title);
-    submitData.append("description", asset.description);
-    submitData.append("assetType", asset.assetType);
-    submitData.append("mediaUrl", asset.mediaUrl);
-    submitData.append("externalUrl", asset.externalUrl);
-    submitData.append("tags", asset.tags.join(","));
-    submitData.append("license", asset.license);
-    submitData.append("isLimited", asset.isLimited ? "1" : "0");
-    submitData.append("totalSupply", asset.totalSupply.toString());
-    submitData.append("collection", isNewCollection ? newCollection : asset.collection);
-    submitData.append("ipVersion", asset.ipVersion);
-
-    if (file) {
-      submitData.append("uploadFile", file);
-    }
-
-    try {
-      const response = await fetch("/api/forms-asset", {
-        method: "POST",
-        body: submitData,
-      });
-      if (!response.ok) {
-        throw new Error("Failed to submit IP");
-      }
-
-      console.log("IP submitted successfully");
-
-      const data = await response.json();
-      const ipfs = data.uploadData.IpfsHash as string;
-      setIpfsHash(ipfs);
-      console.log("IPFS Hash:", ipfs);
-
-      toast({
-        title: "IP Protected",
-        description:
-          "Finalize your intellectual property registration by approving the asset creation on the Starknet blockchain. Visit Portfolio to manage your digital assets.",
-        action: <ToastAction altText="OK">OK</ToastAction>,
-      });
-    } catch (err) {
-      console.error("Submission Error:", err);
-      setError("Failed submitting or minting IP. Please try again.");
-      toast({
-        title: "Error",
-        description:
-          "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
-        action: <ToastAction altText="OK">OK</ToastAction>,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    if (name === "newCollection") {
-      setNewCollection(value);
-    } else {
-      setAsset((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    if (name === "collection" && value === "new") {
-      setIsNewCollection(true);
-      setAsset((prev) => ({ ...prev, collection: "" }));
-    } else {
-      setIsNewCollection(false);
-      setAsset((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
   useEffect(() => {
     if (ipfsHash) {
       handleMintNFT();
     }
   }, [ipfsHash]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   // Global error handler for unhandled promise rejections
@@ -403,11 +277,6 @@ export default function CreateIPPage() {
       window.removeEventListener("error", handleError)
     }
   }, [toast])
-
-
-
-
-
 
   // Initialize form with react-hook-form
   const form = useForm<FormValues>({
@@ -688,26 +557,11 @@ export default function CreateIPPage() {
   // Handle transaction signing
   const handleSignTransaction = async () => {
     try {
+      setIsSubmitting(true)
       setTransactionStatus("processing")
 
       // Simulate blockchain transaction processing
       await new Promise((resolve) => setTimeout(resolve, 3000))
-
-      // Create mock transaction data with more realistic values
-      const mockTransactionHash =
-        "0x" +
-        Array.from({ length: 64 })
-          .map(() => Math.floor(Math.random() * 16).toString(16))
-          .join("")
-
-      const mockTokenId = Math.floor(Math.random() * 1000000) + 1
-      const mockBlockNumber = Math.floor(Math.random() * 10000000) + 10000000
-
-      // Generate a realistic timestamp for the transaction
-      const mockTimestamp = new Date().toISOString()
-
-      // Create a mock contract address
-      const mockContractAddress = "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b"
 
       // Prepare data for storage with the mock transaction data
       const formData = form.getValues()
@@ -728,17 +582,55 @@ export default function CreateIPPage() {
         attribution: formData.attribution,
         filesCount: uploadedFiles.length,
         transaction: {
-          hash: mockTransactionHash,
-          blockNumber: mockBlockNumber,
-          timestamp: mockTimestamp,
-          tokenId: mockTokenId,
+          // hash: mockTransactionHash,
+          // blockNumber: mockBlockNumber,
+          timestamp: Date.now(),
           network: "Starknet",
-          contractAddress: mockContractAddress,
+          contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
         },
-        registrationDate: mockTimestamp,
+        registrationDate: Date.now(),
         protectionStatus: "Active",
         protectionScope: "181 countries (Berne Convention)",
         protectionDuration: "50-70 years (based on jurisdiction)",
+      }
+
+      if (uploadedFiles.length > 0) {
+        const base64String = await fileToBase64(uploadedFiles[0]);
+        assetData.mediaUrl = base64String; 
+        console.log(assetData.mediaUrl)
+      }
+
+      console.log(assetData)
+      try {
+        const response = await fetch("/api/forms-create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(assetData),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to submit IP");
+        }
+  
+        console.log("IP submitted successfully");
+  
+        const data = await response.json();
+        const ipfs = data.uploadData.IpfsHash as string;
+        setIpfsHash(ipfs);
+        console.log("IPFS Hash:", ipfs);
+  
+      } catch (err) {
+        console.error("Submission Error:", err);
+        setError("Failed submitting or minting IP. Please try again.");
+        toast({
+          title: "Error",
+          description:
+            "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
+          action: <ToastAction altText="OK">OK</ToastAction>,
+        });
+      } finally {
+        setIsSubmitting(false);
       }
 
       try {

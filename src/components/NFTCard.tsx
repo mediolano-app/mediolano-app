@@ -35,7 +35,6 @@ import { abi } from "../../src/abis/abi";
 import { type Abi } from "starknet";
 import { useReadContract } from "@starknet-react/core";
 import { pinataClient } from "@/utils/pinataClient";
-import { IP } from "@/types/asset";
 import Link from "next/link";
 
 interface NFTCardProps {
