@@ -46,12 +46,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // If a file was uploaded, create an image URL using the Pinata gateway.
     const imageUrl = fileIpfsHash
       ? `https://gateway.pinata.cloud/ipfs/${fileIpfsHash}`
       : "";
 
-    // Build the attributes array with the art details.
     const attributes = [
       { trait_type: "Artist Name", value: artistName },
       { trait_type: "Medium", value: medium },
@@ -60,7 +58,6 @@ export async function POST(request: NextRequest) {
       { trait_type: "Price", value: price },
     ];
 
-    // Build the final JSON object in the desired NFT metadata format.
     const formattedArt = {
       name: title,
       description,
@@ -69,7 +66,6 @@ export async function POST(request: NextRequest) {
       attributes,
     };
 
-    // Upload the JSON metadata to Pinata.
     const uploadData = await pinataClient.upload.json(formattedArt);
     return NextResponse.json({ uploadData }, { status: 200 });
   } catch (error) {
