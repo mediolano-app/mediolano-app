@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 
 const templates = [
-  { name: "Custom", icon: FileText, href: "/new/asset" },
+  { name: "Custom", icon: FileText, href: "/create" },
   { name: "Art", icon: Image, href: "/new/art" },
   { name: "Document", icon: FileIcon, href: "/new/document" },
   { name: "Video", icon: Film, href: "/new/video" },

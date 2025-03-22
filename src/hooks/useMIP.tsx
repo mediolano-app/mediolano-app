@@ -7,7 +7,7 @@ export function useMIP(){
     const { address } = useAccount();
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP;
 
-    const [balance, setBalance] = useState<BigInt>(0);
+    const [balance, setBalance] = useState<BigInt>(BigInt(0));
     const[tBalance, setTBalance] = useState<number>(0);
     const [tokenIds, setTokenIds] = useState<BigInt[]>([]);
     const [tokenIdsError, setTokenIdsError] = useState<Error | null>(null);

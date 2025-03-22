@@ -26,6 +26,9 @@ import {
   X,
   Code,
   Zap,
+  File,
+  Globe2,
+  Box,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -67,15 +70,16 @@ import { ToastAction } from "@/components/ui/toast";
 interface Asset {
   title: string;
   description: string;
-  assetType: string;
+  author: string;
+  type: string;
   mediaUrl: string;
   externalUrl: string;
   tags: string[];
   license: string;
-  isLimited: boolean;
+  limited: boolean;
   totalSupply: number;
   collection: string;
-  ipVersion: string;
+  version: string;
 }
 
 const assetTypes = [
@@ -106,14 +110,14 @@ const formSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }).max(100),
   author: z.string().min(2, { message: "Author name must be at least 2 characters" }).max(100),
   description: z.string().min(10, { message: "Description must be at least 10 characters" }).max(1000),
-  ipType: z.enum(["artwork", "video", "music", "literary", "ai-model", "software", "3d-model", "other"]),
+  type: z.enum(["3d-model", "ai-model", "audio", "artwork", "document", "literary", "rwa", "software", "video", "other"]),
   collection: z.string().optional(),
   tags: z.array(z.string()).optional().default([]),
   mediaUrl: z.string().url().optional().or(z.literal("")),
   externalUrl: z.string().url().optional().or(z.literal("")),
   licenseType: z.enum(["all-rights", "creative-commons", "open-source", "custom"]),
   licenseDetails: z.string().optional(),
-  ipVersion: z.string().optional(),
+  version: z.string().optional(),
   commercialUse: z.boolean().default(false),
   modifications: z.boolean().default(false),
   attribution: z.boolean().default(true),
@@ -180,15 +184,16 @@ export default function CreateIPPage() {
   const [asset, setAsset] = useState<Asset>({
     title: "",
     description: "",
-    assetType: "",
+    author: "",
+    type: "",
     mediaUrl: "",
     externalUrl: "",
     tags: [],
     license: "",
-    isLimited: false,
+    limited: false,
     totalSupply: 1,
-    collection: "",
-    ipVersion: "",
+    collection: "MIP Collection",
+    version: "1",
   });
   
   const { toast } = useToast();
@@ -286,13 +291,13 @@ export default function CreateIPPage() {
       author: "",
       description: "",
       externalUrl: "",
-      ipType: "artwork",
+      type: "artwork",
       collection: "",
       tags: [],
       mediaUrl: "",
       licenseType: "all-rights",
       licenseDetails: "",
-      ipVersion: "1.0",
+      version: "1.0",
       commercialUse: false,
       modifications: false,
       attribution: true,
@@ -453,7 +458,7 @@ export default function CreateIPPage() {
       const validationResult = await form.trigger()
       if (!validationResult) {
         toast({
-          title: "Form Validation Error",
+          title: "Data Validation Error",
           description: "Please check the form for errors and try again.",
           variant: "destructive",
         })
@@ -486,7 +491,7 @@ export default function CreateIPPage() {
     try {
       if (activeTab === "details") {
         // Validate details tab fields
-        const isValid = await form.trigger(["title", "author", "description", "ipType"])
+        const isValid = await form.trigger(["title", "author", "description", "type"])
         if (isValid) {
           setActiveTab("assets")
           setFormProgress(66)
@@ -576,7 +581,7 @@ export default function CreateIPPage() {
         externalUrl: formData.externalUrl,
         licenseType: formData.licenseType,
         licenseDetails: formData.licenseDetails,
-        ipVersion: formData.ipVersion || "1.0",
+        version: formData.version || "1.0",
         commercialUse: formData.commercialUse,
         modifications: formData.modifications,
         attribution: formData.attribution,
@@ -699,8 +704,8 @@ export default function CreateIPPage() {
     <div className="container mx-auto px-4 py-12 mb-20 bg-background/90 round-lg shadow">
      
       <div className="flex items-center gap-2 mb-6">
-        <Button variant="outline" size="icon" asChild>
-          <Link href="/new">
+        <Button variant="link" size="icon" asChild>
+          <Link href="/new" title="Back to Create Programmable Intellectual Property">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
@@ -708,7 +713,7 @@ export default function CreateIPPage() {
       </div>
 
       <div className="mb-8">
-        <Progress value={formProgress} className="h-2" />
+        <Progress value={formProgress} className="h-1" />
         <div className="flex justify-between mt-2 text-sm text-muted-foreground">
           <span>Details</span>
           <span>Assets</span>
@@ -792,36 +797,15 @@ export default function CreateIPPage() {
                       <span className="text-destructive">*</span>
                     </Label>
                     <RadioGroup
-                      defaultValue={form.getValues("ipType")}
-                      onValueChange={(value) => form.setValue("ipType", value as any, { shouldValidate: true })}
+                      defaultValue={form.getValues("type")}
+                      onValueChange={(value) => form.setValue("type", value as any, { shouldValidate: true })}
                       className="grid grid-cols-2 gap-4"
                     >
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="artwork" id="artwork" />
-                        <Label htmlFor="artwork" className="flex items-center gap-2">
-                          <Image className="h-4 w-4" />
-                          Artwork
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="video" id="video" />
-                        <Label htmlFor="video" className="flex items-center gap-2">
+                        <RadioGroupItem value="3d-model" id="3d-model" />
+                        <Label htmlFor="3d-model" className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
-                          Video
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="music" id="music" />
-                        <Label htmlFor="music" className="flex items-center gap-2">
-                          <Music className="h-4 w-4" />
-                          Music
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="literary" id="literary" />
-                        <Label htmlFor="literary" className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Literary Work
+                          3D Model
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -831,6 +815,45 @@ export default function CreateIPPage() {
                           AI Model
                         </Label>
                       </div>
+                       <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="music" id="music" />
+                        <Label htmlFor="music" className="flex items-center gap-2">
+                          <Music className="h-4 w-4" />
+                          Audio
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="artwork" id="artwork" />
+                        <Label htmlFor="artwork" className="flex items-center gap-2">
+                          <Image className="h-4 w-4" />
+                          Artwork
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="document" id="document" />
+                        <Label htmlFor="document" className="flex items-center gap-2">
+                          <File className="h-4 w-4" />
+                          Document
+                        </Label>
+                      </div>
+                      
+                     
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="literary" id="literary" />
+                        <Label htmlFor="literary" className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Literary Work
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="rwa" id="rwa" />
+                        <Label htmlFor="rwa" className="flex items-center gap-2">
+                          <Globe2 className="h-4 w-4" />
+                          RWA
+                        </Label>
+                      </div>
+
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="software" id="software" />
                         <Label htmlFor="software" className="flex items-center gap-2">
@@ -838,13 +861,15 @@ export default function CreateIPPage() {
                           Software
                         </Label>
                       </div>
+
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="3d-model" id="3d-model" />
-                        <Label htmlFor="3d-model" className="flex items-center gap-2">
+                        <RadioGroupItem value="video" id="video" />
+                        <Label htmlFor="video" className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
-                          3D Model
+                          Video
                         </Label>
                       </div>
+                      
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="other" id="other" />
                         <Label htmlFor="other" className="flex items-center gap-2">
@@ -855,9 +880,9 @@ export default function CreateIPPage() {
                     </RadioGroup>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-5">
                     <Label htmlFor="collection" className="flex items-center gap-1">
-                      Collection
+                      Collection (Demonstration)
                     </Label>
                     <Select value={form.getValues("collection")} onValueChange={handleCollectionChange}>
                       <SelectTrigger>
@@ -1120,8 +1145,8 @@ export default function CreateIPPage() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-4">
-                      <Label htmlFor="ipVersion">IP Version</Label>
-                      <Input id="ipVersion" placeholder="e.g., 1.0" {...form.register("ipVersion")} />
+                      <Label htmlFor="version">IP Version</Label>
+                      <Input id="version" placeholder="e.g., 1.0" {...form.register("version")} />
                       <p className="text-sm text-muted-foreground">
                         Version number to track updates to your intellectual property
                       </p>
@@ -1322,10 +1347,10 @@ export default function CreateIPPage() {
                   </div>
                 )}
 
-                {form.watch("ipType") && (
+                {form.watch("type") && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium">IP Type</p>
-                    <p className="text-sm text-muted-foreground capitalize">{form.watch("ipType").replace("-", " ")}</p>
+                    <p className="text-sm text-muted-foreground capitalize">{form.watch("type").replace("-", " ")}</p>
                   </div>
                 )}
 
@@ -1367,10 +1392,10 @@ export default function CreateIPPage() {
                   </div>
                 )}
 
-                {form.watch("ipVersion") && (
+                {form.watch("version") && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium">IP Version</p>
-                    <p className="text-sm text-muted-foreground">{form.watch("ipVersion")}</p>
+                    <p className="text-sm text-muted-foreground">{form.watch("version")}</p>
                   </div>
                 )}
 
@@ -1413,11 +1438,13 @@ export default function CreateIPPage() {
                     <Shield className="h-4 w-4 mr-2" />
                     Register IP Asset
                   </Button>
-
+                    {/*
                     <hr></hr>
                     <Button type="submit" disabled={isSubmitting || !address}>
                       {isSubmitting ? "Creating Asset..." : "Create Asset"}
                     </Button>
+                    */}
+
                     </>
                 )}
               </CardFooter>
@@ -1546,14 +1573,14 @@ export default function CreateIPPage() {
                       </div>
                     </div>
 
-                    {form.watch("ipVersion") && (
+                    {form.watch("version") && (
                       <div className="flex items-center gap-2">
                         <div className="rounded-full bg-primary/10 p-2">
                           <Info className="h-4 w-4 text-primary" />
                         </div>
                         <div>
                           <p className="text-sm font-medium">IP Version</p>
-                          <p className="text-sm text-muted-foreground">{form.watch("ipVersion")}</p>
+                          <p className="text-sm text-muted-foreground">{form.watch("version")}</p>
                         </div>
                       </div>
                     )}
@@ -1668,10 +1695,11 @@ export default function CreateIPPage() {
                       <span className="text-sm text-muted-foreground">Registration Date</span>
                       <span className="text-sm font-medium">{new Date().toLocaleDateString()}</span>
                     </div>
+                    {/*
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">Token ID</span>
                       <span className="text-sm font-medium">#{Math.floor(Math.random() * 1000000)}</span>
-                    </div>
+                    </div>*/}
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">Protection Status</span>
                       <span className="text-sm font-medium text-green-600 dark:text-green-400">Active</span>
@@ -1681,8 +1709,8 @@ export default function CreateIPPage() {
 
                 <div className="flex flex-col gap-2 w-full max-w-xs">
                   <Button variant="outline" className="w-full">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Certificate
+                    <Box className="h-4 w-4 mr-2" />
+                    Register Another Programmable IP
                   </Button>
                   <Button variant="outline" className="w-full">
                     <ExternalLink className="h-4 w-4 mr-2" />
@@ -1732,10 +1760,10 @@ export default function CreateIPPage() {
                   size="lg"
                 >
                   <Shield className="h-5 w-5 mr-2" />
-                  Mint IP on Blockchain
+                  Mint Programmable IP
                 </Button>
                 <p className="text-xs text-center text-muted-foreground mt-2 mb-4">
-                  By clicking "Mint IP on Blockchain", you confirm that you are the lawful owner of this intellectual
+                  By clicking "Mint Programmable IP", you confirm that you are the lawful owner of this intellectual
                   property and have the right to register it.
                 </p>
                 <DrawerClose asChild>

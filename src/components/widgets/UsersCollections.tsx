@@ -86,7 +86,7 @@ export function UserCollectionsSection() {
           <p className="text-center">Please connect your wallet to view your collections.</p>
         )}
         <div className="text-center mt-12">
-          <Link href="/new/asset">
+          <Link href="/create">
             <Button size="lg">
               Create New IP
               <ArrowRight className="ml-2 h-4 w-4" />

@@ -303,7 +303,7 @@ export default function NFTPortfolio() {
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="all">All NFTs</TabsTrigger>
+          <TabsTrigger value="all">My IP Collection</TabsTrigger>
           <TabsTrigger value="licensings">Licensings</TabsTrigger>
         </TabsList>
 
@@ -343,7 +343,7 @@ export default function NFTPortfolio() {
           )} */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {tokenIds.map((tokenId, index) => (
-              <NFTCard key={index} tokenId={tokenId} status="Listed" onClick={() => router.push(`/assets/${tokenId}`)} />
+              <NFTCard key={index} tokenId={tokenId} status="Listed" onClick={() => router.push(`/asset/${tokenId}`)} />
             ))}
           </div>
         </TabsContent>
@@ -362,7 +362,7 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	status = 'Listed';
+	status = 'MIP';
 
 	const {
 		data: tokenURI,
@@ -376,7 +376,7 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
 		watch: false,
 	});
 
-	console.log("ESSE EH O TOKEN URI", tokenURI);
+	console.log("Token URI:", tokenURI);
 
 	useEffect(() => {
 		const fetchMetadata = async () => {
@@ -416,11 +416,11 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
 	}, [tokenURI]);
 
 	if (isLoading || isContractLoading) {
-		return <div>Loading...</div>; // Consider using a proper loading component
+		return <div>Loading...</div>;
 	}
 
 	if (error || contractError) {
-		return <div>Error: {error || "Failed to fetch token data"}</div>; // Consider using a proper error component
+		return <div>Error: {error || "Failed to fetch token data"}</div>;
 	}
 
 	if (!metadata) {
@@ -430,7 +430,7 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
     <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={onClick}>
       <div className="relative aspect-square">
         <Image
-          src={metadata.image || "/placeholder.svg"}
+          src={metadata.image || "/background.jpg"}
           alt={metadata.name}
           fill
           className="object-cover transition-all duration-300 hover:brightness-90"
@@ -447,7 +447,7 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-semibold truncate">{metadata.name}</h3>
+            <h3 className="font-semibold">{metadata.name}</h3>
             {/* <p className="text-sm text-muted-foreground">{metadata.collection.name}</p> */}
           </div>
           <NFTActionDropdown nftId={tokenId.toString()} />
@@ -455,7 +455,7 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between">
         <Badge variant="outline" className="text-xs">
-          {tokenId.toString()}
+          {metadata.type}
         </Badge>
       </CardFooter>
     </Card>
