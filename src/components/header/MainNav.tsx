@@ -158,7 +158,7 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/new"
+                    href="/create"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <BoxIcon className="mr-2 h-4 w-4  text-blue-600" />

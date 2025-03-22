@@ -47,7 +47,7 @@ import DappInfo from './DappInfo';
 
 const features = [
   { icon: <Brain className="h-6 w-6" />, title: "Discover", description: "IP for the Integrity Web", link: "/discover" },
-  { icon: <Box className="h-6 w-6" />, title: "Tokenize IP", description: "Create New Programmable IP", link: "/new" },
+  { icon: <Box className="h-6 w-6" />, title: "Tokenize IP", description: "Create New Programmable IP", link: "/create" },
   { icon: <LayoutGrid className="h-6 w-6" />, title: "Manage Assets", description: "Manage IP onchain", link: "/portfolio" },
   { icon: <ScrollText className="h-6 w-6" />, title: "Licensing Assets", description: "Register new license", link: "/licensing" },
 ]

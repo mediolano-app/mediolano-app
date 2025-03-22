@@ -574,7 +574,7 @@ export default function CreateIPPage() {
         title: formData.title,
         author: formData.author,
         description: formData.description,
-        type: formData.ipType,
+        type: formData.type,
         collection: formData.collection,
         tags: formData.tags,
         mediaUrl: formData.mediaUrl,
