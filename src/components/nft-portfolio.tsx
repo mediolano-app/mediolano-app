@@ -184,6 +184,7 @@ export default function NFTPortfolio() {
 
   return (
     <div className="space-y-6">
+      
       {showStats && <PortfolioStats useBlockchainData={useBlockchainData} />}
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
@@ -273,8 +274,6 @@ export default function NFTPortfolio() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuRadioGroup value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
-                <DropdownMenuRadioItem value="price-high">Price: High to Low</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="price-low">Price: Low to High</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="name-asc">Name: A to Z</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="name-desc">Name: Z to A</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="date-new">Date: Newest First</DropdownMenuRadioItem>
@@ -304,7 +303,7 @@ export default function NFTPortfolio() {
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="all">My IP Collection</TabsTrigger>
-          <TabsTrigger value="licensings">Licensings</TabsTrigger>
+          <TabsTrigger value="licensings" disabled>Licensings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
@@ -428,7 +427,7 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
 	}
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={onClick}>
-      <div className="relative aspect-square">
+      <div className="relative aspect-video">
         <Image
           src={metadata.image || "/background.jpg"}
           alt={metadata.name}
@@ -447,7 +446,7 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-semibold">{metadata.name}</h3>
+            <h3 className="font-semibold text-lg">{metadata.name}</h3>
             {/* <p className="text-sm text-muted-foreground">{metadata.collection.name}</p> */}
           </div>
           <NFTActionDropdown nftId={tokenId.toString()} />
@@ -455,7 +454,7 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between">
         <Badge variant="outline" className="text-xs">
-          {metadata.type}
+          IP {metadata.type}
         </Badge>
       </CardFooter>
     </Card>

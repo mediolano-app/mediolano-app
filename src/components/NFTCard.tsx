@@ -60,7 +60,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	status = 'Listed';
+	status = 'IP';
 
 	// Get tokenURI from contract
 	const {
@@ -75,7 +75,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		watch: false,
 	});
 
-	console.log("ESSE EH O TOKEN URI", tokenURI);
+	console.log("Token Uri:", tokenURI);
 
 	// Fetch metadata when tokenURI is available
 	useEffect(() => {
@@ -155,15 +155,15 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				/>
 			</CardHeader>
 			<CardContent className="p-4">
-				<CardTitle className="mb-2">{metadata.name}</CardTitle>
+				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
 				<div className="flex justify-between items-center mb-2">
 					<Badge variant="secondary">{metadata.type}</Badge>
 				</div>
-				<Badge
+				<Badge className="text-sm"
 					variant={
-						status === "Listed"
+						status === "IP"
 							? "default"
-							: status === "Licensed"
+							: status === "Programmable IP"
 								? "secondary"
 								: "outline"
 					}

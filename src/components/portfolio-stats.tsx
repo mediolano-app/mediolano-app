@@ -1,11 +1,20 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { getNFTs } from "@/lib/mockupPortfolioData"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowUpRight, TrendingUp, Wallet, BarChart3 } from "lucide-react"
+import { ArrowUpRight, TrendingUp, Wallet, BarChart3, LayoutGrid } from "lucide-react"
 import { useBlockchainPortfolio } from "@/hooks/useBlockchainPortfolio"
+import { NFTLicensings } from "./nft-licensings"
+import { useMIP } from "@/hooks/useMIP"
+import { pinataClient } from "@/utils/pinataClient"
+import { useReadContract } from "@starknet-react/core";
+import { abi } from "../../src/abis/abi";
+import { type Abi } from "starknet";
+
+
 
 interface PortfolioStatsProps {
   useBlockchainData?: boolean;
@@ -23,13 +32,16 @@ type HighestValueNFT = {
 
 export function PortfolioStats({ useBlockchainData = false }: PortfolioStatsProps) {
   const [timeframe, setTimeframe] = useState<TimeframeValue>("month")
+
+
+    const {address, balance, balanceError, tokenIds, tokenIdsError, isLoading} = useMIP();
+  
   
   // Get blockchain data
   const { 
     userAssets: blockchainAssets, 
     userCollections: blockchainCollections,
     portfolioStats: blockchainStats,
-    isLoading
   } = useBlockchainPortfolio()
   
   // Get mock data as fallback
@@ -94,98 +106,70 @@ export function PortfolioStats({ useBlockchainData = false }: PortfolioStatsProp
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Portfolio Value</CardTitle>
-          <Wallet className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          {useBlockchainData && isLoading ? (
-            <div className="text-2xl font-bold">Loading...</div>
-          ) : (
-            <>
-              <div className="text-2xl font-bold">{totalValue.toFixed(2)} {useBlockchainData ? 'STRK' : 'ETH'}</div>
-              <p className="text-xs text-muted-foreground">≈ ${(totalValue * (useBlockchainData ? 1500 : 3500)).toLocaleString()}</p>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Portfolio Growth</CardTitle>
-          <div>
-            <Tabs defaultValue={timeframe} onValueChange={(v) => setTimeframe(v as TimeframeValue)}>
-              <TabsList className="h-7 w-fit">
-                <TabsTrigger value="day" className="text-xs px-2">
-                  1D
-                </TabsTrigger>
-                <TabsTrigger value="week" className="text-xs px-2">
-                  1W
-                </TabsTrigger>
-                <TabsTrigger value="month" className="text-xs px-2">
-                  1M
-                </TabsTrigger>
-                <TabsTrigger value="year" className="text-xs px-2">
-                  1Y
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-baseline space-x-2">
-            <div className="text-2xl font-bold">+{growthData[timeframe]}%</div>
-            <div className="text-sm text-green-500 flex items-center">
-              <ArrowUpRight className="h-4 w-4 mr-1" />
-              <span>Up</span>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground">Compared to previous {timeframe}</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Collection Stats</CardTitle>
-          <BarChart3 className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          {useBlockchainData && isLoading ? (
-            <div className="text-2xl font-bold">Loading...</div>
-          ) : (
-            <>
-              <div className="text-2xl font-bold">{totalNFTs}</div>
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">NFTs across {uniqueCollections} collections</p>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Highest Value NFT</CardTitle>
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          {useBlockchainData && isLoading ? (
-            <div className="text-2xl font-bold">Loading...</div>
-          ) : (
-            <>
+    <>
+    
+    <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="bg-background/80">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Collections</CardTitle>
+              <Wallet className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
               <div className="text-2xl font-bold">
-                {getNFTPrice()} {useBlockchainData ? 'STRK' : 'ETH'}
+                1
               </div>
-              <p className="text-xs text-muted-foreground truncate">
-                {highestValueNFT.name} ({getCollectionName()})
+              <p className="text-xs text-muted-foreground">Programmable IP Collection</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-background/80">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
+              <LayoutGrid className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {address && isLoading ? "Loading..." : balanceError ? "Error" : balance.toString()}
+              </div>
+              <p className="text-xs text-muted-foreground">Total IPs in your portfolio</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-background/80">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Top Collection</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-1xl font-bold">
+                   Programmable IP Collection
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {address && isLoading ? "" : "(New collections soon)"}
               </p>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-background/80">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-1xl font-bold">
+                {address && isLoading ? "Loading..." 
+                  // : (portfolioStats.recentActivity.length > 0 
+                  // ? portfolioStats.recentActivity[0].item 
+                  : "No recorded activity"}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {address && isLoading ? "" 
+                  // : (portfolioStats.recentActivity.length > 0 
+                  // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
+                  : "(Demonstration)"}
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+    
+    </>
   )
 }
 

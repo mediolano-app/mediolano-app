@@ -56,7 +56,7 @@ export default function DashboardPage() {
       
       <main className="p-4 space-y-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Onchain Assets Dashboard</h1>
+          <h1 className="text-2xl font-bold">Onchain Assets Dashboard</h1>
           {/* <div className="flex items-center space-x-2">
             <Input 
               type="search" 
@@ -108,12 +108,11 @@ export default function DashboardPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {address && isLoading ? "Loading..." : "No collections yet"}
-                {/* implementar as collections e voltar aqui */}
+              <div className="text-1xl font-bold">
+                   Programmable IP Collection
               </div>
               <p className="text-xs text-muted-foreground">
-                {address && isLoading ? "" : "Add assets to your portfolio"}
+                {address && isLoading ? "" : "(New collections soon)"}
               </p>
             </CardContent>
           </Card>
@@ -123,17 +122,17 @@ export default function DashboardPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
+              <div className="text-1xl font-bold">
                 {address && isLoading ? "Loading..." 
                   // : (portfolioStats.recentActivity.length > 0 
                   // ? portfolioStats.recentActivity[0].item 
-                  : "No recent activity"}
+                  : "No recorded activity"}
               </div>
               <p className="text-xs text-muted-foreground">
                 {address && isLoading ? "" 
                   // : (portfolioStats.recentActivity.length > 0 
                   // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
-                  : "No transactions yet"}
+                  : "(Demonstration)"}
               </p>
             </CardContent>
           </Card>
@@ -141,8 +140,8 @@ export default function DashboardPage() {
 
         {/* Recent Assets Section */}
         <section>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">Recent Assets</h2>
+          <div className="flex justify-between items-center mb-4 mt-10">
+            <h2 className="text-2xl font-semibold">IP Assets</h2>
             <Button
             onClick={() => router.push('/portfolio')} 
             variant="outline"
@@ -156,7 +155,7 @@ export default function DashboardPage() {
             <div className="text-center py-8 text-red-500">{tokenIdsError.message}</div>          
           ) : balance === 0 ? (
             <div className="text-center py-8">
-              <p>You don&apos;t have any assets yet.</p>
+              <p>Your Programmable IP will appear here after creation.</p>
             </div>
           ) : (
             <>
