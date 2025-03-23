@@ -31,10 +31,11 @@ export function WalletConnect() {
           <DialogDescription>
             {account
               ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}`
-              : "Connect your wallet to interact with the Mediolano dApp."}
+              : "Sign in wth your wallet on SEPOLIA TESTNET."}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+
           {account ? (
             <div className="grid gap-4">
               <Button variant="outline" className="justify-start">
@@ -54,6 +55,7 @@ export function WalletConnect() {
                 Disconnect
               </Button>
             </div>
+            
           ) : (
             <div className="grid gap-4">
               {connectors.map((connector) => (
@@ -61,6 +63,13 @@ export function WalletConnect() {
                   Connect with {connector.name}
                 </Button>
               ))}
+
+          <div className="alert alert-warning">
+            <p className="text-sm">
+              The dApp is connected to the testnet. Please make sure your wallet is usng Starknet Sepolia to interact.
+            </p>
+          </div>
+
             </div>
           )}
         </div>

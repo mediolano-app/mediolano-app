@@ -26,6 +26,9 @@ import {
   X,
   Code,
   Zap,
+  File,
+  Globe2,
+  Box,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -54,9 +57,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 
-
-
-
 import {
   useAccount,
   useContract,
@@ -67,21 +67,19 @@ import { abi } from "@/abis/abi";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
-
-
-
 interface Asset {
   title: string;
   description: string;
-  assetType: string;
+  author: string;
+  type: string;
   mediaUrl: string;
   externalUrl: string;
   tags: string[];
   license: string;
-  isLimited: boolean;
+  limited: boolean;
   totalSupply: number;
   collection: string;
-  ipVersion: string;
+  version: string;
 }
 
 const assetTypes = [
@@ -107,32 +105,25 @@ const collections = [
   { id: "1", name: "Programmable IP Collection" },
 ];
 
-
-
-
 // Define the form schema with zod
 const formSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }).max(100),
   author: z.string().min(2, { message: "Author name must be at least 2 characters" }).max(100),
   description: z.string().min(10, { message: "Description must be at least 10 characters" }).max(1000),
-  ipType: z.enum(["artwork", "video", "music", "literary", "ai-model", "software", "3d-model", "other"]),
+  type: z.enum(["3d-model", "ai-model", "audio", "artwork", "document", "literary", "rwa", "software", "video", "other"]),
   collection: z.string().optional(),
   tags: z.array(z.string()).optional().default([]),
   mediaUrl: z.string().url().optional().or(z.literal("")),
   externalUrl: z.string().url().optional().or(z.literal("")),
   licenseType: z.enum(["all-rights", "creative-commons", "open-source", "custom"]),
   licenseDetails: z.string().optional(),
-  ipVersion: z.string().optional(),
+  version: z.string().optional(),
   commercialUse: z.boolean().default(false),
   modifications: z.boolean().default(false),
   attribution: z.boolean().default(true),
 })
 
 type FormValues = z.infer<typeof formSchema>
-
-
-
-
 
 // Mock file type icons
 const fileTypeIcons = {
@@ -151,11 +142,6 @@ const fileTypeIcons = {
   default: FileText,
 }
 
-
-
-
-
-
 // Mock blockchain data
 const mockBlockchainData = {
   gas: 0.000342,
@@ -167,20 +153,16 @@ const mockBlockchainData = {
   walletAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
 }
 
-
-
-
-
-
-
-
-
-
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+}
 
 export default function CreateIPPage() {
-
-
-
 
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -199,30 +181,19 @@ export default function CreateIPPage() {
   const [isNewCollection, setIsNewCollection] = useState(false)
     */}
 
-
-
-
-
-
-
-
-
-
-
-
-
   const [asset, setAsset] = useState<Asset>({
     title: "",
     description: "",
-    assetType: "",
+    author: "",
+    type: "",
     mediaUrl: "",
     externalUrl: "",
     tags: [],
     license: "",
-    isLimited: false,
+    limited: false,
     totalSupply: 1,
-    collection: "",
-    ipVersion: "",
+    collection: "MIP Collection",
+    version: "1",
   });
   
   const { toast } = useToast();
@@ -264,103 +235,11 @@ export default function CreateIPPage() {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    setIsSubmitting(true);
-    setError(null);
-
-    const submitData = new FormData();
-    submitData.append("title", asset.title);
-    submitData.append("description", asset.description);
-    submitData.append("assetType", asset.assetType);
-    submitData.append("mediaUrl", asset.mediaUrl);
-    submitData.append("externalUrl", asset.externalUrl);
-    submitData.append("tags", asset.tags.join(","));
-    submitData.append("license", asset.license);
-    submitData.append("isLimited", asset.isLimited ? "1" : "0");
-    submitData.append("totalSupply", asset.totalSupply.toString());
-    submitData.append("collection", isNewCollection ? newCollection : asset.collection);
-    submitData.append("ipVersion", asset.ipVersion);
-
-    if (file) {
-      submitData.append("uploadFile", file);
-    }
-
-    try {
-      const response = await fetch("/api/forms-asset", {
-        method: "POST",
-        body: submitData,
-      });
-      if (!response.ok) {
-        throw new Error("Failed to submit IP");
-      }
-
-      console.log("IP submitted successfully");
-
-      const data = await response.json();
-      const ipfs = data.uploadData.IpfsHash as string;
-      setIpfsHash(ipfs);
-      console.log("IPFS Hash:", ipfs);
-
-      toast({
-        title: "IP Protected",
-        description:
-          "Finalize your intellectual property registration by approving the asset creation on the Starknet blockchain. Visit Portfolio to manage your digital assets.",
-        action: <ToastAction altText="OK">OK</ToastAction>,
-      });
-    } catch (err) {
-      console.error("Submission Error:", err);
-      setError("Failed submitting or minting IP. Please try again.");
-      toast({
-        title: "Error",
-        description:
-          "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
-        action: <ToastAction altText="OK">OK</ToastAction>,
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    if (name === "newCollection") {
-      setNewCollection(value);
-    } else {
-      setAsset((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    if (name === "collection" && value === "new") {
-      setIsNewCollection(true);
-      setAsset((prev) => ({ ...prev, collection: "" }));
-    } else {
-      setIsNewCollection(false);
-      setAsset((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
   useEffect(() => {
     if (ipfsHash) {
       handleMintNFT();
     }
   }, [ipfsHash]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
   // Global error handler for unhandled promise rejections
@@ -404,11 +283,6 @@ export default function CreateIPPage() {
     }
   }, [toast])
 
-
-
-
-
-
   // Initialize form with react-hook-form
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -417,13 +291,13 @@ export default function CreateIPPage() {
       author: "",
       description: "",
       externalUrl: "",
-      ipType: "artwork",
+      type: "artwork",
       collection: "",
       tags: [],
       mediaUrl: "",
       licenseType: "all-rights",
       licenseDetails: "",
-      ipVersion: "1.0",
+      version: "1.0",
       commercialUse: false,
       modifications: false,
       attribution: true,
@@ -584,7 +458,7 @@ export default function CreateIPPage() {
       const validationResult = await form.trigger()
       if (!validationResult) {
         toast({
-          title: "Form Validation Error",
+          title: "Data Validation Error",
           description: "Please check the form for errors and try again.",
           variant: "destructive",
         })
@@ -617,7 +491,7 @@ export default function CreateIPPage() {
     try {
       if (activeTab === "details") {
         // Validate details tab fields
-        const isValid = await form.trigger(["title", "author", "description", "ipType"])
+        const isValid = await form.trigger(["title", "author", "description", "type"])
         if (isValid) {
           setActiveTab("assets")
           setFormProgress(66)
@@ -688,26 +562,11 @@ export default function CreateIPPage() {
   // Handle transaction signing
   const handleSignTransaction = async () => {
     try {
+      setIsSubmitting(true)
       setTransactionStatus("processing")
 
       // Simulate blockchain transaction processing
       await new Promise((resolve) => setTimeout(resolve, 3000))
-
-      // Create mock transaction data with more realistic values
-      const mockTransactionHash =
-        "0x" +
-        Array.from({ length: 64 })
-          .map(() => Math.floor(Math.random() * 16).toString(16))
-          .join("")
-
-      const mockTokenId = Math.floor(Math.random() * 1000000) + 1
-      const mockBlockNumber = Math.floor(Math.random() * 10000000) + 10000000
-
-      // Generate a realistic timestamp for the transaction
-      const mockTimestamp = new Date().toISOString()
-
-      // Create a mock contract address
-      const mockContractAddress = "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b"
 
       // Prepare data for storage with the mock transaction data
       const formData = form.getValues()
@@ -715,30 +574,68 @@ export default function CreateIPPage() {
         title: formData.title,
         author: formData.author,
         description: formData.description,
-        type: formData.ipType,
+        type: formData.type,
         collection: formData.collection,
         tags: formData.tags,
         mediaUrl: formData.mediaUrl,
         externalUrl: formData.externalUrl,
         licenseType: formData.licenseType,
         licenseDetails: formData.licenseDetails,
-        ipVersion: formData.ipVersion || "1.0",
+        version: formData.version || "1.0",
         commercialUse: formData.commercialUse,
         modifications: formData.modifications,
         attribution: formData.attribution,
         filesCount: uploadedFiles.length,
         transaction: {
-          hash: mockTransactionHash,
-          blockNumber: mockBlockNumber,
-          timestamp: mockTimestamp,
-          tokenId: mockTokenId,
+          // hash: mockTransactionHash,
+          // blockNumber: mockBlockNumber,
+          timestamp: Date.now(),
           network: "Starknet",
-          contractAddress: mockContractAddress,
+          contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
         },
-        registrationDate: mockTimestamp,
+        registrationDate: Date.now(),
         protectionStatus: "Active",
         protectionScope: "181 countries (Berne Convention)",
         protectionDuration: "50-70 years (based on jurisdiction)",
+      }
+
+      if (uploadedFiles.length > 0) {
+        const base64String = await fileToBase64(uploadedFiles[0]);
+        assetData.mediaUrl = base64String; 
+        console.log(assetData.mediaUrl)
+      }
+
+      console.log(assetData)
+      try {
+        const response = await fetch("/api/forms-create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(assetData),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to submit IP");
+        }
+  
+        console.log("IP submitted successfully");
+  
+        const data = await response.json();
+        const ipfs = data.uploadData.IpfsHash as string;
+        setIpfsHash(ipfs);
+        console.log("IPFS Hash:", ipfs);
+  
+      } catch (err) {
+        console.error("Submission Error:", err);
+        setError("Failed submitting or minting IP. Please try again.");
+        toast({
+          title: "Error",
+          description:
+            "Registration failed. Please contact our support team at mediolanoapp@gmail.com",
+          action: <ToastAction altText="OK">OK</ToastAction>,
+        });
+      } finally {
+        setIsSubmitting(false);
       }
 
       try {
@@ -807,8 +704,8 @@ export default function CreateIPPage() {
     <div className="container mx-auto px-4 py-12 mb-20 bg-background/90 round-lg shadow">
      
       <div className="flex items-center gap-2 mb-6">
-        <Button variant="outline" size="icon" asChild>
-          <Link href="/new">
+        <Button variant="link" size="icon" asChild>
+          <Link href="/new" title="Back to Create Programmable Intellectual Property">
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
@@ -816,7 +713,7 @@ export default function CreateIPPage() {
       </div>
 
       <div className="mb-8">
-        <Progress value={formProgress} className="h-2" />
+        <Progress value={formProgress} className="h-1" />
         <div className="flex justify-between mt-2 text-sm text-muted-foreground">
           <span>Details</span>
           <span>Assets</span>
@@ -900,36 +797,15 @@ export default function CreateIPPage() {
                       <span className="text-destructive">*</span>
                     </Label>
                     <RadioGroup
-                      defaultValue={form.getValues("ipType")}
-                      onValueChange={(value) => form.setValue("ipType", value as any, { shouldValidate: true })}
+                      defaultValue={form.getValues("type")}
+                      onValueChange={(value) => form.setValue("type", value as any, { shouldValidate: true })}
                       className="grid grid-cols-2 gap-4"
                     >
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="artwork" id="artwork" />
-                        <Label htmlFor="artwork" className="flex items-center gap-2">
-                          <Image className="h-4 w-4" />
-                          Artwork
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="video" id="video" />
-                        <Label htmlFor="video" className="flex items-center gap-2">
+                        <RadioGroupItem value="3d-model" id="3d-model" />
+                        <Label htmlFor="3d-model" className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
-                          Video
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="music" id="music" />
-                        <Label htmlFor="music" className="flex items-center gap-2">
-                          <Music className="h-4 w-4" />
-                          Music
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="literary" id="literary" />
-                        <Label htmlFor="literary" className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Literary Work
+                          3D Model
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -939,6 +815,45 @@ export default function CreateIPPage() {
                           AI Model
                         </Label>
                       </div>
+                       <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="music" id="music" />
+                        <Label htmlFor="music" className="flex items-center gap-2">
+                          <Music className="h-4 w-4" />
+                          Audio
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="artwork" id="artwork" />
+                        <Label htmlFor="artwork" className="flex items-center gap-2">
+                          <Image className="h-4 w-4" />
+                          Artwork
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="document" id="document" />
+                        <Label htmlFor="document" className="flex items-center gap-2">
+                          <File className="h-4 w-4" />
+                          Document
+                        </Label>
+                      </div>
+                      
+                     
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="literary" id="literary" />
+                        <Label htmlFor="literary" className="flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Literary Work
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="rwa" id="rwa" />
+                        <Label htmlFor="rwa" className="flex items-center gap-2">
+                          <Globe2 className="h-4 w-4" />
+                          RWA
+                        </Label>
+                      </div>
+
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="software" id="software" />
                         <Label htmlFor="software" className="flex items-center gap-2">
@@ -946,13 +861,15 @@ export default function CreateIPPage() {
                           Software
                         </Label>
                       </div>
+
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="3d-model" id="3d-model" />
-                        <Label htmlFor="3d-model" className="flex items-center gap-2">
+                        <RadioGroupItem value="video" id="video" />
+                        <Label htmlFor="video" className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
-                          3D Model
+                          Video
                         </Label>
                       </div>
+                      
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="other" id="other" />
                         <Label htmlFor="other" className="flex items-center gap-2">
@@ -963,9 +880,9 @@ export default function CreateIPPage() {
                     </RadioGroup>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-5">
                     <Label htmlFor="collection" className="flex items-center gap-1">
-                      Collection
+                      Collection (Demonstration)
                     </Label>
                     <Select value={form.getValues("collection")} onValueChange={handleCollectionChange}>
                       <SelectTrigger>
@@ -1228,8 +1145,8 @@ export default function CreateIPPage() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="space-y-4">
-                      <Label htmlFor="ipVersion">IP Version</Label>
-                      <Input id="ipVersion" placeholder="e.g., 1.0" {...form.register("ipVersion")} />
+                      <Label htmlFor="version">IP Version</Label>
+                      <Input id="version" placeholder="e.g., 1.0" {...form.register("version")} />
                       <p className="text-sm text-muted-foreground">
                         Version number to track updates to your intellectual property
                       </p>
@@ -1430,10 +1347,10 @@ export default function CreateIPPage() {
                   </div>
                 )}
 
-                {form.watch("ipType") && (
+                {form.watch("type") && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium">IP Type</p>
-                    <p className="text-sm text-muted-foreground capitalize">{form.watch("ipType").replace("-", " ")}</p>
+                    <p className="text-sm text-muted-foreground capitalize">{form.watch("type").replace("-", " ")}</p>
                   </div>
                 )}
 
@@ -1475,10 +1392,10 @@ export default function CreateIPPage() {
                   </div>
                 )}
 
-                {form.watch("ipVersion") && (
+                {form.watch("version") && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium">IP Version</p>
-                    <p className="text-sm text-muted-foreground">{form.watch("ipVersion")}</p>
+                    <p className="text-sm text-muted-foreground">{form.watch("version")}</p>
                   </div>
                 )}
 
@@ -1521,11 +1438,13 @@ export default function CreateIPPage() {
                     <Shield className="h-4 w-4 mr-2" />
                     Register IP Asset
                   </Button>
-
+                    {/*
                     <hr></hr>
                     <Button type="submit" disabled={isSubmitting || !address}>
                       {isSubmitting ? "Creating Asset..." : "Create Asset"}
                     </Button>
+                    */}
+
                     </>
                 )}
               </CardFooter>
@@ -1654,14 +1573,14 @@ export default function CreateIPPage() {
                       </div>
                     </div>
 
-                    {form.watch("ipVersion") && (
+                    {form.watch("version") && (
                       <div className="flex items-center gap-2">
                         <div className="rounded-full bg-primary/10 p-2">
                           <Info className="h-4 w-4 text-primary" />
                         </div>
                         <div>
                           <p className="text-sm font-medium">IP Version</p>
-                          <p className="text-sm text-muted-foreground">{form.watch("ipVersion")}</p>
+                          <p className="text-sm text-muted-foreground">{form.watch("version")}</p>
                         </div>
                       </div>
                     )}
@@ -1776,10 +1695,11 @@ export default function CreateIPPage() {
                       <span className="text-sm text-muted-foreground">Registration Date</span>
                       <span className="text-sm font-medium">{new Date().toLocaleDateString()}</span>
                     </div>
+                    {/*
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">Token ID</span>
                       <span className="text-sm font-medium">#{Math.floor(Math.random() * 1000000)}</span>
-                    </div>
+                    </div>*/}
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">Protection Status</span>
                       <span className="text-sm font-medium text-green-600 dark:text-green-400">Active</span>
@@ -1789,8 +1709,8 @@ export default function CreateIPPage() {
 
                 <div className="flex flex-col gap-2 w-full max-w-xs">
                   <Button variant="outline" className="w-full">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Certificate
+                    <Box className="h-4 w-4 mr-2" />
+                    Register Another Programmable IP
                   </Button>
                   <Button variant="outline" className="w-full">
                     <ExternalLink className="h-4 w-4 mr-2" />
@@ -1840,10 +1760,10 @@ export default function CreateIPPage() {
                   size="lg"
                 >
                   <Shield className="h-5 w-5 mr-2" />
-                  Mint IP on Blockchain
+                  Mint Programmable IP
                 </Button>
                 <p className="text-xs text-center text-muted-foreground mt-2 mb-4">
-                  By clicking "Mint IP on Blockchain", you confirm that you are the lawful owner of this intellectual
+                  By clicking "Mint Programmable IP", you confirm that you are the lawful owner of this intellectual
                   property and have the right to register it.
                 </p>
                 <DrawerClose asChild>

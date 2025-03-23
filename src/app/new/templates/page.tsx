@@ -78,7 +78,7 @@ const templatesIP = () => {
 
         <div className="flex flex-col items-left">
           <p className="mb-4">Need a different format?</p>
-          <Link href="/new/asset" title="Register your custom Programmable IP">
+          <Link href="/create" title="Register your custom Programmable IP">
           <Button variant="outline" className="p-6 bg-blue-600 text-white text-lg">Register your custom IP</Button>
           </Link>
           </div>
