@@ -192,6 +192,7 @@ export default function NFTPortfolio() {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
+            disabled
             placeholder="Search by name or collection..."
             className="pl-8"
             value={searchQuery}
@@ -238,7 +239,7 @@ export default function NFTPortfolio() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" disabled>
                 <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -251,7 +252,7 @@ export default function NFTPortfolio() {
                   Show all collections
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel>Rarity Filter</DropdownMenuLabel>
+                <DropdownMenuLabel>Filter</DropdownMenuLabel>
                 <DropdownMenuRadioGroup value={rarityFilter} onValueChange={setRarityFilter}>
                   {rarityOptions.map((option) => (
                     <DropdownMenuRadioItem key={option.value} value={option.value}>
