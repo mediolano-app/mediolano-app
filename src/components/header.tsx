@@ -7,16 +7,20 @@ import { Logo } from "@/components/header/Logo"
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/20 backdrop-blur supports-[backdrop-filter]:bg-background/30">
-      <div className="container flex h-16 items-center justify-between">
+      
+      <div className="container mx-auto flex items-center justify-between h-16">
+        
         <div className="flex items-center md:hidden">
           <Logo />
         </div>
+        
         <MainNav />
-        <div className="flex items-center space-x-2">
-          <div>
+        
+        <div className="flex items-center">
+        
+          <div className="">
             <WalletConnect />
-          </div>
-          
+          </div>          
           <MobileSidebar />
 
           <div className="hidden md:block">
@@ -24,7 +28,9 @@ export function Header() {
           </div>
 
         </div>
+
       </div>
+
     </header>
   )
 }

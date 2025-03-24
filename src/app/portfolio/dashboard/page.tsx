@@ -13,8 +13,6 @@ import {
   Wallet,
 } from "lucide-react"
 import Link from "next/link";
-// import { useAccount } from "@starknet-react/core"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,58 +20,44 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 // import { ConnectWallet } from "@/components/ConnectWallet"
 import { usePortfolio } from "@/hooks/usePortfolio"
+import { useMIP } from "@/hooks/useMIP";
+import { useRouter } from "next/navigation";
+import NFTCard from "@/components/NFTCard";
 
 export default function DashboardPage() {
-  // const { account } = useAccount()
-  const { userAssets, userCollections, portfolioStats, isLoading, account, error, refetch } = usePortfolio();
-  
-  const [recentAssetsCount, setRecentAssetsCount] = useState(4)
-  const [userAssetsPage, setUserAssetsPage] = useState(1)
-  const [userAssetsSearch, setUserAssetsSearch] = useState("")
-  const [userAssetsFilter, setUserAssetsFilter] = useState("all")
-  const [displayedCollections, setDisplayedCollections] = useState(6)
+  // const { userAssets, userCollections, portfolioStats, isLoading, account, error, refetch } = usePortfolio();
 
-  // Filter user assets based on search and collection filter
-  const filteredUserAssets = userAssets.filter(
-    (asset) =>
-      asset.name.toLowerCase().includes(userAssetsSearch.toLowerCase()) &&
-      (userAssetsFilter === "all" || asset.collection.toLowerCase() === userAssetsFilter.toLowerCase()),
-  )
+  // const [recentAssetsCount, setRecentAssetsCount] = useState(4)
+  // const [userAssetsPage, setUserAssetsPage] = useState(1)
+  // const [userAssetsSearch, setUserAssetsSearch] = useState("")
+  // const [userAssetsFilter, setUserAssetsFilter] = useState("all")
+  // const [displayedCollections, setDisplayedCollections] = useState(6)
 
-  const paginatedUserAssets = filteredUserAssets.slice((userAssetsPage - 1) * 6, userAssetsPage * 6)
+  // const filteredUserAssets = userAssets.filter(
+  //   (asset) =>
+  //     asset.name.toLowerCase().includes(userAssetsSearch.toLowerCase()) &&
+  //     (userAssetsFilter === "all" || asset.collection.toLowerCase() === userAssetsFilter.toLowerCase()),
+  // )
 
-  // Reset pagination when filter changes
-  useEffect(() => {
-    setUserAssetsPage(1)
-  }, [userAssetsSearch, userAssetsFilter])
+  // const paginatedUserAssets = filteredUserAssets.slice((userAssetsPage - 1) * 6, userAssetsPage * 6)
 
+  // useEffect(() => {
+  //   setUserAssetsPage(1)
+  // }, [userAssetsSearch, userAssetsFilter])
 
-
-  // if (!account) {
-  //   return (
-  //     <div className="container mx-auto px-4 py-8 mt-10 mb-20 flex flex-col items-center justify-center min-h-[60vh]">
-  //       <Card className="w-full max-w-md">
-  //         <CardHeader>
-  //           <CardTitle className="text-center">Connect Your Wallet</CardTitle>
-  //           <CardDescription className="text-center">
-  //             Please connect your wallet to view your portfolio
-  //           </CardDescription>
-  //         </CardHeader>
-  //         <CardContent className="flex justify-center pb-6">
-  //           <ConnectWallet />
-  //         </CardContent>
-  //       </Card>
-  //     </div>
-  //   )
-  // }
+  const router = useRouter();
+  const {address, balance, balanceError, tokenIds, tokenIdsError, isLoading} = useMIP();
+  console.log(address);
+  console.log(balance);
+  console.log(tokenIds); 
 
   return (
     <div className="container mx-auto px-4 py-8 mt-10 mb-20">
       
       <main className="p-4 space-y-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Onchain Assets Dashboard</h1>
-          <div className="flex items-center space-x-2">
+          <h1 className="text-2xl font-bold">Onchain Assets Dashboard</h1>
+          {/* <div className="flex items-center space-x-2">
             <Input 
               type="search" 
               placeholder="Search assets..." 
@@ -87,33 +71,35 @@ export default function DashboardPage() {
             <Button variant="outline" size="icon">
               <ListFilter className="h-4 w-4" />
             </Button>
-          </div>
+          </div> */}
+
+          {/* put this back later */}
         </div>
 
         {/* Portfolio Stats Section */}
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="bg-background/80">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Portfolio Value</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Collections</CardTitle>
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {account && isLoading? "Loading..." : `${portfolioStats.totalValue.toFixed(2)} STRK`}
+                1
               </div>
-              <p className="text-xs text-muted-foreground">Your total portfolio value</p>
+              <p className="text-xs text-muted-foreground">Programmable IP Collection</p>
             </CardContent>
           </Card>
           <Card className="bg-background/80">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total NFTs</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
               <LayoutGrid className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {account && isLoading ? "Loading..." : portfolioStats.totalNFTs}
+                {address && isLoading ? "Loading..." : balanceError ? "Error" : balance.toString()}
               </div>
-              <p className="text-xs text-muted-foreground">Total assets in your portfolio</p>
+              <p className="text-xs text-muted-foreground">Total IPs in your portfolio</p>
             </CardContent>
           </Card>
           <Card className="bg-background/80">
@@ -122,11 +108,11 @@ export default function DashboardPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {account && isLoading ? "Loading..." : (portfolioStats.topCollection.name || "No collections")}
+              <div className="text-1xl font-bold">
+                   Programmable IP Collection
               </div>
               <p className="text-xs text-muted-foreground">
-                {account && isLoading ? "" : (portfolioStats.topCollection.name ? `Value: ${portfolioStats.topCollection.value.toFixed(2)} STRK` : "Add assets to your portfolio")}
+                {address && isLoading ? "" : "(New collections soon)"}
               </p>
             </CardContent>
           </Card>
@@ -136,15 +122,17 @@ export default function DashboardPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {account && isLoading ? "Loading..." : (portfolioStats.recentActivity.length > 0 
-                  ? portfolioStats.recentActivity[0].item 
-                  : "No recent activity")}
+              <div className="text-1xl font-bold">
+                {address && isLoading ? "Loading..." 
+                  // : (portfolioStats.recentActivity.length > 0 
+                  // ? portfolioStats.recentActivity[0].item 
+                  : "No recorded activity"}
               </div>
               <p className="text-xs text-muted-foreground">
-                {account && isLoading ? "" : (portfolioStats.recentActivity.length > 0 
-                  ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
-                  : "No transactions yet")}
+                {address && isLoading ? "" 
+                  // : (portfolioStats.recentActivity.length > 0 
+                  // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
+                  : "(Demonstration)"}
               </p>
             </CardContent>
           </Card>
@@ -152,22 +140,30 @@ export default function DashboardPage() {
 
         {/* Recent Assets Section */}
         <section>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold">Recent Assets</h2>
-            <Button variant="outline"><Link href="/portfolio">Open Portfolio</Link></Button>
+          <div className="flex justify-between items-center mb-4 mt-10">
+            <h2 className="text-2xl font-semibold">IP Assets</h2>
+            <Button
+            onClick={() => router.push('/portfolio')} 
+            variant="outline"
+            >
+              Open portfolio
+            </Button>
           </div>
-          {account && isLoading ? (
+          {address && isLoading ? (
             <div className="text-center py-8">Loading your assets...</div>
-          ) : error ? (
-            <div className="text-center py-8 text-red-500">{error}</div>
-          ) : userAssets.length === 0 ? (
+          ) : tokenIdsError ? (
+            <div className="text-center py-8 text-red-500">{tokenIdsError.message}</div>          
+          ) : balance === 0 ? (
             <div className="text-center py-8">
-              <p>You don&apos;t have any assets yet.</p>
-              <Button className="mt-4" onClick={refetch}>Refresh</Button>
+              <p>Your Programmable IP will appear here after creation.</p>
             </div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {tokenIds.map((tokenId, index) => (
+                <NFTCard key={index} tokenId={tokenId} status={"teste"}/>
+              ))}
+                {/*                 
                 {userAssets.slice(0, recentAssetsCount).map((asset) => (
                   <Card key={asset.id} className="bg-background/80">
                     <CardHeader>
@@ -190,21 +186,21 @@ export default function DashboardPage() {
                       </span>
                     </CardFooter>
                   </Card>
-                ))}
+                ))} */}
               </div>
-              {recentAssetsCount < userAssets.length && (
+              {/* {recentAssetsCount < userAssets.length && (
                 <div className="mt-4 text-center">
                   <Button onClick={() => setRecentAssetsCount((prev) => Math.min(prev + 4, userAssets.length))}>
                     Load More
                   </Button>
                 </div>
-              )}
+              )} */}
             </>
           )}
         </section>
 
         {/* Top Collections Section */}
-        <section>
+        {/* <section>
           <h2 className="text-2xl font-semibold mb-4">Your Collections</h2>
           {account && isLoading ? (
             <div className="text-center py-8">Loading your collections...</div>
@@ -256,10 +252,10 @@ export default function DashboardPage() {
               )}
             </>
           )}
-        </section>
+        </section> */}
 
         {/* Recent Activity Section */}
-        <section>
+        {/* <section>
           <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
           <Card className="bg-background/80">
             <CardHeader>
@@ -308,10 +304,10 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-        </section>
+        </section> */}
 
         {/* User Assets Section */}
-        <section>
+        {/* <section>
           <h2 className="text-2xl font-semibold mb-4">Your Assets</h2>
           <Card className="bg-background/80">
             <CardHeader>
@@ -397,7 +393,7 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-        </section>
+        </section> */}
       </main>
     </div>
   )

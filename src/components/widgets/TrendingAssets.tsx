@@ -11,7 +11,7 @@ export function TrendingAssetsSection() {
       <section className="py-20 ">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl text-center mb-12">Trending Assets</h2>
-          <div className="overflow-x-auto bg-background/80 rounded-lg shadow-lg">
+          <div className="overflow-x-auto bg-background/80 rounded-lg shadow">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b">

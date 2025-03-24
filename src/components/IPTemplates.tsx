@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 
 const templates = [
-  { name: "Custom", icon: FileText, href: "/new/asset" },
+  { name: "Custom", icon: FileText, href: "/create" },
   { name: "Art", icon: Image, href: "/new/art" },
   { name: "Document", icon: FileIcon, href: "/new/document" },
   { name: "Video", icon: Film, href: "/new/video" },
@@ -30,18 +30,18 @@ const templates = [
 
 export function IPTemplates() {
   return (
-    <div className="py-12 px-4 sm:px-6 lg:px-8 bg-background/30 rounded-lg shadow">
-      <div className="max-w-7xl mx-auto">
+    <div className="py-4 px-4 bg-background/60 rounded-lg shadow border border-border">
+      <div className="max-w-8xl mx-auto p-4">
 
-        <h2 className="text-3xl font-bold text-center">Start with an IP Template</h2>
-        <p className="text-xl text-center mb-12">
+        <h2 className="text-xl font-bold">Start with an IP Template</h2>
+        <p className="mb-12 text-sm text-muted-foreground">
           Select an IP Template to assist and optimize the intellectual property registration process.
         </p>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {templates.map((template) => (
             <Link key={template.name} href={template.href} className="group">
-              <Card className="h-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg bg-background/70">
+              <Card className="h-full transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow bg-background/70">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center">

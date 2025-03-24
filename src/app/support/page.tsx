@@ -87,7 +87,7 @@ export default function Support() {
                 User Guide
               </h3>
               <p className=" mb-2">Comprehensive guide on how to use our platform</p>
-              <Link href="#" className=" hover:underline">Download PDF</Link>
+              <Link href="#" className=" hover:underline"></Link>
             </div>
             <div className=" p-4 rounded-md shadow">
               <h3 className=" mb-2 flex items-center">

@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import NFTPortfolio from "./components/nft-portfolio";
+import NFTPortfolio from "../../components/nft-portfolio";
 import { Skeleton } from "@/components/ui/skeleton";
 // import { useAccount } from "@starknet-react/core";
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,9 +29,9 @@ export default function PortfolioPage() {
   // }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">IP Portfolio</h1>
+    <div className="container mx-auto px-4 py-8 mt-5 mb-20">
+      <div className="space-y-1 mb-5">
+        <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
         <p className="text-muted-foreground">Manage and showcase your digital assets in one place</p>
       </div>
       <Suspense fallback={<PortfolioSkeleton />}>

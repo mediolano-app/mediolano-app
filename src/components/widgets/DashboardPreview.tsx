@@ -15,7 +15,7 @@ export function DashboardPreview() {
   const [activeTab, setActiveTab] = useState("overview")
 
   return (
-    <div className="bg-muted/50 rounded-xl p-4 md:p-6 shadow-lg">
+    <div className="bg-muted/50 rounded-xl p-4 md:p-6 shadow">
       <h3 className="text-2xl font-bold mb-6">Assets Dashboard</h3>
       <Tabs defaultValue="overview" className="space-y-4" onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2">

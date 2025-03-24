@@ -34,6 +34,9 @@ import {
   User,
   ArrowRightLeft,
   Cog,
+  Brain,
+  Box,
+  Scroll,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -43,10 +46,10 @@ import Image from "next/image";
 import DappInfo from './DappInfo';
 
 const features = [
-  { icon: <Plus className="h-6 w-6" />, title: "Tokenize IP", description: "Create new Programmable IP", link: "/new" },
-  { icon: <BookMarked className="h-6 w-6" />, title: "Manage Assets", description: "Your portfolio onchain", link: "/portfolio" },
+  { icon: <Brain className="h-6 w-6" />, title: "Discover", description: "IP for the Integrity Web", link: "/discover" },
+  { icon: <Box className="h-6 w-6" />, title: "Tokenize IP", description: "Create New Programmable IP", link: "/create" },
+  { icon: <LayoutGrid className="h-6 w-6" />, title: "Manage Assets", description: "Manage IP onchain", link: "/portfolio" },
   { icon: <ScrollText className="h-6 w-6" />, title: "Licensing Assets", description: "Register new license", link: "/licensing" },
-  { icon: <Coins className="h-6 w-6" />, title: "Monetize", description: "Earn from your IP", link: "/monetize" },
 ]
 
 const formSchema = z.object({
@@ -139,12 +142,12 @@ export function Footer() {
             <div>
                 <h4 className="mb-6 text-sm font-semibold uppercase">Programmable IP</h4>
                 <ul className="space-y-4">
-                  <li><Link href="/new/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
+                  <li><Link href="/create" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
                   <li><Link href="/new/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
+                  <li><Link href="/new/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
                   <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> Portfolio</Link></li>
                   <li><Link href="/licensing" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Licensing</Link></li>
                   <li><Link href="/monetize" className="flex items-center hover:underline"><Coins className="w-4 h-4 mr-2 ml-blue" /> Monetize</Link></li>
-                  
                   <li><Link href="/transaction" className="flex items-center hover:underline"><Zap className="w-4 h-4 mr-2 ml-blue" /> Smart Transaction</Link></li>
                   <li><Link href="/marketplace" className="flex items-center hover:underline"><LayoutGrid className="w-4 h-4 mr-2 ml-blue" /> Marketplace</Link></li>
                 </ul>
@@ -153,7 +156,7 @@ export function Footer() {
                 <div>
                 <h3 className="mb-6 text-sm font-semibold uppercase">IP Templates</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/new/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Default</Link></li>
+                    <li><Link href="/create" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Default</Link></li>
                     <li><Link href="/new/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Art</Link></li>
                     <li><Link href="/new/document" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
                     <li><Link href="/new/video" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Video</Link></li>
@@ -188,7 +191,7 @@ export function Footer() {
 
 
             {/* Mediolano */}
-            <div className="space-y-4 lg:col-span-1 bg-blue-500/10 p-4 rounded-lg">
+            <div className="space-y-4 lg:col-span-1 bg-blue-600/10 p-4 rounded-lg">
             <Link href="/" className="flex items-center space-x-2">
                 <motion.span
                 className="text-1xl font-bold"

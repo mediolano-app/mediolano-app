@@ -35,22 +35,32 @@ import { abi } from "../../src/abis/abi";
 import { type Abi } from "starknet";
 import { useReadContract } from "@starknet-react/core";
 import { pinataClient } from "@/utils/pinataClient";
-import { IP } from "../app/register/page";
+import Link from "next/link";
 
 interface NFTCardProps {
 	tokenId: BigInt;
 	status: string;
 }
 
+export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 
+export interface IP{
+  name: string,
+  description: string,
+  author: string,
+  type: string,
+  image: string,
+  version: string,
+  external_url: string,
+}
 
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
-	const contract = "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0";
+	const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
 	const [metadata, setMetadata] = useState<IP | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	status = 'Listed';
+	status = 'IP';
 
 	// Get tokenURI from contract
 	const {
@@ -65,7 +75,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		watch: false,
 	});
 
-	console.log("ESSE EH O TOKEN URI", tokenURI);
+	console.log("Token Uri:", tokenURI);
 
 	// Fetch metadata when tokenURI is available
 	useEffect(() => {
@@ -89,10 +99,9 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 					throw new Error("Failed to parse metadata");
 				}
 
-				// Validate metadata structure
-				if (!isValidMetadata(parsedData)) {
-					throw new Error("Invalid metadata format");
-				}
+				// if (!isValidMetadata(parsedData)) {
+				// 	throw new Error("Invalid metadata format");
+				// }
 
 				setMetadata(parsedData);
 				console.log(parsedData);
@@ -110,14 +119,14 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		fetchMetadata();
 	}, [tokenURI]);
 
-	const isValidMetadata = (data: any): data is IP => {
-		return (
-			data &&
-			typeof data === "object" &&
-			"name" in data &&
-			"description" in data
-		);
-	};
+	// const isValidMetadata = (data: any): data is IP => {
+	// 	return (
+	// 		data &&
+	// 		typeof data === "object" &&
+	// 		"name" in data &&
+	// 		"description" in data
+	// 	);
+	// };
 
 	if (isLoading || isContractLoading) {
 		return <div>Loading...</div>; // Consider using a proper loading component
@@ -135,7 +144,10 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		<Card className="overflow-hidden">
 			<CardHeader className="p-0">
 				<Image
-					src={metadata.image || "/background.jpg"} // Add fallback image
+					src={
+						metadata.image || 
+						"/background.jpg"
+					} // Add fallback image
 					alt={metadata.name}
 					width={400}
 					height={400}
@@ -143,15 +155,15 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				/>
 			</CardHeader>
 			<CardContent className="p-4">
-				<CardTitle className="mb-2">{metadata.name}</CardTitle>
+				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
 				<div className="flex justify-between items-center mb-2">
 					<Badge variant="secondary">{metadata.type}</Badge>
 				</div>
-				<Badge
+				<Badge className="text-sm"
 					variant={
-						status === "Listed"
+						status === "IP"
 							? "default"
-							: status === "Licensed"
+							: status === "Programmable IP"
 								? "secondary"
 								: "outline"
 					}
@@ -160,10 +172,13 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				</Badge>
 			</CardContent>
 			<CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
+				
+				<Link href={`/asset/${tokenId}`}>
 				<Button variant="outline" size="sm">
 					<Eye className="h-4 w-4 mr-2" />
 					View
-				</Button>
+				</Button></Link>
+
 				<Button variant="outline" size="sm">
 					<FileText className="h-4 w-4 mr-2" />
 					License

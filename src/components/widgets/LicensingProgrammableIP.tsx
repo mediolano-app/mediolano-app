@@ -27,7 +27,7 @@ export function LicensingProgrammableIP() {
           <p className="text-xl text-center mb-12">Empower artists to take control of their IP with flexible, programmable licensing options.</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card className="bg-background/60" key={index}>
+              <Card className="bg-background/90" key={index}>
                 <CardHeader>
                   <div className="flex items-center space-x-4">
                     {feature.icon}
