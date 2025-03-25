@@ -59,7 +59,7 @@ export default function Home() {
               </p>
             </CardContent>
             <CardFooter>
-              <Link href="/directory">
+              <Link href="/services/proof-of-licensing/directory">
                 <Button variant="outline">Browse Directory</Button>
               </Link>
             </CardFooter>
