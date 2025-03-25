@@ -1,32 +1,56 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import type { Agreement } from "@/types/agreement"
+import { mockAgreements } from "@/lib/mockupProofofLicensing"
 
-export function useCreateAgreement() {
-  const [isCreating, setIsCreating] = useState(false)
+// Mock user data for the current user
+const MOCK_USER = {
+  name: "Demo User",
+  walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
+}
 
-  const createAgreement = async (formData: any) => {
-    setIsCreating(true)
+interface UseAgreementsOptions {
+  limit?: number
+}
 
-    try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+export function useAgreements(options: UseAgreementsOptions = {}) {
+  const [agreements, setAgreements] = useState<Agreement[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-      // Generate a random ID for the new agreement
-      const agreementId = `agr-${crypto.randomUUID().slice(0, 8)}`
+  useEffect(() => {
+    const fetchAgreements = async () => {
+      setIsLoading(true)
 
-      // In a real implementation, this would send the data to the blockchain
-      console.log("Creating agreement:", formData)
+      try {
+        // Simulate API call delay
+        await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      return agreementId
-    } catch (error) {
-      console.error("Error creating agreement:", error)
-      throw error
-    } finally {
-      setIsCreating(false)
+        // Filter agreements by mock user address
+        let filteredAgreements = mockAgreements.filter(
+          (agreement) =>
+            agreement.createdBy.toLowerCase() === MOCK_USER.walletAddress.toLowerCase() ||
+            agreement.parties.some(
+              (party) => party.walletAddress.toLowerCase() === MOCK_USER.walletAddress.toLowerCase(),
+            ),
+        )
+
+        // Apply limit if specified
+        if (options.limit) {
+          filteredAgreements = filteredAgreements.slice(0, options.limit)
+        }
+
+        setAgreements(filteredAgreements)
+      } catch (error) {
+        console.error("Error fetching agreements:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-  }
 
-  return { createAgreement, isCreating }
+    fetchAgreements()
+  }, [options.limit])
+
+  return { agreements, isLoading }
 }
 
