@@ -3,12 +3,16 @@
 import { useState, useEffect } from "react"
 import type { Agreement } from "@/types/agreement"
 import { mockAgreements } from "@/lib/mockupProofofLicensing"
-import { useWallet } from "@/hooks/use-wallet"
+
+// Mock user data for the current user
+const MOCK_USER = {
+  name: "Demo User",
+  walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
+}
 
 export function useAgreement(id: string) {
   const [agreement, setAgreement] = useState<Agreement | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const { address } = useWallet()
 
   useEffect(() => {
     const fetchAgreement = async () => {
@@ -31,19 +35,19 @@ export function useAgreement(id: string) {
   }, [id])
 
   const signAgreement = async () => {
-    if (!agreement || !address) return
+    if (!agreement) return
 
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
-    const party = agreement.parties.find((p) => p.walletAddress.toLowerCase() === address.toLowerCase())
+    const party = agreement.parties.find((p) => p.walletAddress.toLowerCase() === MOCK_USER.walletAddress.toLowerCase())
 
     if (!party) throw new Error("Not authorized to sign this agreement")
 
     const newSignature = {
       id: `sig-${crypto.randomUUID()}`,
       name: party.name,
-      walletAddress: address,
+      walletAddress: MOCK_USER.walletAddress,
       timestamp: new Date().toISOString(),
       signatureHash:
         "0x" +
@@ -63,12 +67,12 @@ export function useAgreement(id: string) {
   }
 
   const finalizeAgreement = async () => {
-    if (!agreement || !address) return
+    if (!agreement) return
 
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    if (agreement.createdBy.toLowerCase() !== address.toLowerCase()) {
+    if (agreement.createdBy.toLowerCase() !== MOCK_USER.walletAddress.toLowerCase()) {
       throw new Error("Only the creator can finalize this agreement")
     }
 

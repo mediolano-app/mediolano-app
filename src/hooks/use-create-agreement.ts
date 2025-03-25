@@ -1,11 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { useWallet } from "@/hooks/use-wallet"
 
 export function useCreateAgreement() {
   const [isCreating, setIsCreating] = useState(false)
-  const { address } = useWallet()
+  const  address  = "0x123456789";
 
   const createAgreement = async (formData: any) => {
     if (!address) throw new Error("Wallet not connected")

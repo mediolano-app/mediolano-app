@@ -16,10 +16,10 @@ export function HeroSection() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/agreements/create">
+            <Link href="/services/proof-of-licensing/agreements/create">
               <Button size="lg">Create Agreement</Button>
             </Link>
-            <Link href="/directory">
+            <Link href="/services/proof-of-licensing/directory">
               <Button variant="outline" size="lg">
                 Browse Directory
               </Button>

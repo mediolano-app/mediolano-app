@@ -80,7 +80,7 @@ export default function DirectoryPage() {
                 </div>
               </CardContent>
               <CardFooter className="flex gap-2">
-                <Link href={`/agreements/${agreement.id}`} className="flex-1">
+                <Link href={`/services/proof-of-licensing/agreements/${agreement.id}`} className="flex-1">
                   <Button variant="outline" className="w-full">
                     View Details
                   </Button>

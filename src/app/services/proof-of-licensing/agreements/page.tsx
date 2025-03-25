@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { AgreementsList } from "@/components/agreements-list"
-import { AgreementFilters } from "@/components/agreement-filters"
+import { AgreementsList } from "@/app/services/proof-of-licensing/components/agreements-list"
+import { AgreementFilters } from "@/app/services/proof-of-licensing/components/agreement-filters"
 
 export default function AgreementsPage() {
   return (

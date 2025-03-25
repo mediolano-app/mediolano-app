@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { Agreement } from "@/lib/types"
-import { mockAgreements } from "@/lib/mock-data"
+import type { Agreement } from "@/types/agreement"
+import { mockAgreements } from "@/lib/mockupProofofLicensing"
 
 export function usePublicAgreements() {
   const [agreements, setAgreements] = useState<Agreement[]>([])
