@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { FileCode, Music, Video, PenTool, Brain, Code } from "lucide-react"
+import { FileCode, Music, Video, PenTool, Brain, Code, Globe, Box } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 import Link from "next/link"
@@ -15,12 +15,14 @@ export default function DiscoverServicesCTA() {
   }, [])
 
   const assetTypes = [
-    { icon: <PenTool className="h-8 w-8" />, name: "Artwork", link: "/new/artwork" },
-    { icon: <Video className="h-8 w-8" />, name: "Video", link: "/new/video" },
-    { icon: <Music className="h-8 w-8" />, name: "Music", link: "/new/music" },
-    { icon: <FileCode className="h-8 w-8" />, name: "Literary Works", link: "/new/literary" },
-    { icon: <Brain className="h-8 w-8" />, name: "AI Models", link: "/new/ai-model" },
-    { icon: <Code className="h-8 w-8" />, name: "Software", link: "/new/software" },
+    { icon: <PenTool className="h-8 w-8 text-blue-500" />, name: "Artwork", link: "/new/artwork" },
+    { icon: <Video className="h-8 w-8 text-blue-500" />, name: "Video", link: "/new/video" },
+    { icon: <Music className="h-8 w-8 text-blue-500" />, name: "Music", link: "/new/music" },
+    { icon: <FileCode className="h-8 w-8 text-blue-500" />, name: "Literary Works", link: "/new/literary" },
+    { icon: <Brain className="h-8 w-8 text-blue-500" />, name: "AI Models", link: "/new/ai-model" },
+    { icon: <Code className="h-8 w-8 text-blue-500" />, name: "Software", link: "/new/software" },
+    { icon: <Globe className="h-8 w-8 text-blue-500" />, name: "RWA", link: "/new/rwa" },
+    { icon: <Box className="h-8 w-8 text-blue-500" />, name: "Custom", link: "/new/asset" },
   ]
 
   const container = {
@@ -128,12 +130,12 @@ export default function DiscoverServicesCTA() {
           initial="hidden"
           animate={isMounted ? "show" : "hidden"}
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4"
+          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4"
         >
           {assetTypes.map((asset, index) => (
             <motion.div key={index} variants={item}>
               <Link href={asset.link}>
-                <Card className="border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md h-full cursor-pointer">
+                <Card className="border-border hover:border-blue-500 transition-all duration-300 hover:shadow-md h-full cursor-pointer">
                   <CardHeader className="pb-2">
                     <div className="mx-auto">{asset.icon}</div>
                   </CardHeader>
