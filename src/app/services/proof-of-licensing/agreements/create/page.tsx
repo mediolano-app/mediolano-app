@@ -235,7 +235,7 @@ export default function CreateAgreementPage() {
       </div>
 
       {/* Progress Steps */}
-      <div className="mb-8">
+      <div className="mb-8 bg-background border border-muted rounded-lg p-4">
         <div className="flex justify-between">
           {steps.map((step, index) => (
             <div

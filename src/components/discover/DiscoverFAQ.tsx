@@ -52,7 +52,7 @@ export default function DiscoverFAQ() {
   return (
     <section id="faq" className="py-20">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 ">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -66,7 +66,7 @@ export default function DiscoverFAQ() {
           </motion.div>
         </div>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto  bg-background/30 rounded-lg shadow">
           <Accordion
             type="single"
             collapsible

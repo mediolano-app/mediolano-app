@@ -39,6 +39,7 @@ import {
   Gauge,
   Brain,
   LayoutGrid,
+  ArrowRightLeft,
 } from "lucide-react"
 import { Logo } from "@/components/header/Logo"
 
@@ -158,14 +159,14 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/create"
+                    href="/transfer"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <BoxIcon className="mr-2 h-4 w-4  text-blue-600" />
-                      New Asset
+                      <ArrowRightLeft className="mr-2 h-4 w-4  text-blue-600" />
+                      Transfer Asset
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Create a new Programmable IP or Collection.
+                      Transfer your Programmable IP to another account.
                     </p>
                   </Link>
                 </NavigationMenuLink>

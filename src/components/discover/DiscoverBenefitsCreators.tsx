@@ -167,16 +167,16 @@ export default function DiscoverBenefitsCreators() {
                       repeatType: "reverse",
                     }}
                   >
-                    <Globe className="h-24 w-24 text-primary/70" />
+                    <Globe className="h-24 w-24 text-blue-600" />
                   </motion.div>
                 </div>
                 <motion.div
-                  className="absolute inset-0 border-2 border-dashed border-primary/30 rounded-full"
+                  className="absolute inset-0 border-2 border-dashed border-blue/30 rounded-full"
                   animate={isMounted ? { rotate: 360 } : {}}
                   transition={{ duration: 30, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                 />
                 <motion.div
-                  className="absolute inset-[15%] border-2 border-dashed border-secondary/30 rounded-full"
+                  className="absolute inset-[15%] border-2 border-dashed border-blue/30 rounded-full"
                   animate={isMounted ? { rotate: -360 } : {}}
                   transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                 />
@@ -186,7 +186,7 @@ export default function DiscoverBenefitsCreators() {
                   particlePositions.current.map((position, i) => (
                     <motion.div
                       key={i}
-                      className="absolute w-2 h-2 rounded-full bg-primary"
+                      className="absolute w-2 h-2 rounded-full bg-blue"
                       style={{
                         top: position.top,
                         left: position.left,
