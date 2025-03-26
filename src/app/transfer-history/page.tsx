@@ -105,7 +105,7 @@ export default function AllTokenURIsPage() {
 
   return (
     <div>
-      <h1>Transfer History</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-center p-4">Transfer History</h1>
       <SearchAndFilter onSearch={handleSearch} />
       {loading ? (
        <Loading />
