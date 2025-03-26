@@ -21,3 +21,31 @@ export const truncateString = (str: string, maxLength: number = 30) => {
   if (str.length <= maxLength) return str
   return `${str.substring(0, maxLength)}...`
 }
+
+
+export function formatDate(dateString: string) {
+  const date = new Date(dateString)
+
+  // Check if the date is today
+  const today = new Date()
+  if (date.toDateString() === today.toDateString()) {
+    return "Today"
+  }
+
+  // Check if the date is yesterday
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  if (date.toDateString() === yesterday.toDateString()) {
+    return "Yesterday"
+  }
+
+  // If within the last 7 days, show the day name
+  const oneWeekAgo = new Date(today)
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+  if (date > oneWeekAgo) {
+    return date.toLocaleDateString("en-US", { weekday: "long" })
+  }
+
+  // Otherwise, show the date
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+}

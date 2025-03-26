@@ -85,9 +85,9 @@ export default function HeroSection() {
           >
             <motion.div
               variants={itemVariants}
-              className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-6"
+              className="inline-flex items-center space-x-2 bg-blue/10 text-primary px-4 py-2 rounded-full mb-6"
             >
-              <Shield className="h-4 w-4" />
+              <Shield className="h-4 w-4" color="blue" />
               <span className="text-sm font-medium">Powered by Starknet</span>
             </motion.div>
 
@@ -107,7 +107,7 @@ export default function HeroSection() {
               <div className="relative w-full max-w-[280px] md:max-w-[400px] mx-auto aspect-square">
                 {/* Central platform */}
                 <motion.div
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 md:w-36 md:h-36 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center z-10 border border-primary/30"
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 md:w-36 md:h-36 bg-gradient-to-br from-secondary/20 to-blue/20 rounded-full flex items-center justify-center z-10 border border-blue/30"
                   animate={{
                     boxShadow: [
                       "0 0 20px rgba(var(--primary-rgb),0.2)",
@@ -117,7 +117,7 @@ export default function HeroSection() {
                   }}
                   transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}
                 >
-                  <Shield className="h-12 w-12 md:h-16 md:w-16 text-primary" />
+                  <Shield className="h-12 w-12 md:h-16 md:w-16 text-blue-600" />
                 </motion.div>
 
                 {/* Orbiting IP assets */}
@@ -132,7 +132,7 @@ export default function HeroSection() {
                       stroke="currentColor"
                       strokeWidth="1"
                       strokeDasharray="5,5"
-                      className="text-primary/20"
+                      className="text-blue/50"
                     />
                     <circle
                       cx="50%"
@@ -142,7 +142,7 @@ export default function HeroSection() {
                       stroke="currentColor"
                       strokeWidth="1"
                       strokeDasharray="5,5"
-                      className="text-secondary/20"
+                      className="text-blue/50"
                     />
                     <circle
                       cx="50%"
@@ -152,7 +152,7 @@ export default function HeroSection() {
                       stroke="currentColor"
                       strokeWidth="1"
                       strokeDasharray="5,5"
-                      className="text-primary/20"
+                      className="text-blue/50"
                     />
                   </svg>
 
@@ -175,7 +175,7 @@ export default function HeroSection() {
                         transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                         style={{ transformOrigin: "center" }}
                       >
-                        <div className="bg-primary/10 p-2 rounded-lg border border-primary/20 shadow-lg">
+                        <div className="bg-blue/10 p-2 rounded-lg border border-blue/20 shadow-lg">
                           <div className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
                             <svg
                               width="18"
@@ -218,7 +218,7 @@ export default function HeroSection() {
                         transition={{ duration: 15, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                         style={{ transformOrigin: "center" }}
                       >
-                        <div className="bg-secondary/10 p-2 rounded-lg border border-secondary/20 shadow-lg">
+                        <div className="bg-blue/10 p-2 rounded-lg border border-secondary/20 shadow-lg">
                           <div className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
                             <svg
                               width="18"
@@ -262,7 +262,7 @@ export default function HeroSection() {
                         transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                         style={{ transformOrigin: "center" }}
                       >
-                        <div className="bg-primary/10 p-2 rounded-lg border border-primary/20 shadow-lg">
+                        <div className="bg-blue/10 p-2 rounded-lg border border-blue/20 shadow-lg">
                           <div className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center">
                             <svg
                               width="18"
@@ -306,7 +306,7 @@ export default function HeroSection() {
                             transition={{ duration: 25, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                             style={{ transformOrigin: "center" }}
                           >
-                            <div className="bg-secondary/10 p-1.5 rounded-lg border border-secondary/20 shadow-lg">
+                            <div className="bg-blue/10 p-1.5 rounded-lg border border-secondary/20 shadow-lg">
                               <div className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center">
                                 <svg
                                   width="14"
@@ -347,7 +347,7 @@ export default function HeroSection() {
                             transition={{ duration: 18, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
                             style={{ transformOrigin: "center" }}
                           >
-                            <div className="bg-primary/10 p-1.5 rounded-lg border border-primary/20 shadow-lg">
+                            <div className="bg-blue/10 p-1.5 rounded-lg border border-blue/20 shadow-lg">
                               <div className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center">
                                 <svg
                                   width="14"
@@ -380,7 +380,7 @@ export default function HeroSection() {
                 {particlePositions.current.slice(0, isMobile ? 3 : 6).map((particle, i) => (
                   <motion.div
                     key={i}
-                    className="absolute w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-primary/60"
+                    className="absolute w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-blue/60"
                     style={{
                       top: particle.top,
                       left: particle.left,
@@ -410,7 +410,7 @@ export default function HeroSection() {
             transition={{ delay: 1.5, duration: 0.5 }}
           >
             <motion.div
-              className="w-6 h-10 border-2 border-primary/30 rounded-full flex justify-center p-1"
+              className="w-6 h-10 border-2 border-blue/30 rounded-full flex justify-center p-1"
               animate={{ y: [0, 5, 0] }}
               transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
             >
