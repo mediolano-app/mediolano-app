@@ -45,14 +45,12 @@ interface NFTCardProps {
 export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 
 export interface IP{
-  name: string,
-  description: string,
-  author: string,
-  type: string,
-  image: string,
-  version: string,
-  external_url: string,
-}
+	name: string,
+	description: string,
+	external_url: string,
+	image: string,
+	attributes: []
+  }
 
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 	const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
@@ -157,7 +155,8 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 			<CardContent className="p-4">
 				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
 				<div className="flex justify-between items-center mb-2">
-					<Badge variant="secondary">{metadata.type}</Badge>
+					<Badge variant="secondary">{metadata.attributes[1].value}</Badge>
+					<Badge variant="secondary"> {metadata.attributes[0].value} </Badge>
 				</div>
 				<Badge className="text-sm"
 					variant={
