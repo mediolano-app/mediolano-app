@@ -15,14 +15,14 @@ export default function DiscoverServicesCTA() {
   }, [])
 
   const assetTypes = [
-    { icon: <PenTool className="h-8 w-8 text-blue-500" />, name: "Artwork", link: "/new/artwork" },
-    { icon: <Video className="h-8 w-8 text-blue-500" />, name: "Video", link: "/new/video" },
-    { icon: <Music className="h-8 w-8 text-blue-500" />, name: "Music", link: "/new/music" },
-    { icon: <FileCode className="h-8 w-8 text-blue-500" />, name: "Literary Works", link: "/new/literary" },
-    { icon: <Brain className="h-8 w-8 text-blue-500" />, name: "AI Models", link: "/new/ai-model" },
-    { icon: <Code className="h-8 w-8 text-blue-500" />, name: "Software", link: "/new/software" },
-    { icon: <Globe className="h-8 w-8 text-blue-500" />, name: "RWA", link: "/new/rwa" },
-    { icon: <Box className="h-8 w-8 text-blue-500" />, name: "Custom", link: "/new/asset" },
+    { icon: <PenTool className="h-8 w-8 text-blue-500" />, name: "Artwork", link: "/create/artwork" },
+    { icon: <Video className="h-8 w-8 text-blue-500" />, name: "Video", link: "/create/video" },
+    { icon: <Music className="h-8 w-8 text-blue-500" />, name: "Music", link: "/create/music" },
+    { icon: <FileCode className="h-8 w-8 text-blue-500" />, name: "Literary Works", link: "/create/literary" },
+    { icon: <Brain className="h-8 w-8 text-blue-500" />, name: "AI Models", link: "/create/ai-model" },
+    { icon: <Code className="h-8 w-8 text-blue-500" />, name: "Software", link: "/create/software" },
+    { icon: <Globe className="h-8 w-8 text-blue-500" />, name: "RWA", link: "/create/rwa" },
+    { icon: <Box className="h-8 w-8 text-blue-500" />, name: "Custom", link: "/create/asset" },
   ]
 
   const container = {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Film, Video, Tv, Globe, Shield, DollarSign, Award, Zap, BarChart, Lock, Search, Clapperboard, Camera, Music } from 'lucide-react'
+import { ArrowLeft, Book, Newspaper, Scroll, FileText, Globe, Shield, DollarSign, Award, Zap, BarChart, Lock, Search } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,14 +11,14 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-export default function FilmsRegistrationPage() {
+export default function PublicationsRegistrationPage() {
   const [formData, setFormData] = useState({
     title: '',
-    director: '',
-    filmType: '',
-    releaseDate: '',
-    duration: '',
-    genre: '',
+    author: '',
+    publicationType: '',
+    isbn: '',
+    publicationDate: '',
+    publisher: '',
     description: '',
     price: '',
   })
@@ -30,23 +30,23 @@ export default function FilmsRegistrationPage() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }))
+  const handleSelectChange = (value: string) => {
+    setFormData(prev => ({ ...prev, publicationType: value }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log(formData)
     console.log(file)
-    alert('Film registration submitted successfully!')
+    alert('Publication registration submitted successfully!')
   }
 
   return (
     <div className="container mx-auto px-4 py-10 mb-20">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Movie Registration</h1>
+        <h1 className="text-3xl font-bold">Publication Registration</h1>
         <Link
-          href="/new/templates"
+          href="/create/templates"
           className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -57,94 +57,86 @@ export default function FilmsRegistrationPage() {
       <div className="grid gap-8 lg:grid-cols-2">
         <Card className="w-full max-w-2xl mx-auto lg:max-w-none">
           <CardHeader>
-            <CardTitle>Film Details</CardTitle>
-            <CardDescription>Please provide information about your film.</CardDescription>
+            <CardTitle>Publication Details</CardTitle>
+            <CardDescription>Please provide information about your publication.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Film Title</Label>
+                <Label htmlFor="title">Publication Title</Label>
                 <Input
                   id="title"
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  placeholder="Enter the title of your film"
+                  placeholder="Enter the title of your publication"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="director">Director</Label>
+                <Label htmlFor="author">Author Name</Label>
                 <Input
-                  id="director"
-                  name="director"
-                  value={formData.director}
+                  id="author"
+                  name="author"
+                  value={formData.author}
                   onChange={handleChange}
-                  placeholder="Enter the director's name"
+                  placeholder="Enter the author's name"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="filmType">Film Type</Label>
-                <Select onValueChange={(value) => handleSelectChange('filmType', value)} value={formData.filmType}>
+                <Label htmlFor="publicationType">Publication Type</Label>
+                <Select onValueChange={handleSelectChange} value={formData.publicationType}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a film type" />
+                    <SelectValue placeholder="Select a publication type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="feature">Feature Film</SelectItem>
-                    <SelectItem value="short">Short Film</SelectItem>
-                    <SelectItem value="documentary">Documentary</SelectItem>
-                    <SelectItem value="animation">Animation</SelectItem>
-                    <SelectItem value="series">TV Series</SelectItem>
+                    <SelectItem value="book">Book</SelectItem>
+                    <SelectItem value="ebook">E-Book</SelectItem>
+                    <SelectItem value="article">Article</SelectItem>
+                    <SelectItem value="journal">Journal</SelectItem>
+                    <SelectItem value="magazine">Magazine</SelectItem>
+                    <SelectItem value="newspaper">Newspaper</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="releaseDate">Release Date</Label>
+                <Label htmlFor="isbn">ISBN (if applicable)</Label>
                 <Input
-                  id="releaseDate"
-                  name="releaseDate"
+                  id="isbn"
+                  name="isbn"
+                  value={formData.isbn}
+                  onChange={handleChange}
+                  placeholder="Enter ISBN"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="publicationDate">Publication Date</Label>
+                <Input
+                  id="publicationDate"
+                  name="publicationDate"
                   type="date"
-                  value={formData.releaseDate}
+                  value={formData.publicationDate}
                   onChange={handleChange}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="duration">Duration (minutes)</Label>
+                <Label htmlFor="publisher">Publisher</Label>
                 <Input
-                  id="duration"
-                  name="duration"
-                  type="number"
-                  value={formData.duration}
+                  id="publisher"
+                  name="publisher"
+                  value={formData.publisher}
                   onChange={handleChange}
-                  min={1}
+                  placeholder="Enter the publisher's name"
                   required
                 />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="genre">Genre</Label>
-                <Select onValueChange={(value) => handleSelectChange('genre', value)} value={formData.genre}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a genre" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="action">Action</SelectItem>
-                    <SelectItem value="comedy">Comedy</SelectItem>
-                    <SelectItem value="drama">Drama</SelectItem>
-                    <SelectItem value="scifi">Science Fiction</SelectItem>
-                    <SelectItem value="horror">Horror</SelectItem>
-                    <SelectItem value="romance">Romance</SelectItem>
-                    <SelectItem value="thriller">Thriller</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               <div className="space-y-2">
@@ -154,7 +146,7 @@ export default function FilmsRegistrationPage() {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Provide a brief description of your film"
+                  placeholder="Provide a brief description of your publication"
                   required
                 />
               </div>
@@ -174,11 +166,11 @@ export default function FilmsRegistrationPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="filmFile">Upload Film File or Trailer</Label>
+                <Label htmlFor="publicationFile">Upload Publication File</Label>
                 <Input
-                  id="filmFile"
+                  id="publicationFile"
                   type="file"
-                  accept="video/*"
+                  accept=".pdf,.epub,.mobi,.doc,.docx"
                   onChange={(e) => {
                     const file = e.target.files?.[0]
                     if (file) setFile(file)
@@ -187,21 +179,21 @@ export default function FilmsRegistrationPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full">Register Film</Button>
+              <Button type="submit" className="w-full">Register Publication</Button>
             </form>
           </CardContent>
         </Card>
 
         <div className="space-y-8">
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground'>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
-              <CardTitle>Why Register Your Film?</CardTitle>
+              <CardTitle>Why Register Your Publication?</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-4">
                 <li className="flex items-center">
                   <Globe className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Global exposure to audiences and distributors</span>
+                  <span>Global exposure to readers and publishers</span>
                 </li>
                 <li className="flex items-center">
                   <Shield className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
@@ -209,11 +201,11 @@ export default function FilmsRegistrationPage() {
                 </li>
                 <li className="flex items-center">
                   <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Monetize your cinematic creations</span>
+                  <span>Monetize your written works</span>
                 </li>
                 <li className="flex items-center">
                   <Award className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Gain recognition in the film industry</span>
+                  <span>Gain recognition in the literary world</span>
                 </li>
                 <li className="flex items-center">
                   <Zap className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
@@ -221,7 +213,7 @@ export default function FilmsRegistrationPage() {
                 </li>
                 <li className="flex items-center">
                   <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Track viewership and revenue analytics</span>
+                  <span>Track sales and readership analytics</span>
                 </li>
                 <li className="flex items-center">
                   <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
@@ -231,49 +223,49 @@ export default function FilmsRegistrationPage() {
             </CardContent>
           </Card>
 
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground'>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
-              <CardTitle>Accepted Film Types</CardTitle>
+              <CardTitle>Accepted Publication Types</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="grid grid-cols-2 gap-4">
                 <li className="flex items-center">
-                  <Film className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Feature Films</span>
+                  <Book className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Books</span>
                 </li>
                 <li className="flex items-center">
-                  <Video className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Short Films</span>
+                  <FileText className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>E-Books</span>
                 </li>
                 <li className="flex items-center">
-                  <Clapperboard className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Documentaries</span>
+                  <Scroll className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Articles</span>
                 </li>
                 <li className="flex items-center">
-                  <Tv className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>TV Series</span>
+                  <Book className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Journals</span>
                 </li>
                 <li className="flex items-center">
-                  <Camera className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Animations</span>
+                  <Newspaper className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Magazines</span>
                 </li>
                 <li className="flex items-center">
-                  <Music className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Music Videos</span>
+                  <Newspaper className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Newspapers</span>
                 </li>
                 <li className="flex items-center">
-                  <Video className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Web Series</span>
+                  <FileText className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Research Papers</span>
                 </li>
                 <li className="flex items-center">
-                  <Clapperboard className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Experimental Films</span>
+                  <Scroll className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Manuscripts</span>
                 </li>
               </ul>
             </CardContent>
           </Card>
 
-          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground'>
+          <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
               <CardTitle>App Features</CardTitle>
             </CardHeader>
@@ -281,11 +273,11 @@ export default function FilmsRegistrationPage() {
               <ul className="space-y-4">
                 <li className="flex items-center">
                   <Search className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Advanced film search and discovery</span>
+                  <span>Advanced publication search and discovery</span>
                 </li>
                 <li className="flex items-center">
                   <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Viewership and revenue analytics</span>
+                  <span>Sales and readership analytics</span>
                 </li>
                 <li className="flex items-center">
                   <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />

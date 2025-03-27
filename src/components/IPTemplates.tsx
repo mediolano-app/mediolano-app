@@ -16,16 +16,16 @@ import {
 } from "lucide-react"
 
 const templates = [
-  { name: "Custom", icon: FileText, href: "/create" },
-  { name: "Art", icon: Image, href: "/new/art" },
-  { name: "Document", icon: FileIcon, href: "/new/document" },
-  { name: "Video", icon: Film, href: "/new/video" },
-  { name: "Music", icon: Music, href: "/new/music" },
-  { name: "NFT", icon: Hexagon, href: "/new/nft" },
-  { name: "Patent", icon: FileCheck, href: "/new/patent" },
-  { name: "Publication", icon: BookOpen, href: "/new/publication" },
-  { name: "Real World Assets", icon: Building, href: "/new/rwa" },
-  { name: "Software", icon: Code, href: "/new/software" },
+  { name: "Custom", icon: FileText, href: "/create/asset" },
+  { name: "Art", icon: Image, href: "/create/art" },
+  { name: "Document", icon: FileIcon, href: "/create/document" },
+  { name: "Video", icon: Film, href: "/create/video" },
+  { name: "Music", icon: Music, href: "/create/music" },
+  { name: "NFT", icon: Hexagon, href: "/create/nft" },
+  { name: "Patent", icon: FileCheck, href: "/create/patent" },
+  { name: "Publication", icon: BookOpen, href: "/create/publication" },
+  { name: "Real World Assets", icon: Building, href: "/create/rwa" },
+  { name: "Software", icon: Code, href: "/create/software" },
 ]
 
 export function IPTemplates() {
