@@ -64,11 +64,9 @@ export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret"
 export interface IP{
   name: string,
   description: string,
-  author: string,
-  type: string,
-  image: string,
-  version: string,
   external_url: string,
+  image: string,
+  attributes: []
 }
 
 export default function NFTPortfolio() {
@@ -398,9 +396,8 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
 				} catch (parseError) {
 					throw new Error("Failed to parse metadata");
 				}
-
+        console.log("METADATA",parsedData);
 				setMetadata(parsedData);
-				console.log(parsedData);
 				setError(null);
 			} catch (err) {
 				setError(
@@ -455,7 +452,10 @@ function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between">
         <Badge variant="outline" className="text-xs">
-          IP {metadata.type}
+          {metadata.attributes[1].value}
+        </Badge>
+        <Badge variant="outline" className="text-xs">
+          {metadata.attributes[0].value}
         </Badge>
       </CardFooter>
     </Card>
