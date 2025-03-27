@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Image, Music, Video, FileText, Globe, Shield, DollarSign, Zap, BarChart, Lock, Search, Palette, Camera, Headphones, Film, Code, Gamepad } from 'lucide-react'
+import { ArrowLeft, Building, Car, Briefcase, Globe, Shield, DollarSign, BarChartIcon as ChartBar, Zap, BarChart, Lock, Search, PieChart, Landmark, TreePine, Gem } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,15 +11,16 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-export default function NFTRegistrationPage() {
+export default function RWARegistrationPage() {
   const [formData, setFormData] = useState({
-    title: '',
-    creator: '',
-    nftType: '',
+    assetName: '',
+    assetType: '',
+    location: '',
+    valuation: '',
+    ownershipStructure: '',
     description: '',
-    price: '',
-    royaltyPercentage: '',
-    blockchain: '',
+    tokenSymbol: '',
+    totalSupply: '',
   })
 
   const [file, setFile] = useState<File | null>(null)
@@ -42,15 +43,15 @@ export default function NFTRegistrationPage() {
     e.preventDefault()
     console.log(formData)
     console.log(file)
-    alert('NFT registration submitted successfully!')
+    alert('RWA registration submitted successfully!')
   }
 
   return (
     <div className="container mx-auto px-4 py-10 mb-20">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">NFT Registration</h1>
+        <h1 className="text-3xl font-bold">Real World Asset (RWA) Registration</h1>
         <Link
-          href="/new/templates"
+          href="/create/templates"
           className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -61,123 +62,134 @@ export default function NFTRegistrationPage() {
       <div className="grid gap-8 lg:grid-cols-2">
         <Card className="w-full max-w-2xl mx-auto lg:max-w-none">
           <CardHeader>
-            <CardTitle>NFT Details</CardTitle>
-            <CardDescription>Please provide information about your NFT.</CardDescription>
+            <CardTitle>RWA Details</CardTitle>
+            <CardDescription>Please provide information about your Real World Asset.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">NFT Title</Label>
+                <Label htmlFor="assetName">Asset Name</Label>
                 <Input
-                  id="title"
-                  name="title"
-                  value={formData.title}
+                  id="assetName"
+                  name="assetName"
+                  value={formData.assetName}
                   onChange={handleChange}
-                  placeholder="Enter the title of your NFT"
+                  placeholder="Enter the name of your asset"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="creator">Creator Name</Label>
-                <Input
-                  id="creator"
-                  name="creator"
-                  value={formData.creator}
-                  onChange={handleChange}
-                  placeholder="Enter your name or pseudonym"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="nftType">NFT Type</Label>
-                <Select onValueChange={(value) => handleSelectChange('nftType', value)} value={formData.nftType}>
+                <Label htmlFor="assetType">Asset Type</Label>
+                <Select onValueChange={(value) => handleSelectChange('assetType', value)} value={formData.assetType}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an NFT type" />
+                    <SelectValue placeholder="Select an asset type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="image">Image</SelectItem>
-                    <SelectItem value="audio">Audio</SelectItem>
-                    <SelectItem value="video">Video</SelectItem>
-                    <SelectItem value="3d">3D Model</SelectItem>
-                    <SelectItem value="game">Game Asset</SelectItem>
-                    <SelectItem value="document">Document</SelectItem>
+                    <SelectItem value="realEstate">Real Estate</SelectItem>
+                    <SelectItem value="vehicle">Vehicle</SelectItem>
+                    <SelectItem value="equipment">Equipment</SelectItem>
+                    <SelectItem value="commodity">Commodity</SelectItem>
+                    <SelectItem value="artwork">Artwork</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="location">Asset Location</Label>
+                <Input
+                  id="location"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  placeholder="Enter the location of the asset"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="valuation">Asset Valuation (USD)</Label>
+                <Input
+                  id="valuation"
+                  name="valuation"
+                  type="number"
+                  value={formData.valuation}
+                  onChange={handleChange}
+                  placeholder="Enter the current valuation of the asset"
+                  min={0}
+                  step={0.01}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ownershipStructure">Ownership Structure</Label>
+                <Select onValueChange={(value) => handleSelectChange('ownershipStructure', value)} value={formData.ownershipStructure}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select ownership structure" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="soleProprietorship">Sole Proprietorship</SelectItem>
+                    <SelectItem value="partnership">Partnership</SelectItem>
+                    <SelectItem value="llc">LLC</SelectItem>
+                    <SelectItem value="corporation">Corporation</SelectItem>
+                    <SelectItem value="trust">Trust</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Asset Description</Label>
                 <Textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Provide a description of your NFT"
+                  placeholder="Provide a detailed description of the asset"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Price (ETH)</Label>
+                <Label htmlFor="tokenSymbol">Token Symbol</Label>
                 <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  value={formData.price}
+                  id="tokenSymbol"
+                  name="tokenSymbol"
+                  value={formData.tokenSymbol}
                   onChange={handleChange}
-                  min={0}
-                  step={0.001}
-                  placeholder="Enter the price in ETH"
+                  placeholder="Enter a symbol for your token (e.g., REAL, VHCL)"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="royaltyPercentage">Royalty Percentage</Label>
+                <Label htmlFor="totalSupply">Total Token Supply</Label>
                 <Input
-                  id="royaltyPercentage"
-                  name="royaltyPercentage"
+                  id="totalSupply"
+                  name="totalSupply"
                   type="number"
-                  value={formData.royaltyPercentage}
+                  value={formData.totalSupply}
                   onChange={handleChange}
-                  min={0}
-                  max={100}
-                  step={0.1}
-                  placeholder="Enter royalty percentage (e.g., 2.5)"
+                  placeholder="Enter the total number of tokens"
+                  min={1}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="blockchain">Blockchain</Label>
-                <Select onValueChange={(value) => handleSelectChange('blockchain', value)} value={formData.blockchain}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a blockchain" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ethereum">Ethereum</SelectItem>
-                    <SelectItem value="polygon">Polygon</SelectItem>
-                    <SelectItem value="solana">Solana</SelectItem>
-                    <SelectItem value="binance">Binance Smart Chain</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="nftFile">Upload NFT File</Label>
+                <Label htmlFor="assetDocumentation">Asset Documentation</Label>
                 <Input
-                  id="nftFile"
+                  id="assetDocumentation"
                   type="file"
                   onChange={handleFileChange}
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                   required
                 />
               </div>
 
-              <Button type="submit" className="w-full">Register NFT</Button>
+              <Button type="submit" className="w-full">Register RWA</Button>
             </form>
           </CardContent>
         </Card>
@@ -185,33 +197,33 @@ export default function NFTRegistrationPage() {
         <div className="space-y-8">
           <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
-              <CardTitle>Why Create NFTs?</CardTitle>
+              <CardTitle>Benefits of RWA Tokenization</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-4">
                 <li className="flex items-center">
                   <Globe className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Global exposure to collectors and enthusiasts</span>
+                  <span>Global access to real-world asset investments</span>
                 </li>
                 <li className="flex items-center">
                   <Shield className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Verifiable ownership and authenticity</span>
+                  <span>Enhanced security and transparency</span>
                 </li>
                 <li className="flex items-center">
                   <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>New revenue streams through digital scarcity</span>
+                  <span>Increased liquidity for traditionally illiquid assets</span>
+                </li>
+                <li className="flex items-center">
+                  <ChartBar className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Fractional ownership opportunities</span>
                 </li>
                 <li className="flex items-center">
                   <Zap className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Instant liquidity and transferability</span>
-                </li>
-                <li className="flex items-center">
-                  <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Ongoing royalties from secondary sales</span>
+                  <span>Streamlined asset management and transfer</span>
                 </li>
                 <li className="flex items-center">
                   <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Immutable proof of creation and provenance</span>
+                  <span>Programmable compliance and automated distributions</span>
                 </li>
               </ul>
             </CardContent>
@@ -219,41 +231,41 @@ export default function NFTRegistrationPage() {
 
           <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
-              <CardTitle>Popular NFT Categories</CardTitle>
+              <CardTitle>Popular RWA Categories</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="grid grid-cols-2 gap-4">
                 <li className="flex items-center">
-                  <Palette className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Digital Art</span>
+                  <Building className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Real Estate</span>
                 </li>
                 <li className="flex items-center">
-                  <Camera className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Photography</span>
+                  <Car className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Vehicles</span>
                 </li>
                 <li className="flex items-center">
-                  <Headphones className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Music</span>
+                  <Briefcase className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Equipment</span>
                 </li>
                 <li className="flex items-center">
-                  <Film className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Videos</span>
+                  <Gem className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Precious Metals</span>
                 </li>
                 <li className="flex items-center">
-                  <Gamepad className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Gaming Assets</span>
+                  <TreePine className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Natural Resources</span>
                 </li>
                 <li className="flex items-center">
-                  <Code className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Virtual Real Estate</span>
+                  <PieChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Private Equity</span>
                 </li>
                 <li className="flex items-center">
-                  <FileText className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Literature</span>
+                  <Landmark className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Infrastructure</span>
                 </li>
                 <li className="flex items-center">
-                  <Image className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Memes</span>
+                  <Gem className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Fine Art</span>
                 </li>
               </ul>
             </CardContent>
@@ -267,23 +279,23 @@ export default function NFTRegistrationPage() {
               <ul className="space-y-4">
                 <li className="flex items-center">
                   <Search className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Advanced NFT discovery and curation</span>
+                  <span>Comprehensive RWA search and discovery</span>
                 </li>
                 <li className="flex items-center">
                   <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Real-time market data and analytics</span>
+                  <span>Real-time valuation and performance tracking</span>
                 </li>
                 <li className="flex items-center">
                   <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Secure wallet integration</span>
+                  <span>Secure digital asset custody solutions</span>
                 </li>
                 <li className="flex items-center">
                   <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Automated royalty distribution</span>
+                  <span>Automated compliance and dividend distribution</span>
                 </li>
                 <li className="flex items-center">
                   <Globe className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Cross-chain NFT marketplace</span>
+                  <span>Global marketplace for tokenized RWAs</span>
                 </li>
               </ul>
             </CardContent>

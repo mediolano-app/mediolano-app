@@ -15,15 +15,15 @@ const templatesIP = () => {
   const { address: connectedAddress, isConnected, isConnecting } = useAccount();
 
   const templates = [
-    { name: 'Art', icon: Palette, href: '/new/art', description: 'Paintings, Photography, Artworks' },
-    { name: 'Documents', icon: File, href: '/new/document', description: 'Preserve documents on-chain' },  
-    { name: 'Video', icon: Film, href: '/new/video', description: 'Movies, videocast, shows, video creations' }, 
-    { name: 'Audio', icon: Music, href: '/new/audio', description: 'Music, podcasts, samplers, radio' },
-    { name: 'NFT', icon: FileLock, href: '/new/nft', description: 'NFT oriented asset design' },
-    { name: 'Patents', icon: ScrollText, href: '/new/patents', description: 'Secure inventions and innovations' },
-    { name: 'Publications', icon: Book, href: '/new/publication', description: 'Articles, news, research, posts' },
-    { name: 'RWA', icon: Globe2, href: '/new/rwa', description: 'Tokenize Real World Assets' },
-    { name: 'Software', icon: FileCode, href: '/new/software', description: 'Safeguard code ownership' },
+    { name: 'Art', icon: Palette, href: '/create/art', description: 'Paintings, Photography, Artworks' },
+    { name: 'Documents', icon: File, href: '/create/document', description: 'Preserve documents on-chain' },  
+    { name: 'Video', icon: Film, href: '/create/video', description: 'Movies, videocast, shows, video creations' }, 
+    { name: 'Audio', icon: Music, href: '/create/audio', description: 'Music, podcasts, samplers, radio' },
+    { name: 'NFT', icon: FileLock, href: '/create/nft', description: 'NFT oriented asset design' },
+    { name: 'Patents', icon: ScrollText, href: '/create/patents', description: 'Secure inventions and innovations' },
+    { name: 'Publications', icon: Book, href: '/create/publication', description: 'Articles, news, research, posts' },
+    { name: 'RWA', icon: Globe2, href: '/create/rwa', description: 'Tokenize Real World Assets' },
+    { name: 'Software', icon: FileCode, href: '/create/software', description: 'Safeguard code ownership' },
   ]
 
 
@@ -38,8 +38,8 @@ const templatesIP = () => {
       <div className="flex items-center justify-between mb-4">
                 <h1 className="text-xl md:pl-6 font-bold">Programmable IP Templates</h1>
                 <Link
-                    href="/new"
-                    title="Back to New Asset"
+                    href="/create"
+                    title="Back to Create Asset"
                     className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
                 >
                     <CornerUpLeft className="mr-2 h-4 w-4" />
@@ -78,7 +78,7 @@ const templatesIP = () => {
 
         <div className="flex flex-col items-left">
           <p className="mb-4">Need a different format?</p>
-          <Link href="/create" title="Register your custom Programmable IP">
+          <Link href="/create/asset" title="Register your custom Programmable IP">
           <Button variant="outline" className="p-6 bg-blue-600 text-white text-lg">Register your custom IP</Button>
           </Link>
           </div>

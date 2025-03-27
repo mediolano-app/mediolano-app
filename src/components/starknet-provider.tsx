@@ -14,7 +14,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
   const { connectors } = useInjectedConnectors({
     recommended: [argent(), braavos()],
     includeRecommended: "onlyIfNoConnectors",
-    order: "random",
+    order: "alphabetical",
   });
 
   // Retrieve your custom RPC URL from environment variables
@@ -29,7 +29,8 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
       provider={providerFactory}
       connectors={connectors}
       explorer={voyager}
-      defaultChainId={sepolia.id} // Set sepolia as the default chain for testing
+      defaultChainId={sepolia.id} // default chain for testing
+      autoConnect={true} // Enable auto-connect
     >
       {children}
     </StarknetConfig>

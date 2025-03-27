@@ -192,7 +192,7 @@ export default function ArtRegistrationPage() {
             <div className="flex items-center justify-between mb-4">
                 <h1 className="text-xl md:pl-6 font-bold">Art Registration</h1>
                 <Link
-                    href="/new/templates"
+                    href="/create/templates"
                     className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" />

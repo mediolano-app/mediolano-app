@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Book, Newspaper, Scroll, FileText, Globe, Shield, DollarSign, Award, Zap, BarChart, Lock, Search } from 'lucide-react'
+import { ArrowLeft, Image, Music, Video, FileText, Globe, Shield, DollarSign, Zap, BarChart, Lock, Search, Palette, Camera, Headphones, Film, Code, Gamepad } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,16 +11,15 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 
-export default function PublicationsRegistrationPage() {
+export default function NFTRegistrationPage() {
   const [formData, setFormData] = useState({
     title: '',
-    author: '',
-    publicationType: '',
-    isbn: '',
-    publicationDate: '',
-    publisher: '',
+    creator: '',
+    nftType: '',
     description: '',
     price: '',
+    royaltyPercentage: '',
+    blockchain: '',
   })
 
   const [file, setFile] = useState<File | null>(null)
@@ -30,113 +29,83 @@ export default function PublicationsRegistrationPage() {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSelectChange = (value: string) => {
-    setFormData(prev => ({ ...prev, publicationType: value }))
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) setFile(file)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log(formData)
     console.log(file)
-    alert('Publication registration submitted successfully!')
+    alert('NFT registration submitted successfully!')
   }
 
   return (
     <div className="container mx-auto px-4 py-10 mb-20">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Publication Registration</h1>
+        <h1 className="text-3xl font-bold">NFT Registration</h1>
         <Link
-          href="/new/templates"
+          href="/create/templates"
           className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Templates
+          Back to Marketplace
         </Link>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
         <Card className="w-full max-w-2xl mx-auto lg:max-w-none">
           <CardHeader>
-            <CardTitle>Publication Details</CardTitle>
-            <CardDescription>Please provide information about your publication.</CardDescription>
+            <CardTitle>NFT Details</CardTitle>
+            <CardDescription>Please provide information about your NFT.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Publication Title</Label>
+                <Label htmlFor="title">NFT Title</Label>
                 <Input
                   id="title"
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  placeholder="Enter the title of your publication"
+                  placeholder="Enter the title of your NFT"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="author">Author Name</Label>
+                <Label htmlFor="creator">Creator Name</Label>
                 <Input
-                  id="author"
-                  name="author"
-                  value={formData.author}
+                  id="creator"
+                  name="creator"
+                  value={formData.creator}
                   onChange={handleChange}
-                  placeholder="Enter the author's name"
+                  placeholder="Enter your name or pseudonym"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="publicationType">Publication Type</Label>
-                <Select onValueChange={handleSelectChange} value={formData.publicationType}>
+                <Label htmlFor="nftType">NFT Type</Label>
+                <Select onValueChange={(value) => handleSelectChange('nftType', value)} value={formData.nftType}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a publication type" />
+                    <SelectValue placeholder="Select an NFT type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="book">Book</SelectItem>
-                    <SelectItem value="ebook">E-Book</SelectItem>
-                    <SelectItem value="article">Article</SelectItem>
-                    <SelectItem value="journal">Journal</SelectItem>
-                    <SelectItem value="magazine">Magazine</SelectItem>
-                    <SelectItem value="newspaper">Newspaper</SelectItem>
+                    <SelectItem value="image">Image</SelectItem>
+                    <SelectItem value="audio">Audio</SelectItem>
+                    <SelectItem value="video">Video</SelectItem>
+                    <SelectItem value="3d">3D Model</SelectItem>
+                    <SelectItem value="game">Game Asset</SelectItem>
+                    <SelectItem value="document">Document</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="isbn">ISBN (if applicable)</Label>
-                <Input
-                  id="isbn"
-                  name="isbn"
-                  value={formData.isbn}
-                  onChange={handleChange}
-                  placeholder="Enter ISBN"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="publicationDate">Publication Date</Label>
-                <Input
-                  id="publicationDate"
-                  name="publicationDate"
-                  type="date"
-                  value={formData.publicationDate}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="publisher">Publisher</Label>
-                <Input
-                  id="publisher"
-                  name="publisher"
-                  value={formData.publisher}
-                  onChange={handleChange}
-                  placeholder="Enter the publisher's name"
-                  required
-                />
               </div>
 
               <div className="space-y-2">
@@ -146,13 +115,13 @@ export default function PublicationsRegistrationPage() {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Provide a brief description of your publication"
+                  placeholder="Provide a description of your NFT"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Price (USD)</Label>
+                <Label htmlFor="price">Price (ETH)</Label>
                 <Input
                   id="price"
                   name="price"
@@ -160,26 +129,55 @@ export default function PublicationsRegistrationPage() {
                   value={formData.price}
                   onChange={handleChange}
                   min={0}
-                  step={0.01}
+                  step={0.001}
+                  placeholder="Enter the price in ETH"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="publicationFile">Upload Publication File</Label>
+                <Label htmlFor="royaltyPercentage">Royalty Percentage</Label>
                 <Input
-                  id="publicationFile"
-                  type="file"
-                  accept=".pdf,.epub,.mobi,.doc,.docx"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) setFile(file)
-                  }}
+                  id="royaltyPercentage"
+                  name="royaltyPercentage"
+                  type="number"
+                  value={formData.royaltyPercentage}
+                  onChange={handleChange}
+                  min={0}
+                  max={100}
+                  step={0.1}
+                  placeholder="Enter royalty percentage (e.g., 2.5)"
                   required
                 />
               </div>
 
-              <Button type="submit" className="w-full">Register Publication</Button>
+              <div className="space-y-2">
+                <Label htmlFor="blockchain">Blockchain</Label>
+                <Select onValueChange={(value) => handleSelectChange('blockchain', value)} value={formData.blockchain}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a blockchain" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ethereum">Ethereum</SelectItem>
+                    <SelectItem value="polygon">Polygon</SelectItem>
+                    <SelectItem value="solana">Solana</SelectItem>
+                    <SelectItem value="binance">Binance Smart Chain</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="nftFile">Upload NFT File</Label>
+                <Input
+                  id="nftFile"
+                  type="file"
+                  onChange={handleFileChange}
+                  required
+                />
+              </div>
+
+              <Button type="submit" className="w-full">Register NFT</Button>
             </form>
           </CardContent>
         </Card>
@@ -187,37 +185,33 @@ export default function PublicationsRegistrationPage() {
         <div className="space-y-8">
           <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
-              <CardTitle>Why Register Your Publication?</CardTitle>
+              <CardTitle>Why Create NFTs?</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-4">
                 <li className="flex items-center">
                   <Globe className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Global exposure to readers and publishers</span>
+                  <span>Global exposure to collectors and enthusiasts</span>
                 </li>
                 <li className="flex items-center">
                   <Shield className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Protect your intellectual property</span>
+                  <span>Verifiable ownership and authenticity</span>
                 </li>
                 <li className="flex items-center">
                   <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Monetize your written works</span>
-                </li>
-                <li className="flex items-center">
-                  <Award className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Gain recognition in the literary world</span>
+                  <span>New revenue streams through digital scarcity</span>
                 </li>
                 <li className="flex items-center">
                   <Zap className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Increase visibility and discoverability</span>
+                  <span>Instant liquidity and transferability</span>
                 </li>
                 <li className="flex items-center">
                   <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Track sales and readership analytics</span>
+                  <span>Ongoing royalties from secondary sales</span>
                 </li>
                 <li className="flex items-center">
                   <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Secure blockchain-based copyright protection</span>
+                  <span>Immutable proof of creation and provenance</span>
                 </li>
               </ul>
             </CardContent>
@@ -225,41 +219,41 @@ export default function PublicationsRegistrationPage() {
 
           <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
-              <CardTitle>Accepted Publication Types</CardTitle>
+              <CardTitle>Popular NFT Categories</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="grid grid-cols-2 gap-4">
                 <li className="flex items-center">
-                  <Book className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Books</span>
+                  <Palette className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Digital Art</span>
+                </li>
+                <li className="flex items-center">
+                  <Camera className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Photography</span>
+                </li>
+                <li className="flex items-center">
+                  <Headphones className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Music</span>
+                </li>
+                <li className="flex items-center">
+                  <Film className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Videos</span>
+                </li>
+                <li className="flex items-center">
+                  <Gamepad className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Gaming Assets</span>
+                </li>
+                <li className="flex items-center">
+                  <Code className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Virtual Real Estate</span>
                 </li>
                 <li className="flex items-center">
                   <FileText className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>E-Books</span>
+                  <span>Literature</span>
                 </li>
                 <li className="flex items-center">
-                  <Scroll className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Articles</span>
-                </li>
-                <li className="flex items-center">
-                  <Book className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Journals</span>
-                </li>
-                <li className="flex items-center">
-                  <Newspaper className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Magazines</span>
-                </li>
-                <li className="flex items-center">
-                  <Newspaper className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Newspapers</span>
-                </li>
-                <li className="flex items-center">
-                  <FileText className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Research Papers</span>
-                </li>
-                <li className="flex items-center">
-                  <Scroll className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Manuscripts</span>
+                  <Image className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                  <span>Memes</span>
                 </li>
               </ul>
             </CardContent>
@@ -267,29 +261,29 @@ export default function PublicationsRegistrationPage() {
 
           <Card className='bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground'>
             <CardHeader>
-              <CardTitle>App Features</CardTitle>
+              <CardTitle>Platform Features</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="space-y-4">
                 <li className="flex items-center">
                   <Search className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Advanced publication search and discovery</span>
+                  <span>Advanced NFT discovery and curation</span>
                 </li>
                 <li className="flex items-center">
                   <BarChart className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Sales and readership analytics</span>
+                  <span>Real-time market data and analytics</span>
                 </li>
                 <li className="flex items-center">
                   <Lock className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Secure blockchain-based copyright protection</span>
+                  <span>Secure wallet integration</span>
                 </li>
                 <li className="flex items-center">
                   <DollarSign className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Integrated royalty management</span>
+                  <span>Automated royalty distribution</span>
                 </li>
                 <li className="flex items-center">
                   <Globe className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-                  <span>Global distribution network</span>
+                  <span>Cross-chain NFT marketplace</span>
                 </li>
               </ul>
             </CardContent>

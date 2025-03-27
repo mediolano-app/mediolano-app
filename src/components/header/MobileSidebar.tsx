@@ -29,8 +29,8 @@ const navigationItems = [
     title: 'Start',
     items: [
       { title: 'Discover', href: '/discover', icon: BookOpen },
-      { title: 'Create IP', href: '/new', icon: Box },
-      { title: 'IP Templates', href: '/new/templates', icon: FileText }, 
+      { title: 'Create IP', href: '/create', icon: Box },
+      { title: 'IP Templates', href: '/create/templates', icon: FileText }, 
     ],
   },
   {
@@ -170,7 +170,7 @@ export function MobileSidebar() {
               variant="default"
               size="lg"
               className="w-full"
-              onClick={() => handleNavigation('/new')}
+              onClick={() => handleNavigation('/create')}
             >
               Register Your IP
             </Button>
