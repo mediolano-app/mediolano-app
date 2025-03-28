@@ -186,7 +186,7 @@ export function IPLicensing() {
       setSubmissionStatus({
         success: true,
         message: "Your IP licensing request has been successfully submitted to the blockchain.",
-        txHash: ""
+        txHash: result.transaction_hash
       });
 
       toast({
