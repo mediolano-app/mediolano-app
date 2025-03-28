@@ -29,6 +29,8 @@ import {
   File,
   Globe2,
   Box,
+  NotepadText,
+  Clapperboard,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -82,16 +84,18 @@ interface Asset {
   version: string;
 }
 
-const assetTypes = [
-  { id: "1", name: "Audio" },
-  { id: "2", name: "Artwork" },
-  { id: "3", name: "Digital Art" },
-  { id: "4", name: "Code" },
+const types = [
+  { id: "1", name: "3D Model" },
+  { id: "2", name: "AI Model" },
+  { id: "3", name: "Artwork" },
+  { id: "4", name: "Audio" },
   { id: "5", name: "Document" },
-  { id: "6", name: "Publication" },
-  { id: "7", name: "RWA" },
-  { id: "8", name: "Software" },
-  { id: "9", name: "General" },
+  { id: "6", name: "Literary" },
+  { id: "7", name: "Publication" },
+  { id: "8", name: "RWA" },
+  { id: "9", name: "Software" },
+  { id: "10", name: "Video" },
+  { id: "11", name: "Other" },
 ];
 
 const licenses = [
@@ -110,7 +114,7 @@ const formSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }).max(100),
   author: z.string().min(2, { message: "Author name must be at least 2 characters" }).max(100),
   description: z.string().min(10, { message: "Description must be at least 10 characters" }).max(1000),
-  type: z.enum(["3d-model", "ai-model", "audio", "artwork", "document", "literary", "rwa", "software", "video", "other"]),
+  type: z.enum(["3d-model", "ai-model", "artwork", "audio", "document", "literary", "post", "rwa", "software", "video", "other"]),
   collection: z.string().optional(),
   tags: z.array(z.string()).optional().default([]),
   mediaUrl: z.string().url().optional().or(z.literal("")),
@@ -220,18 +224,18 @@ export default function CreateIPPage() {
 
   const handleMintNFT = async () => {
     if (!ipfsHash) {
-      toast({ title: "Error", description: "Upload image before minting." });
+      toast({ title: "Error", description: "Error creating metadata." });
       return;
     }
     try {
       send();
       toast({
         title: "Success",
-        description: "NFT Minting Transaction Sent.",
+        description: "Confirm your Mint on your wallet.",
       });
     } catch (error) {
       console.log("mint error", transactionError);
-      toast({ title: "Error", description: "Minting failed." });
+      toast({ title: "Error", description: "Error minting asset." });
     }
   };
 
@@ -473,10 +477,10 @@ export default function CreateIPPage() {
       // Open the drawer for review
       setIsDrawerOpen(true)
     } catch (error) {
-      console.error("Error during form submission:", error)
+      console.error("Error during data submission:", error)
       toast({
         title: "Submission Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: "An unexpected error occurred. Please contact our support.",
         variant: "destructive",
       })
     }
@@ -491,7 +495,7 @@ export default function CreateIPPage() {
     try {
       if (activeTab === "details") {
         // Validate details tab fields
-        const isValid = await form.trigger(["title", "author", "description", "type"])
+        const isValid = await form.trigger(["title", "author", "description", "externalUrl"])
         if (isValid) {
           setActiveTab("assets")
           setFormProgress(66)
@@ -594,7 +598,7 @@ export default function CreateIPPage() {
           contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
         },
         registrationDate: Date.now(),
-        protectionStatus: "Active",
+        protectionStatus: "Minting",
         protectionScope: "181 countries (Berne Convention)",
         protectionDuration: "50-70 years (based on jurisdiction)",
       }
@@ -701,7 +705,7 @@ export default function CreateIPPage() {
 
 
   return (
-    <div className="container mx-auto px-4 py-12 mb-20 bg-background/90 round-lg shadow">
+    <div className="container mx-auto px-4 py-6 mt-10 mb-20 bg-background shadow rounded-lg">
      
       <div className="flex items-center gap-2 mb-6">
         <Button variant="link" size="icon" asChild>
@@ -791,7 +795,7 @@ export default function CreateIPPage() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-4">
                     <Label className="flex items-center gap-1">
                       IP Type
                       <span className="text-destructive">*</span>
@@ -815,13 +819,6 @@ export default function CreateIPPage() {
                           AI Model
                         </Label>
                       </div>
-                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="music" id="music" />
-                        <Label htmlFor="music" className="flex items-center gap-2">
-                          <Music className="h-4 w-4" />
-                          Audio
-                        </Label>
-                      </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="artwork" id="artwork" />
                         <Label htmlFor="artwork" className="flex items-center gap-2">
@@ -829,6 +826,14 @@ export default function CreateIPPage() {
                           Artwork
                         </Label>
                       </div>
+                       <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="music" id="music" />
+                        <Label htmlFor="music" className="flex items-center gap-2">
+                          <Music className="h-4 w-4" />
+                          Audio
+                        </Label>
+                      </div>
+                      
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="document" id="document" />
                         <Label htmlFor="document" className="flex items-center gap-2">
@@ -842,7 +847,15 @@ export default function CreateIPPage() {
                         <RadioGroupItem value="literary" id="literary" />
                         <Label htmlFor="literary" className="flex items-center gap-2">
                           <FileText className="h-4 w-4" />
-                          Literary Work
+                          Literary
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="post" id="post" />
+                        <Label htmlFor="Post / Publication" className="flex items-center gap-2">
+                          <NotepadText className="h-4 w-4" />
+                          Post / Publication
                         </Label>
                       </div>
                       
@@ -850,7 +863,7 @@ export default function CreateIPPage() {
                         <RadioGroupItem value="rwa" id="rwa" />
                         <Label htmlFor="rwa" className="flex items-center gap-2">
                           <Globe2 className="h-4 w-4" />
-                          RWA
+                          RWA (Real World Asset)
                         </Label>
                       </div>
 
@@ -865,7 +878,7 @@ export default function CreateIPPage() {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="video" id="video" />
                         <Label htmlFor="video" className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
+                          <Clapperboard className="h-4 w-4" />
                           Video
                         </Label>
                       </div>
@@ -873,7 +886,7 @@ export default function CreateIPPage() {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="other" id="other" />
                         <Label htmlFor="other" className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
+                          <Box className="h-4 w-4" />
                           Other
                         </Label>
                       </div>
@@ -1327,10 +1340,10 @@ export default function CreateIPPage() {
           
           
           <div>
-            <Card className="sticky top-6">
+            <Card className="sticky top-6 bg-muted/50">
               <CardHeader>
-                <CardTitle>Registration Summary</CardTitle>
-                <CardDescription>Review your IP registration details</CardDescription>
+                <CardTitle>IP Summary</CardTitle>
+                <CardDescription>Review your IP creation</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {form.watch("title") && (
@@ -1472,10 +1485,9 @@ export default function CreateIPPage() {
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent className="overflow-auto">
           <DrawerHeader className="border-b pb-4">
-            <DrawerTitle>Register Your Intellectual Property</DrawerTitle>
+            <DrawerTitle>Create Your Asset</DrawerTitle>
             <DrawerDescription>
-              Review the details and register your intellectual property as a digital asset on the blockchain for
-              immutable proof of ownership.
+              Review the details and create your Programmable IP with immutable proof of ownership.
             </DrawerDescription>
           </DrawerHeader>
 
@@ -1683,10 +1695,10 @@ export default function CreateIPPage() {
                 <div className="rounded-full bg-green-100 p-3 dark:bg-green-900/20 mb-4">
                   <CheckCircle2 className="h-10 w-10 text-green-600 dark:text-green-400" />
                 </div>
-                <h3 className="text-lg font-medium mb-2">IP Successfully Registered!</h3>
+                <h3 className="text-lg font-medium mb-2">{form.watch("title") || "Untitled"}</h3>
                 <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
-                  Your intellectual property "{form.watch("title") || "Untitled"}" has been successfully registered on
-                  the blockchain. You now have immutable proof of ownership.
+                  Please confirm with your encrypted wallet to successfully register on
+                  the blockchain with immutable proof of ownership.
                 </p>
 
                 <div className="w-full max-w-md bg-muted p-4 rounded-md mb-6">
@@ -1701,8 +1713,8 @@ export default function CreateIPPage() {
                       <span className="text-sm font-medium">#{Math.floor(Math.random() * 1000000)}</span>
                     </div>*/}
                     <div className="flex justify-between">
-                      <span className="text-sm text-muted-foreground">Protection Status</span>
-                      <span className="text-sm font-medium text-green-600 dark:text-green-400">Active</span>
+                      <span className="text-sm text-muted-foreground">Powered on</span>
+                      <span className="text-sm font-medium text-green-600 dark:text-green-400">Starknet</span>
                     </div>
                   </div>
                 </div>
@@ -1729,7 +1741,7 @@ export default function CreateIPPage() {
                 <div className="rounded-full bg-red-100 p-3 dark:bg-red-900/20 mb-4">
                   <X className="h-10 w-10 text-red-600 dark:text-red-400" />
                 </div>
-                <h3 className="text-lg font-medium mb-2">Registration Failed</h3>
+                <h3 className="text-lg font-medium mb-2">Creation Failed</h3>
                 <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
                   There was an error while registering your IP on the blockchain. This could be due to network
                   congestion or wallet connection issues.
