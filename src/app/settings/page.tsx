@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Bell, Globe, Key, Lock, Settings, Shield, User, Zap, CheckCircle } from 'lucide-react'
+import { useUsersSettings } from '@/hooks/useUsersSettings'
 
 // Mockup data
 const mockUser = {
@@ -33,6 +34,7 @@ const mockUser = {
 export default function SettingsPage() {
   const [user, setUser] = useState(mockUser)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
+  const { getSetting, storeSetting, removeSetting, updateWalletKey } = useUsersSettings();
 
   const updateUser = (key: string, value: any) => {
     setUser(prevUser => ({ ...prevUser, [key]: value }))
