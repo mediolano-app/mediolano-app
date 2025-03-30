@@ -1,35 +1,14 @@
 import { useState, useCallback } from "react"
-import { TwitterApi } from 'twitter-api-v2'
-
-const [isLoading, setIsLoading] = useState(false)
 
 // Simulated API functions (replace with actual implementations)
 const connectXAccount = async () => {
-  // await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API delay
-  setIsLoading(true);
-  try {
-    const userClient = new TwitterApi({
-      appKey: 'cHPUBUBZsQS4c9IcrELUQdohx',
-      appSecret: '1DmuRzs9nKEhRKehWCeNSRtgduJfBPBAnbbkBX9KZN8iIrjU7C',
-    })
-
-    const currentUser = await userClient.currentUser();
-    userClient.login()
-    
-    return {
-      success: true, username: currentUser.name
-    }
-    
-  } catch (err) {
-    console.error(err)
-    return
-  }
-
-  // return { success: true, username: "exampleUser" }
+  await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API delay
+  
+  return { success: true, username: "exampleUser" }
 }
 
 const verifyIdentity = async (username: string) => {
-  // await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API delay
   return { success: true, verified: true }
 }
 
