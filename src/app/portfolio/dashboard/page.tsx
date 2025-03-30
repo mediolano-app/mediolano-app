@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
+import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -11,15 +11,35 @@ import {
   Search,
   TrendingUp,
   Wallet,
-} from "lucide-react"
+} from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 // import { ConnectWallet } from "@/components/ConnectWallet"
-import { usePortfolio } from "@/hooks/usePortfolio"
+import { usePortfolio } from "@/hooks/usePortfolio";
 import { useMIP } from "@/hooks/useMIP";
 import { useRouter } from "next/navigation";
 import NFTCard from "@/components/NFTCard";
@@ -46,14 +66,14 @@ export default function DashboardPage() {
   // }, [userAssetsSearch, userAssetsFilter])
 
   const router = useRouter();
-  const {address, balance, balanceError, tokenIds, tokenIdsError, isLoading} = useMIP();
+  const { address, balance, balanceError, tokenIds, tokenIdsError, isLoading } =
+    useMIP();
   console.log(address);
   console.log(balance);
-  console.log(tokenIds); 
+  console.log(tokenIds);
 
   return (
     <div className="container mx-auto px-4 py-8 mt-10 mb-20">
-      
       <main className="p-4 space-y-6">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Onchain Assets Dashboard</h1>
@@ -80,36 +100,48 @@ export default function DashboardPage() {
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="bg-background/80">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Collections</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Collections
+              </CardTitle>
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                1
-              </div>
-              <p className="text-xs text-muted-foreground">Programmable IP Collection</p>
+              <div className="text-2xl font-bold">1</div>
+              <p className="text-xs text-muted-foreground">
+                Programmable IP Collection
+              </p>
             </CardContent>
           </Card>
           <Card className="bg-background/80">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Assets
+              </CardTitle>
               <LayoutGrid className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {address && isLoading ? "Loading..." : balanceError ? "Error" : balance.toString()}
+                {address && isLoading
+                  ? "Loading..."
+                  : balanceError
+                  ? "Error"
+                  : balance.toString()}
               </div>
-              <p className="text-xs text-muted-foreground">Total IPs in your portfolio</p>
+              <p className="text-xs text-muted-foreground">
+                Total IPs in your portfolio
+              </p>
             </CardContent>
           </Card>
           <Card className="bg-background/80">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Top Collection</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Top Collection
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-1xl font-bold">
-                   Programmable IP Collection
+                Programmable IP Collection
               </div>
               <p className="text-xs text-muted-foreground">
                 {address && isLoading ? "" : "(New collections soon)"}
@@ -118,21 +150,25 @@ export default function DashboardPage() {
           </Card>
           <Card className="bg-background/80">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Recent Activity
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-1xl font-bold">
-                {address && isLoading ? "Loading..." 
-                  // : (portfolioStats.recentActivity.length > 0 
-                  // ? portfolioStats.recentActivity[0].item 
-                  : "No recorded activity"}
+                {address && isLoading
+                  ? "Loading..."
+                  : // : (portfolioStats.recentActivity.length > 0
+                    // ? portfolioStats.recentActivity[0].item
+                    "No recorded activity"}
               </div>
               <p className="text-xs text-muted-foreground">
-                {address && isLoading ? "" 
-                  // : (portfolioStats.recentActivity.length > 0 
-                  // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
-                  : "(Demonstration)"}
+                {address && isLoading
+                  ? ""
+                  : // : (portfolioStats.recentActivity.length > 0
+                    // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK`
+                    "(Demonstration)"}
               </p>
             </CardContent>
           </Card>
@@ -142,17 +178,16 @@ export default function DashboardPage() {
         <section>
           <div className="flex justify-between items-center mb-4 mt-10">
             <h2 className="text-2xl font-semibold">IP Assets</h2>
-            <Button
-            onClick={() => router.push('/portfolio')} 
-            variant="outline"
-            >
+            <Button onClick={() => router.push("/portfolio")} variant="outline">
               Open portfolio
             </Button>
           </div>
           {address && isLoading ? (
             <div className="text-center py-8">Loading your assets...</div>
           ) : tokenIdsError ? (
-            <div className="text-center py-8 text-red-500">{tokenIdsError.message}</div>          
+            <div className="text-center py-8 text-red-500">
+              {tokenIdsError.message}
+            </div>
           ) : balance === 0 ? (
             <div className="text-center py-8">
               <p>Your Programmable IP will appear here after creation.</p>
@@ -160,9 +195,9 @@ export default function DashboardPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {tokenIds.map((tokenId, index) => (
-                <NFTCard key={index} tokenId={tokenId} status={"teste"}/>
-              ))}
+                {tokenIds.map((tokenId, index) => (
+                  <NFTCard key={index} tokenId={tokenId} status={"teste"} />
+                ))}
                 {/*                 
                 {userAssets.slice(0, recentAssetsCount).map((asset) => (
                   <Card key={asset.id} className="bg-background/80">
@@ -396,5 +431,5 @@ export default function DashboardPage() {
         </section> */}
       </main>
     </div>
-  )
+  );
 }

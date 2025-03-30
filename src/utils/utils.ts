@@ -77,6 +77,16 @@ export const GetChainIdFromName = (chainName: ChainName) => {
     }
 };
 
+export function toU256(value: string | number) {
+  const bigIntValue = BigInt(value);
+  return {
+    low: (
+      bigIntValue & BigInt("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+    ).toString(),
+    high: (bigIntValue >> BigInt(128)).toString(),
+  };
+}
+
 
 
 export function formatDate(dateString: string) {
