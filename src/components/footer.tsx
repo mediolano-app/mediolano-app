@@ -156,7 +156,7 @@ export function Footer() {
                 <div>
                 <h3 className="mb-6 text-sm font-semibold uppercase">IP Templates</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/create/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Default</Link></li>
+                    <li><Link href="/create/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Custom</Link></li>
                     <li><Link href="/create/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Art</Link></li>
                     <li><Link href="/create/document" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
                     <li><Link href="/create/video" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Video</Link></li>
@@ -312,11 +312,11 @@ export function Footer() {
                   <div className="flex items-center space-x-2">
                     <Badge variant="secondary" className="flex items-center space-x-1">
                       <Star className="h-3 w-3" />
-                      <span>14</span>
+                      <span>43</span>
                     </Badge>
                     <Badge variant="secondary" className="flex items-center space-x-1">
                       <GitFork className="h-3 w-3" />
-                      <span>23</span>
+                      <span>27</span>
                     </Badge>
                   </div>
                 </div>

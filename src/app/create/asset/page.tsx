@@ -659,8 +659,8 @@ export default function CreateIPPage() {
           //setIsDrawerOpen(false)
 
           toast({
-            title: "IP Registration Successful",
-            description: `Your intellectual property "${formData.title}" has been registered on the blockchain.`,
+            title: "IP Creation Successful",
+            description: `Your asset "${formData.title}" is ready to be minted onchain.`,
           })
 
           // Wrap the router navigation in a try/catch to handle any navigation errors
