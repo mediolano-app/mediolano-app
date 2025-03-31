@@ -73,8 +73,8 @@ export default function CreateAgreementPage() {
     },
   });
 
-  const agreementContractClassHash = process.env.NEXT_PUBLIC_AGREEMENT_CONTRACT_HASH;
-  const agreementFactoryAddress = process.env.NEXT_PUBLIC_AGREEMENT_FACTORY_ADDRESS;
+  const agreementContractClassHash = process.env.NEXT_PUBLIC_AGREEMENT_CONTRACT_HASH?.toString();
+  const agreementFactoryAddress = process.env.NEXT_PUBLIC_AGREEMENT_FACTORY_ADDRESS?.toString();
 
   const { udc } = useUniversalDeployerContract();
   const getConstructorCalldata = (address: Address) => {
@@ -85,12 +85,12 @@ export default function CreateAgreementPage() {
       .filter(Boolean);
 
     return new CallData(ip_agreement_abi).compile("constructor", {
-      creator: address,
-      factory: agreementFactoryAddress as string,
+      creator: address.toString(),
+      factory: agreementFactoryAddress,
       title: formData.title || "",
       description: formData.description || "",
       ip_metadata: formData.ip_metadata || "",
-      signers: signers,
+      signers: signers.map(s => s.toString()),
     });
   };
 
