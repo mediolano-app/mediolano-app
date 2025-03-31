@@ -11,12 +11,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Wallet, User, Gift, Settings, LogOut } from "lucide-react";
+import { Wallet, User, Gift, Settings, LogOut, Rocket, Box } from "lucide-react";
+import Link from "next/link"
 
 export function WalletConnect() {
   const { connect, connectors } = useConnect();
   const { account, address } = useAccount();
   const { disconnect } = useDisconnect();
+  
 
   return (
     <Dialog>
@@ -28,16 +30,32 @@ export function WalletConnect() {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{account ? "Account" : "Connect"}</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm text-blue-500">
             {account
               ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}`
-              : "Sign in wth your wallet on SEPOLIA TESTNET."}
+              : "Please connect to Starknet Sepolia *"}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4">
 
           {account ? (
             <div className="grid gap-4">
+              
+              <Link href="/discover">
+                <Button variant="outline" className="justify-start w-full">
+                  <Rocket className="mr-2 h-4 w-4" />
+                  Discover
+                </Button>
+              </Link>
+
+              <Link href="/create">
+                <Button variant="outline" className="justify-start w-full">
+                  <Box className="mr-2 h-4 w-4" />
+                  Create
+                </Button>
+              </Link>
+        
+              {/* Account Menu
               <Button variant="outline" className="justify-start">
                 <User className="mr-2 h-4 w-4" />
                 My Account
@@ -50,7 +68,8 @@ export function WalletConnect() {
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Button>
-              <Button variant="destructive" onClick={disconnect} className="justify-start">
+               */}
+              <Button variant="destructive" onClick={() => disconnect()} className="justify-start">
                 <LogOut className="mr-2 h-4 w-4" />
                 Disconnect
               </Button>
@@ -66,7 +85,7 @@ export function WalletConnect() {
 
           <div className="alert alert-warning">
             <p className="text-sm">
-              The dApp is connected to the testnet. Please make sure your wallet is usng Starknet Sepolia to interact.
+             * Mediolano Dapp is under development and connected to the testnet. Please make sure your wallet is connect on <span className="bg-blue-100 p-1 round-lg">Starknet Sepolia</span> to interact.
             </p>
           </div>
 

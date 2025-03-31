@@ -13,8 +13,8 @@ export default function NewContentPage() {
   const [selectedType, setSelectedType] = useState<string | null>(null)
 
   const contentTypes = [
-    { id: 'ip', name: 'Create New IP', icon: BookOpen, route: '/create/asset' },
-    { id: 'collection', name: 'Create New Collection', icon: FolderPlus, route: '/create/collection' },
+    { id: 'ip', name: 'Create Programmable IP', icon: BookOpen, route: '/create/asset' },
+    { id: 'collection', name: 'Create IP Collection', icon: FolderPlus, route: '/create/collection' },
   ]
 
   const handleSelection = (type: string) => {
