@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-interface TwitterTokenResponse {
+interface TwitterToken {
   access_token: string;
   username: string;
   expires_in: number;
@@ -26,20 +24,33 @@ export interface Tweet {
 }
 
 export const twitterService = {
-  // Generate authorization URL for Twitter OAuth
-  getAuthUrl: (): string => {
-    const TWITTER_CLIENT_ID = process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID;
-    const TWITTER_REDIRECT_URI = process.env.NEXT_PUBLIC_TWITTER_REDIRECT_URI;
+  // Get Twitter OAuth authentication URL
+  getAuthUrl(): string {
+    const clientId = process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID;
+    const redirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_TWITTER_REDIRECT_URI || '');
+    const scopes = encodeURIComponent('tweet.read users.read');
+    const state = Math.random().toString(36).substring(7);
+    const codeChallenge = state; // In production, use a proper PKCE code challenge
     
-    const scope = encodeURIComponent('tweet.read users.read');
-    return `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${TWITTER_CLIENT_ID}&redirect_uri=${encodeURIComponent(TWITTER_REDIRECT_URI as string)}&scope=${scope}&state=state&code_challenge=challenge&code_challenge_method=plain`;
+    return `https://twitter.com/i/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scopes}&state=${state}&response_type=code&code_challenge_method=plain&code_challenge=${codeChallenge}`;
   },
 
-  // Exchange code for access token
-  getAccessToken: async (code: string): Promise<TwitterTokenResponse> => {
+  // Exchange OAuth code for access token
+  async getAccessToken(code: string): Promise<TwitterToken> {
     try {
-      const response = await axios.post('/api/twitter/token', { code });
-      return response.data;
+      const response = await fetch('/api/twitter/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get Twitter access token');
+      }
+
+      return await response.json();
     } catch (error) {
       console.error('Error getting Twitter access token:', error);
       throw error;
@@ -47,31 +58,43 @@ export const twitterService = {
   },
 
   // Get user's tweets
-  getUserTweets: async (accessToken: string): Promise<Tweet[]> => {
+  async getUserTweets(accessToken: string): Promise<Tweet[]> {
     try {
-      const response = await axios.get('/api/twitter/tweets', {
+      const response = await fetch('/api/twitter/tweets', {
+        method: 'GET',
         headers: {
-          Authorization: `Bearer ${accessToken}`
+          'Authorization': `Bearer ${accessToken}`
         }
       });
-      return response.data;
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch tweets');
+      }
+
+      return await response.json();
     } catch (error) {
-      console.error('Error fetching user tweets:', error);
+      console.error('Error fetching tweets:', error);
       throw error;
     }
   },
 
-  // Get a single tweet by ID
-  getTweetById: async (accessToken: string, tweetId: string): Promise<Tweet> => {
+  // Get a specific tweet by ID
+  async getTweetById(accessToken: string, tweetId: string): Promise<Tweet> {
     try {
-      const response = await axios.get(`/api/twitter/tweets/${tweetId}`, {
+      const response = await fetch(`/api/twitter/tweet/${tweetId}`, {
+        method: 'GET',
         headers: {
-          Authorization: `Bearer ${accessToken}`
+          'Authorization': `Bearer ${accessToken}`
         }
       });
-      return response.data;
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch tweet');
+      }
+
+      return await response.json();
     } catch (error) {
-      console.error('Error fetching tweet details:', error);
+      console.error('Error fetching tweet:', error);
       throw error;
     }
   }

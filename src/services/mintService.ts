@@ -1,12 +1,12 @@
-import { ethers } from 'ethers';
 import axios from 'axios';
-import { pinataClient } from '../utils/pinataClient';
-import NFTContract from '../contracts/NFT.json';
-import { ToShortAddress } from '../utils/utils';
+import { uploadMetadataToPinata } from '@/utils/pinataClient';
+import { starknetService } from './starknetService';
+import { IPAssetData, AssetType, LicenseTerms, TokenizationResult } from '@/types/starknet';
+import * as crypto from 'crypto';
 
-interface NFTAttribute {
+export interface NFTAttribute {
   trait_type: string;
-  value: string | number | Date;
+  value: string | number;
 }
 
 export interface NFTMetadata {
@@ -15,22 +15,18 @@ export interface NFTMetadata {
   external_url?: string;
   image?: string;
   attributes?: NFTAttribute[];
-}
-
-interface MintResult {
-  success: boolean;
-  txHash: string;
-  metadataURI: string;
+  asset_type?: string;
+  license_terms?: string;
+  source_platform?: string;
+  source_id?: string;
+  creator_address?: string;
 }
 
 export const mintService = {
-  // Upload metadata to IPFS via Pinata
   uploadToIPFS: async (metadata: NFTMetadata): Promise<string> => {
     try {
-      // Using the pinataClient from utils
-      const response = await pinataClient.pinJSON(metadata);
-      
-      return `ipfs://${response.IpfsHash}`;
+      // Using the uploadMetadataToPinata function from utils
+      return await uploadMetadataToPinata(metadata);
     } catch (error) {
       console.error('Error uploading to IPFS:', error);
       
@@ -40,7 +36,7 @@ export const mintService = {
         const PINATA_SECRET_KEY = process.env.NEXT_PUBLIC_PINATA_SECRET_KEY;
         
         const response = await axios.post(
-          'https://api.pinata.cloud/pinning/pinJSONToIPFS',
+          'https://uploads.pinata.cloud/v3/files',
           metadata,
           {
             headers: {
@@ -51,7 +47,7 @@ export const mintService = {
           }
         );
         
-        return `ipfs://${response.data.IpfsHash}`;
+        return `ipfs://${response.data.cid}`;
       } catch (fallbackError) {
         console.error('Fallback IPFS upload failed:', fallbackError);
         throw new Error('Failed to upload to IPFS');
@@ -59,47 +55,97 @@ export const mintService = {
     }
   },
   
-  // Mint NFT with the provided metadata
-  mintNFT: async (metadata: NFTMetadata): Promise<MintResult> => {
+  // Generate metadata hash for verification
+  generateMetadataHash: (metadata: NFTMetadata): string => {
+    const metadataString = JSON.stringify(metadata);
+    return crypto.createHash('sha256').update(metadataString).digest('hex');
+  },
+  
+  // Convert from NFTMetadata to IPAssetData
+  prepareAssetData: async (metadata: NFTMetadata, userAddress: string): Promise<IPAssetData> => {
+    // Upload metadata to IPFS
+    const metadataURI = await mintService.uploadToIPFS(metadata);
+    
+    // Generate hash for verification
+    const metadataHash = mintService.generateMetadataHash(metadata);
+    
+    // Map asset type from metadata (default to Copyright for social media content)
+    let assetType = AssetType.Copyright;
+    if (metadata.asset_type) {
+      switch (metadata.asset_type.toLowerCase()) {
+        case 'patent': assetType = AssetType.Patent; break;
+        case 'trademark': assetType = AssetType.Trademark; break;
+        case 'tradesecret': assetType = AssetType.TradeSecret; break;
+      }
+    }
+    
+    // Map license terms from metadata (default to Standard)
+    let licenseTerms = LicenseTerms.Standard;
+    if (metadata.license_terms) {
+      switch (metadata.license_terms.toLowerCase()) {
+        case 'premium': licenseTerms = LicenseTerms.Premium; break;
+        case 'exclusive': licenseTerms = LicenseTerms.Exclusive; break;
+        case 'custom': licenseTerms = LicenseTerms.Custom; break;
+      }
+    }
+    
+    // Calculate default expiry date (50 years from now)
+    const expiryDate = BigInt(Math.floor(Date.now() / 1000) + 50 * 365 * 24 * 60 * 60);
+    
+    return {
+      metadata_uri: metadataURI,
+      metadata_hash: metadataHash,
+      owner: userAddress,
+      asset_type: assetType,
+      license_terms: licenseTerms,
+      expiry_date: expiryDate
+    };
+  },
+  
+  tokenizeTwitterPost: async (
+    tweetData: any, 
+    userAddress: string, 
+    licenseTerms: LicenseTerms = LicenseTerms.Standard
+  ): Promise<TokenizationResult> => {
     try {
-      const NFT_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS;
+      // Prepare metadata from tweet
+      const metadata: NFTMetadata = {
+        name: `Tweet by @${tweetData.username || 'user'}`,
+        description: tweetData.text,
+        external_url: `https://x.com/user/status/${tweetData.id}`,
+        source_platform: 'twitter/x',
+        source_id: tweetData.id,
+        creator_address: userAddress,
+        license_terms: LicenseTerms[licenseTerms].toLowerCase(),
+        asset_type: 'copyright',
+        attributes: [
+          { trait_type: 'Platform', value: 'Twitter' },
+          { trait_type: 'Created At', value: tweetData.created_at || new Date().toISOString() },
+          { trait_type: 'Likes', value: tweetData.public_metrics?.like_count || 0 },
+          { trait_type: 'Retweets', value: tweetData.public_metrics?.retweet_count || 0 }
+        ]
+      };
       
-      // First, upload metadata to IPFS
-      const metadataURI = await mintService.uploadToIPFS(metadata);
-      
-      // Connect to MetaMask
-      if (typeof window === 'undefined' || !window.ethereum) {
-        throw new Error('MetaMask is not installed');
+      // Add image if available
+      if (tweetData.media && tweetData.media.length > 0) {
+        metadata.image = tweetData.media[0].url;
       }
       
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+      // Convert to IPAssetData
+      const assetData = await mintService.prepareAssetData(metadata, userAddress);
       
-      const userAddress = await signer.getAddress();
-      console.log(`Minting NFT for address: ${ToShortAddress(userAddress)}`);
-      
-      // Connect to the NFT contract
-      const contract = new ethers.Contract(
-        NFT_CONTRACT_ADDRESS as string,
-        NFTContract.abi,
-        signer
-      );
-      
-      // Mint the NFT
-      const tx = await contract.mint(userAddress, metadataURI);
-      await tx.wait();
+      // Tokenize the asset using Starknet
+      const tokenId = await starknetService.tokenizeAsset(assetData);
       
       return {
         success: true,
-        txHash: tx.hash,
-        metadataURI
+        tokenIds: [tokenId],
+        txHash: 'tx_hash', // Should be obtained from the tokenization result
+        metadataURIs: [assetData.metadata_uri]
       };
-    } catch (error) {
-      console.error('Error minting NFT:', error);
-      throw error;
+    } catch (error: any) {
+      console.error('Error minting Twitter NFT:', error);
+      throw new Error(`Failed to mint Twitter NFT: ${error.message}`);
     }
   }
 };
-
-export default mintService;
