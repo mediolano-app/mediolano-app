@@ -43,6 +43,7 @@ export default function CreateAgreementPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const { address, status } = useAccount();
+
   const [formData, setFormData] = useState<AgreementFormData>({
     title: "",
     type: "",
@@ -73,42 +74,98 @@ export default function CreateAgreementPage() {
     },
   });
 
+  const [errors, setErrors] = useState<Record<string, { walletAddress?: string }>>({});
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [isFormDataValid, setIsFormDataValid] = useState(false);
+
   const agreementContractClassHash = process.env.NEXT_PUBLIC_AGREEMENT_CONTRACT_HASH?.toString();
   const agreementFactoryAddress = process.env.NEXT_PUBLIC_AGREEMENT_FACTORY_ADDRESS?.toString();
 
   const { udc } = useUniversalDeployerContract();
-  const getConstructorCalldata = (address: Address) => {
-    if (!agreementFactoryAddress) throw new Error("Agreement factory address not configured");
-    
-    const signers = formData.parties
-      .map((party) => party.walletAddress)
-      .filter(Boolean);
 
+  const getConstructorCalldata = (creatorAddress: Address) => {
+    const signers = formData.parties.map((party) => party.walletAddress).filter(Boolean);
     return new CallData(ip_agreement_abi).compile("constructor", {
-      creator: address.toString(),
-      factory: agreementFactoryAddress,
-      title: formData.title || "",
-      description: formData.description || "",
-      ip_metadata: formData.ip_metadata || "",
-      signers: signers.map(s => s.toString()),
+      creator: creatorAddress,
+      factory: agreementFactoryAddress!,
+      title: formData.title,
+      description: formData.description,
+      ip_metadata: formData.ip_metadata,
+      signers,
     });
   };
 
   const { send, isPending: isCreatingAgreement, error: agreementError, data: agreementData } = useSendTransaction({
-    calls: udc && agreementContractClassHash && address
-      ? [
-          udc.populate("deploy_contract", [
-            agreementContractClassHash,
-            23,
-            false, 
-            getConstructorCalldata(address),
-          ]),
-        ]
-      : undefined,
+    calls:
+      isFormDataValid && udc && address
+        ? [
+            udc.populate("deploy_contract", [
+              agreementContractClassHash!,
+              23,
+              false,
+              getConstructorCalldata(address),
+            ]),
+          ]
+        : undefined,
   });
+
+  // Centralized validation function
+  const validateFormData = (data: AgreementFormData, creatorAddress: string): boolean => {
+    const isValidHex = (str: string): boolean => /^0x[0-9a-fA-F]+$/.test(str);
+
+    if (!creatorAddress || !isValidHex(creatorAddress)) return false;
+    if (!agreementFactoryAddress || !isValidHex(agreementFactoryAddress)) return false;
+    if (!agreementContractClassHash || !isValidHex(agreementContractClassHash)) return false;
+
+    if (!data.title) return false;
+    if (!data.type) return false;
+    if (!data.description) return false;
+    if (!data.ip_metadata) return false;
+
+    if (data.parties.length < 2) return false;
+    for (const party of data.parties) {
+      if (!party.name || !party.walletAddress || !isValidHex(party.walletAddress) || !party.role) return false;
+    }
+
+    if (!data.terms.duration || !data.terms.territory || !data.terms.rights || !data.terms.royalties || !data.terms.termination) return false;
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmissionError(null);
+
+    try {
+      if (!address) throw new Error("Wallet not connected");
+      if (!udc) throw new Error("Universal Deployer Contract not available");
+
+      // Validate form data
+      if (!validateFormData(formData, address)) {
+        throw new Error("Invalid form data. Please check your inputs.");
+      }
+
+      // If valid, set isFormDataValid to true and trigger the transaction
+      setIsFormDataValid(true);
+      await send();
+    } catch (error: any) {
+      console.error("Error creating agreement:", error);
+      const errorMessage = error.message || "Failed to create agreement. Please try again.";
+      setSubmissionError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      // Reset isFormDataValid after submission attempt
+      setIsFormDataValid(false);
+    }
+  };
 
   useEffect(() => {
     if (agreementError) {
+      setSubmissionError(agreementError.message || "Failed to create agreement. Please try again.");
       toast({
         title: "Error",
         description: agreementError.message || "Failed to create agreement. Please try again.",
@@ -119,6 +176,7 @@ export default function CreateAgreementPage() {
 
   useEffect(() => {
     if (agreementData) {
+      setSubmissionError(null);
       toast({
         title: "Agreement Created",
         description: "Your licensing agreement has been created successfully",
@@ -144,23 +202,30 @@ export default function CreateAgreementPage() {
   const updateTerm = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
-      terms: {
-        ...prev.terms,
-        [field]: value,
-      },
+      terms: { ...prev.terms, [field]: value },
     }));
   };
 
   const updateParty = (index: number, field: string, value: string) => {
     const updatedParties = [...formData.parties];
-    updatedParties[index] = {
-      ...updatedParties[index],
-      [field]: value,
-    };
-    setFormData((prev) => ({
-      ...prev,
-      parties: updatedParties,
-    }));
+    updatedParties[index] = { ...updatedParties[index], [field]: value };
+    setFormData((prev) => ({ ...prev, parties: updatedParties }));
+
+    if (field === "walletAddress") {
+      const partyId = formData.parties[index].id;
+      const isValidHex = (str: string) => /^0x[0-9a-fA-F]+$/.test(str);
+      if (value && !isValidHex(value)) {
+        setErrors((prev) => ({
+          ...prev,
+          [partyId]: { walletAddress: "Invalid address: must be a hex string starting with '0x'" },
+        }));
+      } else {
+        setErrors((prev) => {
+          const { [partyId]: _, ...rest } = prev;
+          return rest;
+        });
+      }
+    }
   };
 
   const addParty = () => {
@@ -168,45 +233,16 @@ export default function CreateAgreementPage() {
       ...prev,
       parties: [
         ...prev.parties,
-        {
-          id: crypto.randomUUID(),
-          name: "",
-          walletAddress: "",
-          role: "witness",
-          email: "",
-        },
+        { id: crypto.randomUUID(), name: "", walletAddress: "", role: "witness", email: "" },
       ],
     }));
   };
 
   const removeParty = (index: number) => {
     if (formData.parties.length <= 2) return;
-
     const updatedParties = [...formData.parties];
     updatedParties.splice(index, 1);
-    setFormData((prev) => ({
-      ...prev,
-      parties: updatedParties,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      if (!address) throw new Error("Wallet not connected");
-      if (!agreementContractClassHash) throw new Error("Agreement factory address not configured");
-
-      await send();
-      console.log(agreementData);
-    } catch (error: any) { 
-      console.error("Error creating agreement:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create agreement. Please try again.",
-        variant: "destructive",
-      });
-    }
+    setFormData((prev) => ({ ...prev, parties: updatedParties }));
   };
 
   const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
@@ -217,7 +253,10 @@ export default function CreateAgreementPage() {
       case 0:
         return !!formData.title && !!formData.type && !!formData.description && !!formData.ip_metadata;
       case 1:
-        return formData.parties.every((party) => !!party.name && !!party.walletAddress && !!party.role);
+        return (
+          formData.parties.every((party) => !!party.name && !!party.walletAddress && !!party.role) &&
+          Object.values(errors).every((error) => !error.walletAddress)
+        );
       case 2:
         return (
           !!formData.terms.duration &&
@@ -231,35 +270,20 @@ export default function CreateAgreementPage() {
     }
   };
 
-  const formatValue = (value: string) => {
-    if (!value) return "";
-    return value.replace(/_/g, " ");
-  };
+  const formatValue = (value: string) => (value ? value.replace(/_/g, " ") : "");
 
   useEffect(() => {
     if (status === "disconnected") {
       setShowForm(false);
       setFormData((prev) => ({
         ...prev,
-        parties: [
-          {
-            ...prev.parties[0],
-            walletAddress: "",
-          },
-          ...prev.parties.slice(1),
-        ],
+        parties: [{ ...prev.parties[0], walletAddress: "" }, ...prev.parties.slice(1)],
       }));
     } else if (status === "connected") {
       setShowForm(true);
       setFormData((prev) => ({
         ...prev,
-        parties: [
-          {
-            ...prev.parties[0],
-            walletAddress: address || "",
-          },
-          ...prev.parties.slice(1),
-        ],
+        parties: [{ ...prev.parties[0], walletAddress: address || "" }, ...prev.parties.slice(1)],
       }));
     }
   }, [address, status]);
@@ -268,9 +292,7 @@ export default function CreateAgreementPage() {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return (
     <div className="container max-w-5xl mx-auto px-4 py-8">
@@ -410,6 +432,9 @@ export default function CreateAgreementPage() {
                             placeholder="0x..."
                             disabled={index === 0}
                           />
+                          {errors[party.id]?.walletAddress && (
+                            <p className="text-red-500 text-sm">{errors[party.id].walletAddress}</p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor={`party-role-${index}`}>Role</Label>
@@ -590,9 +615,15 @@ export default function CreateAgreementPage() {
                     <p className="text-sm text-muted-foreground">
                       By creating this agreement, you are initiating a blockchain-based licensing contract. Once created,
                       the agreement will be in draft status until all parties have signed it. As the creator, you will be
-                      able to make changes while it&apos;s in draft status.
+                      able to make changes while it’s in draft status.
                     </p>
                   </div>
+                  {submissionError && (
+                    <div className="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                      <h3 className="font-medium">Submission Error</h3>
+                      <p>{submissionError}</p>
+                    </div>
+                  )}
                 </div>
               )}
               <div className="flex justify-between mt-8">
@@ -610,8 +641,8 @@ export default function CreateAgreementPage() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 ) : (
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={isCreatingAgreement || !validateCurrentStep()}
                     className={isCreatingAgreement ? "animate-pulse" : ""}
                   >
