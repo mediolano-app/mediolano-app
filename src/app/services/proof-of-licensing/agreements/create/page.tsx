@@ -8,10 +8,21 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, ArrowRight, Save, Plus, Trash } from "lucide-react";
-import { type Address, useAccount, useSendTransaction, useUniversalDeployerContract } from "@starknet-react/core";
+import {
+  type Address,
+  useAccount,
+  useSendTransaction,
+  useUniversalDeployerContract,
+} from "@starknet-react/core";
 import { CallData } from "starknet";
 import { ip_agreement_abi } from "@/abis/ip_agreement";
 
@@ -19,7 +30,6 @@ interface AgreementFormData {
   title: string;
   type: string;
   description: string;
-  ip_metadata: string;
   parties: {
     id: string;
     name: string;
@@ -48,7 +58,6 @@ export default function CreateAgreementPage() {
     title: "",
     type: "",
     description: "",
-    ip_metadata: "",
     parties: [
       {
         id: crypto.randomUUID(),
@@ -74,23 +83,50 @@ export default function CreateAgreementPage() {
     },
   });
 
-  const [errors, setErrors] = useState<Record<string, { walletAddress?: string }>>({});
+  const [errors, setErrors] = useState<
+    Record<string, { walletAddress?: string }>
+  >({});
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [isFormDataValid, setIsFormDataValid] = useState(false);
 
-  const agreementContractClassHash = process.env.NEXT_PUBLIC_AGREEMENT_CONTRACT_HASH?.toString();
-  const agreementFactoryAddress = process.env.NEXT_PUBLIC_AGREEMENT_FACTORY_ADDRESS?.toString();
+  const agreementContractClassHash =
+    process.env.NEXT_PUBLIC_AGREEMENT_CONTRACT_HASH?.toString();
+  const agreementFactoryAddress =
+    process.env.NEXT_PUBLIC_AGREEMENT_FACTORY_ADDRESS?.toString();
 
   const { udc } = useUniversalDeployerContract();
 
   const getConstructorCalldata = (creatorAddress: Address) => {
-    const signers = formData.parties.map((party) => party.walletAddress).filter(Boolean);
+    const signers = formData.parties
+      .map((party) => party.walletAddress)
+      .filter(Boolean);
+
+    // Create metadata object with additional agreement details
+    const metadata = {
+      type: formData.type,
+      parties: formData.parties.map((party) => ({
+        name: party.name,
+        role: party.role,
+        email: party.email || undefined,
+      })),
+      terms: {
+        duration: formData.terms.duration,
+        territory: formData.terms.territory,
+        rights: formData.terms.rights,
+        royalties: formData.terms.royalties,
+        termination: formData.terms.termination,
+      },
+    };
+
+    // Serialize metadata to a JSON string
+    const ip_metadata = JSON.stringify(metadata);
+
     return new CallData(ip_agreement_abi).compile("constructor", {
       creator: creatorAddress,
       factory: agreementFactoryAddress!,
       title: formData.title,
       description: formData.description,
-      ip_metadata: formData.ip_metadata,
+      ip_metadata, // Pass the serialized metadata
       signers,
     });
   };
@@ -120,14 +156,19 @@ export default function CreateAgreementPage() {
     if (!data.title) return false;
     if (!data.type) return false;
     if (!data.description) return false;
-    if (!data.ip_metadata) return false;
 
     if (data.parties.length < 2) return false;
     for (const party of data.parties) {
       if (!party.name || !party.walletAddress || !isValidHex(party.walletAddress) || !party.role) return false;
     }
 
-    if (!data.terms.duration || !data.terms.territory || !data.terms.rights || !data.terms.royalties || !data.terms.termination) return false;
+    if (
+      !data.terms.duration ||
+      !data.terms.territory ||
+      !data.terms.rights ||
+      !data.terms.royalties ||
+      !data.terms.termination
+    ) return false;
 
     return true;
   };
@@ -251,7 +292,7 @@ export default function CreateAgreementPage() {
   const validateCurrentStep = (): boolean => {
     switch (currentStep) {
       case 0:
-        return !!formData.title && !!formData.type && !!formData.description && !!formData.ip_metadata;
+        return !!formData.title && !!formData.type && !!formData.description;
       case 1:
         return (
           formData.parties.every((party) => !!party.name && !!party.walletAddress && !!party.role) &&
@@ -380,15 +421,6 @@ export default function CreateAgreementPage() {
                       onChange={(e) => updateField("description", e.target.value)}
                       placeholder="Describe the purpose and scope of this agreement"
                       rows={5}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="ip_metadata">IP Metadata URI</Label>
-                    <Input
-                      id="ip_metadata"
-                      value={formData.ip_metadata}
-                      onChange={(e) => updateField("ip_metadata", e.target.value)}
-                      placeholder="e.g., ipfs://your-metadata-uri"
                     />
                   </div>
                 </div>
@@ -560,10 +592,6 @@ export default function CreateAgreementPage() {
                     <div>
                       <div className="text-sm font-medium text-muted-foreground">Description</div>
                       <div className="whitespace-pre-line">{formData.description || "Not specified"}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-muted-foreground">IP Metadata</div>
-                      <div className="whitespace-pre-line">{formData.ip_metadata || "Not specified"}</div>
                     </div>
                   </div>
                   <div className="p-4 border rounded-lg space-y-4">
