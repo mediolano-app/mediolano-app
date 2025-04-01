@@ -55,6 +55,7 @@ export interface IP{
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 	const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
 	const [metadata, setMetadata] = useState<IP | null>(null);
+	const [isImage, setIsImage] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -72,9 +73,6 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		args: [Number(tokenId)],
 		watch: false,
 	});
-
-	console.log("Token Uri:", tokenURI);
-
 	// Fetch metadata when tokenURI is available
 	useEffect(() => {
 		const fetchMetadata = async () => {
@@ -102,6 +100,9 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				// }
 
 				setMetadata(parsedData);
+				if(parsedData.image.startsWith("https://")) {
+					setIsImage(true);
+				}
 				console.log(parsedData);
 				setError(null);
 			} catch (err) {
@@ -116,15 +117,15 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 
 		fetchMetadata();
 	}, [tokenURI]);
+	
+	useEffect(() => {
+		if (metadata) {
+			console.log("Metadata:", metadata);
+			console.log("Metadata IMAGE", metadata.image);
+		}
+	}
+	, [metadata]);
 
-	// const isValidMetadata = (data: any): data is IP => {
-	// 	return (
-	// 		data &&
-	// 		typeof data === "object" &&
-	// 		"name" in data &&
-	// 		"description" in data
-	// 	);
-	// };
 
 	if (isLoading || isContractLoading) {
 		return <div>Loading...</div>; // Consider using a proper loading component
@@ -141,7 +142,25 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 	return (
 		<Card className="overflow-hidden">
 			<CardHeader className="p-0">
+			  {isImage ? (
 				<Image
+					src={metadata.image}
+					alt={metadata.name}
+					width={400}
+					height={400}
+					className="w-full h-48 object-cover"
+				/> ) : (
+				<Image
+					src={
+						"/background.jpg"
+					} // Add fallback image
+					alt={metadata.name}
+					width={400}
+					height={400}
+					className="w-full h-48 object-cover"
+				/>
+			  )}
+				{/* <Image
 					src={
 						metadata.image || 
 						"/background.jpg"
@@ -150,7 +169,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 					width={400}
 					height={400}
 					className="w-full h-48 object-cover"
-				/>
+				/> */}
 			</CardHeader>
 			<CardContent className="p-4">
 				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
