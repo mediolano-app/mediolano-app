@@ -42,6 +42,11 @@ interface NFTCardProps {
 	status: string;
 }
 
+export interface Attribute {
+	trait_type?: string;
+	value: string;
+}
+
 export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 
 export interface IP{
@@ -49,7 +54,7 @@ export interface IP{
 	description: string,
 	external_url: string,
 	image: string,
-	attributes: []
+	attributes: Attribute[],
   }
 
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
@@ -160,22 +165,16 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 					className="w-full h-48 object-cover"
 				/>
 			  )}
-				{/* <Image
-					src={
-						metadata.image || 
-						"/background.jpg"
-					} // Add fallback image
-					alt={metadata.name}
-					width={400}
-					height={400}
-					className="w-full h-48 object-cover"
-				/> */}
 			</CardHeader>
 			<CardContent className="p-4">
 				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
 				<div className="flex justify-between items-center mb-2">
-					<Badge variant="secondary">{metadata.attributes[1].value}</Badge>
-					<Badge variant="secondary"> {metadata.attributes[0].value} </Badge>
+				<Badge variant="secondary">
+					{metadata.attributes?.[1]?.value ?? "0"}
+				</Badge>
+				<Badge variant="secondary">
+					{metadata.attributes?.[0]?.value ?? "0"}
+				</Badge>
 				</div>
 				<Badge className="text-sm"
 					variant={

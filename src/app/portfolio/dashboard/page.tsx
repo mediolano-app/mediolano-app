@@ -18,7 +18,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-// import { ConnectWallet } from "@/components/ConnectWallet"
 import { usePortfolio } from "@/hooks/usePortfolio"
 import { useMIP } from "@/hooks/useMIP";
 import { useRouter } from "next/navigation";
