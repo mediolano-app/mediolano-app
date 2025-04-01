@@ -17,9 +17,16 @@ export function WalletConnect() {
   const { connect, connectors } = useConnect();
   const { account, address } = useAccount();
   const { disconnect } = useDisconnect();
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (account) {
+      setOpen(false);
+    }
+  }, [account]);
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <Wallet className="h-4 w-4" /> {account ? address?.slice(0, 6) : "Connect"}
@@ -35,7 +42,6 @@ export function WalletConnect() {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-
           {account ? (
             <div className="grid gap-4">
               <Button variant="outline" className="justify-start">
@@ -55,7 +61,6 @@ export function WalletConnect() {
                 Disconnect
               </Button>
             </div>
-            
           ) : (
             <div className="grid gap-4">
               {connectors.map((connector) => (
@@ -64,12 +69,11 @@ export function WalletConnect() {
                 </Button>
               ))}
 
-          <div className="alert alert-warning">
-            <p className="text-sm">
-              The dApp is connected to the testnet. Please make sure your wallet is usng Starknet Sepolia to interact.
-            </p>
-          </div>
-
+              <div className="alert alert-warning">
+                <p className="text-sm">
+                  The dApp is connected to the testnet. Please make sure your wallet is usng Starknet Sepolia to interact.
+                </p>
+              </div>
             </div>
           )}
         </div>
