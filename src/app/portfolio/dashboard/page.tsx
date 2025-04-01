@@ -152,7 +152,7 @@ export default function DashboardPage() {
             <div className="text-center py-8">Loading your assets...</div>
           ) : tokenIdsError ? (
             <div className="text-center py-8 text-red-500">{tokenIdsError.message}</div>          
-          ) : balance === 0 ? (
+          ) : balance === BigInt(0) ? (
             <div className="text-center py-8">
               <p>Your Programmable IP will appear here after creation.</p>
             </div>
