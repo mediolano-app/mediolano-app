@@ -53,8 +53,8 @@ export function LicensingSection() {
                         <li key={i}>{right}</li>
                       ))}
                     </ul>
-                    <p className="font-bold mb-4">Price: {option.price} ETH</p>
-                    <Button className="w-full">Select</Button>
+                    <p className="font-bold mb-4">Price: {option.price} STRK</p>
+                    <Button className="w-full">Create</Button>
                   </CardContent>
                 </Card>
               ))}
@@ -120,7 +120,7 @@ export function LicensingSection() {
                   placeholder="Enter any custom clauses or terms"
                 />
               </div>
-              <Button onClick={handleCreateLicense}>Create Custom License</Button>
+              <Button disabled onClick={handleCreateLicense}>Create Custom License</Button>
             </div>
           </TabsContent>
         </Tabs>

@@ -16,8 +16,8 @@ import { NFTMetadata } from "@/lib/types";
 
 export default function AssetDashboard({ params }: { params: { id: string } }) {
 
-
-  const tokenId = parseInt(params.id);
+  const tokenId = params.id ? parseInt(params.id, 10) : 0;
+  
   const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
   
   // Read basic NFT information (name, symbol)
@@ -96,8 +96,9 @@ export default function AssetDashboard({ params }: { params: { id: string } }) {
         <AssetMetadata nftData={nftData} />
         <CreatorInfo nftData={nftData}/>
       </div>
+      {/*
       <AssetActivity />
-      <CollectionCarousel />
+      <CollectionCarousel />*/}
       <LicensingSection />
       {/*<LicensePreview />*/}
       <div className="flex mb-20"></div>

@@ -61,11 +61,11 @@ export function AssetInfo({ nftData }: AssetInfoProps) {
           </div>
           <div className="flex flex-wrap gap-2">
             
-            <Button variant="outline" size="sm">
+            <Button disabled variant="outline" size="sm">
               <Share2 className="w-4 h-4 mr-2" />
               Share
             </Button>
-            <Button 
+            <Button disabled 
               variant="outline" 
               size="sm"
               onClick={() => window.open(nftData.ipfsUrl, '_blank')}
@@ -75,13 +75,13 @@ export function AssetInfo({ nftData }: AssetInfoProps) {
             </Button>
           </div>
         </div>
-        <div className="relative aspect-square">
+        <div className="relative">
           <Image
-            src={nftData.imageUrl || "/placeholder.svg"}
+            src={nftData.imageUrl || "/background.jpg"}
             alt={nftData.title}
-            layout="fill"
-            objectFit="cover"
             className="rounded-lg"
+            width={900}
+            height={500}
           />
         </div>
       </CardContent>
