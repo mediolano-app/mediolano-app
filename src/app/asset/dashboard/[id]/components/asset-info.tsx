@@ -25,14 +25,14 @@ export function AssetInfo({ nftData }: AssetInfoProps) {
   return (
     <Card className="bg-background/90">
       <CardHeader>
-        <CardTitle>Asset Information</CardTitle>
+        <CardTitle className="text-foreground/50">Asset Information</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-6 md:grid-cols-2">
         <div className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold">{nftData.title}</h2>
-            <p className="text-sm text-muted-foreground">{nftData.description}</p>
-            <p className="text-sm text-muted-foreground">{nftData.nftId}</p>
+            <h2 className="text-4xl font-bold">{nftData.title}</h2>
+            <p className="mt-5 text-lg text-muted-foreground">{nftData.description}</p>
+            <p className="text-lg text-muted-foreground">{nftData.nftId}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
@@ -60,10 +60,7 @@ export function AssetInfo({ nftData }: AssetInfoProps) {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm">
-              <Heart className="w-4 h-4 mr-2" />
-              Add to Favorites
-            </Button>
+            
             <Button variant="outline" size="sm">
               <Share2 className="w-4 h-4 mr-2" />
               Share
@@ -74,7 +71,7 @@ export function AssetInfo({ nftData }: AssetInfoProps) {
               onClick={() => window.open(nftData.ipfsUrl, '_blank')}
             >
               <ExternalLink className="w-4 h-4 mr-2" />
-              View on IPFS
+              View on Explorer
             </Button>
           </div>
         </div>

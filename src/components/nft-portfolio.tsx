@@ -208,7 +208,7 @@ export default function NFTPortfolio() {
             <LineChart className="h-4 w-4" />
           </Button>
 
-          <Button variant="outline" size="icon" onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}>
+          <Button disabled variant="outline" size="icon" onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}>
             {viewMode === "grid" ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
           </Button>
 
@@ -266,7 +266,7 @@ export default function NFTPortfolio() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-1">
+              <Button variant="outline" className="flex items-center gap-1" disabled>
                 <ArrowUpDown className="h-4 w-4 mr-1" />
                 Sort
                 {getSortIcon()}
@@ -345,7 +345,7 @@ export default function NFTPortfolio() {
               <NFTCard 
               key={index} 
               tokenId={tokenId} 
-              status="Listed" 
+              status="Protected" 
               // onClick={() => router.push(`/assets/${tokenId}`)}
   
               />
