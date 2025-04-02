@@ -14,9 +14,10 @@ import { CONTRACT_ADDRESS } from "@/lib/constants"
 import { useEffect, useState } from "react"
 import { NFTMetadata } from "@/lib/types";
 
-export default function AssetDashboard() {
-  // Set token ID to 1 as specified
-  const tokenId = 44;
+export default function AssetDashboard({ params }: { params: { id: string } }) {
+
+
+  const tokenId = parseInt(params.id);
   const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
   
   // Read basic NFT information (name, symbol)
