@@ -64,7 +64,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	status = 'IP';
+	//status = 'IP';
 
 	// Get tokenURI from contract
 	const {
@@ -126,7 +126,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 	useEffect(() => {
 		if (metadata) {
 			console.log("Metadata:", metadata);
-			console.log("Metadata IMAGE", metadata.image);
+			//console.log("Metadata IMAGE", metadata.image);
 		}
 	}
 	, [metadata]);
@@ -142,6 +142,17 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 
 	if (!metadata) {
 		return <div>No metadata available</div>;
+	}
+
+
+	function truncateString(input: string, maxLength: number): string {
+		// Check if the string length exceeds the maximum length
+		if (input.length > maxLength) {
+			// Truncate the string to the specified length and append '...' or another indicator
+			return input.substring(0, maxLength) + "...";
+		}
+		// If the string is within the limit, return it as is
+		return input;
 	}
 
 	return (
@@ -168,39 +179,45 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 			</CardHeader>
 			<CardContent className="p-4">
 				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
+				
+				<p className="text-sm text-muted-foreground mb-5">
+					{ truncateString(metadata.description, 99 ) }</p>
+				
+				
 				<div className="flex justify-between items-center mb-2">
+
+				<Badge variant="default">
+					{metadata.attributes?.[0]?.value ?? "0"}
+				</Badge>
 				<Badge variant="secondary">
 					{metadata.attributes?.[1]?.value ?? "0"}
 				</Badge>
-				<Badge variant="secondary">
-					{metadata.attributes?.[0]?.value ?? "0"}
-				</Badge>
 				</div>
-				<Badge className="text-sm"
+				{/* <Badge className="text-sm"
 					variant={
-						status === "IP"
+						status === "Protected"
 							? "default"
-							: status === "Programmable IP"
+							: status === "Licensed"
 								? "secondary"
 								: "outline"
 					}
 				>
 					{status}
-				</Badge>
+				</Badge>*/}
 			</CardContent>
-			<CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
+			<CardFooter className="p-4 flex flex-wrap gap-2">
 				
 				<Link href={`/asset/${tokenId}`}>
 				<Button variant="outline" size="sm">
 					<Eye className="h-4 w-4 mr-2" />
 					View
 				</Button></Link>
-
+				{/*
 				<Button variant="outline" size="sm">
 					<FileText className="h-4 w-4 mr-2" />
 					License
 				</Button>
-				
+				*/}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="outline" size="sm">
