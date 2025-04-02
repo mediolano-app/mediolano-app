@@ -25,6 +25,8 @@ export function CreatorInfo({ nftData }: CreatorInfoProps) {
         </Avatar>
         <h3 className="text-sm font-semibold mb-2">{nftData.creator || "Unknown"}</h3>
         <p className="text-sm text-muted-foreground mb-4">{creator.bio}</p>
+        
+        {/*
         <div className="grid grid-cols-3 gap-4 w-full mb-4">
           <div>
             <p className="font-semibold">{creator.totalWorks}</p>
@@ -38,7 +40,8 @@ export function CreatorInfo({ nftData }: CreatorInfoProps) {
             <p className="font-semibold">{creator.totalSales}</p>
             <p className="text-xs sm:text-sm text-muted-foreground">Collections</p>
           </div>
-        </div>
+        </div>*/}
+
         <div className="flex flex-wrap justify-center gap-2 mb-4">
           {creator.specialties.map((specialty, index) => (
             <Badge key={index} variant="secondary" className="text-xs">
