@@ -32,7 +32,7 @@ export default function NewContentPage() {
 
   return (
     <> 
-    <div className="container mx-auto p-4 mt-10 mb-20">
+    <div className="container mx-auto p-4">
     
     <div className="space-y-6">
 

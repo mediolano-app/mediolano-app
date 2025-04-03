@@ -89,7 +89,7 @@ export default function AssetDashboard({ params }: { params: { id: string } }) {
   
   return (
     <div className="container mx-auto px-4 py-4 space-y-4 overflow-x-hidden">
-        <h1 className="text-xl text-foreground/50">Programmable IP Dashboard</h1>
+        
       <AssetInfo nftData={nftData} />
       <ActionButtons />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

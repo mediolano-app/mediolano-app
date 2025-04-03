@@ -659,7 +659,7 @@ export default function CreateIPPage() {
           //setIsDrawerOpen(false)
 
           toast({
-            title: "IP Creation Successful",
+            title: "Programmable IP Ready",
             description: `Your asset "${formData.title}" is ready to be minted onchain.`,
           })
 
@@ -705,7 +705,7 @@ export default function CreateIPPage() {
 
 
   return (
-    <div className="container mx-auto px-4 py-6 mt-10 mb-20 bg-background shadow rounded-lg">
+    <div className="container mx-auto px-4 py-6 bg-background shadow rounded-lg">
      
       <div className="flex items-center gap-2 mb-6">
         <Button variant="link" size="icon" asChild>
