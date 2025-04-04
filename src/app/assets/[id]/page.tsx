@@ -171,10 +171,10 @@ const { data: nftSymbol } = useReadContract({
           </Button>
         </Link>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
           
           {/* Left column - Image */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <div className="sticky top-24">
               <div className="relative overflow-hidden rounded-xl border bg-muted/20">
                 <Image
@@ -206,14 +206,37 @@ const { data: nftSymbol } = useReadContract({
             <div className="mb-6">
               <div className="flex items-start justify-between">
                 <div>
-                  <h1 className="text-3xl font-bold text-clip">{asset.name}</h1>
+                  <h1 className="text-3xl font-bold">{asset.name}</h1>
                   
+                  <p className="text-muted-foreground mt-5">
+                    Created by <span className="text-foreground">{asset.creator.name}</span>
+                  </p>
                 </div>
-                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <Share2 className="h-4 w-4" />
+                      <span>Share</span>
+                      
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Twitter</DropdownMenuItem>
+                    <DropdownMenuItem>Facebook</DropdownMenuItem>
+                    <DropdownMenuItem>LinkedIn</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Copy Link</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
-             
-              
+                {/* 
+              <div className="mt-6 flex flex-wrap gap-4">
+                <Button className="flex-1">License This Asset</Button>
+                <Button variant="outline" className="flex-1">
+                  View on Explorer
+                </Button>
+              </div>*/}
 
 
             </div>
@@ -553,8 +576,8 @@ const { data: nftSymbol } = useReadContract({
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-semibold truncate">{asset.owner.name}</h3>
-                            {/*asset.owner.verified && <Badge variant="secondary">Verified</Badge>*/}
+                            <h3 className="text-sm font-semibold">{asset.owner.name}</h3>
+                            {asset.owner.verified && <Badge variant="secondary">Verified</Badge>}
                           </div>
                           <p className="text-sm text-muted-foreground mb-2">Acquired on {asset.owner.acquired}</p>
                           <p className="text-sm font-mono truncate">{asset.owner.address}</p>
@@ -583,8 +606,8 @@ const { data: nftSymbol } = useReadContract({
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-semibold truncate">{asset.creator.name}</h3>
-                            {/* asset.creator.verified && <Badge variant="secondary">Verified</Badge> */}
+                            <h3 className="text-sm font-semibold">{asset.creator.name}</h3>
+                            {asset.creator.verified && <Badge variant="secondary">Verified</Badge>}
                           </div>
                           <p className="text-sm font-mono truncate mb-2">{asset.creator.address}</p>
                           <p className="text-sm text-muted-foreground">{asset.creator.bio}</p>
@@ -645,16 +668,6 @@ const { data: nftSymbol } = useReadContract({
                 </div>
               </TabsContent>
             </Tabs>
-
-
-            <div className="mt-6 flex flex-wrap gap-4">
-                <Button className="flex-1">Share</Button>
-                <Button variant="outline" className="flex-1">
-                  View on Explorer
-                </Button>
-              </div>
-
-
           </div>
         </div>
       </main>
