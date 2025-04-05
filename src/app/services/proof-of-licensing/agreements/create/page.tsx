@@ -161,8 +161,7 @@ export default function CreateAgreementPage() {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => { 
     setSubmissionError(null);
     setIsSubmitting(true);
 
@@ -177,7 +176,6 @@ export default function CreateAgreementPage() {
         throw new Error("Invalid form data. Please check your inputs.");
       }
 
-      // generates a unique salt for this deployment
       const salt = generateSalt();
       const call = udc.populate("deploy_contract", [
         agreementContractClassHash,
@@ -191,6 +189,7 @@ export default function CreateAgreementPage() {
       toast({
         title: "Agreement Created Successfully",
         description: "Transaction hash: " + tx.transaction_hash,
+        
       });
       router.push("/services/proof-of-licensing/agreements/" + tx.transaction_hash);
     } catch (error: any) {
@@ -367,7 +366,7 @@ export default function CreateAgreementPage() {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-1">{steps[currentStep].title}</h2>
             <p className="text-muted-foreground mb-6">{steps[currentStep].description}</p>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={(e) => e.preventDefault()}> 
               {currentStep === 0 && (
                 <div className="space-y-6">
                   <div className="space-y-2">
@@ -651,7 +650,8 @@ export default function CreateAgreementPage() {
                   </Button>
                 ) : (
                   <Button
-                    type="submit"
+                    type="button"
+                    onClick={handleSubmit} 
                     disabled={!validateCurrentStep() || isSubmitting}
                   >
                     {isSubmitting ? (

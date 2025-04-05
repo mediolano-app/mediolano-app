@@ -90,7 +90,7 @@ export function WalletConnect() {
 
           <div className="alert alert-warning">
             <p className="text-sm">
-             * Mediolano Dapp is under development and connected to the testnet. Please make sure your wallet is connect on <span className="bg-blue-100 p-1 round-lg">Starknet Sepolia</span> to interact.
+             * Mediolano Dapp is under development and connected to the testnet. Please make sure your wallet is connect on <strong>Starknet Sepolia</strong> to interact.
             </p>
           </div>
 
