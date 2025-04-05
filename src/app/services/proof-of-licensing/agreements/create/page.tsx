@@ -16,11 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, ArrowRight, Save, Plus, Trash } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, Plus, Trash, Loader2 } from "lucide-react";
 import {
   type Address,
   useAccount,
-  useSendTransaction,
   useUniversalDeployerContract,
 } from "@starknet-react/core";
 import { CallData } from "starknet";
@@ -52,7 +51,8 @@ export default function CreateAgreementPage() {
   const [mounted, setMounted] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [showForm, setShowForm] = useState(false);
-  const { address, status } = useAccount();
+  const { address, status, account } = useAccount();
+  const { udc } = useUniversalDeployerContract();
 
   const [formData, setFormData] = useState<AgreementFormData>({
     title: "",
@@ -87,21 +87,25 @@ export default function CreateAgreementPage() {
     Record<string, { walletAddress?: string }>
   >({});
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [isFormDataValid, setIsFormDataValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const agreementContractClassHash =
     process.env.NEXT_PUBLIC_AGREEMENT_CONTRACT_HASH?.toString();
   const agreementFactoryAddress =
     process.env.NEXT_PUBLIC_AGREEMENT_FACTORY_ADDRESS?.toString();
 
-  const { udc } = useUniversalDeployerContract();
+  const generateSalt = () => {
+    const array = new Uint32Array(2);
+    window.crypto.getRandomValues(array);
+    const salt = (BigInt(array[0]) << BigInt(32)) | BigInt(array[1]);
+    return salt.toString();
+  };
 
   const getConstructorCalldata = (creatorAddress: Address) => {
     const signers = formData.parties
       .map((party) => party.walletAddress)
       .filter(Boolean);
 
-    // Create metadata object with additional agreement details
     const metadata = {
       type: formData.type,
       parties: formData.parties.map((party) => ({
@@ -118,7 +122,6 @@ export default function CreateAgreementPage() {
       },
     };
 
-    // Serialize metadata to a JSON string
     const ip_metadata = JSON.stringify(metadata);
 
     return new CallData(ip_agreement_abi).compile("constructor", {
@@ -126,27 +129,12 @@ export default function CreateAgreementPage() {
       factory: agreementFactoryAddress!,
       title: formData.title,
       description: formData.description,
-      ip_metadata, // Pass the serialized metadata
+      ip_metadata: ip_metadata,
       signers,
     });
   };
 
-  const { send, isPending: isCreatingAgreement, error: agreementError, data: agreementData } = useSendTransaction({
-    calls:
-      isFormDataValid && udc && address
-        ? [
-            udc.populate("deploy_contract", [
-              agreementContractClassHash!,
-              23,
-              false,
-              getConstructorCalldata(address),
-            ]),
-          ]
-        : undefined,
-  });
-
-  // Centralized validation function
-  const validateFormData = (data: AgreementFormData, creatorAddress: string): boolean => {
+  const validateFormData = (data: AgreementFormData, creatorAddress: Address): boolean => {
     const isValidHex = (str: string): boolean => /^0x[0-9a-fA-F]+$/.test(str);
 
     if (!creatorAddress || !isValidHex(creatorAddress)) return false;
@@ -176,19 +164,35 @@ export default function CreateAgreementPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmissionError(null);
+    setIsSubmitting(true);
 
     try {
       if (!address) throw new Error("Wallet not connected");
+      if (!account) throw new Error("Account not available");
       if (!udc) throw new Error("Universal Deployer Contract not available");
+      if (!agreementContractClassHash) throw new Error("Agreement contract class hash is not configured. Check environment variables.");
+      if (!agreementFactoryAddress) throw new Error("Agreement factory address is not configured. Check environment variables.");
 
-      // Validate form data
       if (!validateFormData(formData, address)) {
         throw new Error("Invalid form data. Please check your inputs.");
       }
 
-      // If valid, set isFormDataValid to true and trigger the transaction
-      setIsFormDataValid(true);
-      await send();
+      // generates a unique salt for this deployment
+      const salt = generateSalt();
+      const call = udc.populate("deploy_contract", [
+        agreementContractClassHash,
+        salt,
+        false,
+        getConstructorCalldata(address),
+      ]);
+
+      const tx = await account.execute([call]);
+
+      toast({
+        title: "Agreement Created Successfully",
+        description: "Transaction hash: " + tx.transaction_hash,
+      });
+      router.push("/services/proof-of-licensing/agreements/" + tx.transaction_hash);
     } catch (error: any) {
       console.error("Error creating agreement:", error);
       const errorMessage = error.message || "Failed to create agreement. Please try again.";
@@ -199,32 +203,9 @@ export default function CreateAgreementPage() {
         variant: "destructive",
       });
     } finally {
-      // Reset isFormDataValid after submission attempt
-      setIsFormDataValid(false);
+      setIsSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    if (agreementError) {
-      setSubmissionError(agreementError.message || "Failed to create agreement. Please try again.");
-      toast({
-        title: "Error",
-        description: agreementError.message || "Failed to create agreement. Please try again.",
-        variant: "destructive",
-      });
-    }
-  }, [agreementError, toast]);
-
-  useEffect(() => {
-    if (agreementData) {
-      setSubmissionError(null);
-      toast({
-        title: "Agreement Created",
-        description: "Your licensing agreement has been created successfully",
-      });
-      router.push("/agreements");
-    }
-  }, [agreementData, router, toast]);
 
   const steps = [
     { title: "Agreement Details", description: "Basic information about the agreement" },
@@ -671,11 +652,13 @@ export default function CreateAgreementPage() {
                 ) : (
                   <Button
                     type="submit"
-                    disabled={isCreatingAgreement || !validateCurrentStep()}
-                    className={isCreatingAgreement ? "animate-pulse" : ""}
+                    disabled={!validateCurrentStep() || isSubmitting}
                   >
-                    {isCreatingAgreement ? (
-                      <>Creating Agreement...</>
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating Agreement...
+                      </>
                     ) : (
                       <>
                         <Save className="mr-2 h-4 w-4" />
