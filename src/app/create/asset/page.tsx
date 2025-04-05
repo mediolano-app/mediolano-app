@@ -895,7 +895,7 @@ export default function CreateIPPage() {
 
                   <div className="space-y-2 mt-5">
                     <Label htmlFor="collection" className="flex items-center gap-1">
-                      Collection (Demonstration)
+                      Collection (Preview)
                     </Label>
                     <Select value={form.getValues("collection")} onValueChange={handleCollectionChange}>
                       <SelectTrigger>

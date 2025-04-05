@@ -29,6 +29,7 @@ import {
 	FileText,
 	Zap,
 	Globe,
+	Gauge,
 } from "lucide-react";
 import Image from "next/image";
 import { abi } from "../../src/abis/abi";
@@ -227,18 +228,12 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 					<DropdownMenuContent>
 						<DropdownMenuLabel>More Actions</DropdownMenuLabel>
 						<DropdownMenuSeparator />
+						<Link href={`/asset/dashboard/${tokenId}`}>
 						<DropdownMenuItem>
-							<DollarSign className="h-4 w-4 mr-2" />
-							Monetize
+							<Gauge className="h-4 w-4 mr-2" />
+							Dashboard
 						</DropdownMenuItem>
-						<DropdownMenuItem>
-							<Globe className="h-4 w-4 mr-2" />
-							Listing
-						</DropdownMenuItem>
-						<DropdownMenuItem>
-							<Zap className="h-4 w-4 mr-2" />
-							Transaction
-						</DropdownMenuItem>
+						</Link>
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</CardFooter>

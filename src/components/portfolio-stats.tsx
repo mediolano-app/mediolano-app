@@ -163,7 +163,7 @@ export function PortfolioStats({ useBlockchainData = false }: PortfolioStatsProp
                 {address && isLoading ? "" 
                   // : (portfolioStats.recentActivity.length > 0 
                   // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
-                  : "(Demonstration)"}
+                  : "(Preview)"}
               </p>
             </CardContent>
           </Card>
