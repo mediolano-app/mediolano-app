@@ -23,7 +23,7 @@ export function CreatorInfo({ nftData }: CreatorInfoProps) {
           <AvatarImage src={creator.avatarUrl} alt={creator.name} />
           <AvatarFallback>{nftData.creator.charAt(0) || "U"}</AvatarFallback>
         </Avatar>
-        <h3 className="text-xl font-semibold mb-2">{nftData.creator || "Unknown"}</h3>
+        <h3 className="text-sm font-semibold mb-2">{nftData.creator || "Unknown"}</h3>
         <p className="text-sm text-muted-foreground mb-4">{creator.bio}</p>
         <div className="grid grid-cols-3 gap-4 w-full mb-4">
           <div>
@@ -32,11 +32,11 @@ export function CreatorInfo({ nftData }: CreatorInfoProps) {
           </div>
           <div>
             <p className="font-semibold">{creator.followers}</p>
-            <p className="text-xs sm:text-sm text-muted-foreground">Followers</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Assets</p>
           </div>
           <div>
-            <p className="font-semibold">{creator.totalSales} ETH</p>
-            <p className="text-xs sm:text-sm text-muted-foreground">Sales</p>
+            <p className="font-semibold">{creator.totalSales}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Collections</p>
           </div>
         </div>
         <div className="flex flex-wrap justify-center gap-2 mb-4">
@@ -47,10 +47,10 @@ export function CreatorInfo({ nftData }: CreatorInfoProps) {
           ))}
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full">
-          <Button variant="outline" className="w-full sm:w-1/2">
-            Follow Creator
+          <Button disabled variant="outline" className="w-full sm:w-1/2">
+            View Portfolio
           </Button>
-          <Button variant="outline" className="w-full sm:w-1/2">
+          <Button disabled variant="outline" className="w-full sm:w-1/2">
             <ExternalLink className="w-4 h-4 mr-2" />
             Full Profile
           </Button>

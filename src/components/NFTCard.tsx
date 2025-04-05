@@ -42,6 +42,11 @@ interface NFTCardProps {
 	status: string;
 }
 
+export interface Attribute {
+	trait_type?: string;
+	value: string;
+}
+
 export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 
 export interface IP{
@@ -49,16 +54,17 @@ export interface IP{
 	description: string,
 	external_url: string,
 	image: string,
-	attributes: []
+	attributes: Attribute[],
   }
 
 const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 	const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
 	const [metadata, setMetadata] = useState<IP | null>(null);
+	const [isImage, setIsImage] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	status = 'IP';
+	//status = 'IP';
 
 	// Get tokenURI from contract
 	const {
@@ -72,9 +78,6 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		args: [Number(tokenId)],
 		watch: false,
 	});
-
-	console.log("Token Uri:", tokenURI);
-
 	// Fetch metadata when tokenURI is available
 	useEffect(() => {
 		const fetchMetadata = async () => {
@@ -102,6 +105,9 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				// }
 
 				setMetadata(parsedData);
+				if(parsedData.image.startsWith("https://")) {
+					setIsImage(true);
+				}
 				console.log(parsedData);
 				setError(null);
 			} catch (err) {
@@ -116,15 +122,15 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 
 		fetchMetadata();
 	}, [tokenURI]);
+	
+	useEffect(() => {
+		if (metadata) {
+			console.log("Metadata:", metadata);
+			//console.log("Metadata IMAGE", metadata.image);
+		}
+	}
+	, [metadata]);
 
-	// const isValidMetadata = (data: any): data is IP => {
-	// 	return (
-	// 		data &&
-	// 		typeof data === "object" &&
-	// 		"name" in data &&
-	// 		"description" in data
-	// 	);
-	// };
 
 	if (isLoading || isContractLoading) {
 		return <div>Loading...</div>; // Consider using a proper loading component
@@ -138,12 +144,30 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 		return <div>No metadata available</div>;
 	}
 
+
+	function truncateString(input: string, maxLength: number): string {
+		// Check if the string length exceeds the maximum length
+		if (input.length > maxLength) {
+			// Truncate the string to the specified length and append '...' or another indicator
+			return input.substring(0, maxLength) + "...";
+		}
+		// If the string is within the limit, return it as is
+		return input;
+	}
+
 	return (
 		<Card className="overflow-hidden">
 			<CardHeader className="p-0">
+			  {isImage ? (
+				<Image
+					src={metadata.image}
+					alt={metadata.name}
+					width={400}
+					height={400}
+					className="w-full h-48 object-cover"
+				/> ) : (
 				<Image
 					src={
-						metadata.image || 
 						"/background.jpg"
 					} // Add fallback image
 					alt={metadata.name}
@@ -151,38 +175,49 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 					height={400}
 					className="w-full h-48 object-cover"
 				/>
+			  )}
 			</CardHeader>
 			<CardContent className="p-4">
 				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
+				
+				<p className="text-sm text-muted-foreground mb-5">
+					{ truncateString(metadata.description, 99 ) }</p>
+				
+				
 				<div className="flex justify-between items-center mb-2">
-					<Badge variant="secondary">{metadata.attributes[1].value}</Badge>
-					<Badge variant="secondary"> {metadata.attributes[0].value} </Badge>
+
+				<Badge variant="default">
+					{metadata.attributes?.[0]?.value ?? "0"}
+				</Badge>
+				<Badge variant="secondary">
+					{metadata.attributes?.[1]?.value ?? "0"}
+				</Badge>
 				</div>
-				<Badge className="text-sm"
+				{/* <Badge className="text-sm"
 					variant={
-						status === "IP"
+						status === "Protected"
 							? "default"
-							: status === "Programmable IP"
+							: status === "Licensed"
 								? "secondary"
 								: "outline"
 					}
 				>
 					{status}
-				</Badge>
+				</Badge>*/}
 			</CardContent>
-			<CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
+			<CardFooter className="p-4 flex flex-wrap gap-2">
 				
 				<Link href={`/asset/${tokenId}`}>
 				<Button variant="outline" size="sm">
 					<Eye className="h-4 w-4 mr-2" />
 					View
 				</Button></Link>
-
+				{/*
 				<Button variant="outline" size="sm">
 					<FileText className="h-4 w-4 mr-2" />
 					License
 				</Button>
-				
+				*/}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="outline" size="sm">
