@@ -127,7 +127,7 @@ const { data: nftSymbol } = useReadContract({
       address: "0x1a2b3c4d5e6f7g8h9i0j",
       avatar: metadata?.image || "/background.jpg",
       verified: true,
-      bio: "Creator bio (demonstration).",
+      bio: "Creator bio (Preview).",
       website: "https://ip.mediolano.app",
     },
     owner: {
@@ -144,14 +144,14 @@ const { data: nftSymbol } = useReadContract({
     blockchain: "Starknet",
     tokenStandard: "ERC-721",
     licenseType: metadata?.name || nftName,
-    licenseTerms: "(Demonstration)",
+    licenseTerms: "(Preview)",
     contract: "0x1234...5678",
     attributes: [
       { trait_type: "Asset", value: "Programmable IP" },
       { trait_type: "Protection", value: "Proof of Onwership" },
     ],
     licenseInfo: {
-      type: "(Demonstration)",
+      type: "(Preview)",
       terms: "(Under Development)",
       allowCommercial: false,
       allowDerivatives: true,
@@ -566,7 +566,7 @@ const { data: nftSymbol } = useReadContract({
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Current Owner (Demonstration)</CardTitle>
+                      <CardTitle>Current Owner (Preview)</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-start gap-4">
@@ -596,7 +596,7 @@ const { data: nftSymbol } = useReadContract({
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Creator (Demonstration)</CardTitle>
+                      <CardTitle>Creator (Preview)</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-start gap-4">
@@ -636,7 +636,7 @@ const { data: nftSymbol } = useReadContract({
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Ownership History (Demonstration)</CardTitle>
+                      <CardTitle>Ownership History (Preview)</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">

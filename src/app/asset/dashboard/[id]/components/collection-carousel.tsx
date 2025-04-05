@@ -9,7 +9,7 @@ export function CollectionCarousel() {
   return (
     <Card className="bg-background/30">
       <CardHeader>
-        <CardTitle>More from the Collection (Demonstration)</CardTitle>
+        <CardTitle>More from the Collection (Preview)</CardTitle>
       </CardHeader>
       <CardContent>
         <Carousel className="w-full">

@@ -11,13 +11,23 @@ import { CreatorInfo } from "./components/creator-info"
 import { abi } from "@/abis/abi"
 import { Abi } from "starknet"
 import { CONTRACT_ADDRESS } from "@/lib/constants"
-import { useEffect, useState } from "react"
 import { NFTMetadata } from "@/lib/types";
+import { use, useEffect, useState } from "react"
 
-export default function AssetDashboard({ params }: { params: { id: string } }) {
+interface AssetPageProps {
+    params: Promise<{
+      id: string
+    }>
+  }
+  
 
+  export default function AssetPage({ params }: AssetPageProps) {
+    // Unwrap the params Promise using React.use()
+    const resolvedParams = use(params)
+    const { id } = resolvedParams
 
-  const tokenId = parseInt(params.id);
+  const tokenId = id || 42;
+
   const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
   
   // Read basic NFT information (name, symbol)
