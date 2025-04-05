@@ -18,10 +18,16 @@ export function WalletConnect() {
   const { connect, connectors } = useConnect();
   const { account, address } = useAccount();
   const { disconnect } = useDisconnect();
-  
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (account) {
+      setOpen(false);
+    }
+  }, [account]);
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
           <Wallet className="h-4 w-4" /> {account ? address?.slice(0, 6) : "Connect"}
@@ -74,7 +80,6 @@ export function WalletConnect() {
                 Disconnect
               </Button>
             </div>
-            
           ) : (
             <div className="grid gap-4">
               {connectors.map((connector) => (
@@ -85,7 +90,7 @@ export function WalletConnect() {
 
           <div className="alert alert-warning">
             <p className="text-sm">
-             * Mediolano Dapp is under development and connected to the testnet. Please make sure your wallet is connect on <span className="bg-blue-100 p-1 round-lg">Starknet Sepolia</span> to interact.
+             * Mediolano Dapp is under development and connected to the testnet. Please make sure your wallet is connect on <strong>Starknet Sepolia</strong> to interact.
             </p>
           </div>
 
