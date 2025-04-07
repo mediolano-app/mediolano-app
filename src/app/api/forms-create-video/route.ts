@@ -8,9 +8,14 @@ export async function POST(request: NextRequest) {
 
     const {
       title,
-      author,
       description,
-      type, 
+      type,
+      template,
+      movieType,
+      director,
+      duration,
+      studio,
+      genre,
       collection,
       tags,
       mediaUrl,
@@ -63,10 +68,17 @@ export async function POST(request: NextRequest) {
     }
 
     const attributes = [
-      { trait_type: "Author", value: author },
-      { trait_type: "Asset Type", value: type },
+      { trait_type: "Type", value: type },
+      { trait_type: "Template", value: template },
+      { trait_type: "Title", value: title },
+      { trait_type: "Template", value: template },
+      { trait_type: "Movie Type", value: movieType },
+      { trait_type: "Director", value: director },
+      { trait_type: "Duration", value: duration },
+      { trait_type: "Studio", value: studio },
+      { trait_type: "Genre", value: genre },
       { trait_type: "Collection", value: collection },
-      { trait_type: "License Type", value: licenseType },
+      { trait_type: "License", value: licenseType },
       { trait_type: "License Details", value: licenseDetails },
       { trait_type: "IP Version", value: ipVersion },
       { trait_type: "Commercial Use", value: commercialUse ? "Yes" : "No" },

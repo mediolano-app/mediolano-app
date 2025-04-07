@@ -611,7 +611,7 @@ export default function CreateIPPage() {
 
       console.log(assetData)
       try {
-        const response = await fetch("/api/forms-create", {
+        const response = await fetch("/api/forms-create-asset", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
