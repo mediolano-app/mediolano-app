@@ -827,8 +827,8 @@ export default function CreateIPPage() {
                         </Label>
                       </div>
                        <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="music" id="music" />
-                        <Label htmlFor="music" className="flex items-center gap-2">
+                        <RadioGroupItem value="audio" id="audio" />
+                        <Label htmlFor="audio" className="flex items-center gap-2">
                           <Music className="h-4 w-4" />
                           Audio
                         </Label>

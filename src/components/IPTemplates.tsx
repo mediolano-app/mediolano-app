@@ -20,7 +20,7 @@ const templates = [
   { name: "Art", icon: Image, href: "/create/art" },
   { name: "Document", icon: FileIcon, href: "/create/document" },
   { name: "Video", icon: Film, href: "/create/video" },
-  { name: "Music", icon: Music, href: "/create/music" },
+  { name: "Audio", icon: Music, href: "/create/audio" },
   { name: "NFT", icon: Hexagon, href: "/create/nft" },
   { name: "Patent", icon: FileCheck, href: "/create/patent" },
   { name: "Publication", icon: BookOpen, href: "/create/publication" },

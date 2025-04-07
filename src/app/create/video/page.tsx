@@ -44,7 +44,7 @@ export default function FilmsRegistrationPage() {
   return (
     <div className="container mx-auto px-4 py-10 mb-20">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Movie Registration</h1>
+        <h1 className="text-3xl font-bold">Video Registration</h1>
         <Link
           href="/create/templates"
           className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
