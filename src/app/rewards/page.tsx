@@ -33,7 +33,7 @@ export default function UserRewards() {
   return (
     <div className="container mx-auto p-4 space-y-8 mt-10 mb-20">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">User Rewards Dashboard</h1>
+        <h1 className="text-2xl font-bold">User Rewards Dashboard (Preview)</h1>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

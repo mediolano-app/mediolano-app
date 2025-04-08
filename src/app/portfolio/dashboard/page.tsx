@@ -18,7 +18,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-// import { ConnectWallet } from "@/components/ConnectWallet"
 import { usePortfolio } from "@/hooks/usePortfolio"
 import { useMIP } from "@/hooks/useMIP";
 import { useRouter } from "next/navigation";
@@ -132,7 +131,7 @@ export default function DashboardPage() {
                 {address && isLoading ? "" 
                   // : (portfolioStats.recentActivity.length > 0 
                   // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
-                  : "(Demonstration)"}
+                  : "(Preview)"}
               </p>
             </CardContent>
           </Card>
@@ -153,7 +152,7 @@ export default function DashboardPage() {
             <div className="text-center py-8">Loading your assets...</div>
           ) : tokenIdsError ? (
             <div className="text-center py-8 text-red-500">{tokenIdsError.message}</div>          
-          ) : balance === 0 ? (
+          ) : balance === BigInt(0) ? (
             <div className="text-center py-8">
               <p>Your Programmable IP will appear here after creation.</p>
             </div>

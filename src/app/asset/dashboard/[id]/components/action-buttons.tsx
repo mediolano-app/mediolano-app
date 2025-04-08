@@ -19,7 +19,7 @@ export function ActionButtons() {
         {buttons.map((button, index) => (
           <Tooltip key={index}>
             <TooltipTrigger asChild>
-              <Button className="w-full flex items-center justify-center gap-2 px-2 sm:px-4" variant="outline">
+              <Button disabled className="w-full flex items-center justify-center gap-2 px-2 sm:px-4" variant="outline">
                 <button.icon className="w-4 h-4" />
                 <span className="hidden sm:inline text-xs sm:text-sm">{button.label}</span>
               </Button>

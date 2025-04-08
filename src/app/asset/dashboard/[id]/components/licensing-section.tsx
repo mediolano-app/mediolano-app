@@ -31,7 +31,7 @@ export function LicensingSection() {
   return (
     <Card className="bg-background/80 mb-40">
       <CardHeader>
-        <CardTitle>Licensing Options</CardTitle>
+        <CardTitle>Licensing Options (Preview)</CardTitle>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="predefined" className="w-full">

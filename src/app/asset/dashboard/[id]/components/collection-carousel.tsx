@@ -9,7 +9,7 @@ export function CollectionCarousel() {
   return (
     <Card className="bg-background/30">
       <CardHeader>
-        <CardTitle>More from the Collection</CardTitle>
+        <CardTitle>More from the Collection (Preview)</CardTitle>
       </CardHeader>
       <CardContent>
         <Carousel className="w-full">
@@ -18,9 +18,9 @@ export function CollectionCarousel() {
               <CarouselItem key={index} className="pl-1 basis-full sm:basis-1/2 lg:basis-1/3">
                 <div className="p-1">
                   <Card>
-                    <CardContent className="flex aspect-square items-center justify-center p-6">
+                    <CardContent className="flex items-center justify-center p-6">
                       <Image
-                        src={asset.imageUrl || "/placeholder.svg"}
+                        src={asset.imageUrl || "/background.jpg"}
                         alt={asset.title}
                         width={300}
                         height={300}

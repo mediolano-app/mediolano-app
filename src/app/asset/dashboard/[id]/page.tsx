@@ -11,12 +11,23 @@ import { CreatorInfo } from "./components/creator-info"
 import { abi } from "@/abis/abi"
 import { Abi } from "starknet"
 import { CONTRACT_ADDRESS } from "@/lib/constants"
-import { useEffect, useState } from "react"
 import { NFTMetadata } from "@/lib/types";
+import { use, useEffect, useState } from "react"
 
-export default function AssetDashboard() {
-  // Set token ID to 1 as specified
-  const tokenId = 1;
+interface AssetPageProps {
+    params: Promise<{
+      id: string
+    }>
+  }
+  
+
+  export default function AssetPage({ params }: AssetPageProps) {
+    // Unwrap the params Promise using React.use()
+    const resolvedParams = use(params)
+    const { id } = resolvedParams
+
+  const tokenId = id || 42;
+
   const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
   
   // Read basic NFT information (name, symbol)
@@ -69,15 +80,15 @@ export default function AssetDashboard() {
   }, [tokenURI]);
   
   const nftData = {
-    title: metadata?.name || nftName || "Unnamed NFT",
+    title: metadata?.name || nftName || "Loading IP",
     description: metadata?.description || "",
     nftId: "NFT #" + tokenId,
-    symbol: nftSymbol || "NIL",
+    symbol: nftSymbol || "MIP",
     tokenId: tokenId.toString(),
     tokenURI: tokenURI || "",
     owner: tokenOwner || "",
     tokenStandard: "ERC721",
-    collection: nftName || "Collection",
+    collection: nftName || "My Intellectual Property",
     creator: (metadata?.author || tokenOwner || "Unknown").toString(),
     imageUrl: metadata?.image || "/background.jpg",
     blockchain: "Starknet",
@@ -87,8 +98,8 @@ export default function AssetDashboard() {
   };
   
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8 overflow-x-hidden">
-        <h1 className="text-2xl font-bold">Programmable IP Dashboard</h1>
+    <div className="container mx-auto px-4 py-4 space-y-4 overflow-x-hidden">
+        <h1 className="text-xl text-foreground/50">Programmable IP Dashboard</h1>
       <AssetInfo nftData={nftData} />
       <ActionButtons />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

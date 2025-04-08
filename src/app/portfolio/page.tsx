@@ -32,7 +32,7 @@ export default function PortfolioPage() {
     <div className="container mx-auto px-4 py-8 mt-5 mb-20">
       <div className="space-y-1 mb-5">
         <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
-        <p className="text-muted-foreground">Manage and showcase your digital assets in one place</p>
+        <p className="text-muted-foreground">Showcase and manage your digital assets</p>
       </div>
       <Suspense fallback={<PortfolioSkeleton />}>
         <NFTPortfolio />
