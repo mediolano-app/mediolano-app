@@ -32,6 +32,7 @@ import { useMIP } from "@/hooks/useMIP"
 import { useReadContract } from "@starknet-react/core";
 import { abi } from "@/abis/abi"
 import { Abi } from "starknet"
+import { useConnect, useAccount, useDisconnect } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "@/lib/constants"
 import { NFTMetadata } from "@/lib/types";
 
@@ -50,6 +51,11 @@ interface AssetPageProps {
   const tokenId = id || 42;
     
 const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
+
+
+const { account, address } = useAccount();
+
+const userAddress = address || "Loading";
 
 // Read basic NFT information (name, symbol)
 const { data: nftSymbol } = useReadContract({
@@ -82,6 +88,11 @@ const { data: nftSymbol } = useReadContract({
     address: CONTRACT_ADDRESS,
     args: [tokenId],
   });
+
+
+
+  const tokenOwnerAddress = account ? address?.slice(0, 66) : "Unknown";
+  //console.log("Token Owner:", tokenOwnerAddress);
 
   // Fetch metadata when tokenURI changes
   useEffect(() => {
@@ -123,36 +134,36 @@ const { data: nftSymbol } = useReadContract({
     id,
     name: metadata?.name || nftName || "Loading IP",
     creator: {
-      name: (metadata?.author || tokenOwner || "Unknown").toString(),
-      address: "0x1a2b3c4d5e6f7g8h9i0j",
+      name: (metadata?.author || tokenOwnerAddress || "Unknown").toString(),
+      address: tokenOwnerAddress,
       avatar: metadata?.image || "/background.jpg",
       verified: true,
       bio: "Creator bio (Preview).",
       website: "https://ip.mediolano.app",
     },
     owner: {
-      name: (metadata?.author || tokenOwner || "Unknown").toString(),
-      address: "0x9i8h7g6f5e4d3c2b1a",
+      name: (metadata?.author || tokenOwnerAddress || "Unknown").toString(),
+      address: tokenOwnerAddress,
       avatar: "/background.jpg",
       verified: true,
-      acquired: "March 1, 2025",
+      acquired: "(Preview)",
     },
     description: metadata?.description || "",
     image: metadata?.image || "/background.jpg",
-    createdAt: "March 1, 2025",
+    createdAt: "(Preview)",
     collection: "MIP",
     blockchain: "Starknet",
     tokenStandard: "ERC-721",
     licenseType: metadata?.name || nftName,
     licenseTerms: "(Preview)",
-    contract: "0x1234...5678",
+    contract: CONTRACT_ADDRESS,
     attributes: [
       { trait_type: "Asset", value: "Programmable IP" },
       { trait_type: "Protection", value: "Proof of Onwership" },
     ],
     licenseInfo: {
       type: "(Preview)",
-      terms: "(Under Development)",
+      terms: "(Preview)",
       allowCommercial: false,
       allowDerivatives: true,
       requireAttribution: true,
@@ -176,7 +187,7 @@ const { data: nftSymbol } = useReadContract({
           {/* Left column - Image */}
           <div className="lg:col-span-3">
             <div className="sticky top-24">
-              <div className="relative overflow-hidden rounded-xl border bg-muted/20">
+              <div className="relative overflow-hidden rounded-xl border bg-muted/20 p-2">
                 <Image
                   src={asset.image || "/background.jpg"}
                   alt={asset.name}
@@ -319,7 +330,7 @@ const { data: nftSymbol } = useReadContract({
                         <AccordionTrigger className="py-4">
                           <div className="flex items-center">
                             <History className="mr-2 h-4 w-4" />
-                            <span>History</span>
+                            <span>History (Preview)</span>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
@@ -330,8 +341,8 @@ const { data: nftSymbol } = useReadContract({
                               </div>
                               <div>
                                 <p className="font-medium">License Updated</p>
-                                <p className="text-sm text-muted-foreground">Feb 20, 2025</p>
-                                <p className="text-sm">{asset.creator.name} updated to CC BY-NC</p>
+                                {/*<p className="text-sm text-muted-foreground">Feb 20, 2025</p>*/}
+                                <p className="text-sm">{tokenOwnerAddress?.slice(0,20)} updated</p>
                               </div>
                             </div>
                             <div className="flex items-start">
@@ -340,8 +351,8 @@ const { data: nftSymbol } = useReadContract({
                               </div>
                               <div>
                                 <p className="font-medium">Created</p>
-                                <p className="text-sm text-muted-foreground">Jan 15, 2025</p>
-                                <p className="text-sm">{asset.creator.name} created this asset</p>
+                                {/*<p className="text-sm text-muted-foreground">Jan 15, 2025</p>*/}
+                                <p className="text-sm">{tokenOwnerAddress?.slice(0,20)} minted this asset</p>
                               </div>
                             </div>
                           </div>
@@ -543,7 +554,7 @@ const { data: nftSymbol } = useReadContract({
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Current Owner (Preview)</CardTitle>
+                      <CardTitle>Ownership</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-start gap-4">
@@ -553,18 +564,16 @@ const { data: nftSymbol } = useReadContract({
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-semibold truncate">{asset.owner.name}</h3>
+                            <h3 className="text-sm font-semibold truncate">{tokenOwnerAddress?.slice(0,20)}...</h3>
                             {/*asset.owner.verified && <Badge variant="secondary">Verified</Badge>*/}
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">Acquired on {asset.owner.acquired}</p>
-                          <p className="text-sm font-mono truncate">{asset.owner.address}</p>
+                          
                           <div className="mt-4 flex gap-2">
-                            <Button variant="outline" size="sm">
-                              View Profile
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              Message
-                            </Button>
+                          <Button variant="outline" size="sm" className="h-8">
+                                <Globe className="mr-2 h-4 w-4" />
+                                Profile
+                              </Button>
+
                           </div>
                         </div>
                       </div>
@@ -573,7 +582,7 @@ const { data: nftSymbol } = useReadContract({
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Creator (Preview)</CardTitle>
+                      <CardTitle>Creator</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-start gap-4">
@@ -583,27 +592,18 @@ const { data: nftSymbol } = useReadContract({
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-semibold truncate">{asset.creator.name}</h3>
+                          <h3 className="text-sm font-semibold truncate">{tokenOwnerAddress?.slice(0,20)}...</h3>
                             {/* asset.creator.verified && <Badge variant="secondary">Verified</Badge> */}
                           </div>
-                          <p className="text-sm font-mono truncate mb-2">{asset.creator.address}</p>
                           <p className="text-sm text-muted-foreground">{asset.creator.bio}</p>
 
                           <div className="mt-4">
-                            <h4 className="text-sm font-medium mb-2">Creator Links</h4>
                             <div className="flex gap-2">
                               <Button variant="outline" size="sm" className="h-8">
                                 <Globe className="mr-2 h-4 w-4" />
-                                Website
+                                Profile
                               </Button>
-                              <Button variant="outline" size="sm" className="h-8">
-                                <Twitter className="mr-2 h-4 w-4" />
-                                Twitter
-                              </Button>
-                              <Button variant="outline" size="sm" className="h-8">
-                                <Instagram className="mr-2 h-4 w-4" />
-                                Instagram
-                              </Button>
+
                             </div>
                           </div>
                         </div>
@@ -622,10 +622,10 @@ const { data: nftSymbol } = useReadContract({
                             <Users className="h-5 w-5 text-primary" />
                           </div>
                           <div>
-                            <p className="text-sm">Transferred to {asset.owner.name}</p>
+                            <p className="text-sm">Transferred</p>
                             <p className="text-sm text-muted-foreground">{asset.owner.acquired}</p>
                             <p className="text-sm">
-                              From {asset.creator.name} to {asset.owner.name}
+                              From {tokenOwnerAddress?.slice(0,20)} to {tokenOwnerAddress?.slice(0,20)}
                             </p>
                           </div>
                         </div>
@@ -636,7 +636,7 @@ const { data: nftSymbol } = useReadContract({
                           <div>
                             <p className="text-sm">Created</p>
                             <p className="text-sm text-muted-foreground">{asset.createdAt}</p>
-                            <p className="text-sm">By {asset.creator.name}</p>
+                            <p className="text-sm">By {tokenOwnerAddress?.slice(0,20)}</p>
                           </div>
                         </div>
                       </div>
@@ -648,8 +648,8 @@ const { data: nftSymbol } = useReadContract({
 
 
             <div className="mt-6 flex flex-wrap gap-4">
-                <Button className="flex-1">Share</Button>
-                <Button variant="outline" className="flex-1">
+                <Button disabled variant="outline" className="flex-1">Share</Button>
+                <Button disabled variant="outline" className="flex-1">
                   View on Explorer
                 </Button>
               </div>

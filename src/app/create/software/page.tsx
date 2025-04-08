@@ -31,6 +31,7 @@ import {
   Box,
   NotepadText,
   Clapperboard,
+  Code2,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -1477,40 +1478,20 @@ export default function CreateIPPage() {
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent className="overflow-auto">
           <DrawerHeader className="border-b pb-4">
-            <DrawerTitle>Create Your Asset</DrawerTitle>
+            
             <DrawerDescription>
               Review the details and create your Programmable IP with immutable proof of ownership.
             </DrawerDescription>
           </DrawerHeader>
 
           <div className="px-4 py-6">
+            
             {transactionStatus === "waiting" && (
-              <div className="space-y-6">
+              
+              <div className="space-y-4">
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Media Preview */}
-                  <div className="md:col-span-1 flex justify-center">
-                    <div className="relative aspect-video w-full max-w-md rounded-lg overflow-hidden border bg-muted">
-                      {uploadedFiles.length > 0 && Object.keys(previewUrls).length > 0 ? (
-                        <img
-                          src={Object.values(previewUrls)[0] || "/background.jpg"}
-                          alt="IP Preview"
-                          className="object-cover w-full h-full"
-                        />
-                      ) : form.watch("mediaUrl") ? (
-                        <div className="flex flex-col items-center justify-center h-full p-4">
-                          <Globe className="h-8 w-8 text-muted-foreground mb-2" />
-                          <p className="text-sm text-muted-foreground text-center break-all">
-                            {form.watch("mediaUrl")}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center h-full p-4">
-                          <FileText className="h-8 w-8 text-muted-foreground mb-2" />
-                          <p className="text-sm text-muted-foreground text-center">No media preview available</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+
 
                   {/* Main IP Details */}
                   <div className="space-y-4">
@@ -1538,28 +1519,50 @@ export default function CreateIPPage() {
                       </div>
                     )}
                   </div>
+                  
+                  {/* Media Preview */}
+                  <div className="md:col-span-1 flex justify-center">
+                    <div className="relative aspect-video w-full max-w-md rounded-lg overflow-hidden border bg-muted">
+                      {uploadedFiles.length > 0 && Object.keys(previewUrls).length > 0 ? (
+                        <img
+                          src={Object.values(previewUrls)[0] || "/background.jpg"}
+                          alt="IP Preview"
+                          className="object-cover w-full h-full"
+                        />
+                      ) : form.watch("mediaUrl") ? (
+                        <div className="flex flex-col items-center justify-center h-full p-4">
+                          <Globe className="h-8 w-8 text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground text-center break-all">
+                            {form.watch("mediaUrl")}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-full p-4">
+                          <FileText className="h-8 w-8 text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground text-center">No media preview available</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                  {/* IP Type and Version 
-                  <div className="space-y-4">
+                  
+
+                  
+                  <div className="space-x-4 flex flex-justify-center">
                     
                     <div className="flex items-center gap-2">
                       <div className="rounded-full bg-primary/10 p-2">
-                        {form.watch("ipType") === "artwork" ? (
-                          <Image className="h-4 w-4 text-primary" />
-                        ) : form.watch("ipType") === "music" ? (
-                          <Music className="h-4 w-4 text-primary" />
-                        ) : form.watch("ipType") === "software" ? (
-                          <Code className="h-4 w-4 text-primary" />
-                        ) : form.watch("ipType") === "ai-model" ? (
-                          <Zap className="h-4 w-4 text-primary" />
+                        {form.watch("type") === "software" ? (
+                          <Code2 className="h-4 w-4 text-primary" />
                         ) : (
                           <FileText className="h-4 w-4 text-primary" />
                         )}
                       </div>
+
                       <div>
                         <p className="text-sm font-medium">IP Type</p>
                         <p className="text-sm text-muted-foreground capitalize">
-                          {(form.watch("ipType") || "").replace("-", " ")}
+                          {(form.watch("type") || "").replace("-", " ")}
                         </p>
                       </div>
                     </div>
@@ -1604,7 +1607,7 @@ export default function CreateIPPage() {
                       </div>
                     </div>
                   </div>
-                      */}
+                     
 
 
 
