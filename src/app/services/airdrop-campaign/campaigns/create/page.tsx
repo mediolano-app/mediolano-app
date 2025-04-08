@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { format } from "date-fns"
 import { ArrowLeft, Calendar, Check, Eye, Image, Plus, Trash } from "lucide-react"
+import { useAccount } from "@starknet-react/core"
 
 // UI Components
 import { Button } from "@/components/ui/button"
@@ -21,15 +22,17 @@ import { Badge } from "@/components/ui/badge"
 import { toast } from "@/components/ui/use-toast"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 // Types and utilities
-import type { Task, TaskType } from "@/app/services/airdrop-campaign/lib/types"
-import { mockCreateCampaign } from "@/app/services/airdrop-campaign/lib/blockchain"
+import type { Task, TaskType, CreateCampaignData } from "@/app/services/airdrop-campaign/lib/types"
+import { createCampaign } from "@/app/services/airdrop-campaign/lib/blockchain"
 
 export default function CreateCampaignPage() {
   const router = useRouter()
+  const { address, status } = useAccount()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [tasks, setTasks] = useState<Task[]>([])
+  const [tasks, setTasks] = useState<Omit<Task, "id">[]>([])
   const [activeTab, setActiveTab] = useState("details")
 
   // Form state
@@ -37,14 +40,14 @@ export default function CreateCampaignPage() {
     name: "",
     description: "",
     image: "/background.jpg",
+    tokenAddress: "",
     maxParticipants: 1000,
     reward: 1,
     endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
   })
 
   // Task form state
-  const [taskForm, setTaskForm] = useState<Task>({
-    id: "",
+  const [taskForm, setTaskForm] = useState<Omit<Task, "id">>({
     title: "",
     description: "",
     type: "social",
@@ -93,16 +96,14 @@ export default function CreateCampaignPage() {
       return
     }
 
-    const newTask: Task = {
+    const newTask: Omit<Task, "id"> = {
       ...taskForm,
-      id: crypto.randomUUID(),
     }
 
     setTasks((prev) => [...prev, newTask])
 
     // Reset task form
     setTaskForm({
-      id: "",
       title: "",
       description: "",
       type: "social",
@@ -115,8 +116,8 @@ export default function CreateCampaignPage() {
     })
   }
 
-  const handleRemoveTask = (taskId: string) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId))
+  const handleRemoveTask = (index: number) => {
+    setTasks((prev) => prev.filter((_, i) => i !== index))
     toast({
       title: "Task removed",
       description: "Task has been removed from your campaign",
@@ -126,6 +127,16 @@ export default function CreateCampaignPage() {
   // Form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Check if wallet is connected
+    if (status !== "connected" || !address) {
+      toast({
+        title: "Wallet not connected",
+        description: "Please connect your wallet to create a campaign",
+        variant: "destructive",
+      })
+      return
+    }
 
     // Validation
     if (!formData.name.trim()) {
@@ -148,6 +159,16 @@ export default function CreateCampaignPage() {
       return
     }
 
+    if (!formData.tokenAddress.trim()) {
+      toast({
+        title: "Missing token address",
+        description: "Please provide the token address for rewards",
+        variant: "destructive",
+      })
+      setActiveTab("details")
+      return
+    }
+
     if (tasks.length === 0) {
       toast({
         title: "No tasks added",
@@ -161,23 +182,26 @@ export default function CreateCampaignPage() {
     setIsSubmitting(true)
 
     try {
-      const campaignData = {
-        ...formData,
+      const campaignData: CreateCampaignData = {
+        tokenAddress: formData.tokenAddress,
+        name: formData.name,
+        description: formData.description,
+        image: formData.image,
+        maxParticipants: formData.maxParticipants,
+        reward: formData.reward,
+        endDate: formData.endDate,
         tasks,
-        status: "active",
-        participants: 0,
-        createdAt: new Date(),
       }
 
-      const campaignId = await mockCreateCampaign(campaignData)
+      const campaignId = await createCampaign(campaignData)
 
       toast({
         title: "Campaign created successfully",
         description: `Your campaign "${formData.name}" has been created`,
       })
 
-      // Redirect to dashboard after successful creation
-      router.push("/dashboard")
+      // Redirect to campaign details after successful creation
+      router.push(`/services/airdrop-campaign/campaigns/${campaignId}`)
     } catch (error) {
       console.error("Failed to create campaign:", error)
       toast({
@@ -193,10 +217,11 @@ export default function CreateCampaignPage() {
   // Calculate completion percentage
   const calculateCompletion = () => {
     let completed = 0
-    let total = 2 // Name and description are required
+    let total = 3 // Name, description, and token address are required
 
     if (formData.name.trim()) completed++
     if (formData.description.trim()) completed++
+    if (formData.tokenAddress.trim()) completed++
     if (tasks.length > 0) completed++
 
     total++ // Add tasks to total
@@ -209,7 +234,7 @@ export default function CreateCampaignPage() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <Button variant="ghost" size="icon" asChild className="mr-2">
-            <Link href="/">
+            <Link href="/services/airdrop-campaign">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
@@ -219,6 +244,15 @@ export default function CreateCampaignPage() {
           <Eye className="h-4 w-4" /> Preview Campaign
         </Button>
       </div>
+
+      {status !== "connected" && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTitle>Wallet not connected</AlertTitle>
+          <AlertDescription>
+            Please connect your wallet to create an airdrop campaign. You need to be connected to sign transactions.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="mb-6">
         <Progress value={calculateCompletion()} className="h-2" />
@@ -287,6 +321,20 @@ export default function CreateCampaignPage() {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Add an eye-catching image that represents your campaign (recommended size: 1200x630px)
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tokenAddress">Token Address *</Label>
+                  <Input
+                    id="tokenAddress"
+                    name="tokenAddress"
+                    placeholder="0x..."
+                    value={formData.tokenAddress}
+                    onChange={handleInputChange}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    The address of the token that will be distributed as rewards. Make sure you have sufficient balance.
                   </p>
                 </div>
               </CardContent>
@@ -446,9 +494,9 @@ export default function CreateCampaignPage() {
                       </Badge>
                     </div>
                     <div className="space-y-3">
-                      {tasks.map((task) => (
+                      {tasks.map((task, index) => (
                         <div
-                          key={task.id}
+                          key={index}
                           className="flex items-start justify-between p-4 border rounded-md hover:bg-muted/50 transition-colors"
                         >
                           <div className="space-y-1">
@@ -467,7 +515,7 @@ export default function CreateCampaignPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleRemoveTask(task.id)}
+                            onClick={() => handleRemoveTask(index)}
                             type="button"
                             className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
                           >
@@ -557,8 +605,8 @@ export default function CreateCampaignPage() {
                       <CardContent>
                         {tasks.length > 0 ? (
                           <div className="space-y-4">
-                            {tasks.map((task) => (
-                              <div key={task.id} className="border rounded-lg p-4">
+                            {tasks.map((task, index) => (
+                              <div key={index} className="border rounded-lg p-4">
                                 <div className="space-y-1">
                                   <h3 className="font-medium">{task.title}</h3>
                                   <p className="text-sm text-muted-foreground">{task.description}</p>
@@ -587,6 +635,11 @@ export default function CreateCampaignPage() {
                         <div>
                           <div className="text-sm text-muted-foreground mb-1">Campaign Name</div>
                           <div className="font-medium">{formData.name || "Not set"}</div>
+                        </div>
+
+                        <div>
+                          <div className="text-sm text-muted-foreground mb-1">Token Address</div>
+                          <div className="font-medium">{formData.tokenAddress || "Not set"}</div>
                         </div>
 
                         <div>
@@ -632,17 +685,25 @@ export default function CreateCampaignPage() {
                               <span>• Campaign description is required</span>
                             </div>
                           )}
+                          {!formData.tokenAddress.trim() && (
+                            <div className="flex items-center gap-2 text-sm text-destructive">
+                              <span>• Token address is required</span>
+                            </div>
+                          )}
                           {tasks.length === 0 && (
                             <div className="flex items-center gap-2 text-sm text-destructive">
                               <span>• At least one task is required</span>
                             </div>
                           )}
-                          {formData.name.trim() && formData.description.trim() && tasks.length > 0 && (
-                            <div className="flex items-center gap-2 text-sm text-green-600">
-                              <Check className="h-4 w-4" />
-                              <span>Your campaign is ready to launch!</span>
-                            </div>
-                          )}
+                          {formData.name.trim() &&
+                            formData.description.trim() &&
+                            formData.tokenAddress.trim() &&
+                            tasks.length > 0 && (
+                              <div className="flex items-center gap-2 text-sm text-green-600">
+                                <Check className="h-4 w-4" />
+                                <span>Your campaign is ready to launch!</span>
+                              </div>
+                            )}
                         </div>
                       </CardContent>
                     </Card>
@@ -655,7 +716,14 @@ export default function CreateCampaignPage() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting || tasks.length === 0 || !formData.name.trim() || !formData.description.trim()}
+                  disabled={
+                    isSubmitting ||
+                    tasks.length === 0 ||
+                    !formData.name.trim() ||
+                    !formData.description.trim() ||
+                    !formData.tokenAddress.trim() ||
+                    status !== "connected"
+                  }
                 >
                   {isSubmitting ? "Creating..." : "Create Campaign"}
                 </Button>

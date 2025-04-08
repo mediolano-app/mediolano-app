@@ -24,5 +24,18 @@ export interface Campaign {
   tasks: Task[]
   createdAt: Date
   endDate: Date
+  isParticipating?: boolean
+  completedTasks?: string[]
+}
+
+export interface CreateCampaignData {
+  tokenAddress: string
+  name: string
+  description: string
+  image: string
+  maxParticipants: number
+  reward: number
+  endDate: Date
+  tasks: Omit<Task, "id">[]
 }
 
