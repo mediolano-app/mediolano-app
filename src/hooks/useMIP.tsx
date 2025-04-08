@@ -29,8 +29,7 @@ export function useMIP(){
       useEffect(() => {
         if (myTotalBalance) {
           const totalBalance = parseInt(myTotalBalance.toString());
-          const menosUm = totalBalance - 1;
-          const newBalance = BigInt(menosUm.toString());
+          const newBalance = BigInt(totalBalance.toString());
           setTBalance(totalBalance);
           setBalance(newBalance);
         }

@@ -31,6 +31,7 @@ import {
   Box,
   NotepadText,
   Clapperboard,
+  Film,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -72,30 +73,25 @@ import { ToastAction } from "@/components/ui/toast";
 interface Asset {
   title: string;
   description: string;
-  author: string;
   type: string;
+  template: string;
+  movieType: string;
+  director: string;
+  duration: string;
+  studio: string;
+  genre: string;
   mediaUrl: string;
   externalUrl: string;
   tags: string[];
   license: string;
-  limited: boolean;
-  totalSupply: number;
   collection: string;
   version: string;
 }
 
 const types = [
-  { id: "1", name: "3D Model" },
-  { id: "2", name: "AI Model" },
-  { id: "3", name: "Artwork" },
-  { id: "4", name: "Audio" },
-  { id: "5", name: "Document" },
-  { id: "6", name: "Literary" },
-  { id: "7", name: "Publication" },
-  { id: "8", name: "RWA" },
-  { id: "9", name: "Software" },
-  { id: "10", name: "Video" },
-  { id: "11", name: "Other" },
+  { id: "1", name: "Video" },
+  { id: "2", name: "Film" },
+  { id: "3", name: "Videocast" },
 ];
 
 const licenses = [
@@ -112,9 +108,13 @@ const collections = [
 // Define the form schema with zod
 const formSchema = z.object({
   title: z.string().min(3, { message: "Title must be at least 3 characters" }).max(100),
-  author: z.string().min(2, { message: "Author name must be at least 2 characters" }).max(100),
   description: z.string().min(10, { message: "Description must be at least 10 characters" }).max(1000),
-  type: z.enum(["3d-model", "ai-model", "artwork", "audio", "document", "literary", "post", "rwa", "software", "video", "other"]),
+  type: z.enum(["video", "other"]),
+  movieType: z.string().optional(),
+  director: z.string().optional(),
+  duration: z.string().optional(),
+  studio: z.string().optional(),
+  genre: z.string().optional(),
   collection: z.string().optional(),
   tags: z.array(z.string()).optional().default([]),
   mediaUrl: z.string().url().optional().or(z.literal("")),
@@ -157,6 +157,12 @@ const mockBlockchainData = {
   walletAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
 }
 
+
+
+
+
+
+
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -167,6 +173,8 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 export default function CreateIPPage() {
+
+  
 
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -188,14 +196,17 @@ export default function CreateIPPage() {
   const [asset, setAsset] = useState<Asset>({
     title: "",
     description: "",
-    author: "",
     type: "",
+    template: "video",
+    movieType: "",
+    director: "",
+    duration: "",
+    studio: "",
+    genre: "",
     mediaUrl: "",
     externalUrl: "",
     tags: [],
     license: "",
-    limited: false,
-    totalSupply: 1,
     collection: "MIP Collection",
     version: "1",
   });
@@ -292,10 +303,14 @@ export default function CreateIPPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      author: "",
       description: "",
       externalUrl: "",
-      type: "artwork",
+      type: "video",
+      movieType: "",
+      director: "",
+      duration: "",
+      studio: "",
+      genre: "",
       collection: "",
       tags: [],
       mediaUrl: "",
@@ -495,7 +510,7 @@ export default function CreateIPPage() {
     try {
       if (activeTab === "details") {
         // Validate details tab fields
-        const isValid = await form.trigger(["title", "author", "description", "externalUrl"])
+        const isValid = await form.trigger(["title", "description", "externalUrl"])
         if (isValid) {
           setActiveTab("assets")
           setFormProgress(66)
@@ -572,13 +587,18 @@ export default function CreateIPPage() {
       // Simulate blockchain transaction processing
       await new Promise((resolve) => setTimeout(resolve, 3000))
 
-      // Prepare data for storage with the mock transaction data
+      // Prepare data for storage
       const formData = form.getValues()
       const assetData = {
         title: formData.title,
-        author: formData.author,
         description: formData.description,
         type: formData.type,
+        template: 'video',
+        movieType: formData.movieType,
+        director: formData.director,
+        duration: formData.duration,
+        studio: formData.studio,
+        genre: formData.genre,
         collection: formData.collection,
         tags: formData.tags,
         mediaUrl: formData.mediaUrl,
@@ -611,7 +631,7 @@ export default function CreateIPPage() {
 
       console.log(assetData)
       try {
-        const response = await fetch("/api/forms-create-asset", {
+        const response = await fetch("/api/forms-create-video", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -642,13 +662,7 @@ export default function CreateIPPage() {
         setIsSubmitting(false);
       }
 
-      try {
-        // Store mock transaction data for later use
-        localStorage.setItem("lastRegisteredIP", JSON.stringify(assetData))
-      } catch (storageError) {
-        console.error("Error storing data in localStorage:", storageError)
-        // Continue even if localStorage fails
-      }
+  
 
       // Update transaction status to success
       setTransactionStatus("success")
@@ -713,7 +727,7 @@ export default function CreateIPPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
-        <h1 className="text-2xl font-bold">Create Programmable IP</h1>
+        <h1 className="text-2xl font-bold">Create Programmable IP - Video Template</h1>
       </div>
 
       <div className="mb-8">
@@ -746,6 +760,37 @@ export default function CreateIPPage() {
               {/* Details Tab */}
               <TabsContent value="details" className="space-y-4 mt-4">
                 <div className="grid grid-cols-1 gap-4">
+                  
+                  
+
+                  <div className="space-y-2 mt-2">
+                    <Label className="flex items-center gap-1">
+                      IP Type
+                      <span className="text-destructive">*</span>
+                    </Label>
+                    <RadioGroup
+                      defaultValue={form.getValues("type")}
+                      onValueChange={(value) => form.setValue("type", value as any, { shouldValidate: true })}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                       <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="video" id="video" />
+                        <Label htmlFor="video" className="flex items-center gap-2">
+                          <Film className="h-4 w-4" />
+                          Video
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="other" id="other" />
+                        <Label htmlFor="other" className="flex items-center gap-2">
+                          <Box className="h-4 w-4" />
+                          Other
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="title" className="flex items-center gap-1">
                       Title
@@ -757,16 +802,51 @@ export default function CreateIPPage() {
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="author" className="flex items-center gap-1">
-                      Author
-                      <span className="text-destructive">*</span>
+
+                  <div className="space-y-2 mt-2">
+                    <Label htmlFor="movieType" className="flex items-center gap-1">
+                    Movie Type
                     </Label>
-                    <Input id="author" placeholder="Enter the author's name" {...form.register("author")} />
-                    {form.formState.errors.author && (
-                      <p className="text-sm text-destructive">{form.formState.errors.author.message as string}</p>
-                    )}
+                    <Input id="movieType" placeholder="Enter movie type" {...form.register("movieType")} />
                   </div>
+
+
+                  <div className="space-y-2">
+                    <Label htmlFor="director" className="flex items-center gap-1">
+                    Director
+                    </Label>
+                    <Input id="director" placeholder="Enter director name" {...form.register("director")} />
+                  </div>
+
+
+                  <div className="space-y-2">
+                    <Label htmlFor="duration" className="flex items-center gap-1">
+                    Duration
+                    </Label>
+                    <Input id="duration" placeholder="Enter duration time" {...form.register("duration")} />
+                  </div>
+
+
+                  <div className="space-y-2">
+                    <Label htmlFor="studio" className="flex items-center gap-1">
+                    Studio
+                    </Label>
+                    <Input id="studio" placeholder="Enter studio name" {...form.register("studio")} />
+                  </div>
+
+
+                  <div className="space-y-2">
+                    <Label htmlFor="genre" className="flex items-center gap-1">
+                    Genre
+                    </Label>
+                    <Input id="genre" placeholder="Enter genre name" {...form.register("genre")} />
+                  </div>
+
+
+                  <Separator className="my-4" />
+
+                  <h3 className="text-sm font-semibold">Asset Details</h3>
+
 
                   <div className="space-y-2">
                     <Label htmlFor="description" className="flex items-center gap-1">
@@ -789,109 +869,16 @@ export default function CreateIPPage() {
                       External Url
                       <span className="text-destructive">*</span>
                     </Label>
-                    <Input id="externalUrl" placeholder="Enter a external Url link" {...form.register("externalUrl")} />
+                    <Input id="externalUrl" placeholder="Enter the external url media link" {...form.register("externalUrl")} />
                     {form.formState.errors.externalUrl && (
                       <p className="text-sm text-destructive">{form.formState.errors.externalUrl.message as string}</p>
                     )}
                   </div>
 
-                  <div className="space-y-2 mt-4">
-                    <Label className="flex items-center gap-1">
-                      IP Type
-                      <span className="text-destructive">*</span>
-                    </Label>
-                    <RadioGroup
-                      defaultValue={form.getValues("type")}
-                      onValueChange={(value) => form.setValue("type", value as any, { shouldValidate: true })}
-                      className="grid grid-cols-2 gap-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="3d-model" id="3d-model" />
-                        <Label htmlFor="3d-model" className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          3D Model
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="ai-model" id="ai-model" />
-                        <Label htmlFor="ai-model" className="flex items-center gap-2">
-                          <Zap className="h-4 w-4" />
-                          AI Model
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="artwork" id="artwork" />
-                        <Label htmlFor="artwork" className="flex items-center gap-2">
-                          <Image className="h-4 w-4" />
-                          Artwork
-                        </Label>
-                      </div>
-                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="audio" id="audio" />
-                        <Label htmlFor="audio" className="flex items-center gap-2">
-                          <Music className="h-4 w-4" />
-                          Audio
-                        </Label>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="document" id="document" />
-                        <Label htmlFor="document" className="flex items-center gap-2">
-                          <File className="h-4 w-4" />
-                          Document
-                        </Label>
-                      </div>
-                      
-                     
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="literary" id="literary" />
-                        <Label htmlFor="literary" className="flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          Literary
-                        </Label>
-                      </div>
+                  
 
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="post" id="post" />
-                        <Label htmlFor="Post / Publication" className="flex items-center gap-2">
-                          <NotepadText className="h-4 w-4" />
-                          Post / Publication
-                        </Label>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="rwa" id="rwa" />
-                        <Label htmlFor="rwa" className="flex items-center gap-2">
-                          <Globe2 className="h-4 w-4" />
-                          RWA (Real World Asset)
-                        </Label>
-                      </div>
 
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="software" id="software" />
-                        <Label htmlFor="software" className="flex items-center gap-2">
-                          <Code className="h-4 w-4" />
-                          Software
-                        </Label>
-                      </div>
 
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="video" id="video" />
-                        <Label htmlFor="video" className="flex items-center gap-2">
-                          <Clapperboard className="h-4 w-4" />
-                          Video
-                        </Label>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="other" id="other" />
-                        <Label htmlFor="other" className="flex items-center gap-2">
-                          <Box className="h-4 w-4" />
-                          Other
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
 
                   <div className="space-y-2 mt-5">
                     <Label htmlFor="collection" className="flex items-center gap-1">
@@ -1157,6 +1144,7 @@ export default function CreateIPPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
+                   
                     <div className="space-y-4">
                       <Label htmlFor="version">IP Version</Label>
                       <Input id="version" placeholder="e.g., 1.0" {...form.register("version")} />
@@ -1353,13 +1341,6 @@ export default function CreateIPPage() {
                   </div>
                 )}
 
-                {form.watch("author") && (
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">Author</p>
-                    <p className="text-sm text-muted-foreground">{form.watch("author")}</p>
-                  </div>
-                )}
-
                 {form.watch("type") && (
                   <div className="space-y-1">
                     <p className="text-sm font-medium">IP Type</p>
@@ -1524,7 +1505,6 @@ export default function CreateIPPage() {
                   <div className="space-y-4">
                     <div>
                       <h3 className="text-lg font-semibold">{form.watch("title") || "Untitled"}</h3>
-                      <p className="text-sm text-muted-foreground">By {form.watch("author") || "Unknown"}</p>
                     </div>
 
                     <div className="space-y-1">

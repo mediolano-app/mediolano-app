@@ -1,5 +1,6 @@
 import { useConnect, useDisconnect, useAccount } from '@starknet-react/core';
 import { LogOut, LogOutIcon, LucideLogOut, Wallet } from 'lucide-react';
+import { Button } from '../ui/button';
 
 const WalletBarM: React.FC = () => {
   const { connect, connectors } = useConnect();
@@ -7,33 +8,48 @@ const WalletBarM: React.FC = () => {
   const { address } = useAccount();
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+
+    <div className="space-y-4 mb-5">
+     
       {!address ? (
+
         <div className="flex flex-wrap justify-center gap-2">
           {connectors.map((connector) => (
-            <button
-              key={connector.id}
-              onClick={() => connect({ connector })}
-              className="rounded shadow text-sm py-4 px-4 bg-blue-600"
+
+
+            <Button
+            variant="default"
+            size="lg"
+            className="w-full"
+            key={connector.id}
+            onClick={() => connect({ connector })}
             >
-              Connect {connector.id}
-            </button>
+            Connect {connector.id}
+            </Button>
+
           ))}
         </div>
+
+
       ) : (
-        <div className="flex flex-col items-center">
-          <div className="text-sm px-4 rounded">
-            
-            <button
+        
+        <div className="space-y-4">
+         
+          <Button
+            variant="default"
+            size="lg"
+            className="w-full"
             onClick={() => disconnect()}
-            className="py-4 px-4 flex items-center justify-center bg-blue-600"
           >
-           Account: {address.slice(0, 6)}...{address.slice(-4)} &nbsp; <LucideLogOut className='h-4 w-4'/>
-          </button>
-          </div>
+            <span className='text-muted'>Account:</span>&nbsp; {address.slice(0, 6)}...{address.slice(-4)} &nbsp; &nbsp; <LucideLogOut className='h-4 w-4 text-muted'/>
+          </Button>
+
+
           
         </div>
       )}
+
+
     </div>
   );
 };
