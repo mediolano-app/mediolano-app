@@ -188,10 +188,10 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 				<div className="flex justify-between items-center mb-2">
 
 				<Badge variant="default">
-					{metadata.attributes?.[0]?.value ?? "0"}
+					{metadata.attributes?.[2]?.value ?? "MIP"}
 				</Badge>
 				<Badge variant="secondary">
-					{metadata.attributes?.[1]?.value ?? "0"}
+					{metadata.attributes?.[0]?.value ?? "MIP"}
 				</Badge>
 				</div>
 				{/* <Badge className="text-sm"
