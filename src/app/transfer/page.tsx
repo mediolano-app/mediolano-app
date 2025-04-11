@@ -1,7 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { useContract, useSendTransaction, useAccount } from "@starknet-react/core";
+import React, { useState, useEffect } from "react";
+import {
+  useContract,
+  useSendTransaction,
+  useAccount,
+} from "@starknet-react/core";
 import { RpcProvider, Contract } from "starknet";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,94 +14,86 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { abi } from "@/abis/abi";
 import { Abi } from "starknet";
+import { useMIP } from "@/hooks/useMIP";
 
 export default function TransferNFTPage() {
   const [recipientAddress, setRecipientAddress] = useState("");
   const [tokenId, setTokenId] = useState("");
-  const [ownerAddress, setOwnerAddress] = useState<string | null>(null);
-  const [verifying, setVerifying] = useState(false);
   const { toast } = useToast();
 
+  const { tokenIds } = useMIP();
+  console.log("Token IDs:", tokenIds);
+
   const { address } = useAccount();
+  console.log("User Address:", address);
+
   const { contract } = useContract({
     abi: abi as Abi,
     address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
   });
 
-  const { send, error: transactionError } = useSendTransaction({
+  // const handleTransfer = async () => {
+  //   console.log("To:", recipientAddress); // Must be 0xdef...
+  //   console.log("Token:", BigInt(tokenId));
+  //   if (!recipientAddress || !tokenId || !contract || !address) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Please fill in all fields.",
+  //     });
+  //     return;
+  //   }
+
+  //   try {
+  //     // Note: call 'safe_transfer_from' instead of transfer_ownership
+  //     const tx_hash = await contract.safe_transfer_from(
+  //       address as `0x${string}`,
+  //       recipientAddress as `0x${string}`,
+  //       BigInt(tokenId),
+  //       [] // data parameter: empty array
+  //     );
+  //     console.log("Transaction hash:", tx_hash);
+  //     toast({
+  //       title: "Success",
+  //       description: "NFT Transfer Transaction Sent.",
+  //     });
+  //   } catch (error) {
+  //     console.error("Transfer error", error);
+  //     toast({
+  //       title: "Error",
+  //       description: "NFT transfer failed.",
+  //     });
+  //   }
+  // };
+
+  const { send, error: transferError } = useSendTransaction({
     calls:
       contract && address && recipientAddress && tokenId
-        ? [contract.populate("transfer_ownership", [BigInt(tokenId), recipientAddress])]
+        ? [
+            contract.populate("safe_transfer_from", [
+              address,
+              recipientAddress,
+              BigInt(tokenId),
+              [], // data parameter
+            ]),
+          ]
         : undefined,
   });
 
   const handleTransfer = async () => {
-    if (!recipientAddress || !tokenId) {
-      toast({
-        title: "Error",
-        description: "Please provide both token ID and recipient address.",
-      });
-      return;
-    }
-
     try {
-      await send();
+      send();
       toast({
         title: "Success",
         description: "NFT Transfer Transaction Sent.",
       });
-    } catch {
-      console.error("Transfer error", transactionError);
+    } catch (transferError) {
+      console.error("Transfer error", transferError);
       toast({
         title: "Error",
         description: "NFT transfer failed.",
       });
     }
   };
-
-  const verifyOwnership = async () => {
-    if (!tokenId) {
-      toast({
-        title: "Error",
-        description: "Please provide a token ID to verify ownership.",
-      });
-      return;
-    }
-
-    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
-    if (!contractAddress) {
-      console.error("Contract address is not defined in the environment variables.");
-      toast({
-        title: "Error",
-        description: "Contract address is not configured. Please check your environment variables.",
-      });
-      return;
-    }
-
-    setVerifying(true);
-    try {
-      const provider = new RpcProvider({ nodeUrl: process.env.NEXT_PUBLIC_RPC_URL });
-      const contract = new Contract(abi, contractAddress, provider);
-
- 
-      const owner = await contract.owner_of(BigInt(tokenId));
-      setOwnerAddress(owner.toString());
-
-      toast({
-        title: "Verification Success",
-        description: `The current owner of token ID ${tokenId} is ${owner.toString()}.`,
-      });
-    } catch (err) {
-      console.error("Verification error:", err);
-      toast({
-        title: "Error",
-        description: "Failed to verify ownership. Please try again.",
-      });
-    } finally {
-      setVerifying(false);
-    }
-  };
-
   return (
     <div className="min-h-[70vh] flex flex-col items-center justify-center">
       <Card className="container mx-auto px-4 py-10 max-w-2xl">
@@ -129,23 +125,35 @@ export default function TransferNFTPage() {
           </div>
 
           {/* Transfer Button */}
-          <Button onClick={handleTransfer} className="w-full">
+          <Button
+            onClick={() => {
+              console.log("Transfer button clicked");
+              handleTransfer();
+            }}
+            className="w-full"
+          >
             Transfer NFT
           </Button>
 
           {/* Verify Ownership Button */}
-          <Button onClick={verifyOwnership} className="w-full" disabled={verifying}>
-            {verifying ? "Verifying..." : "Verify Ownership"}
-          </Button>
+          {/*
+            <Button
+              onClick={verifyOwnership}
+              className="w-full"
+              disabled={verifying}
+            >
+              {verifying ? "Verifying..." : "Verify Ownership"}
+            </Button>
+          */}
 
           {/* Display Current Owner */}
-          {ownerAddress && (
+          {/* {ownerAddress && (
             <div className="mt-4">
               <p className="text-sm text-gray-600">
                 <strong>Current Owner:</strong> {ownerAddress}
               </p>
             </div>
-          )}
+          )} */}
         </div>
       </Card>
     </div>
