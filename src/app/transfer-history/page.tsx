@@ -12,21 +12,29 @@ import { BlockTag } from "starknet";
 import stringify from "safe-stable-stringify";
 import { Button } from "@/components/ui/button";
 
+// Helper: combine two U256 halves into one BigInt as string.
 function decodeU256(lowHex: string, highHex: string): string {
   const low = BigInt(lowHex);
   const high = BigInt(highHex);
-  // Combine the two 128-bit halves into one 256-bit number:
   return ((high << 128n) | low).toString();
+}
+
+// Helper: Insert a "0" after "0x" if needed.
+function fixAddress(addr: string) {
+  if (!addr) return addr;
+  const lower = addr.toLowerCase();
+  if (lower.startsWith("0x") && lower.length > 2 && lower[2] !== "0") {
+    return "0x0" + lower.slice(2);
+  }
+  return lower;
 }
 
 export function EventsHandler() {
   const eventName = "Transfer";
   const fromBlock = 0;
   const toBlock = BlockTag.LATEST;
-  const pageSize = 75;
-
+  const pageSize = 10;
   const { address } = useAccount();
-
   const {
     data,
     error: eventError,
@@ -40,98 +48,52 @@ export function EventsHandler() {
     toBlock,
     pageSize,
   });
-
   const allEvents = data?.pages.flatMap((page) => page.events) || [];
   console.log("All Events:", allEvents);
 
-  // Derive filtered events based on the connected user's address using useMemo.
-  // This will update automatically whenever allEvents or address changes.
-  const filteredEvents = useMemo(() => {
-    if (!address) return [];
-    return allEvents.filter(
-      (event) => event.keys[1]?.toLowerCase() === address.toLowerCase()
+  // Make filtered events a state variable so other parts can access it.
+  const [filteredEvents, setFilteredEvents] = useState<typeof allEvents>([]);
+
+  // Re-filter events whenever allEvents or address changes.
+  useEffect(() => {
+    const newFiltered = allEvents.filter(
+      (event) =>
+        fixAddress(event.keys[1].toLowerCase()) === address?.toLowerCase()
     );
+    setFilteredEvents(newFiltered);
   }, [allEvents, address]);
-  console.log("Filtered Events:", filteredEvents);
 
   // Automatically fetch the next page at set intervals until no more pages exist.
   useEffect(() => {
-    // Set an interval to trigger fetchNextPage every 5 seconds
     const interval = setInterval(() => {
       if (hasNextPage && !isFetchingNextPage) {
         console.log("Automatically fetching next page...");
         fetchNextPage();
       } else if (!hasNextPage) {
-        // Clear the interval if there are no more pages to fetch
         clearInterval(interval);
       }
     }, 5000);
     return () => clearInterval(interval);
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  console.log("All Events:", allEvents);
-  console.log(allEvents[71]);
-  console.log("event keys 72", allEvents[72]?.keys[1]);
-  console.log("address", address);
-
-  useEffect(() => {
-    console.log(allEvents[72]?.keys[1] == address);
-  }, [allEvents, address]);
-
-  // (Optional) Log filteredEvents once per change
   console.log("Filtered Events:", filteredEvents);
 
-  const response =
-    status === "pending" ? (
-      <p>Loading first events ...</p>
-    ) : status === "error" ? (
-      <>
-        <p>Error: {eventError?.message}</p>
-        <pre>{stringify({ data, eventError }, null, 2)}</pre>
-      </>
-    ) : (
-      <>
-        <div>
-          <Button
-            onClick={() => {
-              fetchNextPage();
-            }}
-            disabled={!hasNextPage || isFetchingNextPage}
-          >
-            {isFetchingNextPage
-              ? "Loading more events ..."
-              : hasNextPage
-              ? "Load more events"
-              : "No more events to load"}
-          </Button>
-        </div>
+  // Example log for debugging:
+  useEffect(() => {
+    if (filteredEvents.length > 0) {
+      console.log(
+        "Event keys of first filtered event:",
+        filteredEvents[0]?.keys
+      );
+    }
+  }, [filteredEvents]);
 
-        {/* {data?.pages
-          .slice(0)
-          .reverse()
-          .map((page, i) => (
-            <div key={page.continuation_token}>
-              <p>Chunk: {data.pages.length - i}</p>
-              <pre>{stringify({ page }, null, 2)}</pre>
-            </div>
-          ))} */}
-      </>
-    );
   return (
     <div className="flex flex-col gap-4">
-      {/* <p>Fetching events for</p>
-      <pre>
-        {stringify(
-          { address, eventName: "Transfer", fromBlock, toBlock, pageSize },
-          null,
-          2
-        )}
-      </pre> */}
       {filteredEvents.map((event, idx) => {
-        // The 'keys' array typically contains [from, to, token_id].
-        // Let's decode them:
+        // Extract a token ID from the event’s keys.
+        // (Assuming event.keys[3] and event.keys[4] hold low and high parts respectively)
         const tokenId = decodeU256(event.keys[3], event.keys[4]);
-
         return (
           <div key={idx} style={{ marginBottom: "1rem" }}>
             <p>
@@ -141,19 +103,21 @@ export function EventsHandler() {
           </div>
         );
       })}
-      {response}
+      <div>
+        <Button
+          onClick={() => fetchNextPage()}
+          disabled={!hasNextPage || isFetchingNextPage}
+        >
+          {isFetchingNextPage
+            ? "Loading more events ..."
+            : hasNextPage
+            ? "Load more events"
+            : "No more events to load"}
+        </Button>
+      </div>
     </div>
   );
 }
-
-const isValidUrl = (url: string) => {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 export function SearchAndFilter({
   onSearch,
@@ -165,7 +129,7 @@ export function SearchAndFilter({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    onSearch(query); // Trigger search dynamically as the user types
+    onSearch(query);
   };
 
   return (
@@ -181,6 +145,7 @@ export function SearchAndFilter({
   );
 }
 
+// This component now uses a state variable for filtered token IDs.
 export default function AllTokenURIsPage() {
   const [allTokenData, setAllTokenData] = useState<
     { tokenId: number; uri: string; metadata: any; hash: string }[]
@@ -188,26 +153,36 @@ export default function AllTokenURIsPage() {
   const [filteredTokenData, setFilteredTokenData] = useState<
     { tokenId: number; uri: string; metadata: any; hash: string }[]
   >([]);
+  // A state for filtered token IDs (as strings).
+  const [filteredTokenIds, setFilteredTokenIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // In this useEffect, you might update filteredTokenIds based on some filtering criteria.
+  // For example, assume you want to filter based on some condition on the tokenId.
+  // You can update filteredTokenIds once you have allTokenData.
   useEffect(() => {
-    const fetchAllTokenData = async () => {
+    // Example: Filter tokens with even tokenId.
+    const ids = allTokenData
+      .filter((data) => data.tokenId % 2 === 0)
+      .map((data) => data.tokenId.toString());
+    setFilteredTokenIds(ids);
+  }, [allTokenData]);
+
+  // Now, instead of looping tokenId 1 to TOTAL_SUPPLY,
+  // we loop over filteredTokenIds to fetch metadata:
+  useEffect(() => {
+    const fetchTokenData = async () => {
       try {
         const customRpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
-        const CONTRACT_ADDRESS =
-          "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0"; // Replace with your contract address
-
+        const CONTRACT_ADDRESS = process.env
+          .NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
         const provider = new RpcProvider({ nodeUrl: customRpcUrl });
-
         const { abi } = await provider.getClassAt(CONTRACT_ADDRESS);
         if (!abi) {
           throw new Error("Failed to fetch ABI for the contract.");
         }
-
         const contract = new Contract(abi, CONTRACT_ADDRESS, provider);
-        const totalSupplyResult = await contract.total_supply();
-        const TOTAL_SUPPLY = parseInt(totalSupplyResult.toString(), 10);
 
         const data: {
           tokenId: number;
@@ -215,7 +190,9 @@ export default function AllTokenURIsPage() {
           metadata: any;
           hash: string;
         }[] = [];
-        for (let tokenId = 1; tokenId <= TOTAL_SUPPLY; tokenId++) {
+        // Loop over filteredTokenIds rather than a continuous range.
+        for (let tokenIdStr of filteredTokenIds) {
+          const tokenId = parseInt(tokenIdStr, 10);
           try {
             const uri = await contract.token_uri(tokenId.toString());
 
@@ -226,7 +203,6 @@ export default function AllTokenURIsPage() {
               );
             }
             const metadata = await response.json();
-
             const metadataString = JSON.stringify(metadata);
             const hash = CryptoJS.SHA256(metadataString).toString();
 
@@ -235,19 +211,20 @@ export default function AllTokenURIsPage() {
             console.error(`Error fetching data for token ID ${tokenId}:`, err);
           }
         }
-
         setAllTokenData(data);
-        setFilteredTokenData(data);
-      } catch (err) {
+        setFilteredTokenData(data); // or apply additional filtering if needed
+      } catch (err: any) {
         console.error("Error fetching token data:", err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchAllTokenData();
-  }, []);
+    // Only fetch if there are some filtered token IDs.
+    if (filteredTokenIds.length > 0) {
+      fetchTokenData();
+    }
+  }, [filteredTokenIds]);
 
   const handleSearch = (query: string) => {
     if (!query) {
@@ -262,7 +239,7 @@ export default function AllTokenURIsPage() {
         token.tokenId.toString().includes(lowerCaseQuery) ||
         token.hash.toLowerCase().includes(lowerCaseQuery) ||
         (token.metadata.author &&
-          token.metadata.author.toLowerCase().includes(lowerCaseQuery)) // Match Metadata Author
+          token.metadata.author.toLowerCase().includes(lowerCaseQuery))
     );
 
     setFilteredTokenData(filtered);
@@ -274,6 +251,7 @@ export default function AllTokenURIsPage() {
       <h1 className="text-2xl font-bold tracking-tight text-center p-4">
         Transfer History
       </h1>
+      {/* Uncomment the SearchAndFilter component if you want live searching */}
       {/* <SearchAndFilter onSearch={handleSearch} /> */}
       {loading ? (
         <Loading />
@@ -282,11 +260,10 @@ export default function AllTokenURIsPage() {
       ) : filteredTokenData.length > 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTokenData.map((data) => {
-            const metadata = data.metadata || {}; // Fallback to an empty object if metadata is missing
+            const metadata = data.metadata || {};
             const imageUrl = isValidUrl(metadata.image)
               ? metadata.image
               : "/background.jpg";
-
             return (
               <Card key={data.tokenId} className="overflow-hidden">
                 <div className="relative aspect-square">
@@ -335,4 +312,13 @@ export default function AllTokenURIsPage() {
       )}
     </div>
   );
+}
+
+function isValidUrl(url: string) {
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
 }
