@@ -13,8 +13,8 @@ import { useUsersSettings } from '@/hooks/useUsersSettings'
 
 // Mockup data
 const mockUser = {
-  name: 'Alice Johnson',
-  email: 'alice@example.com',
+  name: 'Testing',
+  email: 'alice@mediolano.app',
   username: 'alice_ip_creator',
   language: 'en',
   twoFactorEnabled: false,
