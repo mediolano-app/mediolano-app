@@ -33,11 +33,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import {
-  useCreateDummyIPLising,
-  useCreateIPLising,
-} from "@/hooks/useIPListingContract";
+import { useCreateIPLising } from "@/hooks/useIPListingContract";
 import { Listing } from "@/types/marketplace";
+import { useAccount } from "@starknet-react/core";
 
 // Mock data for previously registered IPs
 const mockIPs = [
@@ -101,55 +99,90 @@ export default function ListingIP() {
     buyoutPricePerToken: "",
     tokenTypeOfListing: "0",
   });
-  // const { createListing, createListingError } = useCreateIPLising(listingData);
-  const { createListing, createListingError } = useCreateDummyIPLising();
 
+  const { createListing, createListingError } = useCreateIPLising(listingData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  const { account, address } = useAccount();
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!listingData.assetContract) {
+      errors.assetContract = "Asset contract address is required";
+    }
+
+    if (!listingData.tokenId) {
+      errors.tokenId = "Token ID is required";
+    }
+
+    if (!listingData.secondsUntilEndTime) {
+      errors.secondsUntilEndTime = "Duration is required";
+    }
+
+    if (!listingData.buyoutPricePerToken) {
+      errors.buyoutPricePerToken = "Price per token is required";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsSubmitting(true);
 
-    try {
-      console.log("Summiting listing.............");
-
-      createListing();
-
+    if (!validateForm()) {
       toast({
-        title: "IP Listed",
-        description: "Visit Portfolio to manage your digital assets.",
+        title: "Validation Error",
+        description: "Please check the form for errors",
         action: <ToastAction altText="OK">OK</ToastAction>,
       });
-    } catch (err) {
-      console.error("Submission Error:", err, createListingError);
-      toast({
-        title: "Error",
-        description: "Registration failed. Please contact our support team.",
-        action: <ToastAction altText="OK">OK</ToastAction>,
-      });
-    } finally {
-      setIsSubmitting(false);
+      return;
     }
-  };
 
-  const handleSubmitMock = async () => {
     setIsSubmitting(true);
 
     try {
-      console.log("Summiting listing.............");
+      if (account && address) {
+        // Call createListing and wait for the transaction to be sent
+        const result = await createListing();
 
-      createListing();
+        // Only show success toast if the transaction was actually sent
+        if (result) {
+          toast({
+            title: "Transaction Sent",
+            description:
+              "Please check your wallet to complete the transaction.",
+            action: <ToastAction altText="OK">OK</ToastAction>,
+          });
 
-      toast({
-        title: "IP Listed",
-        description: "Visit Portfolio to manage your digital assets.",
-        action: <ToastAction altText="OK">OK</ToastAction>,
-      });
+          // Reset form after successful submission
+          setListingData({
+            assetContract: "",
+            tokenId: "",
+            startTime: Math.floor(Date.now() / 1000).toString(),
+            endTime: "",
+            secondsUntilEndTime: "",
+            quantityToList: "1",
+            currencyToAccept: process.env
+              .NEXT_PUBLIC_STRK_ADDRESS as `0x${string}`,
+            buyoutPricePerToken: "",
+            tokenTypeOfListing: "0",
+          });
+        }
+      } else {
+        toast({
+          title: "Please connect your wallet",
+          description: "Please connect your wallet to create a listing.",
+          action: <ToastAction altText="OK">OK</ToastAction>,
+        });
+      }
     } catch (err) {
       console.error("Submission Error:", err, createListingError);
       toast({
         title: "Error",
-        description: "Registration failed. Please contact our support team.",
+        description: "Listing failed. Please try again or contact support.",
         action: <ToastAction altText="OK">OK</ToastAction>,
       });
     } finally {
@@ -162,6 +195,15 @@ export default function ListingIP() {
   ) => {
     const { name, value } = e.target;
     setListingData((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
 
   return (
@@ -254,38 +296,58 @@ export default function ListingIP() {
               <form onSubmit={handleSubmit}>
                 <div className="grid w-full items-center gap-4">
                   <div className="flex flex-col space-y-1.5">
-                    <Label htmlFor="AssetAddress">Asset address</Label>
+                    <Label htmlFor="assetContract">Asset address</Label>
                     <Input
                       id="assetContract"
+                      name="assetContract"
+                      value={listingData.assetContract}
                       onChange={handleChange}
                       placeholder="Enter the asset contract address"
+                      className={
+                        formErrors.assetContract ? "border-red-500" : ""
+                      }
                     />
+                    {formErrors.assetContract && (
+                      <p className="text-sm text-red-500">
+                        {formErrors.assetContract}
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col space-y-1.5">
                     <Label htmlFor="tokenId">Token Id</Label>
                     <Input
                       id="tokenId"
+                      name="tokenId"
+                      value={listingData.tokenId}
                       onChange={handleChange}
                       placeholder="Enter the asset token Id"
+                      className={formErrors.tokenId ? "border-red-500" : ""}
                     />
-                  </div>
-                  <div className="flex flex-col space-y-1.5">
-                    <Label htmlFor="endTime">End Time</Label>
-                    <Input
-                      id="endTime"
-                      onChange={handleChange}
-                      placeholder="Enter the end time"
-                    />
+                    {formErrors.tokenId && (
+                      <p className="text-sm text-red-500">
+                        {formErrors.tokenId}
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col space-y-1.5">
                     <Label htmlFor="secondsUntilEndTime">
-                      Seconds until end time
+                      Duration (in seconds)
                     </Label>
                     <Input
                       id="secondsUntilEndTime"
+                      name="secondsUntilEndTime"
+                      value={listingData.secondsUntilEndTime}
                       onChange={handleChange}
-                      placeholder="Enter seconds until end time"
+                      placeholder="Enter listing duration in seconds"
+                      className={
+                        formErrors.secondsUntilEndTime ? "border-red-500" : ""
+                      }
                     />
+                    {formErrors.secondsUntilEndTime && (
+                      <p className="text-sm text-red-500">
+                        {formErrors.secondsUntilEndTime}
+                      </p>
+                    )}
                   </div>
                   <div className="flex flex-col space-y-1.5">
                     <Label htmlFor="buyoutPricePerToken">
@@ -293,22 +355,35 @@ export default function ListingIP() {
                     </Label>
                     <Input
                       id="buyoutPricePerToken"
+                      name="buyoutPricePerToken"
+                      value={listingData.buyoutPricePerToken}
                       onChange={handleChange}
                       placeholder="Enter the price per token"
+                      className={
+                        formErrors.buyoutPricePerToken ? "border-red-500" : ""
+                      }
                     />
+                    {formErrors.buyoutPricePerToken && (
+                      <p className="text-sm text-red-500">
+                        {formErrors.buyoutPricePerToken}
+                      </p>
+                    )}
                   </div>
                 </div>
+                <CardFooter className="flex justify-between mt-6">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => router.back()}
+                  >
+                    Cancel
+                  </Button>
+                  <Button disabled={isSubmitting} type="submit">
+                    {isSubmitting ? "Submitting..." : "Create Listing"}
+                  </Button>
+                </CardFooter>
               </form>
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline">Cancel</Button>
-              <Button disabled={isSubmitting} type="submit">
-                {isSubmitting ? "Submitting..." : "Register NFT"}
-              </Button>
-              <Button disabled={isSubmitting} onClick={handleSubmitMock}>
-                {isSubmitting ? "Submitting..." : "Register mock NFT"}
-              </Button>
-            </CardFooter>
           </Card>
         </div>
       </div>

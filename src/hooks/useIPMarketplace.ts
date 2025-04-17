@@ -11,25 +11,28 @@ import { Abi } from "starknet";
 export const useListItem = (data: Listing) => {
   const { address } = useAccount();
 
-  console.log("address", address);
-
   const { contract: IPMarketplaceContract } = useContract({
     address: process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS as `0x${string}`,
     abi: IPMarketplaceABI as Abi,
   });
 
-  const { send, error: listItemError } = useSendTransaction({
-    calls:
-      IPMarketplaceContract && address
-        ? [IPMarketplaceContract.populate("list_item", [data])] // take note of the metadata type
-        : undefined,
+  const { sendAsync, error: listItemError } = useSendTransaction({
+    calls: [],
   });
 
   const listItem = () => {
     console.log("listing item...");
 
+    if (!IPMarketplaceContract || !address) {
+      console.error("Contract or address not available");
+      return false;
+    }
+
     try {
-      send();
+      const calls = IPMarketplaceContract?.populate("list_item", [data]);
+      if (calls) {
+        sendAsync([calls]);
+      }
     } catch (error) {
       console.log("listing error", error);
     }
@@ -44,27 +47,35 @@ export const useListItem = (data: Listing) => {
 export const useUnlistItem = (data: Listing) => {
   const { address } = useAccount();
 
-  console.log("address", address);
-
   const { contract: IPMarketplaceContract } = useContract({
     address: process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS as `0x${string}`,
     abi: IPMarketplaceABI as Abi,
   });
 
-  const { send, error: unlistItemError } = useSendTransaction({
-    calls:
-      IPMarketplaceContract && address
-        ? [IPMarketplaceContract.populate("unlist_item", [data])] // nft_contract: ContractAddress & token_id: u256
-        : undefined,
+  const { sendAsync, error: unlistItemError } = useSendTransaction({
+    calls: [],
   });
 
-  const unlistItem = () => {
+  const unlistItem = async () => {
     console.log("Unlisting item...");
 
     try {
-      send();
+      const calls = IPMarketplaceContract?.populate("create_listing", [data]);
+
+      if (!IPMarketplaceContract || !address) {
+        console.error("Contract or address not available");
+        return false;
+      }
+
+      if (calls) {
+        const result = await sendAsync([calls]);
+        console.log("Transaction sent:", result);
+        return true;
+      }
+      return false;
     } catch (error) {
       console.log("Unlisting error", error);
+      return false;
     }
   };
 
@@ -77,25 +88,26 @@ export const useUnlistItem = (data: Listing) => {
 export const useBuyItem = (data: Listing) => {
   const { address } = useAccount();
 
-  console.log("address", address);
-
   const { contract: IPMarketplaceContract } = useContract({
     address: process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS as `0x${string}`,
     abi: IPMarketplaceABI as Abi,
   });
 
-  const { send, error: buyItemError } = useSendTransaction({
-    calls:
-      IPMarketplaceContract && address
-        ? [IPMarketplaceContract.populate("buy_item", [data])] // nft_contract: ContractAddress & token_id: u256
-        : undefined,
+  const { sendAsync, error: buyItemError } = useSendTransaction({
+    calls: [],
   });
 
-  const buyItem = () => {
-    console.log("Unlisting item...");
+  const buyItem = async () => {
+    if (!IPMarketplaceContract || !address) {
+      console.error("Contract or address not available");
+      return false;
+    }
 
     try {
-      send();
+      const calls = IPMarketplaceContract?.populate("buy_item", [data]);
+      if (calls) {
+        sendAsync([calls]);
+      }
     } catch (error) {
       console.log("Unlisting error", error);
     }
@@ -110,25 +122,26 @@ export const useBuyItem = (data: Listing) => {
 export const useUpdateListing = (data: Listing) => {
   const { address } = useAccount();
 
-  console.log("address", address);
-
   const { contract: IPMarketplaceContract } = useContract({
     address: process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS as `0x${string}`,
     abi: IPMarketplaceABI as Abi,
   });
 
-  const { send, error: UpdateListingError } = useSendTransaction({
-    calls:
-      IPMarketplaceContract && address
-        ? [IPMarketplaceContract.populate("update_listing", [data])] // nft_contract: ContractAddress, token_id: u256 & new_price: u256
-        : undefined,
+  const { sendAsync, error: UpdateListingError } = useSendTransaction({
+    calls: [],
   });
 
-  const UpdateListing = () => {
-    console.log("Unlisting item...");
+  const UpdateListing = async () => {
+    if (!IPMarketplaceContract || !address) {
+      console.error("Contract or address not available");
+      return false;
+    }
 
     try {
-      send();
+      const calls = IPMarketplaceContract?.populate("update_listing", [data]);
+      if (calls) {
+        sendAsync([calls]);
+      }
     } catch (error) {
       console.log("Unlisting error", error);
     }
@@ -143,8 +156,8 @@ export const useUpdateListing = (data: Listing) => {
 export function useGetListing(nftContract: string, tokenId: string) {
   const { data, error, isLoading } = useReadContract({
     abi: IPMarketplaceABI as Abi,
-    functionName: "get_listing",
     address: process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS as `0x${string}`,
+    functionName: "get_listing",
     args: [nftContract, tokenId],
     watch: true,
   });
