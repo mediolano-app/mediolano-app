@@ -104,7 +104,7 @@ export default function UserAccount() {
       
       <div className="container mx-auto py-10">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">My Account</h1>
+          <h1 className="text-3xl font-bold">My Account (Preview)</h1>
           
         </div>
 

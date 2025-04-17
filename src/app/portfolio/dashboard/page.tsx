@@ -164,11 +164,10 @@ export default function DashboardPage() {
                     "No recorded activity"}
               </div>
               <p className="text-xs text-muted-foreground">
-                {address && isLoading
-                  ? ""
-                  : // : (portfolioStats.recentActivity.length > 0
-                    // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK`
-                    "(Demonstration)"}
+                {address && isLoading ? "" 
+                  // : (portfolioStats.recentActivity.length > 0 
+                  // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
+                  : "(Preview)"}
               </p>
             </CardContent>
           </Card>
@@ -185,10 +184,8 @@ export default function DashboardPage() {
           {address && isLoading ? (
             <div className="text-center py-8">Loading your assets...</div>
           ) : tokenIdsError ? (
-            <div className="text-center py-8 text-red-500">
-              {tokenIdsError.message}
-            </div>
-          ) : balance === 0 ? (
+            <div className="text-center py-8 text-red-500">{tokenIdsError.message}</div>          
+          ) : balance === BigInt(0) ? (
             <div className="text-center py-8">
               <p>Your Programmable IP will appear here after creation.</p>
             </div>

@@ -45,8 +45,10 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "crypto-js": "^4.2.0",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.1",
+    "fast-safe-stringify": "^2.1.1",
     "fetch-blob": "^4.0.0",
     "framer-motion": "^12.4.1",
     "get-starknet": "^3.3.3",
@@ -64,6 +66,7 @@
     "react-hook-form": "^7.53.2",
     "react-resizable-panels": "^2.1.6",
     "recharts": "^2.13.3",
+    "safe-stable-stringify": "^2.5.0",
     "sonner": "^1.7.0",
     "starknet": "^6.17.0",
     "tailwind-merge": "^2.5.4",
@@ -73,6 +76,7 @@
     "zustand": "^5.0.1"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

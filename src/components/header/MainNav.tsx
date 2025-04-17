@@ -39,6 +39,9 @@ import {
   Gauge,
   Brain,
   LayoutGrid,
+  ArrowRightLeft,
+  Building,
+  FileBadge,
 } from "lucide-react"
 import { Logo } from "@/components/header/Logo"
 
@@ -103,7 +106,7 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/new/templates"
+                    href="/create/templates"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <FileCode className="mr-2 h-4 w-4  text-blue-600" />
@@ -158,14 +161,14 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/create"
+                    href="/transfer"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <BoxIcon className="mr-2 h-4 w-4  text-blue-600" />
-                      New Asset
+                      <ArrowRightLeft className="mr-2 h-4 w-4  text-blue-600" />
+                      Transfer Asset
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Create a new Programmable IP or Collection.
+                      Transfer your Programmable IP to another account.
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -220,7 +223,7 @@ export function MainNav() {
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
               <Gem className="mr-2 h-4 w-4" />
-              Monetize
+              Services
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
@@ -231,10 +234,10 @@ export function MainNav() {
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <Gem className="mr-2 h-4 w-4  text-blue-600" />
-                      IP Monetization
+                      Monetize
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Permissionless services to monetize Programmable IP.
+                      Permissionless services to monetize Programmable IP (Preview) 
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -248,21 +251,35 @@ export function MainNav() {
                       Marketplace
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Buy and trade Intellectual Property onchain.
+                      Buy, sell and trade Programmable IP (Preview) 
                     </p>
                   </Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/"
+                    href="/services/proof-of-ownership"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <LayoutDashboard className="mr-2 h-4 w-4  text-blue-600" />
-                      Smart Transaction
+                      <FileBadge className="mr-2 h-4 w-4  text-blue-600" />
+                      Proof of Ownership
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Create custom agreements.
+                      Verifiable ownership of a digital asset (Preview)
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/services/proof-of-licensing"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <FileSignature className="mr-2 h-4 w-4  text-blue-600" />
+                      Proof of Licensing
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Create public proof of licensing agreements (Preview)
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -272,11 +289,11 @@ export function MainNav() {
                     href="/business"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Blocks className="mr-2 h-4 w-4  text-blue-600" />
+                      <Building className="mr-2 h-4 w-4  text-blue-600" />
                       Business Services
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Premium services for organizations.
+                      Enterprise-grade services for organizations (Preview)
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -290,21 +307,7 @@ export function MainNav() {
                       Rewards
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Mediolano token rewards.
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <Gauge className="mr-2 h-4 w-4  text-blue-600" />
-                      Financial Dashboard
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Mediolano token rewards.
+                      Mediolano token rewards (Preview)
                     </p>
                   </Link>
                 </NavigationMenuLink>

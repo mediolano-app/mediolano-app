@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid, Gem } from 'lucide-react'
+import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid, Gem, ArrowRightLeft, FileBadge, FileCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -29,8 +29,8 @@ const navigationItems = [
     title: 'Start',
     items: [
       { title: 'Discover', href: '/discover', icon: BookOpen },
-      { title: 'Create IP', href: '/new', icon: Box },
-      { title: 'IP Templates', href: '/new/templates', icon: FileText }, 
+      { title: 'Create IP', href: '/create', icon: Box },
+      { title: 'IP Templates', href: '/create/templates', icon: FileText }, 
     ],
   },
   {
@@ -43,11 +43,13 @@ const navigationItems = [
     ],
   },
   {
-    title: 'Monetization',
+    title: 'Services (Preview)',
     items: [
       { title: 'Monetize', href: '/monetize', icon: Gem },
       { title: 'Marketplace', href: '/marketplace', icon: Banknote },
-      { title: 'Smart Transaction', href: '/', icon: FileText },
+      { title: 'Proof of Ownership', href: '/services/proof-of-ownership', icon: FileBadge },
+      { title: 'Proof of Licensing', href: '/services/proof-of-licensing', icon: FileCheck },
+      { title: 'Transfer Asset', href: '/transfer', icon: ArrowRightLeft },
       { title: 'Business', href: '/business', icon: Briefcase },
     ],
   },
@@ -169,9 +171,9 @@ export function MobileSidebar() {
               variant="default"
               size="lg"
               className="w-full"
-              onClick={() => handleNavigation('/new')}
+              onClick={() => handleNavigation('/create')}
             >
-              Register Your IP
+              Create Programmable IP
             </Button>
             <Button
               variant="default"

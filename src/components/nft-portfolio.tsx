@@ -47,6 +47,7 @@ import {
   Send,
   RefreshCw,
 } from "lucide-react"
+import NFTCard from "./NFTCard"
 import { PortfolioStats } from "./portfolio-stats"
 import { NFTLicensings } from "./nft-licensings"
 import { useMIP } from "@/hooks/useMIP"
@@ -64,11 +65,9 @@ export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret"
 export interface IP{
   name: string,
   description: string,
-  author: string,
-  type: string,
-  image: string,
-  version: string,
   external_url: string,
+  image: string,
+  attributes: []
 }
 
 export default function NFTPortfolio() {
@@ -209,7 +208,7 @@ export default function NFTPortfolio() {
             <LineChart className="h-4 w-4" />
           </Button>
 
-          <Button variant="outline" size="icon" onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}>
+          <Button disabled variant="outline" size="icon" onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}>
             {viewMode === "grid" ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
           </Button>
 
@@ -267,7 +266,7 @@ export default function NFTPortfolio() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="flex items-center gap-1">
+              <Button variant="outline" className="flex items-center gap-1" disabled>
                 <ArrowUpDown className="h-4 w-4 mr-1" />
                 Sort
                 {getSortIcon()}
@@ -343,7 +342,13 @@ export default function NFTPortfolio() {
           )} */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {tokenIds.map((tokenId, index) => (
-              <NFTCard key={index} tokenId={tokenId} status="Listed" onClick={() => router.push(`/asset/${tokenId}`)} />
+              <NFTCard 
+              key={index} 
+              tokenId={tokenId} 
+              status="Protected" 
+              // onClick={() => router.push(`/assets/${tokenId}`)}
+  
+              />
             ))}
           </div>
         </TabsContent>
@@ -356,111 +361,113 @@ export default function NFTPortfolio() {
   )
 }
 
-function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string; onClick: () => void }) {
-  const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
-	const [metadata, setMetadata] = useState<IP | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+// function NFTCard({ tokenId, status, onClick }: { tokenId: BigInt; status: string; onClick: () => void }) {
+//   const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
+// 	const [metadata, setMetadata] = useState<IP | null>(null);
+// 	const [isLoading, setIsLoading] = useState(true);
+// 	const [error, setError] = useState<string | null>(null);
 
-	status = 'MIP';
+// 	status = 'MIP';
 
-	const {
-		data: tokenURI,
-		isLoading: isContractLoading,
-		error: contractError,
-	} = useReadContract({
-		abi: abi as Abi,
-		functionName: "tokenURI",
-		address: contract as `0x${string}`,
-		args: [Number(tokenId)],
-		watch: false,
-	});
+// 	const {
+// 		data: tokenURI,
+// 		isLoading: isContractLoading,
+// 		error: contractError,
+// 	} = useReadContract({
+// 		abi: abi as Abi,
+// 		functionName: "tokenURI",
+// 		address: contract as `0x${string}`,
+// 		args: [Number(tokenId)],
+// 		watch: false,
+// 	});
 
-	console.log("Token URI:", tokenURI);
+// 	console.log("Token URI:", tokenURI);
 
-	useEffect(() => {
-		const fetchMetadata = async () => {
-			if (!tokenURI || typeof tokenURI !== "string") {
-				return;
-			}
+// 	useEffect(() => {
+// 		const fetchMetadata = async () => {
+// 			if (!tokenURI || typeof tokenURI !== "string") {
+// 				return;
+// 			}
 
-			try {
-				setIsLoading(true);
-        		console.log(tokenURI);
-				const response = await pinataClient.gateways.get(tokenURI);
-				console.log(response);
-				let parsedData: any;
-				try {
-					parsedData =
-						typeof response.data === "string"
-							? JSON.parse(response.data)
-							: response.data;
-				} catch (parseError) {
-					throw new Error("Failed to parse metadata");
-				}
+// 			try {
+// 				setIsLoading(true);
+//         		console.log(tokenURI);
+// 				const response = await pinataClient.gateways.get(tokenURI);
+// 				console.log(response);
+// 				let parsedData: any;
+// 				try {
+// 					parsedData =
+// 						typeof response.data === "string"
+// 							? JSON.parse(response.data)
+// 							: response.data;
+// 				} catch (parseError) {
+// 					throw new Error("Failed to parse metadata");
+// 				}
+//         console.log("METADATA",parsedData);
+// 				setMetadata(parsedData);
+// 				setError(null);
+// 			} catch (err) {
+// 				setError(
+// 					err instanceof Error ? err.message : "Failed to fetch metadata",
+// 				);
+// 				setMetadata(null);
+// 			} finally {
+// 				setIsLoading(false);
+// 			}
+// 		};
 
-				setMetadata(parsedData);
-				console.log(parsedData);
-				setError(null);
-			} catch (err) {
-				setError(
-					err instanceof Error ? err.message : "Failed to fetch metadata",
-				);
-				setMetadata(null);
-			} finally {
-				setIsLoading(false);
-			}
-		};
+// 		fetchMetadata();
+// 	}, [tokenURI]);
 
-		fetchMetadata();
-	}, [tokenURI]);
+// 	if (isLoading || isContractLoading) {
+// 		return <div>Loading...</div>;
+// 	}
 
-	if (isLoading || isContractLoading) {
-		return <div>Loading...</div>;
-	}
+// 	if (error || contractError) {
+// 		return <div>Error: {error || "Failed to fetch token data"}</div>;
+// 	}
 
-	if (error || contractError) {
-		return <div>Error: {error || "Failed to fetch token data"}</div>;
-	}
-
-	if (!metadata) {
-		return <div>No metadata available</div>;
-	}
-  return (
-    <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={onClick}>
-      <div className="relative aspect-video">
-        <Image
-          src={metadata.image || "/background.jpg"}
-          alt={metadata.name}
-          fill
-          className="object-cover transition-all duration-300 hover:brightness-90"
-        />
-        {/* {nft.rarity && (
-          <div className="absolute top-2 left-2">
-            <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
-              <Sparkles className="h-3 w-3 mr-1" />
-              {nft.rarity}
-            </Badge>
-          </div>
-        )} */}
-      </div>
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="font-semibold text-lg">{metadata.name}</h3>
-            {/* <p className="text-sm text-muted-foreground">{metadata.collection.name}</p> */}
-          </div>
-          <NFTActionDropdown nftId={tokenId.toString()} />
-        </div>
-      </CardContent>
-      <CardFooter className="p-4 pt-0 flex justify-between">
-        <Badge variant="outline" className="text-xs">
-          IP {metadata.type}
-        </Badge>
-      </CardFooter>
-    </Card>
-  )
-}
+// 	if (!metadata) {
+// 		return <div>No metadata available</div>;
+// 	}
+//   return (
+//     <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer" onClick={onClick}>
+//       <div className="relative aspect-video">
+//         {/* <Image
+//           src={metadata.image || "/background.jpg"}
+//           alt={metadata.name}
+//           fill
+//           className="object-cover transition-all duration-300 hover:brightness-90"
+//         /> */}
+//         {/* {nft.rarity && (
+//           <div className="absolute top-2 left-2">
+//             <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
+//               <Sparkles className="h-3 w-3 mr-1" />
+//               {nft.rarity}
+//             </Badge>
+//           </div>
+//         )} */}
+//       </div>
+//       <CardContent className="p-4">
+//         <div className="flex justify-between items-start">
+//           <div>
+//             <h3 className="font-semibold text-lg">{metadata.name}</h3>
+//             {/* <p className="text-sm text-muted-foreground">{metadata.collection.name}</p> */}
+//           </div>
+//           <NFTActionDropdown nftId={tokenId.toString()} />
+//         </div>
+//       </CardContent>
+//       <CardFooter className="p-4 pt-0 flex justify-between">
+//         <Badge variant="outline" className="text-xs">
+//           {metadata.attributes[1].value}
+//         </Badge>
+//         <Badge variant="outline" className="text-xs">
+//           {metadata.attributes[0].value}
+//         </Badge>
+//       </CardFooter>
+//     </Card>
+//   )
+// }
 
 function NFTActionDropdown({ nftId }: { nftId: string }) {
   return (
