@@ -680,7 +680,7 @@ function TaskTypeBadge({ type }: { type: string }) {
       color = "bg-green-500/10 text-green-500 hover:bg-green-500/20"
       break
     case "transaction":
-      color = "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20"
+      color = "bg-blue-500/10 text-blue-500 hover:bg-blue-500/20"
       break
     case "referral":
       color = "bg-orange-500/10 text-orange-500 hover:bg-orange-500/20"

@@ -58,7 +58,7 @@ export default function OwnershipStats() {
           <div className="text-2xl font-bold">70 years</div>
           <div className="flex items-center justify-between mt-1">
             <p className="text-xs text-muted-foreground">After publication</p>
-            <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-0.5 rounded-full">
               Long-term
             </span>
           </div>
