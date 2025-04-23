@@ -86,7 +86,7 @@ const monetizeIP: NextPage = () => {
         
         <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
           <CardHeader>
-            <CardTitle>Marketplace </CardTitle>
+            <CardTitle>IP Marketplace</CardTitle>
             <CardDescription>List your IP assets for trade</CardDescription>
           </CardHeader>
           <CardContent>
@@ -107,7 +107,21 @@ const monetizeIP: NextPage = () => {
           <CardContent>
             <p className="mb-4"> Whether it's a film, an ebook, a podcast series, a survey, or a music concert, the NFT tickets will grant unique, verifiable access rights</p>
             <Button variant="secondary">
-            Planned Service
+            Under Development
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
+          <CardHeader>
+            <CardTitle>IP Coin</CardTitle>
+            <CardDescription>Permissionless comminties witu IP Ownership</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-4">Empower users to monetize their intellectual property (IP) by creating their own ERC20-compliant tokens—referred to as "IP Coins". These tokens will represent fractional ownership or rights tied to the user's IP. Users will also be able to establish liquidity pools for their IP Coins on the Ekubo platform, allowing them to fragment and commercialize their IP through token sales.
+            .</p>
+            <Button variant="secondary">
+            Under Development
             </Button>
           </CardContent>
         </Card>
@@ -122,7 +136,7 @@ const monetizeIP: NextPage = () => {
             <p className="mb-4">Monetize assets efficiently while providing subscribers with flexible and transparent access to rights for commercial use.
             </p>
             <Button variant="secondary">
-            Planned Service
+            Under Development
             </Button>
           </CardContent>
         </Card>
@@ -138,7 +152,7 @@ const monetizeIP: NextPage = () => {
             <p className="mb-4">Enabling monetization with permissionless crowdfunding campaigns.
             </p>
             <Button variant="secondary">
-            Planned Service
+            Under Development
             </Button>
           </CardContent>
         </Card>
@@ -153,7 +167,7 @@ const monetizeIP: NextPage = () => {
             <p className="mb-4">This service allows a group of people to purchase the rights to an intellectual property onchain.
             </p>
             <Button variant="secondary">
-            Planned Service
+            Under Development
             </Button>
           </CardContent>
         </Card>
@@ -166,7 +180,7 @@ const monetizeIP: NextPage = () => {
           <CardContent>
             <p className="mb-4">Automated royalty payments for creators and rights holders, ensuring fair compensation for their work.</p>
             <Button variant="secondary">
-            Planned Service
+            Under Development
             </Button>
           </CardContent>
         </Card>
@@ -179,7 +193,7 @@ const monetizeIP: NextPage = () => {
           <CardContent>
             <p className="mb-4">'Enables multiple individuals to contribute creatively to an NFT collection with monetization rights.</p>
             <Button variant="secondary">
-            Planned Service
+            Under Development
             </Button>
           </CardContent>
           </Card>
@@ -193,7 +207,7 @@ const monetizeIP: NextPage = () => {
           <CardContent>
             <p className="mb-4">Cuild a community around a permissionless airdrop campaign</p>
             <Button variant="secondary">
-            Planned Service
+            Under Development
             </Button>
           </CardContent>
         </Card>
@@ -208,7 +222,7 @@ const monetizeIP: NextPage = () => {
             <p className="mb-4">Create a commercial framework for Programmable IP, allowing them to generate revenue through fees and/or royalties.
             .</p>
             <Button variant="secondary">
-            Planned Service
+            Under Development
             </Button>
           </CardContent>
         </Card>
@@ -224,7 +238,7 @@ const monetizeIP: NextPage = () => {
             .
             .</p>
             <Button variant="secondary">
-            Planned Service
+            Under Development
             </Button>
           </CardContent>
         </Card>
