@@ -2,10 +2,10 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import ClaimableRevenue from "@/app/components/claimable-revenue"
-import ClaimHistory from "@/app/components/claim-history"
-import { getUserRevenue } from "@/lib/mock-data"
-import RevenueNavigation from "@/app/components/revenue-navigation"
+import ClaimableRevenue from "@/app/services/revenue-sharing/components/claimable-revenue"
+import ClaimHistory from "@/app/services/revenue-sharing/components/claim-history"
+import { getUserRevenue } from "@/app/services/revenue-sharing/lib/mock-data"
+import RevenueNavigation from "@/app/services/revenue-sharing/components/revenue-navigation"
 import { useSearchParams } from "next/navigation"
 
 export default function ClaimRevenue() {

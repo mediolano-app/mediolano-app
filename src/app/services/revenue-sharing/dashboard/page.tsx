@@ -1,14 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getUserRevenue, getRevenueAnalytics } from "@/lib/mock-data"
-import RevenueOverview from "@/app/components/revenue-overview"
-import RevenueAnalytics from "@/app/components/revenue-analytics"
-import ClaimableRevenue from "@/app/components/claimable-revenue"
-import ClaimHistory from "@/app/components/claim-history"
+import { getUserRevenue, getRevenueAnalytics } from "@/app/services/revenue-sharing//lib/mock-data"
+import RevenueOverview from "@/app/services/revenue-sharing/components/revenue-overview"
+import RevenueAnalytics from "@/app/services/revenue-sharing/components/revenue-analytics"
+import ClaimableRevenue from "@/app/services/revenue-sharing/components/claimable-revenue"
+import ClaimHistory from "@/app/services/revenue-sharing/components/claim-history"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Download, BarChart3, PieChart, LineChart } from "lucide-react"
-import RevenueNavigation from "@/app/components/revenue-navigation"
+import RevenueNavigation from "@/app/services/revenue-sharing/components/revenue-navigation"
 
 export default function RevenueDashboard() {
   const revenueData = getUserRevenue()
@@ -26,7 +26,7 @@ export default function RevenueDashboard() {
             <Download className="mr-2 h-4 w-4" /> Export Report
           </Button>
           <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-            <Link href="/revenue-sharing/claim">
+            <Link href="/services/revenue-sharing/claim">
               Claim Revenue <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
@@ -103,7 +103,7 @@ export default function RevenueDashboard() {
                 <ClaimableRevenue data={revenueData.claimableBreakdown} />
                 <div className="mt-4 text-center">
                   <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-                    <Link href="/revenue-sharing/claim">
+                    <Link href="/services/revenue-sharing/claim">
                       View All Claimable Revenue <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -120,7 +120,7 @@ export default function RevenueDashboard() {
                 <ClaimHistory limit={5} />
                 <div className="mt-4 text-center">
                   <Button asChild variant="outline">
-                    <Link href="/revenue-sharing/claim?tab=history">
+                    <Link href="/services/revenue-sharing/claim?tab=history">
                       View Full Claim History <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>

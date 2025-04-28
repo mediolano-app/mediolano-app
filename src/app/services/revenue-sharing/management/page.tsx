@@ -18,10 +18,10 @@ export default function RevenueManagement() {
         </div>
         <div className="mt-4 md:mt-0 flex gap-4">
           <Button asChild variant="outline">
-            <Link href="/revenue-sharing/claim">Claim Revenue</Link>
+            <Link href="/services/revenue-sharing/claim">Claim Revenue</Link>
           </Button>
           <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-            <Link href="/revenue-sharing/setup">
+            <Link href="/services/revenue-sharing/setup">
               <Plus className="mr-2 h-4 w-4" /> Setup New
             </Link>
           </Button>
@@ -49,7 +49,7 @@ export default function RevenueManagement() {
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-500 mb-4">Want to set up revenue sharing for a new IP asset?</p>
                 <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-                  <Link href="/revenue-sharing/setup">
+                  <Link href="/services/revenue-sharing/setup">
                     Setup Revenue Sharing <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -128,7 +128,7 @@ export default function RevenueManagement() {
               their share through the platform.
             </p>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/revenue-sharing/claim">View Claimable Revenue</Link>
+              <Link href="/services/revenue-sharing/claim">View Claimable Revenue</Link>
             </Button>
           </CardContent>
         </Card>
@@ -142,7 +142,7 @@ export default function RevenueManagement() {
               Track revenue performance, distribution metrics, and claim rates for your IP assets.
             </p>
             <Button asChild className="w-full bg-emerald-600 hover:bg-emerald-700">
-              <Link href="/revenue-sharing/dashboard">View Revenue Dashboard</Link>
+              <Link href="/services/revenue-sharing/dashboard">View Revenue Dashboard</Link>
             </Button>
           </CardContent>
         </Card>

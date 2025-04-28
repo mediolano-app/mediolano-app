@@ -1,9 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getAssetById } from "@/lib/mock-data"
-import AssetRevenueOverview from "@/app/components/asset-revenue-overview"
-import AssetRevenueDistribution from "@/app/components/asset-revenue-distribution"
-import AssetRevenueSettings from "@/app/components/asset-revenue-settings"
+import { getAssetById } from "@/app/services/revenue-sharing/lib/mock-data"
+import AssetRevenueOverview from "@/app/services/revenue-sharing/components/asset-revenue-overview"
+import AssetRevenueDistribution from "@/app/services/revenue-sharing/components/asset-revenue-distribution"
+import AssetRevenueSettings from "@/app/services/revenue-sharing/components/asset-revenue-settings"
 import { notFound } from "next/navigation"
 
 interface AssetPageProps {

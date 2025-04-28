@@ -8,7 +8,7 @@ export default function RevenueSharing() {
   const router = useRouter()
 
   useEffect(() => {
-    router.push("/revenue-sharing/management")
+    router.push("/services/revenue-sharing/management")
   }, [router])
 
   return null
