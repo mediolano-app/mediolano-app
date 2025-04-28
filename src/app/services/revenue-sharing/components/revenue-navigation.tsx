@@ -11,32 +11,32 @@ export default function RevenueNavigation() {
   const navItems = [
     {
       title: "Dashboard",
-      href: "/revenue-sharing/dashboard",
+      href: "/services/revenue-sharing/dashboard",
       icon: <LayoutDashboard className="h-4 w-4 mr-2" />,
     },
     {
       title: "Management",
-      href: "/revenue-sharing/management",
+      href: "/services/revenue-sharing/management",
       icon: <Settings className="h-4 w-4 mr-2" />,
     },
     {
       title: "Setup",
-      href: "/revenue-sharing/setup",
+      href: "/services/revenue-sharing/setup",
       icon: <PlusCircle className="h-4 w-4 mr-2" />,
     },
     {
       title: "Claim Revenue",
-      href: "/revenue-sharing/claim",
+      href: "/services/revenue-sharing/claim",
       icon: <CreditCard className="h-4 w-4 mr-2" />,
     },
     {
       title: "Distributions",
-      href: "/revenue-sharing/distributions",
+      href: "/services/revenue-sharing/distributions",
       icon: <History className="h-4 w-4 mr-2" />,
     },
     {
       title: "Schedule",
-      href: "/revenue-sharing/schedule",
+      href: "/services/revenue-sharing/schedule",
       icon: <Calendar className="h-4 w-4 mr-2" />,
     },
   ]

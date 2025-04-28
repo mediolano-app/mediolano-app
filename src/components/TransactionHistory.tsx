@@ -48,7 +48,7 @@ import {
             <TableRow>
               <TableHead>Asset Name</TableHead>
               <TableHead>Type</TableHead>
-              <TableHead>PriceTableHead>Price</TableHead>
+              <TableHead>Price</TableHead>
               <TableHead>Buyer</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Status</TableHead>

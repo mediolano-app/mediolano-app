@@ -37,7 +37,7 @@ const mockNotifications: Notification[] = [
   {
     id: "3",
     title: "Sale Completed",
-    message: "Your NFT Doodle #8147 was sold for 6.2 ETH",
+    message: "Your NFT Doodle #8147 was sold for 6.2 STRK",
     time: "1 day ago",
     read: true,
     type: "sale",

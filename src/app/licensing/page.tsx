@@ -29,11 +29,11 @@ const ipItems: IPItem[] = [
 
 // Mock data for previously registered IPs
 const mockIPs = [
-  { id: 1, name: "Novel: The Cosmic Journey", type: "Book", status: "Listed", price: "0.5 ETH", image: "/background.jpg" },
-  { id: 2, name: "Song: Echoes of Tomorrow", type: "Music", status: "Sold", price: "0.2 ETH", image: "/background.jpg" },
-  { id: 3, name: "Artwork: Nebula Dreams", type: "Image", status: "Listed", price: "1.5 ETH", image: "/background.jpg" },
+  { id: 1, name: "Novel: The Cosmic Journey", type: "Book", status: "Listed", price: "0.5 STRK", image: "/background.jpg" },
+  { id: 2, name: "Song: Echoes of Tomorrow", type: "Music", status: "Sold", price: "0.2 STRK", image: "/background.jpg" },
+  { id: 3, name: "Artwork: Nebula Dreams", type: "Image", status: "Listed", price: "1.5 STRK", image: "/background.jpg" },
   { id: 4, name: "Screenplay: The Last Frontier", type: "Text", status: "Draft", price: "N/A", image: "/background.jpg" },
-  { id: 5, name: "Short Film: Beyond the Stars", type: "Video", status: "Transfer", price: "3 ETH", image: "/background.jpg" },
+  { id: 5, name: "Short Film: Beyond the Stars", type: "Video", status: "Transfer", price: "3 STRK", image: "/background.jpg" },
 ]
 
 const Licensing = () => {
