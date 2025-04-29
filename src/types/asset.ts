@@ -22,7 +22,7 @@ export interface IP {
   type?: string;
 }
 
-export type IPType = "Art" | "Audio" | "Video" | "Document" | "Patent" | "Trademark" | "Software" | "NFT" | "Other"
+export type IPType = "Basic" | "Art" | "Audio" | "Video" | "Document" | "Patent" | "RWA" | "Trademark" | "Software" | "NFT" | "Custom"
 
 export type LicenseType = "Creative Commons" | "Commercial Use" | "Personal Use" | "Exclusive Rights" | "Open Source"
 
