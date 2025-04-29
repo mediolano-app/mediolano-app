@@ -35,6 +35,7 @@ import {
   ExternalLink,
   Verified,
   CircleHelp,
+  Globe,
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import {
@@ -56,9 +57,12 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import type { IPType } from "@/types/asset"
+
+// temporary data
 import { assets, recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
 
-export default function Home() {
+export default function AssetsPage() {
+
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -77,14 +81,23 @@ export default function Home() {
     return () => clearTimeout(timer)
   }, [])
 
+
+
   // Get unique collections, types, licenses, and templates for filters
   const uniqueCollections = Array.from(new Set(assets.map((asset) => asset.collection)))
   const uniqueTypes = Array.from(new Set(assets.map((asset) => asset.type)))
   const uniqueLicenses = Array.from(new Set(assets.map((asset) => asset.licenseType)))
   const uniqueTemplates = Array.from(new Set(assets.map((asset) => asset.templateType).filter(Boolean)))
 
+
+
   // Calculate portfolio statistics
   const portfolioStats = calculatePortfolioStats(assets)
+
+
+
+
+
 
   // Filter assets based on search query and filters
   const filteredAssets = assets.filter((asset) => {
@@ -104,6 +117,8 @@ export default function Home() {
     return matchesSearch && matchesType && matchesCollection && matchesLicense && matchesTemplate
   })
 
+
+
   // Sort assets
   const sortedAssets = [...filteredAssets].sort((a, b) => {
     switch (sortBy) {
@@ -120,6 +135,9 @@ export default function Home() {
     }
   })
 
+
+
+
   const renderActivityIcon = (type: string) => {
     switch (type) {
       case "view":
@@ -134,6 +152,8 @@ export default function Home() {
         return <Clock className="h-4 w-4 text-gray-500" />
     }
   }
+
+
 
   const renderTypeIcon = (type: IPType) => {
     switch (type) {
@@ -151,6 +171,8 @@ export default function Home() {
         return <Hexagon className="h-4 w-4 text-teal-500" />
       case "Patent":
         return <Lightbulb className="h-4 w-4 text-amber-500" />
+      case "RWA":
+        return <Globe className="h-4 w-4 text-green-500" />
       case "Trademark":
         return <BadgeCheck className="h-4 w-4 text-green-500" />
       default:
@@ -435,11 +457,13 @@ export default function Home() {
           </Button>
         </div>
 
+
+
         {/* Asset Management Section */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
-              <h2 className="text-2xl font-bold">My Digital IP Assets</h2>
+              <h2 className="text-2xl font-bold">Programmable IP</h2>
               <p className="text-muted-foreground">Manage your intellectual property and licensing</p>
             </div>
 
@@ -491,7 +515,7 @@ export default function Home() {
                     <DropdownMenuCheckboxItem
                       key={template}
                       checked={filterTemplate === template}
-                      onCheckedChange={() => setFilterTemplate(template)}
+                      onCheckedChange={() => template && setFilterTemplate(template)}
                     >
                       {template}
                     </DropdownMenuCheckboxItem>
@@ -602,7 +626,7 @@ export default function Home() {
 
             <TabsContent value="all">
               {loading ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-3 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {Array(8)
                     .fill(0)
                     .map((_, i) => (
@@ -630,7 +654,7 @@ export default function Home() {
                   </Button>
                 </div>
               ) : viewMode === "grid" ? (
-                <div className="masonry-grid">
+                <div className="masonry-grid grid grid-cols-3 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {sortedAssets.map((asset, index) => (
                     <motion.div
                       key={asset.id}

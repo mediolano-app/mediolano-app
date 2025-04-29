@@ -20,7 +20,7 @@ const templatesIP = () => {
     { name: 'Video', icon: Film, href: '/create/video', description: 'Movies, videocast, shows, video creations' }, 
     { name: 'Audio', icon: Music, href: '/create/audio', description: 'Music, podcasts, samplers, radio' },
     { name: 'NFT', icon: FileLock, href: '/create/nft', description: 'NFT oriented asset design' },
-    { name: 'Patents', icon: ScrollText, href: '/create/patents', description: 'Secure inventions and innovations' },
+    { name: 'Patents', icon: ScrollText, href: '/create/patent', description: 'Secure inventions and innovations' },
     { name: 'Publications', icon: Book, href: '/create/publication', description: 'Articles, news, research, posts' },
     { name: 'RWA', icon: Globe2, href: '/create/rwa', description: 'Tokenize Real World Assets' },
     { name: 'Software', icon: FileCode, href: '/create/software', description: 'Safeguard code ownership' },

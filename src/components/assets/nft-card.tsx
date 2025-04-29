@@ -45,7 +45,7 @@ export default function NFTCard({
   name = "Abstract Dimension #312",
   creator = "0xArtist",
   verified = true,
-  image = "/placeholder.svg?height=400&width=400",
+  image = "/background.jpg",
   collection = "Digital Masterpieces",
   licenseType = "Creative Commons",
   description = "Digital asset with programmable licensing terms and royalty structures.",
@@ -102,9 +102,9 @@ export default function NFTCard({
   return (
     <Card className={cn("overflow-hidden transition-all duration-300 hover:shadow-md", className)}>
       {/* Image */}
-      <div className="aspect-square relative overflow-hidden">
+      <div className="aspect-video relative overflow-hidden">
         <Image
-          src={image || "/placeholder.svg"}
+          src={image || "/background.jpg"}
           alt={name}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"
