@@ -1,11 +1,19 @@
-"use client";
+"use client"
 
-import { use, useEffect, useState } from "react"
+import { useState } from "react"
 import type { ComponentProps } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Share2, FileCheck, DollarSign, Users, Box } from "lucide-react"
+import { ArrowLeft, Share2, FileCheck, DollarSign, Send } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -27,132 +35,70 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { TransferAssetDialog } from "@/components/transfer-asset-dialog"
 
-import { useMIP } from "@/hooks/useMIP"
-import { useReadContract } from "@starknet-react/core";
-import { abi } from "@/abis/abi"
-import { Abi } from "starknet"
-import { CONTRACT_ADDRESS } from "@/lib/constants"
-import { NFTMetadata } from "@/lib/types";
+import { IPTypeInfo } from "@/components/ip-type-info"
 
 interface AssetPageProps {
-    params: Promise<{
-      id: string
-    }>
+  params: {
+    id: string
   }
-  
+}
 
-  export default function AssetPage({ params }: AssetPageProps) {
-    // Unwrap the params Promise using React.use()
-    const resolvedParams = use(params)
-    const { id } = resolvedParams
+export default function AssetPage({ params }: AssetPageProps) {
+  const { id } = params
+  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false)
 
-  const tokenId = id || 1;
-    
-const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
-
-// Read basic NFT information (name, symbol)
-const { data: nftSymbol } = useReadContract({
-    abi: abi as Abi,
-    functionName: "symbol",
-    address: CONTRACT_ADDRESS,
-    args: [],
-  });
-
-  // Read token name
-  const { data: nftName } = useReadContract({
-    abi: abi as Abi,
-    functionName: "name",
-    address: CONTRACT_ADDRESS,
-    args: [],
-  });
-
-  // Read token URI for metadata
-  const { data: tokenURI } = useReadContract({
-    abi: abi as Abi,
-    functionName: "tokenURI",
-    address: CONTRACT_ADDRESS,
-    args: [tokenId],
-  });
-
-  // Read token owner
-  const { data: tokenOwner } = useReadContract({
-    abi: abi as Abi,
-    functionName: "ownerOf",
-    address: CONTRACT_ADDRESS,
-    args: [tokenId],
-  });
-
-  // Fetch metadata when tokenURI changes
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      if (tokenURI) {
-        try {
-          const response = await fetch(tokenURI);
-          const data = await response.json();
-          setMetadata(data);
-        } catch (error) {
-          console.error('Error fetching metadata:', error);
-        }
-      }
-    };
-
-    fetchMetadata();
-  }, [tokenURI]);
-  
-  const nftData = {
-    title: metadata?.name || nftName || "Loading IP",
-    description: metadata?.description || "",
-    nftId: "NFT #" + tokenId,
-    symbol: nftSymbol || "MIP",
-    tokenId: tokenId.toString(),
-    tokenURI: tokenURI || "",
-    owner: tokenOwner || "",
-    tokenStandard: "ERC721",
-    collection: nftName || "MIP",
-    creator: (metadata?.author || tokenOwner || "Unknown").toString(),
-    imageUrl: metadata?.image || "/background.jpg",
-    blockchain: "Starknet",
-    contractAddress: CONTRACT_ADDRESS || "",
-    ipfsUrl: tokenURI || "",
-    externalUrl: metadata?.external_url || ""
-  };
+  const [assetOwner, setAssetOwner] = useState({
+    name: "CollectorDAO",
+    address: "0x9i8h7g6f5e4d3c2b1a",
+    avatar: "/background.jpg",
+    verified: true,
+    acquired: "February 10, 2025",
+  })
+  const [transferHistory, setTransferHistory] = useState([
+    {
+      event: "Transferred",
+      from: "0xArtist",
+      to: "CollectorDAO",
+      date: "February 10, 2025",
+      memo: "Initial acquisition",
+    },
+  ])
 
   // In a real application, you would fetch the NFT data based on the ID
   const asset = {
     id,
-    name: metadata?.name || nftName || "Loading IP",
+    name: `Digital IP Asset #${id}`,
     creator: {
-      name: (metadata?.author || tokenOwner || "Unknown").toString(),
+      name: "0xArtist",
       address: "0x1a2b3c4d5e6f7g8h9i0j",
-      avatar: metadata?.image || "/background.jpg",
+      avatar: "/placeholder.svg?height=40&width=40",
       verified: true,
-      bio: "Creator bio (Preview).",
-      website: "https://ip.mediolano.app",
+      bio: "Digital artist specializing in abstract and futuristic designs. Creating programmable IP assets since 2023.",
+      website: "https://artist-portfolio.com",
     },
-    owner: {
-      name: (metadata?.author || tokenOwner || "Unknown").toString(),
-      address: "0x9i8h7g6f5e4d3c2b1a",
-      avatar: "/background.jpg",
-      verified: true,
-      acquired: "March 1, 2025",
-    },
-    description: metadata?.description || "",
-    image: metadata?.image || "/background.jpg",
-    createdAt: "March 1, 2025",
-    collection: "MIP",
-    blockchain: "Starknet",
+    owner: assetOwner,
+    description:
+      "This digital asset represents intellectual property with programmable licensing terms. The creator has established specific usage rights and royalty structures that are encoded directly into the asset.",
+    image: "/placeholder.svg?height=600&width=600",
+    createdAt: "March 15, 2025",
+    collection: "Programmable IP",
+    blockchain: "Ethereum",
     tokenStandard: "ERC-721",
-    licenseType: metadata?.name || nftName,
-    licenseTerms: "(Preview)",
+    licenseType: "Creative Commons",
+    licenseTerms: "CC BY-NC-SA 4.0",
     contract: "0x1234...5678",
     attributes: [
-      { trait_type: "Asset", value: "Programmable IP" },
-      { trait_type: "Protection", value: "Proof of Onwership" },
+      { trait_type: "Style", value: "Abstract" },
+      { trait_type: "Medium", value: "Digital" },
+      { trait_type: "Colors", value: "Vibrant" },
+      { trait_type: "Theme", value: "Futuristic" },
+      { trait_type: "Resolution", value: "4K" },
     ],
     licenseInfo: {
-      type: "(Preview)",
-      terms: "(Under Development)",
+      type: "Creative Commons",
+      terms: "CC BY-NC-SA 4.0",
       allowCommercial: false,
       allowDerivatives: true,
       requireAttribution: true,
@@ -160,25 +106,53 @@ const { data: nftSymbol } = useReadContract({
     },
   }
 
-  return (
-    <div className="min-h-screen bg-background">
+  const handleTransferComplete = (newOwnerAddress: string, memo?: string) => {
+    // In a real app, this would be handled by blockchain events
+    const newOwner = {
+      name: `0x${newOwnerAddress.substring(2, 6)}...${newOwnerAddress.substring(newOwnerAddress.length - 4)}`,
+      address: newOwnerAddress,
+      avatar: "/placeholder.svg?height=40&width=40",
+      verified: false,
+      acquired: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+    }
 
-      <main className="container mx-auto p-4 py-8 ">
-        <Link href="/portfolio">
+    // Update the owner
+    setAssetOwner(newOwner)
+
+    // Add to transfer history with memo if provided
+    setTransferHistory([
+      {
+        event: "Transferred",
+        from: asset.owner.name,
+        to: newOwner.name,
+        date: newOwner.acquired,
+        memo: memo || "",
+      },
+      ...transferHistory,
+    ])
+  }
+
+  return (
+
+    <div className="min-h-screen">
+
+      
+      <main className="container mx-auto p-4 py-8 max-w-8xl">
+
+        <Link href="/assets">
           <Button variant="ghost" size="sm" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-             Portfolio
+            View collection
           </Button>
         </Link>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-          
           {/* Left column - Image */}
           <div className="lg:col-span-2">
             <div className="sticky top-24">
               <div className="relative overflow-hidden rounded-xl border bg-muted/20">
                 <Image
-                  src={asset.image || "/background.jpg"}
+                  src={asset.image || "/placeholder.svg"}
                   alt={asset.name}
                   width={600}
                   height={600}
@@ -198,8 +172,19 @@ const { data: nftSymbol } = useReadContract({
                   </Badge>
                 ))}
               </div>
+
+
+
+              {/* IP Type Info (IP Template) Component */}
+              <div className="mt-6">
+                <IPTypeInfo asset={asset} />
+              </div>
             </div>
           </div>
+
+
+
+
 
           {/* Right column - Content */}
           <div className="lg:col-span-3">
@@ -207,9 +192,9 @@ const { data: nftSymbol } = useReadContract({
               <div className="flex items-start justify-between">
                 <div>
                   <h1 className="text-3xl font-bold">{asset.name}</h1>
-                  
-                  <p className="text-muted-foreground mt-5">
-                    Created by <span className="text-foreground">{asset.creator.name}</span>
+                  <p className="text-muted-foreground">
+                    Created by <span className="font-medium text-foreground">{asset.creator.name}</span> •{" "}
+                    {asset.createdAt}
                   </p>
                 </div>
                 <DropdownMenu>
@@ -217,7 +202,9 @@ const { data: nftSymbol } = useReadContract({
                     <Button variant="outline" size="sm" className="flex items-center gap-2">
                       <Share2 className="h-4 w-4" />
                       <span>Share</span>
-                      
+                      <Badge variant="outline" className="ml-1">
+                        #{asset.id}
+                      </Badge>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -230,15 +217,12 @@ const { data: nftSymbol } = useReadContract({
                 </DropdownMenu>
               </div>
 
-                {/* 
               <div className="mt-6 flex flex-wrap gap-4">
                 <Button className="flex-1">License This Asset</Button>
                 <Button variant="outline" className="flex-1">
                   View on Explorer
                 </Button>
-              </div>*/}
-
-
+              </div>
             </div>
 
             <Tabs defaultValue="overview" className="mt-8">
@@ -263,18 +247,19 @@ const { data: nftSymbol } = useReadContract({
                       <CardContent className="p-4 flex items-center gap-3">
                         <FileCheck className="h-8 w-8 text-primary" />
                         <div>
-                          <h3 className="text-sm">License</h3>
-                          <p className="text-lg text-muted-foreground">{asset.licenseTerms}</p>
+                          <h3 className="font-medium">License</h3>
+                          <p className="text-sm text-muted-foreground">{asset.licenseTerms}</p>
                         </div>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4 flex items-center gap-3">
-                        <Box className="h-8 w-8 text-primary" />
+                        <DollarSign className="h-8 w-8 text-primary" />
                         <div>
-                          <h3 className="text-sm">IP Version</h3>
-                          <p className="text-lg text-muted-foreground">
-                            1</p>
+                          <h3 className="font-medium">Royalties</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {asset.licenseInfo.royaltyPercentage}% Creator Fee
+                          </p>
                         </div>
                       </CardContent>
                     </Card>
@@ -327,6 +312,7 @@ const { data: nftSymbol } = useReadContract({
                                   attributes: asset.attributes,
                                   tokenId: asset.id,
                                   creator: asset.creator.name,
+                                  owner: asset.owner.name,
                                   licenseType: asset.licenseType,
                                   licenseTerms: asset.licenseTerms,
                                 },
@@ -347,24 +333,28 @@ const { data: nftSymbol } = useReadContract({
                         </AccordionTrigger>
                         <AccordionContent>
                           <div className="space-y-4 p-2">
-                            <div className="flex items-start">
-                              <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                <FileCheck className="h-5 w-5 text-primary" />
+                            {transferHistory.map((item, index) => (
+                              <div key={index} className="flex items-start">
+                                <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <Send className="h-5 w-5 text-primary" />
+                                </div>
+                                <div>
+                                  <p className="font-medium">{item.event}</p>
+                                  <p className="text-sm text-muted-foreground">{item.date}</p>
+                                  <p className="text-sm">
+                                    From {item.from} to {item.to}
+                                  </p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="font-medium">License Updated</p>
-                                <p className="text-sm text-muted-foreground">Feb 20, 2025</p>
-                                <p className="text-sm">{asset.creator.name} updated to CC BY-NC</p>
-                              </div>
-                            </div>
+                            ))}
                             <div className="flex items-start">
                               <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                                 <PlusCircle className="h-5 w-5 text-primary" />
                               </div>
                               <div>
                                 <p className="font-medium">Created</p>
-                                <p className="text-sm text-muted-foreground">Jan 15, 2025</p>
-                                <p className="text-sm">{asset.creator.name} created this asset</p>
+                                <p className="text-sm text-muted-foreground">{asset.createdAt}</p>
+                                <p className="text-sm">By {asset.creator.name}</p>
                               </div>
                             </div>
                           </div>
@@ -385,7 +375,9 @@ const { data: nftSymbol } = useReadContract({
                           <h2 className="text-xl font-semibold">{asset.licenseInfo.type}</h2>
                           <p className="text-muted-foreground">{asset.licenseInfo.terms}</p>
                         </div>
-                        
+                        <Button variant="outline" size="sm">
+                          Download License
+                        </Button>
                       </div>
 
                       <Separator className="my-4" />
@@ -565,18 +557,27 @@ const { data: nftSymbol } = useReadContract({
               <TabsContent value="owner" className="mt-6">
                 <div className="space-y-6">
                   <Card>
-                    <CardHeader>
-                      <CardTitle>Current Owner (Preview)</CardTitle>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle>Current Owner</CardTitle>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center gap-2"
+                        onClick={() => setIsTransferDialogOpen(true)}
+                      >
+                        <Send className="h-4 w-4" />
+                        Transfer Asset
+                      </Button>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                       <div className="flex items-start gap-4">
                         <Avatar className="h-16 w-16">
-                          <AvatarImage src={asset.owner.avatar} alt={asset.owner.name} />
+                          <AvatarImage src={asset.owner.avatar || "/placeholder.svg"} alt={asset.owner.name} />
                           <AvatarFallback>{asset.owner.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-semibold">{asset.owner.name}</h3>
+                            <h3 className="text-lg font-semibold">{asset.owner.name}</h3>
                             {asset.owner.verified && <Badge variant="secondary">Verified</Badge>}
                           </div>
                           <p className="text-sm text-muted-foreground mb-2">Acquired on {asset.owner.acquired}</p>
@@ -596,17 +597,17 @@ const { data: nftSymbol } = useReadContract({
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Creator (Preview)</CardTitle>
+                      <CardTitle>Creator</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-start gap-4">
                         <Avatar className="h-16 w-16">
-                          <AvatarImage src={asset.creator.avatar} alt={asset.creator.name} />
+                          <AvatarImage src={asset.creator.avatar || "/placeholder.svg"} alt={asset.creator.name} />
                           <AvatarFallback>{asset.creator.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-semibold">{asset.creator.name}</h3>
+                            <h3 className="text-lg font-semibold">{asset.creator.name}</h3>
                             {asset.creator.verified && <Badge variant="secondary">Verified</Badge>}
                           </div>
                           <p className="text-sm font-mono truncate mb-2">{asset.creator.address}</p>
@@ -636,28 +637,31 @@ const { data: nftSymbol } = useReadContract({
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Ownership History (Preview)</CardTitle>
+                      <CardTitle>Ownership History</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        <div className="flex items-start">
-                          <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Users className="h-5 w-5 text-primary" />
+                        {transferHistory.map((item, index) => (
+                          <div key={index} className="flex items-start">
+                            <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <Send className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <p className="font-medium">
+                                {item.event} to {item.to}
+                              </p>
+                              <p className="text-sm text-muted-foreground">{item.date}</p>
+                              <p className="text-sm">From {item.from}</p>
+                              {item.memo && <p className="text-sm italic mt-1 text-muted-foreground">"{item.memo}"</p>}
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-sm">Transferred to {asset.owner.name}</p>
-                            <p className="text-sm text-muted-foreground">{asset.owner.acquired}</p>
-                            <p className="text-sm">
-                              From {asset.creator.name} to {asset.owner.name}
-                            </p>
-                          </div>
-                        </div>
+                        ))}
                         <div className="flex items-start">
                           <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                             <PlusCircle className="h-5 w-5 text-primary" />
                           </div>
                           <div>
-                            <p className="text-sm">Created</p>
+                            <p className="font-medium">Created</p>
                             <p className="text-sm text-muted-foreground">{asset.createdAt}</p>
                             <p className="text-sm">By {asset.creator.name}</p>
                           </div>
@@ -671,11 +675,21 @@ const { data: nftSymbol } = useReadContract({
           </div>
         </div>
       </main>
+
+      {/* Transfer Asset Dialog */}
+      <TransferAssetDialog
+        assetId={asset.id}
+        assetName={asset.name}
+        currentOwner={asset.owner.address}
+        isOpen={isTransferDialogOpen}
+        onClose={() => setIsTransferDialogOpen(false)}
+        onTransferComplete={handleTransferComplete}
+      />
     </div>
   )
 }
 
-function Code({ className, ...props }: React.ComponentProps<"svg">) {
+function Code({ className, ...props }: ComponentProps<"svg">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -694,7 +708,7 @@ function Code({ className, ...props }: React.ComponentProps<"svg">) {
   )
 }
 
-function History({ className, ...props }: React.ComponentProps<"svg">) {
+function History({ className, ...props }: ComponentProps<"svg">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -714,7 +728,7 @@ function History({ className, ...props }: React.ComponentProps<"svg">) {
   )
 }
 
-function PlusCircle({ className, ...props }: React.ComponentProps<"svg">) {
+function PlusCircle({ className, ...props }: ComponentProps<"svg">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -734,7 +748,7 @@ function PlusCircle({ className, ...props }: React.ComponentProps<"svg">) {
   )
 }
 
-function Globe({ className, ...props }: React.ComponentProps<"svg">) {
+function Globe({ className, ...props }: ComponentProps<"svg">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -754,7 +768,7 @@ function Globe({ className, ...props }: React.ComponentProps<"svg">) {
   )
 }
 
-function Twitter({ className, ...props }: React.ComponentProps<"svg">) {
+function Twitter({ className, ...props }: ComponentProps<"svg">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -772,7 +786,7 @@ function Twitter({ className, ...props }: React.ComponentProps<"svg">) {
   )
 }
 
-function Instagram({ className, ...props }: React.ComponentProps<"svg">) {
+function Instagram({ className, ...props }: ComponentProps<"svg">) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -791,4 +805,3 @@ function Instagram({ className, ...props }: React.ComponentProps<"svg">) {
     </svg>
   )
 }
-

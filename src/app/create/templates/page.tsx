@@ -149,25 +149,13 @@ export default function TemplatesPage() {
   return (
     <div className="min-h-screen">
 
-      <header className="top-0 z-10 border-b bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto flex items-center justify-between p-4">
-          <h1 className="text-2xl font-bold">IP Templates</h1>
-          <div className="flex items-center gap-4">
-            <Link href="/support" rel="noopener noreferrer">
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                Support
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+     
 
       <main className="container mx-auto p-4 py-8">
-        <Link href="/">
+        <Link href="/create">
           <Button variant="ghost" size="sm" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to dashboard
+            Create Panel
           </Button>
         </Link>
 

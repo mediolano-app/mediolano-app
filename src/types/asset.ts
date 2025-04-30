@@ -1,31 +1,3 @@
-
-export interface NFT {
-  id: string;
-  name: string;
-  imageUrl: string;
-  isVisible: boolean;
-  category?: string;
-  collection?: string;
-  tokenId?: string;
-  openseaUrl?: string;
-}
-
-
-export interface IP {
-  id: string;
-  name: string;
-  image: string;
-  isVisible: boolean;
-  category?: string;
-  collection?: string;
-  tokenId?: string;
-  type?: string;
-}
-
-export type IPType = "Basic" | "Art" | "Audio" | "Video" | "Document" | "Patent" | "RWA" | "Trademark" | "Software" | "NFT" | "Custom"
-
-export type LicenseType = "Creative Commons" | "Commercial Use" | "Personal Use" | "Exclusive Rights" | "Open Source"
-
 export interface Asset {
   id: string
   name: string
@@ -46,6 +18,34 @@ export interface Asset {
   ownershipHistory?: OwnershipRecord[]
   licensingTerms?: LicensingTerms
 }
+
+export interface IP {
+  id: string;
+  name: string;
+  image: string;
+  isVisible: boolean;
+  category?: string;
+  collection?: string;
+  tokenId?: string;
+  type?: string;
+}
+
+export interface NFT {
+  id: string;
+  name: string;
+  imageUrl: string;
+  isVisible: boolean;
+  category?: string;
+  collection?: string;
+  tokenId?: string;
+  openseaUrl?: string;
+}
+
+export type IPType = "Basic" | "Art" | "Audio" | "Video" | "Document" | "Patent" | "RWA" | "Trademark" | "Software" | "NFT" | "Custom"
+
+export type LicenseType = "Creative Commons" | "Commercial Use" | "Personal Use" | "Exclusive Rights" | "Open Source"
+
+
 
 export interface OwnershipRecord {
   owner: string
