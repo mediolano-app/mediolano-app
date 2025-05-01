@@ -15,7 +15,7 @@ export function useMIP() {
 
   const { contract } = useContract({
     abi: abi as Abi,
-    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
+    address: contractAddress as `0x${string}`,
   });
 
   const { data: myTotalBalance, error: balanceError } = useReadContract({
