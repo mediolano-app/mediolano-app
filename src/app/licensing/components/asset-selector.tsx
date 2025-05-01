@@ -45,7 +45,7 @@ export function AssetSelector() {
   )
 
   const handleSelect = (assetId: string) => {
-    router.push(`/create-license?assetId=${assetId}`)
+    router.push(`/licensing/create-license?assetId=${assetId}`)
   }
 
   if (loading) {

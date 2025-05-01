@@ -23,7 +23,7 @@ export function AssetList() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Your Assets</h2>
-        <Link href="/assets">
+        <Link href="/licensing/assets">
           <Button variant="ghost" size="sm">
             View All
           </Button>
@@ -78,13 +78,13 @@ export function AssetList() {
                 </div>
 
                 <div className="flex items-center gap-2 ml-4 shrink-0">
-                  <Link href={`/assets/${asset.id}`}>
+                  <Link href={`/licensing/assets/${asset.id}`}>
                     <Button variant="outline" size="sm" className="h-8 w-8 p-0">
                       <FileCheck className="h-4 w-4" />
                       <span className="sr-only">View details</span>
                     </Button>
                   </Link>
-                  <Link href={`/create-license?assetId=${asset.id}`}>
+                  <Link href={`/licensing/create-license?assetId=${asset.id}`}>
                     <Button size="sm" className="h-8">
                       <FilePlus className="h-4 w-4 mr-2" />
                       <span>License</span>
@@ -115,7 +115,7 @@ export function AssetList() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-10">
             <p className="text-muted-foreground">You don't have any assets yet.</p>
-            <Link href="/assets/create">
+            <Link href="/licensing/assets/create">
               <Button className="mt-4">Create Your First Asset</Button>
             </Link>
           </CardContent>

@@ -43,13 +43,13 @@ export function AssetCards() {
             </div>
           </CardContent>
           <CardFooter className="mt-auto flex gap-2 pt-2">
-            <Link href={`/assets/${asset.id}`} className="flex-1">
+            <Link href={`/licensing/assets/${asset.id}`} className="flex-1">
               <Button variant="secondary" className="w-full" size="sm">
                 <FileCheck className="mr-2 h-4 w-4" />
                 View
               </Button>
             </Link>
-            <Link href={`/create-license?assetId=${asset.id}`} className="flex-1">
+            <Link href={`/licensing/create-license?assetId=${asset.id}`} className="flex-1">
               <Button className="w-full" size="sm">
                 <FilePlus className="mr-2 h-4 w-4" />
                 License

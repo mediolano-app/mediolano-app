@@ -15,7 +15,7 @@ export default function CreateLicensePage({ searchParams }: CreateLicensePagePro
   return (
     <div className="container px-4 py-6 md:px-6 md:py-8">
       <div className="flex items-center gap-2">
-        <Link href={assetId ? `/assets/${assetId}` : "/assets"} className="hidden sm:block">
+        <Link href={assetId ? `/licensing/assets/${assetId}` : "/licensing/assets"} className="hidden sm:block">
           <Button variant="ghost" size="icon" className="h-8 w-8">
             <ChevronLeft className="h-4 w-4" />
           </Button>
