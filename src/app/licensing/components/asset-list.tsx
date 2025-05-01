@@ -67,13 +67,13 @@ export function AssetList() {
             </div>
 
             <div className="mt-4 flex gap-2">
-              <Link href={`/assets/${asset.id}`} className="flex-1">
+              <Link href={`/licensing/assets/${asset.id}`} className="flex-1">
                 <Button variant="outline" size="sm" className="w-full">
                   <FileCheck className="mr-2 h-4 w-4" />
                   View
                 </Button>
               </Link>
-              <Link href={`/create-license?assetId=${asset.id}`} className="flex-1">
+              <Link href={`/licensing/create-license?assetId=${asset.id}`} className="flex-1">
                 <Button size="sm" className="w-full">
                   <FilePlus className="mr-2 h-4 w-4" />
                   License
@@ -158,13 +158,13 @@ export function AssetList() {
               <TableCell>{new Date(asset.createdAt).toLocaleDateString()}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Link href={`/assets/${asset.id}`}>
+                  <Link href={`/licensing/assets/${asset.id}`}>
                     <Button variant="outline" size="icon">
                       <FileCheck className="h-4 w-4" />
                       <span className="sr-only">View details</span>
                     </Button>
                   </Link>
-                  <Link href={`/create-license?assetId=${asset.id}`}>
+                  <Link href={`/licensing/create-license?assetId=${asset.id}`}>
                     <Button size="icon">
                       <FilePlus className="h-4 w-4" />
                       <span className="sr-only">Create license</span>

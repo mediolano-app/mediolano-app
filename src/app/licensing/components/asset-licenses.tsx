@@ -60,7 +60,7 @@ export function AssetLicenses({ assetId }: AssetLicensesProps) {
           <FileCheck className="h-12 w-12 text-muted-foreground" />
           <h3 className="mt-4 text-xl font-medium">No Licenses</h3>
           <p className="mt-2 text-center text-muted-foreground">This asset doesn't have any licenses yet.</p>
-          <Link href={`/create-license?assetId=${assetId}`}>
+          <Link href={`/licensing/create-license?assetId=${assetId}`}>
             <Button className="mt-4">Create License</Button>
           </Link>
         </CardContent>
@@ -108,7 +108,7 @@ export function AssetLicenses({ assetId }: AssetLicensesProps) {
               </div>
             </div>
             <div className="flex justify-end">
-              <Link href={`/licenses/${license.id}`}>
+              <Link href={`/licensing/licenses/${license.id}`}>
                 <Button variant="outline" size="sm">
                   View Details
                 </Button>
