@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 import { useContract } from '@starknet-react/core';
 import { useCallback } from 'react';
 import UserSettingsABI from '../abis/user_settings';
 import { BigNumberish } from 'starknet';
+=======
+import { useContract, useAccount } from "@starknet-react/core";
+import { useCallback } from "react";
+import { abi } from "../abis/user-settings.abi";
+import { BigNumberish } from "starknet";
+import type { Abi } from "starknet";
+>>>>>>> 99a6c42 (fix the env)
 
 export type GetSettingResponse = Record<
   number,
@@ -20,11 +28,21 @@ export interface TransactionResponse {
 }
 
 export const useUsersSettings = () => {
+<<<<<<< HEAD
     // Initialize contract
     const { contract } = useContract({
         address: process.env.NEXT_PUBLIC_USER_SETTINGS_CONTRACT_ADDRESS as `0x${string}`,
         abi: UserSettingsABI,
     });
+=======
+  // Initialize contract
+  const { account } = useAccount();
+  const { contract } = useContract({
+    address: process.env
+      .NEXT_PUBLIC_USER_SETTINGS_CONTRACT_ADDRESS as `0x${string}`,
+    abi: abi as Abi,
+  });
+>>>>>>> 99a6c42 (fix the env)
 
 <<<<<<< HEAD
     // Queries
@@ -90,7 +108,7 @@ export const useUsersSettings = () => {
       key: string,
       encryptedData: string[],
       walletSignature: string[],
-      pubKey: string
+      pubKey: String
     ): Promise<TransactionResponse> => {
       if (!contract) throw new Error("Contract not initialized");
       return contract.store_setting(
@@ -113,7 +131,7 @@ export const useUsersSettings = () => {
 
   const updateWalletKey = useCallback(
     async (
-      newPubKey: string,
+      newPubKey: String,
       signature: string[]
     ): Promise<TransactionResponse> => {
       if (!contract) throw new Error("Contract not initialized");
