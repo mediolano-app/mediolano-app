@@ -106,14 +106,14 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/create/templates"
+                    href="/assets"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <FileCode className="mr-2 h-4 w-4  text-blue-600" />
-                      IP Templates
+                      Explore IP
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Optimize your workflow with custom templates.
+                      Discover and explore all available assets.
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -241,20 +241,7 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/marketplace"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <Rocket className="mr-2 h-4 w-4  text-blue-600" />
-                      Marketplace
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Buy, sell and trade Programmable IP (Preview) 
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+                
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
@@ -283,6 +270,22 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
+
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/services/revenue-sharing"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Rocket className="mr-2 h-4 w-4  text-blue-600" />
+                      Revenue Sharing
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Share revenue and monetize your IP
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"

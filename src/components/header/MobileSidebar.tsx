@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid, Gem, ArrowRightLeft, FileBadge, FileCheck } from 'lucide-react'
+import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid, Gem, ArrowRightLeft, FileBadge, FileCheck, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -30,7 +30,7 @@ const navigationItems = [
     items: [
       { title: 'Discover', href: '/discover', icon: BookOpen },
       { title: 'Create IP', href: '/create', icon: Box },
-      { title: 'IP Templates', href: '/create/templates', icon: FileText }, 
+      { title: 'Explore Assets', href: '/assets', icon: Grid },
     ],
   },
   {
@@ -38,6 +38,7 @@ const navigationItems = [
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: FileText },
       { title: 'Assets Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
+      { title: 'Transfer Asset', href: '/transfer', icon: ArrowRightLeft },
       { title: 'Licensing', href: '/licensing', icon: FileText },
       { title: 'Listings', href: '/listing', icon: Banknote },
     ],
@@ -45,11 +46,11 @@ const navigationItems = [
   {
     title: 'Services (Preview)',
     items: [
-      { title: 'Monetize', href: '/monetize', icon: Gem },
-      { title: 'Marketplace', href: '/marketplace', icon: Banknote },
+
       { title: 'Proof of Ownership', href: '/services/proof-of-ownership', icon: FileBadge },
       { title: 'Proof of Licensing', href: '/services/proof-of-licensing', icon: FileCheck },
-      { title: 'Transfer Asset', href: '/transfer', icon: ArrowRightLeft },
+      { title: 'Monetize', href: '/monetize', icon: Gem },
+      { title: 'Sharing Revenue', href: '/services/revenue-sharing', icon: DollarSign },
       { title: 'Business', href: '/business', icon: Briefcase },
     ],
   },
