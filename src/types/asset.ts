@@ -42,6 +42,261 @@ export interface NFT {
 }
 
 
+export interface assetIP  {
+  title: string;
+  author: string;
+  description: string;
+  type: string;
+  template: string;
+  collection: string;
+  tags: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  ipVersion: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
+}
+
+
+export interface artworkIP  {
+  title: string;
+  author: string;
+  description: string;
+  type: string;
+  template: string;
+  format: string;
+  dimensions: string;
+  created: string;
+  language: string;
+  collection: string;
+  tags: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  ipVersion: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
+}
+
+
+export interface audioIP  {
+  title: string;
+  author: string;
+  description: string;
+  type: string;
+  template: string;
+  artist: string;
+  album: string;
+  genre: string;
+  composer: string;
+  band: string; 
+  publisher: string;
+  collection: string;
+  tags: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  ipVersion: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
+}
+
+export interface documentIP  {
+  title: string;
+  description: string;
+  type: string;
+  template: string;
+  author: string;
+  format: string;
+  categories: string;
+  publisher: string;
+  date: string;
+  expiration: string;
+  language: string;
+  collection: string;
+  tags: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  ipVersion: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  filesCount: string;
+  transaction: string;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
+}
+
+export interface patentIP  {
+      title: string;
+      description: string;
+      type: string;
+      template: string;
+      author: string;
+      inventor: string;
+      patentType: string;
+      filingDate: string;
+      patentNumber: string;
+      status: string;
+      collection: string;
+      tags: string;
+      mediaUrl: string;
+      externalUrl: string;
+      licenseType: string;
+      licenseDetails: string;
+      ipVersion: string;
+      commercialUse: boolean;
+      modifications: boolean;
+      attribution: boolean;
+      filesCount: string;
+      transaction: string;
+      registrationDate: string;
+      protectionStatus: string;
+      protectionScope: string;
+      protectionDuration: string;
+}
+
+export interface publicationIP  {
+      title: string;
+      description: string;
+      type: string;
+      template: string;
+      author: string;
+      format: string;
+      categories: string;
+      isbn: string;
+      publisher: string;
+      date: string;
+      collection: string;
+      tags: string;
+      mediaUrl: string;
+      externalUrl: string;
+      licenseType: string;
+      licenseDetails: string;
+      ipVersion: string;
+      commercialUse: boolean;
+      modifications: boolean;
+      attribution: boolean;
+      filesCount: string;
+      transaction: string;
+      registrationDate: string;
+      protectionStatus: string;
+      protectionScope: string;
+      protectionDuration: string;
+}
+
+export interface rwaIP  {
+  title: string;
+  description: string;
+  type: string;
+  template: string;
+      rwa: string;
+      location: string;
+      valuation: string;
+      insurance: string;
+      structure: string;
+      documentation: string;
+      collection: string;
+      tags: string;
+      mediaUrl: string;
+      externalUrl: string;
+      licenseType: string;
+      licenseDetails: string;
+      ipVersion: string;
+      commercialUse: boolean;
+      modifications: boolean;
+      attribution: boolean;
+      filesCount: string;
+      transaction: string;
+      registrationDate: string;
+      protectionStatus: string;
+      protectionScope: string;
+      protectionDuration: string;
+}
+
+
+export interface softwareIP  {
+      title: string;
+      description: string;
+      type: string;
+      template: string;
+      developer: string;
+      versionCode: string;
+      releaseDate: string;
+      progammingLanguage: string;
+      sourceCode: string;
+      documentation: string;
+      repository: string;
+      collection: string;
+      tags: string;
+      mediaUrl: string;
+      externalUrl: string;
+      licenseType: string;
+      licenseDetails: string;
+      ipVersion: string;
+      commercialUse: boolean;
+      modifications: boolean;
+      attribution: boolean;
+      filesCount: string;
+      transaction: string;
+      registrationDate: string;
+      protectionStatus: string;
+      protectionScope: string;
+      protectionDuration: string;
+}
+
+export interface trademarkIP  {
+      title: string;
+      description: string;
+      type: string;
+      template: string;
+      movieType: string;
+      director: string;
+      duration: string;
+      studio: string;
+      genre: string;
+      collection: string;
+      tags: string;
+      mediaUrl: string;
+      externalUrl: string;
+      licenseType: string;
+      licenseDetails: string;
+      ipVersion: string;
+      commercialUse: boolean;
+      modifications: boolean;
+      attribution: boolean;
+      filesCount: string;
+      transaction: string;
+      registrationDate: string;
+      protectionStatus: string;
+      protectionScope: string;
+      protectionDuration: string;
+}
+
+
 
 export type IPType = "Basic" | "Art" | "Audio" | "Video" | "Document" | "Patent" | "RWA" | "Trademark" | "Software" | "NFT" | "Custom"
 
