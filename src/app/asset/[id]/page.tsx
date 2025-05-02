@@ -28,7 +28,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-import { useMIP } from "@/hooks/useMIP"
+import { useMIP } from "@/hooks/contracts/use-mip"
 import { useReadContract } from "@starknet-react/core";
 import { abi } from "@/abis/abi"
 import { Abi } from "starknet"

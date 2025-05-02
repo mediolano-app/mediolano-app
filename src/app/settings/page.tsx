@@ -9,43 +9,85 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Bell, Globe, Key, Lock, Settings, Shield, User, Zap, CheckCircle } from 'lucide-react'
-import { useUsersSettings } from '@/hooks/useUsersSettings'
+import { useAccount, useContract, useSendTransaction } from '@starknet-react/core'
+import UserSettingsABI from '@/abis/user_settings'
+// import { useUsersSettings } from '@/hooks/useUsersSettings'
 
-// Mockup data
+// Mockup data with booleans replaced by numbers
 const mockUser = {
   name: 'Testing',
   email: 'alice@mediolano.app',
   username: 'alice_ip_creator',
   language: 'en',
-  twoFactorEnabled: false,
-  notificationsEnabled: true,
+  twoFactorEnabled: 0,
+  notificationsEnabled: 1,
   ipProtectionLevel: 'standard',
   networkType: 'testnet',
   gasPrice: 'medium',
-  autoRegistration: true,
+  autoRegistration: 1,
   notificationTypes: {
-    ipUpdates: true,
-    blockchainEvents: false,
-    accountActivity: true
+    ipUpdates: 1,
+    blockchainEvents: 0,
+    accountActivity: 1
   },
   dataRetention: 180
 }
 
+// Flattened array for on-chain storage
+const mockUserArray = [
+  'Testing',                            // name
+  'alice@mediolano.app',               // email
+  'alice_ip_creator',                  // username
+  'en',                                // language
+  0,                                   // twoFactorEnabled
+  1,                                   // notificationsEnabled
+  'standard',                          // ipProtectionLevel
+  'testnet',                           // networkType
+  'medium',                            // gasPrice
+  1,                                   // autoRegistration
+  1,                                   // notificationTypes.ipUpdates
+  0,                                   // notificationTypes.blockchainEvents
+  1,                                   // notificationTypes.accountActivity
+  180                                  // dataRetention
+]
+
 export default function SettingsPage() {
+  const { address } = useAccount()
+  const { contract } = useContract({
+    address: process.env.NEXT_PUBLIC_USER_SETTINGS_CONTRACT_ADDRESS as `0x${string}`,
+    abi: UserSettingsABI,
+  });
+  const myPubKey = process.env.NEXT_PUBLIC_PUB_KEY as string
+  const mockedKey = '0x123456'
+  const mockedSignature = ['0xabc123', '0xdef456']
+
+  const { send: sendStoreSetting, error: storeSettingError } = useSendTransaction({
+    calls:
+      contract && address
+        ? [contract.populate("store_setting", [
+          mockedKey,
+          mockUserArray, // encryptedData
+          mockedSignature, // walletSignature
+          myPubKey // pubKey
+        ])]
+        : undefined,
+  });
+
   const [user, setUser] = useState(mockUser)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
-  const { getSetting, storeSetting, removeSetting, updateWalletKey } = useUsersSettings();
 
+  // Generic updater for flat fields
   const updateUser = (key: string, value: any) => {
     setUser(prevUser => ({ ...prevUser, [key]: value }))
   }
 
+  // Updater for notificationTypes (maps boolean to number)
   const updateNotificationType = (type: string, checked: boolean) => {
     setUser(prevUser => ({
       ...prevUser,
       notificationTypes: {
         ...prevUser.notificationTypes,
-        [type]: checked
+        [type]: checked ? 1 : 0
       }
     }))
   }
@@ -124,8 +166,10 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="auto-registration"
-                checked={user.autoRegistration}
-                onCheckedChange={(checked) => updateUser('autoRegistration', checked)}
+                checked={user.autoRegistration === 1}
+                onCheckedChange={(checked: boolean) =>
+                  updateUser('autoRegistration', checked ? 1 : 0)
+                }
               />
               <Label htmlFor="auto-registration">Automatic IP Registration</Label>
             </div>
@@ -142,8 +186,10 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-2">
               <Switch
                 id="notifications-enabled"
-                checked={user.notificationsEnabled}
-                onCheckedChange={(checked) => updateUser('notificationsEnabled', checked)}
+                checked={user.notificationsEnabled === 1}
+                onCheckedChange={(checked: boolean) =>
+                  updateUser('notificationsEnabled', checked ? 1 : 0)
+                }
               />
               <Label htmlFor="notifications-enabled">Enable Notifications</Label>
             </div>
@@ -151,27 +197,27 @@ export default function SettingsPage() {
               <Label>Notification Types</Label>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <Switch
-                    id="ip-updates"
-                    checked={user.notificationTypes.ipUpdates}
-                    onCheckedChange={(checked) => updateNotificationType('ipUpdates', checked)}
-                  />
-                  <Label htmlFor="ip-updates">IP Updates</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="blockchain-events"
-                    checked={user.notificationTypes.blockchainEvents}
-                    onCheckedChange={(checked) => updateNotificationType('blockchainEvents', checked)}
-                  />
-                  <Label htmlFor="blockchain-events">Blockchain Events</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="account-activity"
-                    checked={user.notificationTypes.accountActivity}
-                    onCheckedChange={(checked) => updateNotificationType('accountActivity', checked)}
-                  />
+                <Switch
+                  id="ip-updates"
+                  checked={user.notificationTypes.ipUpdates === 1}
+                  onCheckedChange={(checked) => updateNotificationType('ipUpdates', checked)}
+                />
+                <Label htmlFor="ip-updates">IP Updates</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="blockchain-events"
+                  checked={user.notificationTypes.blockchainEvents === 1}
+                  onCheckedChange={(checked) => updateNotificationType('blockchainEvents', checked)}
+                />
+                <Label htmlFor="blockchain-events">Blockchain Events</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="account-activity"
+                  checked={user.notificationTypes.accountActivity === 1}
+                  onCheckedChange={(checked) => updateNotificationType('accountActivity', checked)}
+                />
                   <Label htmlFor="account-activity">Account Activity</Label>
                 </div>
               </div>

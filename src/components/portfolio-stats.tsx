@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowUpRight, TrendingUp, Wallet, BarChart3, LayoutGrid } from "lucide-react"
 import { useBlockchainPortfolio } from "@/hooks/useBlockchainPortfolio"
 import { NFTLicensings } from "./nft-licensings"
-import { useMIP } from "@/hooks/useMIP"
+import { useMIP } from "@/hooks/contracts/use-mip"
 import { pinataClient } from "@/utils/pinataClient"
 import { useReadContract } from "@starknet-react/core";
 import { abi } from "../../src/abis/abi";
