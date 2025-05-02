@@ -7,8 +7,6 @@ export interface Asset {
   revenueShare: number
   ownerCount: number
   status: "Active" | "Pending" | "Inactive"
-  metadataHash?: string
-  licenseHash?: string
 }
 
 export interface MarketplaceListing {

@@ -44,7 +44,7 @@ export function getRecentAssets() {
 }
 
 // Mock data for user assets
-export function getUserAssets(): Asset[] {
+export function getUserAssets(): Array<Asset & { metadataHash: string; licenseHash: string }> {
   return [
     {
       id: "asset-101",

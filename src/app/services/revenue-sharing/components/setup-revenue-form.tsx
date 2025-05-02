@@ -49,12 +49,6 @@ const formSchema = z.object({
     .max(10000, {
       message: "Total shares cannot exceed 10,000.",
     }),
-  metadataHash: z.string().min(1, {
-    message: "Metadata hash is required.",
-  }),
-  licenseTermsHash: z.string().min(1, {
-    message: "License terms hash is required.",
-  }),
   creatorShare: z
     .number()
     .min(1, {
@@ -92,7 +86,7 @@ const formSchema = z.object({
 export default function SetupRevenueForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const { status } = useAccount();
+  const { status, address } = useAccount();
   const router = useRouter();
   const assets = getUserAssets();
   const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_REVENUE_CONTRACT_ADDRESS as `0x${string}`;
@@ -102,8 +96,6 @@ export default function SetupRevenueForm() {
     defaultValues: {
       totalShares: 100,
       creatorShare: 70,
-      metadataHash: "default_metadata_hash", // Provide a valid default
-      licenseTermsHash: "default_license_hash", // Provide a valid default
       claimPeriod: "30days",
       autoDistribute: false,
       distributionFrequency: "monthly",
@@ -141,22 +133,28 @@ export default function SetupRevenueForm() {
 
   const selectedAsset = assets.find((asset) => asset.id === selectedAssetId);
 
-  const totalShares = form.watch("totalShares");
-
-   const getConstructorCalldata = () => {
-   }
+  const { contract } = useContract({
+    abi: ip_revenue_abi as Abi,
+    address: CONTRACT_ADDRESS,
+  });
 
   const calls = useMemo(() => {
-    const values = form.getValues();
-
+    if (!selectedAsset || !address || !contract) return [];
+  
+    // Helper function to convert hex to decimal string
+    const hexToDecimal = (hex: string) => BigInt(hex).toString(10);
+    
+    // Extract numeric ID from asset ID (e.g., "asset-101" -> "101")
+    const tokenId = selectedAsset.id.replace('asset-', '');
+  
     const calldata = new CallData(ip_revenue_abi).compile("create_ip_asset", {
-      nft_contract: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-      token_id: selectedAsset?.id,
-      metadata_hash: selectedAsset?.metadataHash,
-      license_terms_hash: selectedAsset?.licenseHash,
-      total_shares: values.totalShares,
+      nft_contract: hexToDecimal("0x1234567890abcdef1234567890abcdef12345678"),
+      token_id: BigInt(tokenId).toString(10),
+      metadata_hash: hexToDecimal(selectedAsset.metadataHash),
+      license_terms_hash: hexToDecimal(selectedAsset.licenseHash),
+      total_shares: BigInt(form.getValues().totalShares).toString(10),
     });
-
+  
     return [
       {
         contractAddress: CONTRACT_ADDRESS,
@@ -164,23 +162,29 @@ export default function SetupRevenueForm() {
         calldata,
       },
     ];
-  }, [selectedAssetId, selectedAsset, assets, CONTRACT_ADDRESS, totalShares, form]);
+  }, [selectedAsset, CONTRACT_ADDRESS, form, address, contract]);
 
-  const { contract } = useContract({
-    abi: ip_revenue_abi as Abi,
-    address: CONTRACT_ADDRESS,
-  });
+
 
   const { sendAsync } = useSendTransaction({
     calls,
   });
 
-  // Form submission with createIPAsset
   const handleSubmit = async () => {
     if (status === "disconnected") {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet to proceed.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!selectedAsset) {
+      toast({
+        title: "Error",
+        description: "Please select an asset.",
         variant: "destructive",
       });
       setIsSubmitting(false);
@@ -206,7 +210,7 @@ export default function SetupRevenueForm() {
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   const nextStep = () => {
     if (currentStep < 3) {
@@ -239,7 +243,7 @@ export default function SetupRevenueForm() {
       {/* Form */}
       {status === "connected" && (
         <Form {...form}>
-          <form onSubmit={(e)=>e.preventDefault()} className="space-y-6">
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
             <div className="mb-8">
               <div className="flex justify-between mb-2">
                 <div className="text-sm font-medium">Step {currentStep} of 3</div>
