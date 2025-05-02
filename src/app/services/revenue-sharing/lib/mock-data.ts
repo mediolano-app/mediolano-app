@@ -55,6 +55,8 @@ export function getUserAssets(): Asset[] {
       revenueShare: 70,
       ownerCount: 5,
       status: "Active",
+      metadataHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      licenseHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
     },
     {
       id: "asset-102",
@@ -65,6 +67,8 @@ export function getUserAssets(): Asset[] {
       revenueShare: 85,
       ownerCount: 3,
       status: "Active",
+      metadataHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      licenseHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
     },
     {
       id: "asset-103",
@@ -75,6 +79,8 @@ export function getUserAssets(): Asset[] {
       revenueShare: 60,
       ownerCount: 8,
       status: "Active",
+      metadataHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      licenseHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
     },
     {
       id: "asset-104",
@@ -85,6 +91,8 @@ export function getUserAssets(): Asset[] {
       revenueShare: 75,
       ownerCount: 2,
       status: "Pending",
+      metadataHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      licenseHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
     },
   ]
 }
