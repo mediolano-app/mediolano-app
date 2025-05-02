@@ -1,181 +1,276 @@
-  "use client";
+"use client"
 
-import { useRouter } from "next/navigation";
-import type { NextPage } from "next";
-import { useAccount } from "@starknet-react/core";
-import { useState, FormEvent, useRef} from "react";
-import { FilePlus, Lock, FileText, Coins, Shield, Globe, BarChart, Book, Music, Film, FileCode, Palette, File, ScrollText, Clock, ArrowRightLeft, ShieldCheck, Banknote, Globe2, FileLock, ArrowLeft, CornerUpLeft, Crown, Crosshair, LockOpen } from 'lucide-react'
-import Link from 'next/link'
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
+import { ArrowLeft, ArrowRight, Search, Info, ExternalLink } from "lucide-react"
+import Link from "next/link"
 
-const templatesIP = () => {
+import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-  const router = useRouter();
-  const { address: connectedAddress, isConnected, isConnecting } = useAccount();
+import { TemplateCard } from "@/components/template-card"
+import { TemplateDetails } from "@/components/template-details"
 
-  const templates = [
-    { name: 'Art', icon: Palette, href: '/create/art', description: 'Paintings, Photography, Artworks' },
-    { name: 'Documents', icon: File, href: '/create/document', description: 'Preserve documents on-chain' },  
-    { name: 'Video', icon: Film, href: '/create/video', description: 'Movies, videocast, shows, video creations' }, 
-    { name: 'Audio', icon: Music, href: '/create/audio', description: 'Music, podcasts, samplers, radio' },
-    { name: 'NFT', icon: FileLock, href: '/create/nft', description: 'NFT oriented asset design' },
-    { name: 'Patents', icon: ScrollText, href: '/create/patents', description: 'Secure inventions and innovations' },
-    { name: 'Publications', icon: Book, href: '/create/publication', description: 'Articles, news, research, posts' },
-    { name: 'RWA', icon: Globe2, href: '/create/rwa', description: 'Tokenize Real World Assets' },
-    { name: 'Software', icon: FileCode, href: '/create/software', description: 'Safeguard code ownership' },
-  ]
+// Template data
+const templates = [
+  {
+    id: "art",
+    name: "Art",
+    icon: "Palette",
+    description: "Register digital or physical artwork, illustrations, paintings, and other visual creations.",
+    examples: ["Digital illustrations", "Paintings", "Sculptures", "Photography", "Graphic designs"],
+    fields: ["Title", "Artist", "Medium", "Dimensions", "Creation date", "Style"],
+    popular: true,
+    color: "purple",
+  },
+  {
+    id: "audio",
+    name: "Audio",
+    icon: "Music",
+    description: "Register audio files, music, sound effects, podcasts, and other audio content.",
+    examples: ["Music tracks", "Sound effects", "Podcasts", "Voice recordings", "Audio books"],
+    fields: ["Title", "Creator", "Duration", "Genre", "Release date", "BPM", "Key"],
+    popular: true,
+    color: "blue",
+  },
+  {
+    id: "document",
+    name: "Documents",
+    icon: "FileText",
+    description: "Register written documents, contracts, agreements, and other text-based content.",
+    examples: ["Legal documents", "Contracts", "Research papers", "Manuscripts", "Technical documentation"],
+    fields: ["Title", "Author", "Document type", "Page count", "Creation date", "Version"],
+    popular: false,
+    color: "gray",
+  },
+  {
+    id: "nft",
+    name: "NFT",
+    icon: "Hexagon",
+    description: "Register non-fungible tokens and blockchain-based digital assets.",
+    examples: ["Digital collectibles", "Crypto art", "Virtual real estate", "Game assets", "Tokenized media"],
+    fields: ["Title", "Creator", "Blockchain", "Token standard", "Collection name", "Mint date"],
+    popular: true,
+    color: "teal",
+  },
+  {
+    id: "video",
+    name: "Video",
+    icon: "Video",
+    description: "Register video content, films, animations, and other moving image media.",
+    examples: ["Short films", "Animations", "Video clips", "Tutorials", "Documentaries"],
+    fields: ["Title", "Director", "Duration", "Resolution", "Release date", "Genre"],
+    popular: false,
+    color: "red",
+  },
+  {
+    id: "patents",
+    name: "Patents",
+    icon: "Award",
+    description: "Register patents, inventions, and novel technological solutions.",
+    examples: ["Inventions", "Technological processes", "Industrial designs", "Utility models", "Improvements"],
+    fields: ["Title", "Inventor", "Patent type", "Filing date", "Priority date", "Classification"],
+    popular: false,
+    color: "amber",
+  },
+  {
+    id: "post",
+    name: "Posts",
+    icon: "MessageSquare",
+    description: "Register social media posts, articles, and other short-form content.",
+    examples: ["Blog posts", "Social media content", "Short articles", "Forum posts", "Comments"],
+    fields: ["Title", "Author", "Platform", "Publication date", "Category", "Word count"],
+    popular: false,
+    color: "sky",
+  },
+  {
+    id: "publication",
+    name: "Publications",
+    icon: "BookOpen",
+    description: "Register books, journals, magazines, and other published materials.",
+    examples: ["Books", "E-books", "Journals", "Magazines", "Academic papers"],
+    fields: ["Title", "Author", "Publisher", "ISBN", "Publication date", "Edition", "Genre"],
+    popular: false,
+    color: "indigo",
+  },
+  {
+    id: "rwa",
+    name: "RWA",
+    icon: "Building",
+    description: "Register real-world assets that have been tokenized or digitally represented.",
+    examples: ["Real estate", "Commodities", "Collectibles", "Vehicles", "Luxury goods"],
+    fields: ["Asset name", "Owner", "Asset type", "Value", "Location", "Acquisition date"],
+    popular: false,
+    color: "emerald",
+  },
+  {
+    id: "software",
+    name: "Software",
+    icon: "Code",
+    description: "Register software applications, code, algorithms, and digital tools.",
+    examples: ["Applications", "Games", "Algorithms", "Libraries", "Frameworks"],
+    fields: ["Title", "Developer", "Version", "Programming language", "Release date", "License type"],
+    popular: true,
+    color: "violet",
+  },
+  {
+    id: "asset",
+    name: "Custom",
+    icon: "Settings",
+    description: "Create a custom template for your unique intellectual property needs.",
+    examples: ["Mixed media", "Hybrid assets", "Novel IP types", "Specialized content", "Experimental works"],
+    fields: ["Custom fields", "Flexible structure", "Adaptable metadata", "Personalized attributes"],
+    popular: false,
+    color: "slate",
+  },
+]
 
+export default function TemplatesPage() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<"all" | "popular">("all")
 
-  
+  // Filter templates based on search query
+  const filteredTemplates = templates.filter(
+    (template) =>
+      template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      template.description.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
+
+  // Filter templates based on active tab
+  const displayedTemplates =
+    activeTab === "popular" ? filteredTemplates.filter((template) => template.popular) : filteredTemplates
+
+  // Get the selected template object
+  const selectedTemplateObject = templates.find((template) => template.id === selectedTemplate)
+
   return (
-    <>
-
-    <div className="container mx-auto px-4 py-8 mb-20">
-      <main>
-
-
-      <div className="flex items-center justify-between mb-4">
-                <h1 className="text-xl md:pl-6 font-bold">Programmable IP Templates</h1>
-                <Link
-                    href="/create"
-                    title="Back to Create Asset"
-                    className="flex items-center text-sm font-medium text-muted-foreground hover:underline"
-                >
-                    <CornerUpLeft className="mr-2 h-4 w-4" />
-                </Link>
-            </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-        <div className="bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/30 text-foreground p-4 rounded-lg">
-
-        <main className="max-w-7xl mx-auto px-4">
-        
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-          {templates.map((template) => (
-            <Link
-              key={template.name}
-              href={template.href}
-              className="block group"
-            >
-              <div className="relative rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground p-6 ">
-                <div className="flex items-center mb-4">
-                  <template.icon className="h-6 w-6 mr-3 text-blue-600" />
-                  <h3 className="text-lg font-semibold">{template.name}</h3>
-                </div>
-                <p className="text-sm">{template.description}</p>
-                <div className="mt-4 flex items-center text-indigo-600 group-hover:text-indigo-500">
-                  <span className="text-sm font-medium">Create</span>
-                  <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="flex flex-col items-left">
-          <p className="mb-4">Need a different format?</p>
-          <Link href="/create/asset" title="Register your custom Programmable IP">
-          <Button variant="outline" className="p-6 bg-blue-600 text-white text-lg">Register your custom IP</Button>
-          </Link>
-          </div>
-
-      </main>
-
-          
-
-      </div>
-
-
-        
-      <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground p-8 rounded-lg shadow">
+    <div className="min-h-screen">
 
      
-        <div className="">
-          <h3 className="text-lg">Intellectual Property Onchain</h3>
-          <h4 className="text-blue-600 text-sm">Unlock the future of the integrity web</h4>
+
+      <main className="container mx-auto p-4 py-8">
+        <Link href="/create">
+          <Button variant="ghost" size="sm" className="mb-6">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Create Panel
+          </Button>
+        </Link>
+
+        <div className="mb-8 space-y-6">
+          <div>
+            <h2 className="text-3xl font-bold">Choose an IP Template</h2>
+            <p className="text-muted-foreground">
+              Select a template to streamline your intellectual property registration process
+            </p>
           </div>
 
-      <div className="mt-6">
-        
-          <ul className="space-y-6">
-            <li className="flex items-start">
-              <Lock className="w-6 h-6 mr-3 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold mb-1">Immutable Protection</h3>
-                <p className="text-sm text-muted-foreground">Your IP is secured on blockchain, providing tamper-proof evidence of ownership.</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <FileText className="w-6 h-6 mr-3 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold mb-1">Smart Licensing</h3>
-                <p className="text-sm text-muted-foreground">Utilize smart contracts for intelligence licensing agreements, ensuring proper attribution.</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <Coins className="w-6 h-6 mr-3 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold mb-1">Tokenized Monetization</h3>
-                <p className="text-sm text-muted-foreground">Transform your IP into digital assets, enabling new revenue streams.</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <Shield className="w-6 h-6 mr-3 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold mb-1">Enhanced Security</h3>
-                <p className="text-sm text-muted-foreground">Benefit from blockchain's cryptographic security.</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <Globe className="w-6 h-6 mr-3 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold mb-1">Global Reach</h3>
-                <p className="text-sm text-muted-foreground">Adherence to world markets and unlock international reach.</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <Crown className="w-6 h-6 mr-3 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold mb-1">Self Custody</h3>
-                <p className="text-sm text-muted-foreground">Own and manage with digital assets with your encrypt wallet.</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <Crosshair className="w-6 h-6 mr-3 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold mb-1">Real-Time Asset Tracking</h3>
-                <p className="text-sm text-muted-foreground">Continuous monitoring for unauthorized use and infringement.</p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <LockOpen className="w-6 h-6 mr-3 flex-shrink-0" />
-              <div>
-                <h3 className="font-semibold mb-1">Permissionless Registration</h3>
-                <p className="text-sm text-muted-foreground">Anyone can register their IP assets without restrictions, democratizing access to IP protection.</p>
-              </div>
-            </li>
-          </ul>
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Why use templates?</AlertTitle>
+            <AlertDescription>
+              Templates provide pre-configured fields and settings optimized for different types of intellectual
+              property, saving you time and ensuring you capture all relevant information.
+            </AlertDescription>
+          </Alert>
+
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search templates..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
-      
-      
-      
 
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Left column - Template selection */}
+          <div className="lg:col-span-2 space-y-6">
+            <Tabs
+              defaultValue="all"
+              value={activeTab}
+              onValueChange={(value) => setActiveTab(value as "all" | "popular")}
+            >
+              <TabsList>
+                <TabsTrigger value="all">All Templates</TabsTrigger>
+                <TabsTrigger value="popular">Popular</TabsTrigger>
+              </TabsList>
 
-      
-    </Card>
+              <TabsContent value="all" className="mt-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                  {displayedTemplates.length === 0 ? (
+                    <div className="col-span-full p-8 text-center border rounded-lg">
+                      <p className="text-muted-foreground">No templates found matching your search criteria.</p>
+                    </div>
+                  ) : (
+                    displayedTemplates.map((template) => (
+                      <TemplateCard
+                        key={template.id}
+                        template={template}
+                        isSelected={selectedTemplate === template.id}
+                        onSelect={() => setSelectedTemplate(template.id)}
+                      />
+                    ))
+                  )}
+                </div>
+              </TabsContent>
 
+              <TabsContent value="popular" className="mt-6">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                  {displayedTemplates.length === 0 ? (
+                    <div className="col-span-full p-8 text-center border rounded-lg">
+                      <p className="text-muted-foreground">No popular templates found matching your search criteria.</p>
+                    </div>
+                  ) : (
+                    displayedTemplates.map((template) => (
+                      <TemplateCard
+                        key={template.id}
+                        template={template}
+                        isSelected={selectedTemplate === template.id}
+                        onSelect={() => setSelectedTemplate(template.id)}
+                      />
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {/* Right column - Selected template details */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 space-y-6">
+              {selectedTemplateObject ? (
+                <TemplateDetails template={selectedTemplateObject} />
+              ) : (
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                      <Info className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="mb-2 text-xl font-medium">Select a Template</h3>
+                    <p className="text-muted-foreground">
+                      Choose a template from the left to see more details and continue with your IP registration.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {selectedTemplateObject && (
+                <Link href={`/create/${selectedTemplateObject.id}`}>
+                <Button className="w-full" size="lg">
+                  Continue with {selectedTemplateObject.name} Template
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-
-
-    </main>
-    </div>
-      
-    </>
-  );
-};
-
-export default templatesIP;
+  )
+}

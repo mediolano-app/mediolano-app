@@ -21,7 +21,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 342,
       views: 1205,
-      price: "0.25 ETH",
+      price: "0.25 STRK",
       badge: "New",
     },
     {
@@ -32,7 +32,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 189,
       views: 876,
-      price: "1.2 ETH",
+      price: "1.2 STRK",
       badge: "Featured",
     },
     {
@@ -43,7 +43,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 421,
       views: 1567,
-      price: "0.75 ETH",
+      price: "0.75 STRK",
     },
     {
       id: 4,
@@ -53,7 +53,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 267,
       views: 982,
-      price: "0.5 ETH",
+      price: "0.5 STRK",
       badge: "Popular",
     },
   ],
@@ -66,7 +66,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 112,
       views: 543,
-      price: "0.8 ETH",
+      price: "0.8 STRK",
       badge: "New",
     },
     {
@@ -77,7 +77,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 98,
       views: 412,
-      price: "0.15 ETH",
+      price: "0.15 STRK",
       badge: "New",
     },
     {
@@ -88,7 +88,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 156,
       views: 678,
-      price: "0.45 ETH",
+      price: "0.45 STRK",
       badge: "New",
     },
     {
@@ -99,7 +99,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 87,
       views: 321,
-      price: "0.35 ETH",
+      price: "0.35 STRK",
       badge: "New",
     },
   ],
@@ -112,7 +112,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 532,
       views: 2341,
-      price: "1.5 ETH",
+      price: "1.5 STRK",
       badge: "Popular",
     },
     {
@@ -123,7 +123,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 478,
       views: 1876,
-      price: "2.0 ETH",
+      price: "2.0 STRK",
       badge: "Popular",
     },
     {
@@ -134,7 +134,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 621,
       views: 2789,
-      price: "1.8 ETH",
+      price: "1.8 STRK",
       badge: "Popular",
     },
     {
@@ -145,7 +145,7 @@ const featuredAssets = {
       image: "/placeholder.svg?height=300&width=300",
       likes: 498,
       views: 2156,
-      price: "1.2 ETH",
+      price: "1.2 STRK",
       badge: "Popular",
     },
   ],

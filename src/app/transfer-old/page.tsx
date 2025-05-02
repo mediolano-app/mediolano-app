@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { abi } from "@/abis/abi";
 import { Abi } from "starknet";
-import { useMIP } from "@/hooks/useMIP";
+import { useMIP } from "@/hooks/contracts/use-mip";
 
 export default function TransferNFTPage() {
   const [recipientAddress, setRecipientAddress] = useState("");

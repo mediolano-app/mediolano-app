@@ -50,7 +50,7 @@ import {
 import NFTCard from "./NFTCard"
 import { PortfolioStats } from "./portfolio-stats"
 import { NFTLicensings } from "./nft-licensings"
-import { useMIP } from "@/hooks/useMIP"
+import { useMIP } from "@/hooks/contracts/use-mip"
 import { pinataClient } from "@/utils/pinataClient"
 import { useReadContract } from "@starknet-react/core";
 import { abi } from "../../src/abis/abi";

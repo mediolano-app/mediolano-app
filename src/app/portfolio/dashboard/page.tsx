@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/select";
 // import { ConnectWallet } from "@/components/ConnectWallet"
 import { usePortfolio } from "@/hooks/usePortfolio";
-import { useMIP } from "@/hooks/useMIP";
+import { useMIP } from "@/hooks/contracts/use-mip";
 import { useRouter } from "next/navigation";
 import NFTCard from "@/components/NFTCard";
 
