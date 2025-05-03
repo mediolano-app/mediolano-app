@@ -31,8 +31,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
-import { Abi, CallData } from "starknet";
-import { useAccount, useContract, useSendTransaction } from "@starknet-react/core";
+import { Abi } from "starknet";
+import { useAccount, useContract, useSendTransaction, useTransactionReceipt } from "@starknet-react/core";
 import { ConnectWallet } from "@/components/ConnectWallet";
 import { ip_revenue_abi } from "@/abis/ip_revenue";
 
@@ -138,36 +138,40 @@ export default function SetupRevenueForm() {
     address: CONTRACT_ADDRESS,
   });
 
-  const calls = useMemo(() => {
-    if (!selectedAsset || !address || !contract) return [];
-  
-    // Helper function to convert hex to decimal string
-    const hexToDecimal = (hex: string) => BigInt(hex).toString(10);
-    
-    // Extract numeric ID from asset ID (e.g., "asset-101" -> "101")
-    const tokenId = selectedAsset.id.replace('asset-', '');
-  
-    const calldata = new CallData(ip_revenue_abi).compile("create_ip_asset", {
-      nft_contract: hexToDecimal("0x1234567890abcdef1234567890abcdef12345678"),
-      token_id: BigInt(tokenId).toString(10),
-      metadata_hash: hexToDecimal(selectedAsset.metadataHash),
-      license_terms_hash: hexToDecimal(selectedAsset.licenseHash),
-      total_shares: BigInt(form.getValues().totalShares).toString(10),
-    });
-  
-    return [
-      {
-        contractAddress: CONTRACT_ADDRESS,
-        entrypoint: "create_ip_asset",
-        calldata,
-      },
-    ];
-  }, [selectedAsset, CONTRACT_ADDRESS, form, address, contract]);
+const calls = useMemo(() => {
+  if (
+    !selectedAsset ||
+    !address ||
+    !contract ||
+    !selectedAsset.nft_contract ||
+    !selectedAsset.id ||
+    !selectedAsset.metadataHash ||
+    !selectedAsset.licenseHash ||
+    !form.getValues().totalShares
+  ) {
+    console.warn("Missing required fields for contract call");
+    return [];
+  }
+
+  return [
+    contract.populate("create_ip_asset", [
+      selectedAsset.nft_contract,
+      selectedAsset.id,
+      selectedAsset.metadataHash,
+      selectedAsset.licenseHash,
+      form.getValues().totalShares.toString(),
+    ]),
+  ];
+}, [selectedAsset, address, contract]);
 
 
-
-  const { sendAsync } = useSendTransaction({
+  const { sendAsync, data: createData, isPending: isCreatingAsset } = useSendTransaction({
     calls,
+  });
+
+  const {data: waitData, status: waitStatus,  } = useTransactionReceipt({ 
+    watch: true, 
+    hash: createData?.hash
   });
 
   const handleSubmit = async () => {
