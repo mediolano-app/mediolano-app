@@ -57,12 +57,31 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import type { IPType } from "@/types/asset"
+import { getKnownCids, AssetType } from "@/utils/ipfs"
 
-// temporary data
-import { assets, recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
+// temporary data - importado pero será aumentado con IPFS
+import { assets as mockAssets, recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
+
+// Mejorar el componente NFTCard para añadir soporte para IPFS CID
+// Esto se hará creando una interfaz extendida mientras se mantiene la compatibilidad
+interface EnhancedAsset {
+  id: string;
+  name: string;
+  creator: string;
+  verified?: boolean;
+  image: string;
+  collection?: string;
+  licenseType?: string;
+  description: string;
+  registrationDate: string;
+  type: IPType;
+  templateType?: string;
+  protectionLevel?: number;
+  value?: string;
+  ipfsCid?: string; // Añadido para soportar IPFS
+}
 
 export default function AssetsPage() {
-
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -71,14 +90,41 @@ export default function AssetsPage() {
   const [filterCollection, setFilterCollection] = useState<string>("all")
   const [filterLicense, setFilterLicense] = useState<string>("all")
   const [filterTemplate, setFilterTemplate] = useState<string>("all")
+  const [assets, setAssets] = useState<EnhancedAsset[]>([])
+
+  console.log(assets);
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 1000)
+    // Cargar datos y enriquecerlos con información de IPFS
+    const loadAssetsWithIPFS = async () => {
+      setLoading(true)
+      try {
+        // Obtener los CIDs conocidos
+        const knownCids = getKnownCids()
 
-    return () => clearTimeout(timer)
+        // Enriquecer los assets mock con información de IPFS
+        const enhancedAssets = mockAssets.map((asset) => {
+          const ipfsCid = knownCids[asset.id] || null
+          
+          // Retornar el asset enriquecido
+          return {
+            ...asset,
+            ...(ipfsCid && { ipfsCid })
+          } as EnhancedAsset
+        })
+
+        // Actualizar el estado con los assets enriquecidos
+        setAssets(enhancedAssets)
+      } catch (error) {
+        console.error("Error loading assets with IPFS data:", error)
+        // En caso de error, usar los datos mock sin modificar
+        setAssets(mockAssets as EnhancedAsset[])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadAssetsWithIPFS()
   }, [])
 
 
@@ -129,7 +175,7 @@ export default function AssetsPage() {
       case "name":
         return a.name.localeCompare(b.name)
       case "value":
-        return Number.parseFloat(b.value.split(" ")[0]) - Number.parseFloat(a.value.split(" ")[0])
+        return Number.parseFloat(b.value?.split(" ")[0] || "0") - Number.parseFloat(a.value?.split(" ")[0] || "0")
       default:
         return 0
     }
@@ -178,6 +224,193 @@ export default function AssetsPage() {
       default:
         return <Box className="h-4 w-4 text-gray-500" />
     }
+  }
+
+  // Renderiza el NFT Card con un indicador de IPFS si está disponible
+  const renderNFTCard = (asset: EnhancedAsset, index: number) => {
+    return (
+      <motion.div
+        key={asset.id}
+        className="masonry-item mb-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: index * 0.05 }}
+      >
+        <div className="relative">
+          {/* NFT Card estándar */}
+          <NFTCard
+            id={asset.id}
+            name={asset.name}
+            creator={asset.creator}
+            verified={asset.verified}
+            image={asset.image}
+            collection={asset.collection}
+            licenseType={asset.licenseType}
+            description={asset.description}
+            registrationDate={asset.registrationDate}
+            type={asset.type as IPType}
+            templateType={asset.templateType}
+            protectionLevel={asset.protectionLevel}
+          />
+          
+          {/* Indicador de IPFS si está disponible */}
+          {asset.ipfsCid && (
+            <div className="absolute top-3 right-3">
+              <Badge variant="outline" className="bg-background/80 border-teal-500 text-teal-500">
+                <Hexagon className="mr-1 h-3 w-3" />
+                IPFS
+              </Badge>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    )
+  }
+
+  // Renderiza el NFT Card en vista de lista con indicador de IPFS
+  const renderNFTCardList = (asset: EnhancedAsset, index: number) => {
+    return (
+      <motion.div
+        key={asset.id}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2, delay: index * 0.03 }}
+      >
+        <Card className="overflow-hidden">
+          <div className="flex flex-col sm:flex-row">
+            <div className="w-full sm:w-48 h-48 sm:h-auto relative">
+              <Image
+                src={asset.image || "/placeholder.svg"}
+                alt={asset.name}
+                fill
+                className="object-cover"
+              />
+              {asset.ipfsCid && (
+                <div className="absolute top-3 right-3">
+                  <Badge variant="outline" className="bg-background/80 border-teal-500 text-teal-500">
+                    <Hexagon className="mr-1 h-3 w-3" />
+                    IPFS
+                  </Badge>
+                </div>
+              )}
+            </div>
+            <div className="p-4 flex-1 flex flex-col">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="font-semibold text-lg">{asset.name}</h3>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    by {asset.creator}{" "}
+                    {asset.verified && <Verified className="h-3.5 w-3.5 text-blue-400" />}
+                  </p>
+                </div>
+                <Badge variant="outline">{asset.value}</Badge>
+              </div>
+
+              {/* Template Type - Highlighted */}
+              <div className="flex items-center gap-2 p-2 rounded-md border bg-muted/30 mb-3 max-w-xs">
+                <div
+                  className={`rounded-md p-1.5 ${
+                    asset.type === "Art"
+                      ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800/30"
+                      : asset.type === "Audio"
+                        ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/30"
+                        : asset.type === "Software"
+                          ? "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400 border-violet-200 dark:border-violet-800/30"
+                          : asset.type === "NFT"
+                            ? "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400 border-teal-200 dark:border-teal-800/30"
+                            : asset.type === "Patent"
+                              ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/30"
+                              : "bg-gray-100 text-gray-600 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-800/30"
+                  }`}
+                >
+                  {renderTypeIcon(asset.type as IPType)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs text-muted-foreground">Template</div>
+                  <div className="text-sm font-medium truncate" title={asset.templateType}>
+                    {asset.templateType}
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{asset.description}</p>
+
+              <div className="grid grid-cols-3 gap-x-4 gap-y-2 text-sm mb-4">
+                <div>
+                  <span className="text-muted-foreground">Collection:</span>{" "}
+                  <span className="font-medium">{asset.collection}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">License:</span>{" "}
+                  <span className="font-medium">{asset.licenseType}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Registered:</span>{" "}
+                  <span className="font-medium">{asset.registrationDate}</span>
+                </div>
+              </div>
+
+              <div className="mt-auto flex justify-end gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      Actions
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>Asset Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Shield className="mr-2 h-4 w-4" />
+                      <span>Proof of Ownership</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <Send className="mr-2 h-4 w-4" />
+                      <span>Transfer Asset</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <FileCheck className="mr-2 h-4 w-4" />
+                      <span>Licensing Options</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      <span>Asset Dashboard</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer">
+                      <DollarSign className="mr-2 h-4 w-4" />
+                      <span>Monetize</span>
+                    </DropdownMenuItem>
+                    {asset.ipfsCid && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="cursor-pointer">
+                          <Hexagon className="mr-2 h-4 w-4" />
+                          <a
+                            href={`https://gateway.pinata.cloud/ipfs/${asset.ipfsCid}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full"
+                          >
+                            View on IPFS
+                          </a>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Link href={`/assets/${asset.id}`}>
+                  <Button size="sm">
+                    View IP
+                    <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    )
   }
 
   return (
@@ -655,151 +888,11 @@ export default function AssetsPage() {
                 </div>
               ) : viewMode === "grid" ? (
                 <div className="masonry-grid grid grid-cols-3 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {sortedAssets.map((asset, index) => (
-                    <motion.div
-                      key={asset.id}
-                      className="masonry-item mb-6"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
-                      <NFTCard
-                        id={asset.id}
-                        name={asset.name}
-                        creator={asset.creator}
-                        verified={asset.verified}
-                        image={asset.image}
-                        collection={asset.collection}
-                        licenseType={asset.licenseType}
-                        description={asset.description}
-                        registrationDate={asset.registrationDate}
-                        type={asset.type as IPType}
-                        templateType={asset.templateType}
-                        protectionLevel={asset.protectionLevel}
-                      />
-                    </motion.div>
-                  ))}
+                  {sortedAssets.map((asset, index) => renderNFTCard(asset, index))}
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {sortedAssets.map((asset, index) => (
-                    <motion.div
-                      key={asset.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2, delay: index * 0.03 }}
-                    >
-                      <Card className="overflow-hidden">
-                        <div className="flex flex-col sm:flex-row">
-                          <div className="w-full sm:w-48 h-48 sm:h-auto relative">
-                            <Image
-                              src={asset.image || "/placeholder.svg"}
-                              alt={asset.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <div className="p-4 flex-1 flex flex-col">
-                            <div className="flex items-start justify-between mb-3">
-                              <div>
-                                <h3 className="font-semibold text-lg">{asset.name}</h3>
-                                <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                  by {asset.creator}{" "}
-                                  {asset.verified && <Verified className="h-3.5 w-3.5 text-blue-400" />}
-                                </p>
-                              </div>
-                              <Badge variant="outline">{asset.value}</Badge>
-                            </div>
-
-                            {/* Template Type - Highlighted */}
-                            <div className="flex items-center gap-2 p-2 rounded-md border bg-muted/30 mb-3 max-w-xs">
-                              <div
-                                className={`rounded-md p-1.5 ${
-                                  asset.type === "Art"
-                                    ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800/30"
-                                    : asset.type === "Audio"
-                                      ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/30"
-                                      : asset.type === "Software"
-                                        ? "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400 border-violet-200 dark:border-violet-800/30"
-                                        : asset.type === "NFT"
-                                          ? "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400 border-teal-200 dark:border-teal-800/30"
-                                          : asset.type === "Patent"
-                                            ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/30"
-                                            : "bg-gray-100 text-gray-600 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-800/30"
-                                }`}
-                              >
-                                {renderTypeIcon(asset.type as IPType)}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-xs text-muted-foreground">Template</div>
-                                <div className="text-sm font-medium truncate" title={asset.templateType}>
-                                  {asset.templateType}
-                                </div>
-                              </div>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{asset.description}</p>
-
-                            <div className="grid grid-cols-3 gap-x-4 gap-y-2 text-sm mb-4">
-                              <div>
-                                <span className="text-muted-foreground">Collection:</span>{" "}
-                                <span className="font-medium">{asset.collection}</span>
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">License:</span>{" "}
-                                <span className="font-medium">{asset.licenseType}</span>
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">Registered:</span>{" "}
-                                <span className="font-medium">{asset.registrationDate}</span>
-                              </div>
-                            </div>
-
-                            <div className="mt-auto flex justify-end gap-2">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="outline" size="sm">
-                                    Actions
-                                    <ChevronDown className="ml-2 h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56">
-                                  <DropdownMenuLabel>Asset Actions</DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem className="cursor-pointer">
-                                    <Shield className="mr-2 h-4 w-4" />
-                                    <span>Proof of Ownership</span>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem className="cursor-pointer">
-                                    <Send className="mr-2 h-4 w-4" />
-                                    <span>Transfer Asset</span>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem className="cursor-pointer">
-                                    <FileCheck className="mr-2 h-4 w-4" />
-                                    <span>Licensing Options</span>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem className="cursor-pointer">
-                                    <BarChart3 className="mr-2 h-4 w-4" />
-                                    <span>Asset Dashboard</span>
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem className="cursor-pointer">
-                                    <DollarSign className="mr-2 h-4 w-4" />
-                                    <span>Monetize</span>
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                              <Link href={`/assets/${asset.id}`}>
-                                <Button size="sm">
-                                  View IP
-                                  <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                                </Button>
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    </motion.div>
-                  ))}
+                  {sortedAssets.map((asset, index) => renderNFTCardList(asset, index))}
                 </div>
               )}
             </TabsContent>
@@ -816,119 +909,12 @@ export default function AssetsPage() {
               <div className={viewMode === "grid" ? "masonry-grid" : "space-y-4"}>
                 {assets
                   .filter((a) => a.creator === "0xArtist")
-                  .map((asset) => (
+                  .map((asset, index) => (
                     <div key={asset.id} className={viewMode === "grid" ? "masonry-item mb-6" : ""}>
-                      {viewMode === "grid" ? (
-                        <NFTCard
-                          id={asset.id}
-                          name={asset.name}
-                          creator={asset.creator}
-                          verified={asset.verified}
-                          image={asset.image}
-                          collection={asset.collection}
-                          licenseType={asset.licenseType}
-                          description={asset.description}
-                          registrationDate={asset.registrationDate}
-                          type={asset.type as IPType}
-                          templateType={asset.templateType}
-                          protectionLevel={asset.protectionLevel}
-                        />
-                      ) : (
-                        <Card className="overflow-hidden">
-                          <div className="flex flex-col sm:flex-row">
-                            <div className="w-full sm:w-48 h-48 sm:h-auto relative">
-                              <Image
-                                src={asset.image || "/placeholder.svg"}
-                                alt={asset.name}
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                            <div className="p-4 flex-1">
-                              <div className="flex items-start justify-between mb-2">
-                                <div>
-                                  <h3 className="font-semibold text-lg">{asset.name}</h3>
-                                  <p className="text-sm text-muted-foreground flex items-center gap-1">
-                                    by {asset.creator}{" "}
-                                    {asset.verified && <Verified className="h-3.5 w-3.5 text-blue-400" />}
-                                  </p>
-                                </div>
-                                <Badge variant="outline">{asset.value}</Badge>
-                              </div>
-
-                              {/* Template Type - Highlighted */}
-                              <div className="flex items-center gap-2 p-2 rounded-md border bg-muted/30 mb-3 max-w-xs">
-                                <div
-                                  className={`rounded-md p-1.5 ${
-                                    asset.type === "Art"
-                                      ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-                                      : asset.type === "Audio"
-                                        ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-                                        : asset.type === "Software"
-                                          ? "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400"
-                                          : asset.type === "NFT"
-                                            ? "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400"
-                                            : asset.type === "Patent"
-                                              ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
-                                              : "bg-gray-100 text-gray-600 dark:bg-gray-900/30 dark:text-gray-400"
-                                  }`}
-                                >
-                                  {renderTypeIcon(asset.type as IPType)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-xs text-muted-foreground">Template</div>
-                                  <div className="text-sm font-medium truncate" title={asset.templateType}>
-                                    {asset.templateType}
-                                  </div>
-                                </div>
-                              </div>
-
-                              <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{asset.description}</p>
-
-                              <div className="flex justify-end gap-2">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm">
-                                      Actions
-                                      <ChevronDown className="ml-2 h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end" className="w-56">
-                                    <DropdownMenuLabel>Asset Actions</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="cursor-pointer">
-                                      <Shield className="mr-2 h-4 w-4" />
-                                      <span>Proof of Ownership</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer">
-                                      <Send className="mr-2 h-4 w-4" />
-                                      <span>Transfer Asset</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer">
-                                      <FileCheck className="mr-2 h-4 w-4" />
-                                      <span>Licensing Options</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer">
-                                      <BarChart3 className="mr-2 h-4 w-4" />
-                                      <span>Asset Dashboard</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer">
-                                      <DollarSign className="mr-2 h-4 w-4" />
-                                      <span>Monetize</span>
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                                <Link href={`/assets/${asset.id}`}>
-                                  <Button size="sm">
-                                    View IP
-                                    <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                                  </Button>
-                                </Link>
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-                      )}
+                      {viewMode === "grid" 
+                        ? renderNFTCard(asset, index)
+                        : renderNFTCardList(asset, index)
+                      }
                     </div>
                   ))}
               </div>
