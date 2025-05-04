@@ -43,8 +43,60 @@ export function getRecentAssets() {
   ]
 }
 
+// Mock data for user revenue
+export function getUserRevenue(): RevenueData {
+  return {
+    totalRevenue: 12.45,
+    totalClaimed: 9.25,
+    pendingRevenue: 1.8,
+    claimableAmount: 3.2,
+    monthlyData: [
+      { month: "Jan", amount: 0.8, revenue: 0.8, claimed: 0.7 },
+      { month: "Feb", amount: 1.2, revenue: 1.2, claimed: 1.0 },
+      { month: "Mar", amount: 0.9, revenue: 0.9, claimed: 0.8 },
+      { month: "Apr", amount: 1.5, revenue: 1.5, claimed: 1.3 },
+      { month: "May", amount: 2.1, revenue: 2.1, claimed: 1.8 },
+      { month: "Jun", amount: 1.8, revenue: 1.8, claimed: 1.5 },
+      { month: "Jul", amount: 2.4, revenue: 2.4, claimed: 1.9 },
+      { month: "Aug", amount: 1.7, revenue: 1.7, claimed: 0.2 },
+    ],
+    claimableBreakdown: [
+      {
+        id: "001",
+        assetName: "Digital Art Series: Future Cities",
+        description: "Revenue from NFT marketplace sales",
+        amount: 1.2,
+        source: "OpenSea",
+        generatedAt: "2023-08-15T10:30:00Z",
+        expiresAt: "2023-09-15T10:30:00Z",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
+      },
+      {
+        id: "002",
+        assetName: "Electronic Music Album",
+        description: "Streaming royalties",
+        amount: 0.8,
+        source: "Spotify",
+        generatedAt: "2023-08-10T14:45:00Z",
+        expiresAt: "2023-09-10T14:45:00Z",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
+      },
+      {
+        id: "003",
+        assetName: "AI Model: Text Generator",
+        description: "Usage fees",
+        amount: 1.2,
+        source: "API Access",
+        generatedAt: "2023-08-05T09:15:00Z",
+        expiresAt: "2023-09-05T09:15:00Z",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
+      },
+    ],
+  }
+}
+
 // Mock data for user assets
-export function getUserAssets(): Array<Asset & { metadataHash: string; licenseHash: string; nft_contract: string }> {
+export function getUserAssets(): Array<Asset & { metadataHash: string; licenseHash: string; nftContract: string }> {
   return [
       {
         id: "101",
@@ -57,7 +109,7 @@ export function getUserAssets(): Array<Asset & { metadataHash: string; licenseHa
         status: "Active",
         metadataHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc",
         licenseHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
-        nft_contract: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef", 
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
       },
       {
         id: "102",
@@ -70,7 +122,7 @@ export function getUserAssets(): Array<Asset & { metadataHash: string; licenseHa
         status: "Active",
         metadataHash: "0x234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
         licenseHash: "0xbcdef1234567890abcdef1234567890abcdef1234567890abcdef123456789",
-        nft_contract: "0x234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef", 
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
       },
       {
         id: "103",
@@ -83,7 +135,7 @@ export function getUserAssets(): Array<Asset & { metadataHash: string; licenseHa
         status: "Active",
         metadataHash: "0x34567890abcdef1234567890abcdef1234567890abcdef1234567890abcde",
         licenseHash: "0xcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-        nft_contract: "0x34567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef", 
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
       },
       {
         id: "104",
@@ -96,7 +148,7 @@ export function getUserAssets(): Array<Asset & { metadataHash: string; licenseHa
         status: "Pending",
         metadataHash: "0x4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
         licenseHash: "0xdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890a",
-        nft_contract: "0x4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef", 
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
       },
     ];
 }
@@ -111,7 +163,7 @@ export function getClaimHistory(): ClaimHistoryItem[] {
       date: "2023-08-01T14:30:00Z",
       source: "OpenSea",
       status: "Completed",
-      transactionHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      transactionHash: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
     },
     {
       id: "claim-history-002",
@@ -171,7 +223,7 @@ export function getDistributionHistory(): DistributionHistoryItem[] {
       date: "2023-08-01T12:00:00Z",
       recipientCount: 5,
       status: "Completed",
-      transactionHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      transactionHash: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
       recipients: [
         {
           wallet: "0x1234567890abcdef1234567890abcdef12345678",

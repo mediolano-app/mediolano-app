@@ -31,8 +31,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/components/ui/use-toast";
-import { Abi } from "starknet";
-import { useAccount, useContract, useSendTransaction, useTransactionReceipt } from "@starknet-react/core";
+import { Abi, useAccount, useContract, useSendTransaction, useTransactionReceipt } from "@starknet-react/core";
 import { ConnectWallet } from "@/components/ConnectWallet";
 import { ip_revenue_abi } from "@/abis/ip_revenue";
 
@@ -143,7 +142,7 @@ const calls = useMemo(() => {
     !selectedAsset ||
     !address ||
     !contract ||
-    !selectedAsset.nft_contract ||
+    !selectedAsset.nftContract ||
     !selectedAsset.id ||
     !selectedAsset.metadataHash ||
     !selectedAsset.licenseHash ||
@@ -155,7 +154,7 @@ const calls = useMemo(() => {
 
   return [
     contract.populate("create_ip_asset", [
-      selectedAsset.nft_contract,
+      selectedAsset.nftContract,
       selectedAsset.id,
       selectedAsset.metadataHash,
       selectedAsset.licenseHash,

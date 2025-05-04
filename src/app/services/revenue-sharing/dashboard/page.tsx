@@ -1,6 +1,8 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getUserRevenue, getRevenueAnalytics } from "@/app/services/revenue-sharing//lib/mock-data"
+import { getUserRevenue } from "@/app/services/revenue-sharing//lib/mock-data"
 import RevenueOverview from "@/app/services/revenue-sharing/components/revenue-overview"
 import RevenueAnalytics from "@/app/services/revenue-sharing/components/revenue-analytics"
 import ClaimableRevenue from "@/app/services/revenue-sharing/components/claimable-revenue"
@@ -9,10 +11,129 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Download, BarChart3, PieChart, LineChart } from "lucide-react"
 import RevenueNavigation from "@/app/services/revenue-sharing/components/revenue-navigation"
+import { useEffect, useState } from "react"
+import { Abi, useAccount, useContract } from "@starknet-react/core"
+import { ip_revenue_abi } from "@/abis/ip_revenue"
 
 export default function RevenueDashboard() {
-  const revenueData = getUserRevenue()
-  const analytics = getRevenueAnalytics()
+  // const analytics = getRevenueAnalytics();
+  const mockRevenueData = getUserRevenue();
+
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_REVENUE_CONTRACT_ADDRESS as `0x${string}`;
+
+  const { contract } = useContract({ abi: ip_revenue_abi as Abi, address: CONTRACT_ADDRESS });
+  const {address} = useAccount();
+
+  const [revenueData, setRevenueData] = useState<{
+    totalRevenue: number;
+    totalClaimed: number;
+    claimableAmount: number;
+    pendingRevenue: number;
+    claimableBreakdown: Array<{ nftContract: string; tokenId: string; amount: number; source: string }>;
+  } | null>(null);
+  const [analytics, setAnalytics] = useState<{
+    bySource: Array<{ name: string; value: number }>;
+    byAsset: Array<{ name: string; value: number }>;
+    monthly: Array<{ month: string; revenue: number }>;
+  } | undefined>(undefined);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!address || !contract) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        // Fetch revenue data
+        const assetCountResponse = await contract.call('get_user_ip_asset_count', [address]);
+        const assetCount = Number(assetCountResponse);
+        const assets = [];
+        for (let i = 0; i < assetCount; i++) {
+          const [nftContract, tokenId] = await contract.call('get_user_ip_asset', [address, i]);
+          assets.push({ nftContract: nftContract.toString(), tokenId: tokenId.toString() });
+        }
+
+        let totalRevenue = 0;
+        let totalClaimed = 0;
+        let claimableAmount = 0;
+        let pendingRevenue = 0;
+        const claimableBreakdown = [];
+
+        for (const { nftContract, tokenId } of assets) {
+          const sharesResponse = await contract.call('get_fractional_shares', [nftContract, tokenId, address]);
+          const claimedResponse = await contract.call('get_claimed_revenue', [nftContract, tokenId, address]);
+          const listingResponse = await contract.call('get_listing', [nftContract, tokenId]);
+
+          const shares = Number(sharesResponse);
+          const claimed = Number(claimedResponse);
+          const listing = listingResponse as any; // Adjust based on ABI structure
+          const totalShares = Number(listing.fractional.total_shares);
+          const accruedRevenue = Number(listing.fractional.accrued_revenue);
+
+          const userRevenue = (accruedRevenue * shares) / totalShares;
+          const claimable = userRevenue - claimed;
+
+          totalRevenue += userRevenue / 1e18;
+          totalClaimed += claimed / 1e18;
+          claimableAmount += claimable / 1e18;
+          pendingRevenue += claimable > 0 ? 0 : userRevenue / 1e18;
+
+          if (claimable > 0) {
+            claimableBreakdown.push({
+              nftContract,
+              tokenId,
+              amount: claimable / 1e18,
+              source: `NFT ${tokenId}`,
+            });
+          }
+        }
+
+        setRevenueData({
+          totalRevenue: Number(totalRevenue.toFixed(4)),
+          totalClaimed: Number(totalClaimed.toFixed(4)),
+          claimableAmount: Number(claimableAmount.toFixed(4)),
+          pendingRevenue: Number(pendingRevenue.toFixed(4)),
+          claimableBreakdown,
+        });
+
+        // Fetch analytics data
+        const bySource = [];
+        const byAsset = [];
+        const monthly = [];
+
+        for (const { nftContract, tokenId } of assets) {
+          const listingResponse = await contract.call('get_listing', [nftContract, tokenId]);
+          const listing = listingResponse as any;
+          const revenue = Number(listing.fractional.accrued_revenue) / 1e18;
+          bySource.push({ name: `NFT ${tokenId}`, value: revenue });
+          byAsset.push({ name: `NFT ${tokenId}`, value: revenue });
+        }
+
+        // Mock monthly data (since contract doesn't store historical data)
+        const now = new Date();
+        for (let i = 4; i >= 0; i--) {
+          const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          monthly.push({
+            month: date.toLocaleString('default', { month: 'short', year: 'numeric' }),
+            revenue: Number((Math.random() * 10).toFixed(2)),
+          });
+        }
+
+        setAnalytics({ bySource, byAsset, monthly });
+      } catch (err) {
+        setError('Failed to load data. Please ensure your wallet is connected.');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [contract]);
 
   return (
     <div className="container mx-auto px-4 py-10">
@@ -41,7 +162,7 @@ export default function RevenueDashboard() {
             <CardTitle className="text-sm font-medium text-gray-500">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{revenueData.totalRevenue} ETH</div>
+            <div className="text-3xl font-bold">{revenueData?.totalRevenue ?? 0} ETH</div>
             <p className="text-xs text-gray-500 mt-1">Lifetime earnings</p>
           </CardContent>
         </Card>
@@ -51,7 +172,7 @@ export default function RevenueDashboard() {
             <CardTitle className="text-sm font-medium text-gray-500">Total Claimed</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{revenueData.totalClaimed} ETH</div>
+            <div className="text-3xl font-bold">{revenueData?.totalClaimed ?? 0} ETH</div>
             <p className="text-xs text-gray-500 mt-1">Successfully claimed</p>
           </CardContent>
         </Card>
@@ -61,7 +182,7 @@ export default function RevenueDashboard() {
             <CardTitle className="text-sm font-medium text-gray-500">Available to Claim</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{revenueData.claimableAmount} ETH</div>
+            <div className="text-3xl font-bold">{revenueData?.claimableAmount ?? 0} ETH</div>
             <p className="text-xs text-gray-500 mt-1">Ready for claiming</p>
           </CardContent>
         </Card>
@@ -71,7 +192,7 @@ export default function RevenueDashboard() {
             <CardTitle className="text-sm font-medium text-gray-500">Pending Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{revenueData.pendingRevenue} ETH</div>
+            <div className="text-3xl font-bold">{revenueData?.pendingRevenue ?? 0} ETH</div>
             <p className="text-xs text-gray-500 mt-1">Generated but not yet claimable</p>
           </CardContent>
         </Card>
@@ -100,7 +221,7 @@ export default function RevenueDashboard() {
                 <CardDescription>Revenue available for you to claim</CardDescription>
               </CardHeader>
               <CardContent>
-                <ClaimableRevenue data={revenueData.claimableBreakdown} />
+                <ClaimableRevenue data={revenueData?.claimableBreakdown ?? mockRevenueData.claimableBreakdown} />
                 <div className="mt-4 text-center">
                   <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
                     <Link href="/services/revenue-sharing/claim">
@@ -139,7 +260,7 @@ export default function RevenueDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {analytics.bySource.map((source, index) => (
+              {analytics?.bySource.map((source, index) => (
                 <div key={source.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div
@@ -162,7 +283,7 @@ export default function RevenueDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {analytics.byAsset.map((asset) => (
+              {analytics?.byAsset.map((asset) => (
                 <div key={asset.name} className="space-y-1">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">{asset.name}</span>
@@ -171,7 +292,7 @@ export default function RevenueDashboard() {
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-emerald-600"
-                      style={{ width: `${(asset.value / analytics.byAsset[0].value) * 100}%` }}
+                      style={{ width: `${(asset.value / analytics?.byAsset[0].value) * 100}%` }}
                     ></div>
                   </div>
                 </div>
@@ -187,7 +308,7 @@ export default function RevenueDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {analytics.monthly.slice(-5).map((month) => (
+              {analytics?.monthly.slice(-5).map((month) => (
                 <div key={month.month} className="space-y-1">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">{month.month}</span>
@@ -197,7 +318,7 @@ export default function RevenueDashboard() {
                     <div
                       className="h-full bg-emerald-600"
                       style={{
-                        width: `${(month.revenue / Math.max(...analytics.monthly.map((m) => m.revenue))) * 100}%`,
+                        width: `${(month.revenue / Math.max(...analytics?.monthly.map((m) => m.revenue))) * 100}%`,
                       }}
                     ></div>
                   </div>
