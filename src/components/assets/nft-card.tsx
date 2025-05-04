@@ -38,6 +38,7 @@ import type { Asset, IPType } from "@/types/asset"
 
 interface NFTCardProps extends Partial<Asset> {
   className?: string
+  ipfsCid?: string // Añadido para soportar IPFS
 }
 
 export default function NFTCard({
@@ -54,6 +55,7 @@ export default function NFTCard({
   templateType = "Standard Art",
   protectionLevel = 90,
   value = "0.85 ETH",
+  ipfsCid, // Nuevo campo para CID de IPFS
   className,
 }: NFTCardProps) {
   const getTypeIcon = (type: IPType) => {
@@ -101,7 +103,7 @@ export default function NFTCard({
 
   return (
     <Card className={cn("overflow-hidden transition-all duration-300 hover:shadow-md", className)}>
-      {/* Image */}
+      {/* Image with IPFS badge indicator */}
       <div className="aspect-video relative overflow-hidden">
         <Image
           src={image || "/background.jpg"}
@@ -110,6 +112,16 @@ export default function NFTCard({
           className="object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
+        
+        {/* IPFS Badge Indicator */}
+        {ipfsCid && (
+          <div className="absolute top-3 right-3">
+            <Badge variant="outline" className="bg-background/80 border-teal-500 text-teal-500">
+              <Hexagon className="mr-1 h-3 w-3" />
+              IPFS
+            </Badge>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -198,6 +210,18 @@ export default function NFTCard({
               <BarChart3 className="mr-2 h-4 w-4" />
               <span>Asset Dashboard</span>
             </DropdownMenuItem>
+
+            {/* IPFS specific actions for assets with CID */}
+            {ipfsCid && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">
+                  <Hexagon className="mr-2 h-4 w-4 text-teal-500" />
+                  <span>View on IPFS</span>
+                </DropdownMenuItem>
+              </>
+            )}
+
             <DropdownMenuItem className="cursor-pointer">
               <DollarSign className="mr-2 h-4 w-4" />
               <span>Monetize</span>
@@ -206,5 +230,5 @@ export default function NFTCard({
         </DropdownMenu>
       </CardFooter>
     </Card>
-  )
+  )                                                                                             
 }
