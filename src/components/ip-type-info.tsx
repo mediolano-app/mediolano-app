@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -41,9 +41,10 @@ import {
   Lightbulb,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { fetchIPFSMetadata, determineIPType, getKnownCids, combineData, AssetType, IPFSMetadata } from "@/utils/ipfs"
 
 // Define the possible IP types
-type IPType =
+export type IPType =
   | "Audio"
   | "Art"
   | "Documents"
@@ -55,9 +56,15 @@ type IPType =
   | "RWA"
   | "Software"
   | "Custom"
+  | "Generic";
+
+// Define el tipo para los datos de cada tipo de IP
+export type IPTypeDataType = {
+  [key: string]: any;
+};
 
 // Mock data for each IP type
-const mockIPTypeData = {
+const mockIPTypeData: Record<string, IPTypeDataType> = {
   Audio: {
     duration: "3:45",
     genre: "Electronic",
@@ -206,21 +213,101 @@ const mockIPTypeData = {
     maintenanceSchedule: "Quarterly",
     components: ["Visual Display", "Audio System", "Motion Sensors", "Custom Software"],
   },
-}
+  Generic: {
+    type: "Generic IP",
+    registrationDate: "2025-01-01",
+    createdAt: "2024-12-25",
+    creator: "Unknown Creator",
+    format: "Digital",
+    license: "Standard",
+    notes: "Generic metadata for fallback purposes",
+  },
+};
 
 interface IPTypeInfoProps {
-  asset: any // In a real app, you would define a proper type for the asset
+  asset: AssetType; // Asegúrate de importar este tipo desde utils/ipfs.ts
 }
 
 export function IPTypeInfo({ asset }: IPTypeInfoProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [activeTab, setActiveTab] = useState("details")
+  const [isLoading, setIsLoading] = useState(true)
+  const [ipfsMetadata, setIpfsMetadata] = useState<IPFSMetadata | null>(null)
+  const [mergedData, setMergedData] = useState<AssetType | null>(null)
+  const [ipType, setIpType] = useState<IPType>("Generic")
+  const [ipfsError, setIpfsError] = useState<Error | null>(null)
 
-  // In a real app, you would extract the IP type from the asset metadata
-  // For now, we'll determine it based on the asset name or other properties
-  const determineIPType = (asset: any): IPType => {
-    const name = asset.name.toLowerCase()
+  useEffect(() => {
+    async function loadIPFSData() {
+      if (!asset) {
+        setIsLoading(false)
+        return
+      }
+
+      setIsLoading(true)
+      try {
+        // Verifica si el asset tiene un CID directamente
+        let cid = asset.ipfsCid
+        
+        // Si no tiene CID, comprueba en los CIDs conocidos
+        if (!cid) {
+          const knownCids = getKnownCids()
+          cid = knownCids[asset.id]
+        }
+        
+        // Si tenemos un CID, intentamos obtener los datos de IPFS
+        let fetchedMetadata: IPFSMetadata | null = null
+        if (cid) {
+          fetchedMetadata = await fetchIPFSMetadata(cid)
+        }
+        
+        if (fetchedMetadata) {
+          // Determinar tipo basado en los metadatos de IPFS
+          const detectedType = determineIPType(fetchedMetadata) as IPType
+          
+          // Combinar los datos IPFS con los datos mock
+          const finalData = combineData(fetchedMetadata, asset)
+          
+          setIpfsMetadata(fetchedMetadata)
+          setMergedData(finalData)
+          setIpType(detectedType)
+        } else {
+          // Fallback a los datos mock y determinación de tipo basada en el nombre
+          let detectedType = determineTypeFromAsset(asset)
+          
+          setIpfsMetadata(null)
+          setMergedData(asset)
+          setIpType(detectedType)
+        }
+      } catch (error) {
+        console.error("Error loading IPFS data:", error)
+        setIpfsError(error as Error)
+        
+        // En caso de error, utilizamos la determinación de tipo por nombre
+        const fallbackType = determineTypeFromAsset(asset)
+        
+        setIpfsMetadata(null)
+        setMergedData(asset)
+        setIpType(fallbackType)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    loadIPFSData()
+  }, [asset])
+
+  // Determinar el tipo de IP basado en el nombre del asset (método fallback)
+  const determineTypeFromAsset = (asset: AssetType): IPType => {
+    if (!asset) return "Generic"
+    
+    // Si el asset ya tiene un tipo definido, lo usamos
+    if (asset.type && Object.keys(mockIPTypeData).includes(asset.type)) {
+      return asset.type as IPType
+    }
+    
+    const name = asset.name ? asset.name.toLowerCase() : ""
 
     if (name.includes("audio") || name.includes("music") || name.includes("sound")) return "Audio"
     if (name.includes("art") || name.includes("painting") || name.includes("abstract")) return "Art"
@@ -233,7 +320,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
     if (name.includes("real") || name.includes("property") || name.includes("asset")) return "RWA"
     if (name.includes("software") || name.includes("app") || name.includes("code")) return "Software"
 
-    // For demo purposes, we'll assign types based on asset ID to show different templates
+    // Para fines de demostración, asignamos tipos basados en el ID del asset para mostrar diferentes plantillas
     const id = Number.parseInt(asset.id)
     const types: IPType[] = [
       "Audio",
@@ -251,8 +338,22 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
     return types[id % types.length]
   }
 
-  const ipType = determineIPType(asset)
-  const typeData = mockIPTypeData[ipType]
+  // Combina datos de IPFS (si existen) con datos mock para el tipo de IP
+  const getTypeData = (): IPTypeDataType => {
+    // Si no hay datos, retorna los datos mock para el tipo
+    if (!mergedData) {
+      return mockIPTypeData[ipType] || mockIPTypeData.Generic;
+    }
+    
+    // Combina los datos mock específicos del tipo con los datos del asset
+    return {
+      ...mockIPTypeData[ipType],
+      ...(ipfsMetadata || {}),
+    };
+  }
+
+  // Obtiene el typeData combinado
+  const typeData = getTypeData()
 
   // Get the icon for the IP type
   const getIconComponent = (type: IPType) => {
@@ -366,6 +467,24 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
 
   const colorClasses = getColorClasses(ipType)
 
+  // Mostrar indicador de carga mientras se recuperan los datos
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader className="animate-pulse">
+          <div className="h-6 w-32 bg-muted rounded"></div>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div className="h-4 w-full bg-muted rounded"></div>
+            <div className="h-4 w-3/4 bg-muted rounded"></div>
+            <div className="h-4 w-1/2 bg-muted rounded"></div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   // Render different content based on IP type
   const renderIPTypeContent = () => {
     switch (ipType) {
@@ -442,7 +561,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               <h3 className="font-medium">Technical Information</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Sample Rate</p>
+                <p className="text-sm text-muted-foreground">Sample Rate</p>
                   <p className="font-medium">{typeData.sampleRate}</p>
                 </div>
                 <div className="space-y-1">
@@ -511,7 +630,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="space-y-2">
               <h3 className="font-medium">Color Palette</h3>
               <div className="flex gap-2">
-                {typeData.colorPalette.map((color, index) => (
+                {typeData.colorPalette && Array.isArray(typeData.colorPalette) && typeData.colorPalette.map((color, index) => (
                   <div key={index} className="flex flex-col items-center">
                     <div className="h-8 w-8 rounded-full border" style={{ backgroundColor: color }}></div>
                     <span className="text-xs mt-1">{color}</span>
@@ -544,7 +663,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Materials</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.materials.map((material, index) => (
+                    {typeData.materials && Array.isArray(typeData.materials) && typeData.materials.map((material, index) => (
                       <Badge key={index} variant="outline">
                         {material}
                       </Badge>
@@ -621,7 +740,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="space-y-2">
               <h3 className="font-medium">Traits</h3>
               <div className="grid grid-cols-3 gap-2">
-                {typeData.traits.map((trait, index) => (
+                {typeData.traits && Array.isArray(typeData.traits) && typeData.traits.map((trait, index) => (
                   <div key={index} className="rounded-lg border p-2 text-center">
                     <p className="text-xs text-muted-foreground">{trait.trait_type}</p>
                     <p className="font-medium truncate">{trait.value}</p>
@@ -654,7 +773,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="flex justify-end gap-2">
               <Button variant="outline" className="flex items-center gap-2">
                 <ExternalLink className="h-4 w-4" />
-                View on {typeData.marketplace}
+                View on {typeData.marketplace || "Marketplace"}
               </Button>
               <Button variant="outline" className="flex items-center gap-2">
                 <ExternalLink className="h-4 w-4" />
@@ -734,7 +853,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Cast</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.cast.map((actor, index) => (
+                    {typeData.cast && Array.isArray(typeData.cast) && typeData.cast.map((actor, index) => (
                       <Badge key={index} variant="outline">
                         {actor}
                       </Badge>
@@ -745,7 +864,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                   <p className="text-sm text-muted-foreground">Language & Subtitles</p>
                   <p className="font-medium">{typeData.language}</p>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {typeData.subtitles.map((language, index) => (
+                    {typeData.subtitles && Array.isArray(typeData.subtitles) && typeData.subtitles.map((language, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
                         {language}
                       </Badge>
@@ -763,409 +882,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               <Button variant="outline" className="flex items-center gap-2">
                 <ExternalLink className="h-4 w-4" />
                 View Full Video
-              </Button>
-            </div>
-          </div>
-        )
-
-      case "Patents":
-        return (
-          <div className="space-y-4">
-            <div className={cn("rounded-lg p-4", colorClasses.bgLight)}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Award className={colorClasses.text} />
-                  <h3 className="font-medium">Patent Information</h3>
-                </div>
-                <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-                  {typeData.status}
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Patent Number</p>
-                  <p className="font-medium">{typeData.patentNumber}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Patent Type</p>
-                  <p className="font-medium">{typeData.patentType}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Filing Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {typeData.filingDate}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Grant Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {typeData.grantDate}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Inventors & Assignee</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Inventors</p>
-                  <div className="flex flex-wrap gap-1">
-                    {typeData.inventors.map((inventor, index) => (
-                      <Badge key={index} variant="outline">
-                        {inventor}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Assignee</p>
-                  <p className="font-medium">{typeData.assignee}</p>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Jurisdiction</p>
-                <p className="font-medium flex items-center gap-1">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  {typeData.jurisdiction}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Classification</p>
-                <p className="font-medium">{typeData.classification}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Expiration Date</p>
-                <p className="font-medium flex items-center gap-1">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  {typeData.expirationDate}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Claims</p>
-                <p className="font-medium">{typeData.claims}</p>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Download Patent PDF
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4" />
-                View Claims
-              </Button>
-            </div>
-          </div>
-        )
-
-      case "Posts":
-        return (
-          <div className="space-y-4">
-            <div className={cn("rounded-lg p-4", colorClasses.bgLight)}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <MessageSquare className={colorClasses.text} />
-                  <h3 className="font-medium">Post Information</h3>
-                </div>
-                <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-                  {typeData.platform}
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Publication Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {typeData.publicationDate}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Last Updated</p>
-                  <p className="font-medium">{typeData.lastUpdated}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Word Count</p>
-                  <p className="font-medium">{typeData.wordCount}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Read Time</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    {typeData.readTime}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Categories & Tags</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Category</p>
-                  <p className="font-medium">{typeData.category}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Tags</p>
-                  <div className="flex flex-wrap gap-1">
-                    {typeData.tags.map((tag, index) => (
-                      <Badge key={index} variant="outline">
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Engagement</h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Views</p>
-                  <p className="font-medium">{typeData.views.toLocaleString()}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Likes</p>
-                  <p className="font-medium">{typeData.likes.toLocaleString()}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Comments</p>
-                  <p className="font-medium">{typeData.comments.toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                View Original Post
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Download as PDF
-              </Button>
-            </div>
-          </div>
-        )
-
-      case "Publications":
-        return (
-          <div className="space-y-4">
-            <div className={cn("rounded-lg p-4", colorClasses.bgLight)}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <BookOpen className={colorClasses.text} />
-                  <h3 className="font-medium">Publication Information</h3>
-                </div>
-                <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-                  {typeData.publicationType}
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Publisher</p>
-                  <p className="font-medium">{typeData.publisher}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Publication Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {typeData.publicationDate}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">ISBN</p>
-                  <p className="font-medium">{typeData.isbn}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Edition</p>
-                  <p className="font-medium">{typeData.edition}</p>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Page Count</p>
-                <p className="font-medium">{typeData.pageCount}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Language</p>
-                <p className="font-medium">{typeData.language}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Genre</p>
-                <p className="font-medium">{typeData.genre}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Average Rating</p>
-                <p className="font-medium">{typeData.reviews} / 5</p>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Available Formats</h3>
-              <div className="flex flex-wrap gap-2">
-                {typeData.format.map((format, index) => (
-                  <Badge key={index} variant="outline">
-                    {format}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Contributors</h3>
-              <ul className="space-y-1">
-                {typeData.contributors.map((contributor, index) => (
-                  <li key={index} className="text-sm">
-                    {contributor}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <BookMarked className="h-4 w-4" />
-                Preview Contents
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                Publisher Page
-              </Button>
-            </div>
-          </div>
-        )
-
-      case "RWA":
-        return (
-          <div className="space-y-4">
-            <div className={cn("rounded-lg p-4", colorClasses.bgLight)}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Building className={colorClasses.text} />
-                  <h3 className="font-medium">Real World Asset Information</h3>
-                </div>
-                <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-                  {typeData.assetType}
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Location</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Globe className="h-4 w-4 text-muted-foreground" />
-                    {typeData.location}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Value</p>
-                  <p className="font-medium">{typeData.value}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Acquisition Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {typeData.acquisitionDate}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Tokenization Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {typeData.tokenizationDate}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Tokenization Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Fractionalized</p>
-                  <p className="font-medium">{typeData.fractionalized ? "Yes" : "No"}</p>
-                </div>
-                {typeData.fractionalized && (
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Total Shares</p>
-                    <p className="font-medium">{typeData.totalShares.toLocaleString()}</p>
-                  </div>
-                )}
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Custodian</p>
-                  <p className="font-medium">{typeData.custodian}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Last Valuation</p>
-                  <p className="font-medium">{typeData.lastValuation}</p>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Regulatory & Insurance</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Regulatory Compliance</p>
-                  <div className="flex flex-wrap gap-1">
-                    {typeData.regulatoryCompliance.map((reg, index) => (
-                      <Badge key={index} variant="outline">
-                        {reg}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Insurance Policy</p>
-                  <p className="font-medium">{typeData.insurancePolicy}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Appreciation Rate</p>
-              <p className="font-medium">{typeData.appreciationRate}</p>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Landmark className="h-4 w-4" />
-                View Ownership Records
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Scale className="h-4 w-4" />
-                View Legal Documents
               </Button>
             </div>
           </div>
@@ -1204,7 +920,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Platforms</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.platforms.map((platform, index) => (
+                    {typeData.platforms && Array.isArray(typeData.platforms) && typeData.platforms.map((platform, index) => (
                       <Badge key={index} variant="outline">
                         {platform}
                       </Badge>
@@ -1222,7 +938,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Programming Languages</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.programmingLanguages.map((lang, index) => (
+                    {typeData.programmingLanguages && Array.isArray(typeData.programmingLanguages) && typeData.programmingLanguages.map((lang, index) => (
                       <Badge key={index} variant="outline">
                         {lang}
                       </Badge>
@@ -1232,7 +948,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Dependencies</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.dependencies.map((dep, index) => (
+                    {typeData.dependencies && Array.isArray(typeData.dependencies) && typeData.dependencies.map((dep, index) => (
                       <Badge key={index} variant="outline">
                         {dep}
                       </Badge>
@@ -1247,7 +963,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="space-y-2">
               <h3 className="font-medium">Features</h3>
               <div className="flex flex-wrap gap-1">
-                {typeData.features.map((feature, index) => (
+                {typeData.features && Array.isArray(typeData.features) && typeData.features.map((feature, index) => (
                   <Badge key={index} variant="outline">
                     {feature}
                   </Badge>
@@ -1260,26 +976,30 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="space-y-2">
               <h3 className="font-medium">Resources</h3>
               <div className="grid grid-cols-1 gap-2">
-                <div className="flex items-center justify-between rounded-md border p-2">
-                  <div className="flex items-center gap-2">
-                    <FileCode className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">Source Code Repository</span>
+                {typeData.sourceCodeRepository && (
+                  <div className="flex items-center justify-between rounded-md border p-2">
+                    <div className="flex items-center gap-2">
+                      <FileCode className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">Source Code Repository</span>
+                    </div>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1">
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span className="text-xs">GitHub</span>
+                    </Button>
                   </div>
-                  <Button variant="ghost" size="sm" className="h-8 gap-1">
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    <span className="text-xs">GitHub</span>
-                  </Button>
-                </div>
-                <div className="flex items-center justify-between rounded-md border p-2">
-                  <div className="flex items-center gap-2">
-                    <Database className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">API Documentation</span>
+                )}
+                {typeData.apiDocumentation && (
+                  <div className="flex items-center justify-between rounded-md border p-2">
+                    <div className="flex items-center gap-2">
+                      <Database className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">API Documentation</span>
+                    </div>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1">
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      <span className="text-xs">View Docs</span>
+                    </Button>
                   </div>
-                  <Button variant="ghost" size="sm" className="h-8 gap-1">
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    <span className="text-xs">View Docs</span>
-                  </Button>
-                </div>
+                )}
               </div>
             </div>
 
@@ -1296,107 +1016,48 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
           </div>
         )
 
-      case "Custom":
+      default:
+        // Generic fallback template para cualquier otro tipo
         return (
           <div className="space-y-4">
-            <div className={cn("rounded-lg p-4", colorClasses.bgLight)}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Settings className={colorClasses.text} />
-                  <h3 className="font-medium">Custom IP Information</h3>
-                </div>
-                <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-                  {typeData.customType}
-                </Badge>
-              </div>
-
+            {/* Mostrar alerta si se han obtenido datos desde IPFS */}
+            {ipfsMetadata && (
               <Alert>
                 <Info className="h-4 w-4" />
                 <AlertDescription>
-                  This is a custom IP type with specialized metadata fields tailored to this specific asset.
+                  This asset's metadata was retrieved from IPFS {asset.ipfsCid ? "(" + asset.ipfsCid.substring(0, 8) + "...)" : ""}.
                 </AlertDescription>
               </Alert>
-            </div>
-
+            )}
+            
+            {/* Mostrar mensaje si hubo un error al obtener datos de IPFS */}
+            {ipfsError && (
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Using fallback metadata. Could not retrieve data from IPFS.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Dimensions</p>
-                <p className="font-medium">{typeData.dimensions}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Creation Date</p>
-                <p className="font-medium flex items-center gap-1">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  {typeData.creationDate}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Exhibition</p>
-                <p className="font-medium">{typeData.exhibition}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Interactive</p>
-                <p className="font-medium">{typeData.interactivity ? "Yes" : "No"}</p>
-              </div>
+              {/* Mostrar datos disponibles de forma dinámica */}
+              {typeData && Object.entries(typeData)
+                .filter(([key]) => !['id', 'image', 'name', 'description'].includes(key))
+                .map(([key, value]) => {
+                  // Comprobar si el valor es un objeto o un array
+                  if (typeof value === 'object' && value !== null) {
+                    return null // Saltarse objetos complejos o manejarlos según sea necesario
+                  }
+                  
+                  return (
+                    <div key={key} className="space-y-1">
+                      <p className="text-sm text-muted-foreground capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
+                      <p className="font-medium">{String(value)}</p>
+                    </div>
+                  )
+                })}
             </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Materials</h3>
-              <div className="flex flex-wrap gap-1">
-                {typeData.materials.map((material, index) => (
-                  <Badge key={index} variant="outline">
-                    {material}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Components</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {typeData.components.map((component, index) => (
-                  <div key={index} className="flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground"></span>
-                    <span className="text-sm">{component}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Power Requirements</p>
-                <p className="font-medium">{typeData.powerRequirements}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Maintenance</p>
-                <p className="font-medium">{typeData.maintenanceSchedule}</p>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Installation Guide
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Layers className="h-4 w-4" />
-                View Components
-              </Button>
-            </div>
-          </div>
-        )
-
-      default:
-        return (
-          <div className="p-4 text-center">
-            <p className="text-muted-foreground">No template-specific information available for this asset.</p>
           </div>
         )
     }
@@ -1416,6 +1077,14 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             #{asset.id}
           </Badge>
         </div>
+        
+        {/* Mostrar indicador de datos de IPFS si están disponibles */}
+        {ipfsMetadata && (
+          <div className="mt-2 flex items-center text-xs text-muted-foreground">
+            <Hexagon className="h-3 w-3 mr-1" />
+            <span>IPFS Metadata Available</span>
+          </div>
+        )}
       </CardHeader>
       <CardContent className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -1428,7 +1097,8 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
           </TabsContent>
           <TabsContent value="metadata" className="mt-4">
             <div className="rounded-lg border bg-muted/20 p-4 font-mono text-sm overflow-auto max-h-[400px]">
-              <pre>{JSON.stringify(typeData, null, 2)}</pre>
+              {/* Mostrar metadatos de IPFS si están disponibles, o metadata combinados */}
+              <pre>{JSON.stringify(ipfsMetadata || typeData, null, 2)}</pre>
             </div>
           </TabsContent>
         </Tabs>
