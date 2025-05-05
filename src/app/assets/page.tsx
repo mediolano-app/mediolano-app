@@ -57,7 +57,10 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import type { IPType } from "@/types/asset"
-import { getKnownCids, AssetType } from "@/utils/ipfs"
+import { 
+  getKnownCids, 
+  loadIPFSMetadataInBackground 
+} from '@/utils/ipfs';
 
 // temporary data - would be mixed with IPFS data if is necessary
 import { assets as mockAssets, recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
@@ -93,31 +96,45 @@ export default function AssetsPage() {
   console.log(assets);
 
   useEffect(() => {
+    // Cargar datos y enriquecerlos con información de IPFS
     const loadAssetsWithIPFS = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const knownCids = getKnownCids()
+        // Obtener los CIDs conocidos
+        const knownCids = getKnownCids();
 
+        // Enriquecer los assets mock con información de IPFS
         const enhancedAssets = mockAssets.map((asset) => {
-          const ipfsCid = knownCids[asset.id] || null
+          const ipfsCid = knownCids[asset.id] || null;
           
+          // Retornar el asset enriquecido
           return {
             ...asset,
             ...(ipfsCid && { ipfsCid })
-          } as EnhancedAsset
-        })
+          } as EnhancedAsset;
+        });
 
-        setAssets(enhancedAssets)
+        // Actualizar el estado con los assets enriquecidos inmediatamente
+        setAssets(enhancedAssets);
+        setLoading(false);
+
+        // Cargar metadatos de IPFS en segundo plano
+        loadIPFSMetadataInBackground(
+          enhancedAssets,
+          (updatedAssets) => {
+            setAssets(updatedAssets);
+          }
+        );
       } catch (error) {
-        console.error("Error loading assets with IPFS data:", error)
-        setAssets(mockAssets as EnhancedAsset[])
-      } finally {
-        setLoading(false)
+        console.error("Error loading assets with IPFS data:", error);
+        // En caso de error, usar los datos mock sin modificar
+        setAssets(mockAssets as EnhancedAsset[]);
+        setLoading(false);
       }
-    }
+    };
 
-    loadAssetsWithIPFS()
-  }, [])
+    loadAssetsWithIPFS();
+  }, []);
 
 
 
