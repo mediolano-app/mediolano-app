@@ -58,7 +58,6 @@ export type IPType =
   | "Custom"
   | "Generic";
 
-// Define el tipo para los datos de cada tipo de IP
 export type IPTypeDataType = {
   [key: string]: any;
 };
@@ -225,7 +224,7 @@ const mockIPTypeData: Record<string, IPTypeDataType> = {
 };
 
 interface IPTypeInfoProps {
-  asset: AssetType; // Asegúrate de importar este tipo desde utils/ipfs.ts
+  asset: AssetType; 
 }
 
 export function IPTypeInfo({ asset }: IPTypeInfoProps) {
@@ -247,33 +246,27 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
 
       setIsLoading(true)
       try {
-        // Verifica si el asset tiene un CID directamente
         let cid = asset.ipfsCid
         
-        // Si no tiene CID, comprueba en los CIDs conocidos
         if (!cid) {
           const knownCids = getKnownCids()
           cid = knownCids[asset.id]
         }
         
-        // Si tenemos un CID, intentamos obtener los datos de IPFS
         let fetchedMetadata: IPFSMetadata | null = null
         if (cid) {
           fetchedMetadata = await fetchIPFSMetadata(cid)
         }
         
         if (fetchedMetadata) {
-          // Determinar tipo basado en los metadatos de IPFS
           const detectedType = determineIPType(fetchedMetadata) as IPType
           
-          // Combinar los datos IPFS con los datos mock
           const finalData = combineData(fetchedMetadata, asset)
           
           setIpfsMetadata(fetchedMetadata)
           setMergedData(finalData)
           setIpType(detectedType)
         } else {
-          // Fallback a los datos mock y determinación de tipo basada en el nombre
           let detectedType = determineTypeFromAsset(asset)
           
           setIpfsMetadata(null)
@@ -284,7 +277,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         console.error("Error loading IPFS data:", error)
         setIpfsError(error as Error)
         
-        // En caso de error, utilizamos la determinación de tipo por nombre
         const fallbackType = determineTypeFromAsset(asset)
         
         setIpfsMetadata(null)
@@ -298,11 +290,9 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
     loadIPFSData()
   }, [asset])
 
-  // Determinar el tipo de IP basado en el nombre del asset (método fallback)
   const determineTypeFromAsset = (asset: AssetType): IPType => {
     if (!asset) return "Generic"
     
-    // Si el asset ya tiene un tipo definido, lo usamos
     if (asset.type && Object.keys(mockIPTypeData).includes(asset.type)) {
       return asset.type as IPType
     }
@@ -320,7 +310,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
     if (name.includes("real") || name.includes("property") || name.includes("asset")) return "RWA"
     if (name.includes("software") || name.includes("app") || name.includes("code")) return "Software"
 
-    // Para fines de demostración, asignamos tipos basados en el ID del asset para mostrar diferentes plantillas
     const id = Number.parseInt(asset.id)
     const types: IPType[] = [
       "Audio",
@@ -338,24 +327,19 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
     return types[id % types.length]
   }
 
-  // Combina datos de IPFS (si existen) con datos mock para el tipo de IP
   const getTypeData = (): IPTypeDataType => {
-    // Si no hay datos, retorna los datos mock para el tipo
     if (!mergedData) {
       return mockIPTypeData[ipType] || mockIPTypeData.Generic;
     }
     
-    // Combina los datos mock específicos del tipo con los datos del asset
     return {
       ...mockIPTypeData[ipType],
       ...(ipfsMetadata || {}),
     };
   }
 
-  // Obtiene el typeData combinado
   const typeData = getTypeData()
 
-  // Get the icon for the IP type
   const getIconComponent = (type: IPType) => {
     switch (type) {
       case "Audio":
@@ -387,7 +371,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
 
   const IconComponent = getIconComponent(ipType)
 
-  // Get color classes for the IP type
   const getColorClasses = (type: IPType) => {
     switch (type) {
       case "Audio":
@@ -467,7 +450,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
 
   const colorClasses = getColorClasses(ipType)
 
-  // Mostrar indicador de carga mientras se recuperan los datos
   if (isLoading) {
     return (
       <Card>
@@ -485,7 +467,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
     )
   }
 
-  // Render different content based on IP type
   const renderIPTypeContent = () => {
     switch (ipType) {
       case "Audio":
@@ -1017,10 +998,8 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         )
 
       default:
-        // Generic fallback template para cualquier otro tipo
         return (
           <div className="space-y-4">
-            {/* Mostrar alerta si se han obtenido datos desde IPFS */}
             {ipfsMetadata && (
               <Alert>
                 <Info className="h-4 w-4" />
@@ -1030,7 +1009,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               </Alert>
             )}
             
-            {/* Mostrar mensaje si hubo un error al obtener datos de IPFS */}
             {ipfsError && (
               <Alert>
                 <Info className="h-4 w-4" />
@@ -1041,13 +1019,11 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             )}
             
             <div className="grid grid-cols-2 gap-4">
-              {/* Mostrar datos disponibles de forma dinámica */}
               {typeData && Object.entries(typeData)
                 .filter(([key]) => !['id', 'image', 'name', 'description'].includes(key))
                 .map(([key, value]) => {
-                  // Comprobar si el valor es un objeto o un array
                   if (typeof value === 'object' && value !== null) {
-                    return null // Saltarse objetos complejos o manejarlos según sea necesario
+                    return null 
                   }
                   
                   return (
@@ -1078,7 +1054,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
           </Badge>
         </div>
         
-        {/* Mostrar indicador de datos de IPFS si están disponibles */}
         {ipfsMetadata && (
           <div className="mt-2 flex items-center text-xs text-muted-foreground">
             <Hexagon className="h-3 w-3 mr-1" />
