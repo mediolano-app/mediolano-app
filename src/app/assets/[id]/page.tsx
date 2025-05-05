@@ -46,7 +46,6 @@ interface AssetPageProps {
   }
 }
 
-// Definir el tipo para el propietario del activo
 interface AssetOwner {
   name: string;
   address: string;
@@ -55,7 +54,6 @@ interface AssetOwner {
   acquired: string;
 }
 
-// Definir el tipo para la transferencia de historial
 interface TransferHistoryItem {
   event: string;
   from: string;
@@ -65,16 +63,14 @@ interface TransferHistoryItem {
 }
 
 /**
- * Esta función obtiene los datos del activo, incluyendo el CID de IPFS si está disponible
- * @param {string} id - ID del activo
- * @returns {AssetType} - Datos del activo con CID de IPFS si está disponible
+ * Retrieve data, IPFS CDI if exists
+ * @param {string} id 
+ * @returns {AssetType} 
  */
 function getAssetData(id: string): AssetType {
-  // Verificar si hay un CID conocido para este activo
   const knownCids = getKnownCids()
   const ipfsCid = knownCids[id] || null
 
-  // Datos simulados como fallback
   const mockAsset: AssetType = {
     id,
     name: `Digital IP Asset #${id}`,
@@ -118,7 +114,6 @@ function getAssetData(id: string): AssetType {
       requireAttribution: true,
       royaltyPercentage: 5,
     },
-    // Simular diferentes tipos de IP basados en el ID
     type: id === "1" ? "Art" : 
           id === "2" ? "Software" : 
           id === "3" ? "Audio" : 
@@ -126,7 +121,6 @@ function getAssetData(id: string): AssetType {
           id === "5" ? "Patents" : "NFT",
   }
 
-  // Si tenemos un CID, lo agregamos al objeto
   if (ipfsCid) {
     mockAsset.ipfsCid = ipfsCid
   }
@@ -157,17 +151,13 @@ export default function AssetPage({ params }: AssetPageProps) {
     },
   ])
 
-  // Cargar los datos del asset
   useEffect(() => {
     async function loadAsset() {
       setIsLoading(true)
       try {
-        // Simulamos una llamada a la API/blockchain para obtener datos del asset
-        // En una implementación real, esto sería una llamada a tu backend
         const data = getAssetData(id)
         setAsset(data)
         
-        // Actualizamos el estado del propietario con los datos del asset
         if (data.owner) {
           setAssetOwner(data.owner as AssetOwner)
         }
@@ -184,7 +174,6 @@ export default function AssetPage({ params }: AssetPageProps) {
   const handleTransferComplete = (newOwnerAddress: string, memo?: string) => {
     if (!asset) return;
     
-    // In a real app, this would be handled by blockchain events
     const newOwner: AssetOwner = {
       name: `0x${newOwnerAddress.substring(2, 6)}...${newOwnerAddress.substring(newOwnerAddress.length - 4)}`,
       address: newOwnerAddress,
@@ -193,16 +182,13 @@ export default function AssetPage({ params }: AssetPageProps) {
       acquired: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
     }
 
-    // Update the owner
     setAssetOwner(newOwner)
 
-    // Actualizar el owner en el asset
     setAsset({
       ...asset,
       owner: newOwner
     })
 
-    // Add to transfer history with memo if provided
     setTransferHistory([
       {
         event: "Transferred",
@@ -215,7 +201,6 @@ export default function AssetPage({ params }: AssetPageProps) {
     ])
   }
 
-  // Mostrar un indicador de carga mientras se cargan los datos
   if (isLoading || !asset) {
     return (
       <div className="min-h-screen">
