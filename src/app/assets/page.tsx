@@ -59,11 +59,9 @@ import Image from "next/image"
 import type { IPType } from "@/types/asset"
 import { getKnownCids, AssetType } from "@/utils/ipfs"
 
-// temporary data - importado pero será aumentado con IPFS
+// temporary data - would be mixed with IPFS data if is necessary
 import { assets as mockAssets, recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
 
-// Mejorar el componente NFTCard para añadir soporte para IPFS CID
-// Esto se hará creando una interfaz extendida mientras se mantiene la compatibilidad
 interface EnhancedAsset {
   id: string;
   name: string;
@@ -78,7 +76,7 @@ interface EnhancedAsset {
   templateType?: string;
   protectionLevel?: number;
   value?: string;
-  ipfsCid?: string; // Añadido para soportar IPFS
+  ipfsCid?: string; 
 }
 
 export default function AssetsPage() {
@@ -95,29 +93,23 @@ export default function AssetsPage() {
   console.log(assets);
 
   useEffect(() => {
-    // Cargar datos y enriquecerlos con información de IPFS
     const loadAssetsWithIPFS = async () => {
       setLoading(true)
       try {
-        // Obtener los CIDs conocidos
         const knownCids = getKnownCids()
 
-        // Enriquecer los assets mock con información de IPFS
         const enhancedAssets = mockAssets.map((asset) => {
           const ipfsCid = knownCids[asset.id] || null
           
-          // Retornar el asset enriquecido
           return {
             ...asset,
             ...(ipfsCid && { ipfsCid })
           } as EnhancedAsset
         })
 
-        // Actualizar el estado con los assets enriquecidos
         setAssets(enhancedAssets)
       } catch (error) {
         console.error("Error loading assets with IPFS data:", error)
-        // En caso de error, usar los datos mock sin modificar
         setAssets(mockAssets as EnhancedAsset[])
       } finally {
         setLoading(false)
@@ -226,7 +218,6 @@ export default function AssetsPage() {
     }
   }
 
-  // Renderiza el NFT Card con un indicador de IPFS si está disponible
   const renderNFTCard = (asset: EnhancedAsset, index: number) => {
     return (
       <motion.div
@@ -253,7 +244,7 @@ export default function AssetsPage() {
             protectionLevel={asset.protectionLevel}
           />
           
-          {/* Indicador de IPFS si está disponible */}
+            {/* IPFS flag(if available) */}
           {asset.ipfsCid && (
             <div className="absolute top-3 right-3">
               <Badge variant="outline" className="bg-background/80 border-teal-500 text-teal-500">
@@ -267,7 +258,6 @@ export default function AssetsPage() {
     )
   }
 
-  // Renderiza el NFT Card en vista de lista con indicador de IPFS
   const renderNFTCardList = (asset: EnhancedAsset, index: number) => {
     return (
       <motion.div
