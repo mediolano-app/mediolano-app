@@ -38,7 +38,7 @@ import type { Asset, IPType } from "@/types/asset"
 
 interface NFTCardProps extends Partial<Asset> {
   className?: string
-  ipfsCid?: string // Añadido para soportar IPFS
+  ipfsCid?: string 
 }
 
 export default function NFTCard({
@@ -55,7 +55,7 @@ export default function NFTCard({
   templateType = "Standard Art",
   protectionLevel = 90,
   value = "0.85 ETH",
-  ipfsCid, // Nuevo campo para CID de IPFS
+  ipfsCid, 
   className,
 }: NFTCardProps) {
   const getTypeIcon = (type: IPType) => {
