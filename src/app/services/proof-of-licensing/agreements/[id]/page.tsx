@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast"
 import { ArrowLeft, Share2 } from "lucide-react"
 import { Abi, useAccount, useContract, useProvider, useReadContract, useSendTransaction } from "@starknet-react/core"
 import { ip_licensing_agreement } from "@/abis/ip_licensing_agreement"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { formatDate } from "@/lib/utils"
 import { decToHexAddress, hexToDecAddress } from "@/utils/utils"
 import { Party, Signature } from "@/types/agreement"
@@ -32,7 +32,7 @@ export default function AgreementPage() {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [type, setType] = useState<string>("Unknown");
-  const [status, setStatus] = useState<string>("");
+  const [status, setStatus] = useState<string>("draft");
   const [parties, setParties] = useState<Party[]>([]);
   const [signatures, setSignatures] = useState<Signature[]>([]);
   
@@ -42,14 +42,14 @@ export default function AgreementPage() {
   });
 
 
-  const { sendAsync: signAgreement, error: signAgreementError } = useSendTransaction({
+  const { sendAsync: signAgreement, isPending: isSignLoading, error: signAgreementError } = useSendTransaction({
     calls:
       contract && address
         ? [contract.populate("sign_agreement", [])]
         : undefined,
   });
 
-  const { sendAsync: finalizeAgreement, error: finalizeAgreementError } = useSendTransaction({
+  const { sendAsync: finalizeAgreement, isPending: isFinalizeLoading, error: finalizeAgreementError } = useSendTransaction({
     calls:
       contract && address
         ? [contract.populate("make_immutable", [])]
@@ -121,7 +121,6 @@ export default function AgreementPage() {
               entrypoint: "has_signed",
               calldata: [signer],
             });
-            console.log(hasSignedResult)
             if (hasSignedResult[0] === "0x1") {
               const timestampResult = await provider.callContract({
                 contractAddress: params.id,
@@ -186,28 +185,37 @@ export default function AgreementPage() {
     console.log("Parties:", parties);
   }, [parties]);
 
-   // Update status based on isFullySigned
-   useEffect(() => {
-    if (!isFullySignedLoading && isFullySigned !== undefined) {
-      setStatus(isFullySigned === "0x1" ? "completed" : "pending");
+  useEffect(() => {
+    if (!isFullySignedLoading && !signatureCountLoading && signatureCount !== undefined && isFullySigned !== undefined) {
+      if (isFullySigned === true) {
+        setStatus("completed");
+      } else if (Number(signatureCount) > 0) {
+        setStatus("pending");
+      } else {
+        setStatus("draft");
+      }
     }
-  }, [isFullySigned, isFullySignedLoading]);
+  }, [isFullySigned, signatureCount, isFullySignedLoading, signatureCountLoading]);
 
-  const canSign =
-  address &&
-  !hasSignedLoading &&
-  !currentUserHasSigned &&
-  signers?.some((signer) => address.toLowerCase() === decToHexAddress(signer).toLowerCase());
-  console.log("cansign",canSign)
-  console.log("curren", currentUserHasSigned)
-  
-  const canFinalize =
-  status === "pending" &&
-  signers &&
-  signatures.length === signers.length &&
-  owner &&
-  address?.toLowerCase() === decToHexAddress(owner).toLowerCase();
-  console.log("canfinalize",canFinalize)
+const canSign = useMemo(
+  () =>
+    address &&
+    !hasSignedLoading &&
+    !currentUserHasSigned &&
+    signers?.some((signer) => address.toLowerCase() === decToHexAddress(signer).toLowerCase()),
+  [address, hasSignedLoading, currentUserHasSigned, signers, isSignLoading]
+);
+
+const canFinalize = useMemo(
+  () =>
+    address &&
+    isFullySigned &&
+    signers &&
+    signatures.length === signers.length &&
+    owner &&
+    address.toLowerCase() === decToHexAddress(owner).toLowerCase(),
+  [address, status, signers, isFullySigned, signatures, owner, isFinalizeLoading]
+);
 
   const handleSign = async () => {
     try {
@@ -249,14 +257,21 @@ export default function AgreementPage() {
     });
   };
 
-  if (isLoadingMetadata || isLoadingAgreement || isFullySignedLoading || hasSignedLoading) {
+  if (
+    isLoadingMetadata ||
+    isLoadingAgreement ||
+    isFullySignedLoading ||
+    hasSignedLoading ||
+    signersLoading ||
+    signatureCountLoading ||
+    ownerLoading
+  ) {
     return (
       <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
-
   if (!metadata || !agreement) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
@@ -293,8 +308,8 @@ export default function AgreementPage() {
           <Button variant="outline" size="icon" onClick={handleShare}>
             <Share2 className="h-4 w-4" />
           </Button>
-          {canSign && <Button onClick={handleSign}>Sign Agreement</Button>}
-          {canFinalize && <Button onClick={handleFinalize}>Finalize Agreement</Button>}
+          {canSign && <Button disabled={isSignLoading} onClick={handleSign}>{isSignLoading ? "Signing..." : "Sign Agreement"}</Button>}
+          {canFinalize && <Button disabled={isFinalizeLoading} onClick={handleFinalize}>{isFinalizeLoading ? "Finalizing..." : "Finalize Agreement"}</Button>}
         </div>
       </div>
 
@@ -331,7 +346,7 @@ export default function AgreementPage() {
 function AgreementStatusBadge({ status }: { status: string }) {
   switch (status) {
     case "draft":
-      return <Badge variant="outline">Draft</Badge>
+      return <Badge variant="outline">Unsigned</Badge>
     case "pending":
       return <Badge variant="secondary">Pending Signatures</Badge>
     case "completed":

@@ -11,7 +11,7 @@ interface AgreementDetailsProps {
   signatures: Signature[];
 }
 
-export function AgreementDetails({ agreement, description, parties, createdAt, status="completed", signatures }: AgreementDetailsProps) {
+export function AgreementDetails({ agreement, description, parties, createdAt, status, signatures }: AgreementDetailsProps) {
     
     const getPartyNameByAddress = (walletAddress: string): string => {
       console.log("parties", parties)
@@ -50,7 +50,7 @@ export function AgreementDetails({ agreement, description, parties, createdAt, s
               </div>
             </div>
 
-            {status === "pending" && signatures.map((signature, index) => (
+            {status !== "draft" && signatures.map((signature, index) => (
               <div key={signature.walletAddress} className="flex items-start">
                 <div className="mr-4 h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                   {index + 2}

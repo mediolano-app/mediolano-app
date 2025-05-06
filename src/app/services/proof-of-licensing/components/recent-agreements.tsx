@@ -105,7 +105,7 @@ function AgreementCard({ agreement }) {
 
 
 export function RecentAgreements() {
-  const { agreements } = useAgreements({ limit: 3 });
+  const { agreements } = useAgreements({ limit: 4 });
 
   return (
     <div className="grid gap-6 md:grid-cols-3">
