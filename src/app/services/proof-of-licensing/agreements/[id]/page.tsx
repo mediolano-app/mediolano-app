@@ -11,29 +11,58 @@ import { AgreementProof } from "@/app/services/proof-of-licensing/components/agr
 import { useAgreement } from "@/hooks/use-agreement"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowLeft, Share2 } from "lucide-react"
+import { Abi, useAccount, useReadContract } from "@starknet-react/core"
+import { ip_licensing_agreement } from "@/abis/ip_licensing_agreement"
+import { useState } from "react"
 
-// Mock user data for the current user
-const MOCK_USER = {
-  name: "Demo User",
-  walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
-}
+
 
 export default function AgreementPage() {
+  const {address} = useAccount();
   const params = useParams()
   const router = useRouter()
   const { toast } = useToast()
   const { agreement, isLoading, signAgreement, finalizeAgreement } = useAgreement(params.id as string)
 
+   const [dateString, setDateString] = useState<string | null>(null);
+  
+   const { data: metadata, isLoading: isLoadingMetadata } = useReadContract({
+     abi: ip_licensing_agreement as Abi,
+     functionName: "get_metadata",
+     address: agreement?.id || "",
+     args: [],
+   });
+  
+    useEffect(() => {
+      if (metadata && !isLoadingMetadata) {
+        const timestamp = metadata[3];
+        const date = new Date(Number(timestamp) * 1000);
+        setDateString(date.toISOString());
+      }
+    }, [metadata, isLoadingMetadata]);
+
+  
+  if(!isLoadingMetadata && metadata) {
+    const title = metadata[0];
+    const description = metadata[1];
+    const detailsJson = metadata[2];
+    const details = JSON.parse(detailsJson || "{}");
+    const parties = details.parties || [];
+    const type = details.type || "Unknown";
+    const status = agreement.status || (metadata[4] ? "completed" : "pending");
+  }
+
+
   const canSign = agreement?.parties.some(
     (party) =>
-      party.walletAddress.toLowerCase() === MOCK_USER.walletAddress.toLowerCase() &&
-      !agreement.signatures.some((sig) => sig.walletAddress.toLowerCase() === MOCK_USER.walletAddress.toLowerCase()),
+      party.walletAddress.toLowerCase() === address?.toLowerCase() &&
+      !agreement.signatures.some((sig) => sig.walletAddress.toLowerCase() === address?.toLowerCase()),
   )
 
   const canFinalize =
     agreement?.status === "pending" &&
     agreement.signatures.length === agreement.parties.length &&
-    agreement.createdBy.toLowerCase() === MOCK_USER.walletAddress.toLowerCase()
+    agreement.createdBy.toLowerCase() === address?.toLowerCase()
 
   const handleSign = async () => {
     try {
@@ -90,7 +119,7 @@ export default function AgreementPage() {
         <p className="text-muted-foreground mb-6">
           The agreement you're looking for doesn't exist or you don't have access to it.
         </p>
-        <Button onClick={() => router.push("/agreements")}>
+        <Button onClick={() => router.back()}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Agreements
         </Button>
@@ -102,7 +131,7 @@ export default function AgreementPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" onClick={() => router.push("/agreements")}>
+          <Button variant="outline" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>

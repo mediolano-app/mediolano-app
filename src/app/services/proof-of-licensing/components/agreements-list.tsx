@@ -87,7 +87,7 @@ export function AgreementsList() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Link href={`/agreements/${agreement.id}`} className="w-full">
+                <Link href={`agreements/${agreement.id}`} className="w-full">
                   <Button variant="outline" className="w-full">
                     View Details
                   </Button>

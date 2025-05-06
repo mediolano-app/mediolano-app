@@ -1,9 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText, Users, CheckCircle, Eye } from "lucide-react"
 import { useAgreementStats } from "@/hooks/use-agreement-stats"
+import { Abi, useAccount, useReadContract } from "@starknet-react/core";
+import { ip_licensing_agreement } from "@/abis/ip_licensing_agreement";
 
 export function StatsCards() {
   const { totalAgreements, totalSignatures, completedAgreements, publicViews } = useAgreementStats()
+
+  const {address} = useAccount();
+  const AGREEMENT_HASH = process.env.NEXT_PUBLIC_AGREEMENT_CONTRACT_HASH as `0x${string}`;
+
+  // use the user address to check the deployed contract instances of this contract class by the address
+
+  //   const { data: agreementMetadata } = useReadContract({
+  //     abi: ip_licensing_agreement as Abi,
+  //     functionName: "get_metadata",
+  //     address: CONTRACT_ADDRESS,
+  //     args: [],
+  //   });
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
