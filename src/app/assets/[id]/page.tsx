@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type { ComponentProps } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Share2, FileCheck, DollarSign, Send } from "lucide-react"
@@ -38,6 +38,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { TransferAssetDialog } from "@/components/transfer-asset-dialog"
 
 import { IPTypeInfo } from "@/components/ip-type-info"
+import { getKnownCids, AssetType } from "@/utils/ipfs"
 
 interface AssetPageProps {
   params: {
@@ -45,29 +46,32 @@ interface AssetPageProps {
   }
 }
 
-export default function AssetPage({ params }: AssetPageProps) {
-  const { id } = params
-  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false)
+interface AssetOwner {
+  name: string;
+  address: string;
+  avatar: string;
+  verified: boolean;
+  acquired: string;
+}
 
-  const [assetOwner, setAssetOwner] = useState({
-    name: "CollectorDAO",
-    address: "0x9i8h7g6f5e4d3c2b1a",
-    avatar: "/background.jpg",
-    verified: true,
-    acquired: "February 10, 2025",
-  })
-  const [transferHistory, setTransferHistory] = useState([
-    {
-      event: "Transferred",
-      from: "0xArtist",
-      to: "CollectorDAO",
-      date: "February 10, 2025",
-      memo: "Initial acquisition",
-    },
-  ])
+interface TransferHistoryItem {
+  event: string;
+  from: string;
+  to: string;
+  date: string;
+  memo?: string;
+}
 
-  // In a real application, you would fetch the NFT data based on the ID
-  const asset = {
+/**
+ * Retrieve data, IPFS CDI if exists
+ * @param {string} id 
+ * @returns {AssetType} 
+ */
+function getAssetData(id: string): AssetType {
+  const knownCids = getKnownCids()
+  const ipfsCid = knownCids[id] || null
+
+  const mockAsset: AssetType = {
     id,
     name: `Digital IP Asset #${id}`,
     creator: {
@@ -78,7 +82,13 @@ export default function AssetPage({ params }: AssetPageProps) {
       bio: "Digital artist specializing in abstract and futuristic designs. Creating programmable IP assets since 2023.",
       website: "https://artist-portfolio.com",
     },
-    owner: assetOwner,
+    owner: {
+      name: "CollectorDAO",
+      address: "0x9i8h7g6f5e4d3c2b1a",
+      avatar: "/background.jpg",
+      verified: true,
+      acquired: "February 10, 2025",
+    },
     description:
       "This digital asset represents intellectual property with programmable licensing terms. The creator has established specific usage rights and royalty structures that are encoded directly into the asset.",
     image: "/placeholder.svg?height=600&width=600",
@@ -104,11 +114,67 @@ export default function AssetPage({ params }: AssetPageProps) {
       requireAttribution: true,
       royaltyPercentage: 5,
     },
+    type: id === "1" ? "Art" : 
+          id === "2" ? "Software" : 
+          id === "3" ? "Audio" : 
+          id === "4" ? "Video" : 
+          id === "5" ? "Patents" : "NFT",
   }
 
+  if (ipfsCid) {
+    mockAsset.ipfsCid = ipfsCid
+  }
+
+  return mockAsset
+}
+
+export default function AssetPage({ params }: AssetPageProps) {
+  const { id } = params
+  const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [asset, setAsset] = useState<AssetType | null>(null)
+
+  const [assetOwner, setAssetOwner] = useState<AssetOwner>({
+    name: "CollectorDAO",
+    address: "0x9i8h7g6f5e4d3c2b1a",
+    avatar: "/background.jpg",
+    verified: true,
+    acquired: "February 10, 2025",
+  })
+  const [transferHistory, setTransferHistory] = useState<TransferHistoryItem[]>([
+    {
+      event: "Transferred",
+      from: "0xArtist",
+      to: "CollectorDAO",
+      date: "February 10, 2025",
+      memo: "Initial acquisition",
+    },
+  ])
+
+  useEffect(() => {
+    async function loadAsset() {
+      setIsLoading(true)
+      try {
+        const data = getAssetData(id)
+        setAsset(data)
+        
+        if (data.owner) {
+          setAssetOwner(data.owner as AssetOwner)
+        }
+      } catch (error) {
+        console.error("Error loading asset:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    loadAsset()
+  }, [id])
+
   const handleTransferComplete = (newOwnerAddress: string, memo?: string) => {
-    // In a real app, this would be handled by blockchain events
-    const newOwner = {
+    if (!asset) return;
+    
+    const newOwner: AssetOwner = {
       name: `0x${newOwnerAddress.substring(2, 6)}...${newOwnerAddress.substring(newOwnerAddress.length - 4)}`,
       address: newOwnerAddress,
       avatar: "/placeholder.svg?height=40&width=40",
@@ -116,14 +182,17 @@ export default function AssetPage({ params }: AssetPageProps) {
       acquired: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
     }
 
-    // Update the owner
     setAssetOwner(newOwner)
 
-    // Add to transfer history with memo if provided
+    setAsset({
+      ...asset,
+      owner: newOwner
+    })
+
     setTransferHistory([
       {
         event: "Transferred",
-        from: asset.owner.name,
+        from: asset.owner?.name || assetOwner.name,
         to: newOwner.name,
         date: newOwner.acquired,
         memo: memo || "",
@@ -132,13 +201,24 @@ export default function AssetPage({ params }: AssetPageProps) {
     ])
   }
 
+  if (isLoading || !asset) {
+    return (
+      <div className="min-h-screen">
+        <main className="container mx-auto p-4 py-8 max-w-8xl">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-pulse space-y-4">
+              <div className="h-12 w-48 bg-muted rounded"></div>
+              <div className="h-4 w-64 bg-muted rounded"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   return (
-
     <div className="min-h-screen">
-
-      
       <main className="container mx-auto p-4 py-8 max-w-8xl">
-
         <Link href="/assets">
           <Button variant="ghost" size="sm" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -163,17 +243,22 @@ export default function AssetPage({ params }: AssetPageProps) {
                 <div className="absolute top-3 left-3">
                   <Badge className="bg-primary/90 text-primary-foreground">{asset.collection}</Badge>
                 </div>
+                {asset.ipfsCid && (
+                  <div className="absolute top-3 right-3">
+                    <Badge variant="outline" className="bg-background/80">
+                      IPFS
+                    </Badge>
+                  </div>
+                )}
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                {asset.attributes.map((attr, index) => (
+                {asset.attributes && asset.attributes.map((attr, index) => (
                   <Badge key={index} variant="outline" className="bg-background">
                     {attr.trait_type}: {attr.value}
                   </Badge>
                 ))}
               </div>
-
-
 
               {/* IP Type Info (IP Template) Component */}
               <div className="mt-6">
@@ -181,10 +266,6 @@ export default function AssetPage({ params }: AssetPageProps) {
               </div>
             </div>
           </div>
-
-
-
-
 
           {/* Right column - Content */}
           <div className="lg:col-span-3">
@@ -213,6 +294,21 @@ export default function AssetPage({ params }: AssetPageProps) {
                     <DropdownMenuItem>LinkedIn</DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>Copy Link</DropdownMenuItem>
+                    {asset.ipfsCid && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                          <a
+                            href={`https://gateway.pinata.cloud/ipfs/${asset.ipfsCid}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center w-full"
+                          >
+                            View on IPFS
+                          </a>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -288,6 +384,14 @@ export default function AssetPage({ params }: AssetPageProps) {
                           {asset.contract}
                         </dd>
                       </div>
+                      {asset.ipfsCid && (
+                        <div className="rounded-lg border p-3">
+                          <dt className="text-sm text-muted-foreground">IPFS CID</dt>
+                          <dd className="font-medium truncate" title={asset.ipfsCid}>
+                            {asset.ipfsCid}
+                          </dd>
+                        </div>
+                      )}
                     </dl>
                   </div>
 
@@ -315,6 +419,7 @@ export default function AssetPage({ params }: AssetPageProps) {
                                   owner: asset.owner.name,
                                   licenseType: asset.licenseType,
                                   licenseTerms: asset.licenseTerms,
+                                  ...(asset.ipfsCid && { ipfsCid: asset.ipfsCid }),
                                 },
                                 null,
                                 2,
@@ -572,16 +677,16 @@ export default function AssetPage({ params }: AssetPageProps) {
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-4">
                         <Avatar className="h-16 w-16">
-                          <AvatarImage src={asset.owner.avatar || "/placeholder.svg"} alt={asset.owner.name} />
-                          <AvatarFallback>{asset.owner.name.substring(0, 2)}</AvatarFallback>
+                          <AvatarImage src={asset.owner?.avatar || "/placeholder.svg"} alt={asset.owner?.name || ""} />
+                          <AvatarFallback>{(asset.owner?.name || "").substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-lg font-semibold">{asset.owner.name}</h3>
-                            {asset.owner.verified && <Badge variant="secondary">Verified</Badge>}
+                            <h3 className="text-lg font-semibold">{asset.owner?.name}</h3>
+                            {asset.owner?.verified && <Badge variant="secondary">Verified</Badge>}
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">Acquired on {asset.owner.acquired}</p>
-                          <p className="text-sm font-mono truncate">{asset.owner.address}</p>
+                          <p className="text-sm text-muted-foreground mb-2">Acquired on {asset.owner?.acquired}</p>
+                          <p className="text-sm font-mono truncate">{asset.owner?.address}</p>
                           <div className="mt-4 flex gap-2">
                             <Button variant="outline" size="sm">
                               View Profile
@@ -602,16 +707,16 @@ export default function AssetPage({ params }: AssetPageProps) {
                     <CardContent>
                       <div className="flex items-start gap-4">
                         <Avatar className="h-16 w-16">
-                          <AvatarImage src={asset.creator.avatar || "/placeholder.svg"} alt={asset.creator.name} />
-                          <AvatarFallback>{asset.creator.name.substring(0, 2)}</AvatarFallback>
+                          <AvatarImage src={asset.creator?.avatar || "/placeholder.svg"} alt={asset.creator?.name || ""} />
+                          <AvatarFallback>{(asset.creator?.name || "").substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="text-lg font-semibold">{asset.creator.name}</h3>
-                            {asset.creator.verified && <Badge variant="secondary">Verified</Badge>}
+                            <h3 className="text-lg font-semibold">{asset.creator?.name}</h3>
+                            {asset.creator?.verified && <Badge variant="secondary">Verified</Badge>}
                           </div>
-                          <p className="text-sm font-mono truncate mb-2">{asset.creator.address}</p>
-                          <p className="text-sm text-muted-foreground">{asset.creator.bio}</p>
+                          <p className="text-sm font-mono truncate mb-2">{asset.creator?.address}</p>
+                          <p className="text-sm text-muted-foreground">{asset.creator?.bio}</p>
 
                           <div className="mt-4">
                             <h4 className="text-sm font-medium mb-2">Creator Links</h4>
@@ -663,7 +768,7 @@ export default function AssetPage({ params }: AssetPageProps) {
                           <div>
                             <p className="font-medium">Created</p>
                             <p className="text-sm text-muted-foreground">{asset.createdAt}</p>
-                            <p className="text-sm">By {asset.creator.name}</p>
+                            <p className="text-sm">By {asset.creator?.name}</p>
                           </div>
                         </div>
                       </div>
@@ -680,7 +785,7 @@ export default function AssetPage({ params }: AssetPageProps) {
       <TransferAssetDialog
         assetId={asset.id}
         assetName={asset.name}
-        currentOwner={asset.owner.address}
+        currentOwner={asset.owner?.address || ""}
         isOpen={isTransferDialogOpen}
         onClose={() => setIsTransferDialogOpen(false)}
         onTransferComplete={handleTransferComplete}
@@ -756,6 +861,7 @@ function Globe({ className, ...props }: ComponentProps<"svg">) {
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
+      strokeLinecap="round"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
