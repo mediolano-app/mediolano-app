@@ -60,9 +60,7 @@ export function useAgreements(options: UseAgreementsOptions = {}) {
   
 //     // Get the provider for read-only contract calls
 //     const { provider } = useProvider();
-  
-//     // State to store signature details
-//     const [signatures, setSignatures] = useState([]);
+
   
 //     // Fetch agreement metadata
 //     const { data: metadata, isLoading: metadataLoading } = useReadContract({
@@ -72,13 +70,7 @@ export function useAgreements(options: UseAgreementsOptions = {}) {
 //       args: [],
 //     });
   
-//     // Fetch list of signers
-//     const { data: signers, isLoading: signersLoading } = useReadContract({
-//       abi: ip_licensing_agreement as Abi,
-//       functionName: "get_signers",
-//       address: id,
-//       args: [],
-//     });
+
   
 //     // Fetch signature count
 //     const { data: signatureCount, isLoading: signatureCountLoading } = useReadContract({

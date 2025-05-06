@@ -1,11 +1,26 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import type { Agreement } from "@/types/agreement"
+import type { Agreement, Party, Signature } from "@/types/agreement"
+
 
 interface AgreementDetailsProps {
-  agreement: Agreement
+  agreement: Agreement;
+  description: string;
+  status: string;
+  createdAt: string | null
+  parties: Party[];
+  signatures: Signature[];
 }
 
-export function AgreementDetails({ agreement }: AgreementDetailsProps) {
+export function AgreementDetails({ agreement, description, parties, createdAt, status="completed", signatures }: AgreementDetailsProps) {
+    
+    const getPartyNameByAddress = (walletAddress: string): string => {
+      console.log("parties", parties)
+      const party = parties.find(
+        (p) => p.walletAddress == walletAddress,
+      );
+      return party?.name || walletAddress;
+    };
+  
   return (
     <div className="space-y-6">
       <Card>
@@ -14,7 +29,7 @@ export function AgreementDetails({ agreement }: AgreementDetailsProps) {
           <CardDescription>Overview and purpose of this licensing agreement</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="whitespace-pre-line">{agreement.description}</p>
+          <p className="whitespace-pre-line">{description}</p>
         </CardContent>
       </Card>
 
@@ -31,23 +46,23 @@ export function AgreementDetails({ agreement }: AgreementDetailsProps) {
               </div>
               <div>
                 <h4 className="font-medium">Created</h4>
-                <p className="text-sm text-muted-foreground">{new Date(agreement.createdAt).toLocaleString()}</p>
+                <p className="text-sm text-muted-foreground">{new Date(createdAt).toLocaleString()}</p>
               </div>
             </div>
 
-            {agreement.signatures.map((signature, index) => (
-              <div key={signature.id} className="flex items-start">
+            {status === "pending" && signatures.map((signature, index) => (
+              <div key={signature.walletAddress} className="flex items-start">
                 <div className="mr-4 h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                   {index + 2}
                 </div>
                 <div>
-                  <h4 className="font-medium">Signed by {signature.name}</h4>
-                  <p className="text-sm text-muted-foreground">{new Date(signature.timestamp).toLocaleString()}</p>
+                  <h4 className="font-medium">Signed by {getPartyNameByAddress(signature.walletAddress)}</h4>
+                  <p className="text-sm text-muted-foreground">{new Date(Number(signature.timestamp)*1000).toLocaleString()}</p>
                 </div>
               </div>
             ))}
 
-            {agreement.status === "completed" && (
+            {status === "completed" && (
               <div className="flex items-start">
                 <div className="mr-4 h-8 w-8 rounded-full bg-green-500 flex items-center justify-center text-white">
                   ✓
