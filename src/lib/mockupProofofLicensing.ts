@@ -58,6 +58,61 @@ export const mockAgreements: Agreement[] = [
     },
   },
   {
+    id: "0x061f74157975bbf800653165b3be4ccf7a7fb367488af7c04ad5a5e06c884454",
+    title: "Software Development License Agreement",
+    type: "Software License",
+    description:
+      "This agreement grants the licensee the right to use and modify the software codebase for the development of a mobile application. The licensor retains ownership of the intellectual property while allowing the licensee to create derivative works under specific conditions.",
+      status: "completed",
+      createdAt: "2023-11-15T10:30:00Z",
+      createdBy: "0x1234567890abcdef1234567890abcdef12345678",
+    completedAt: "2023-11-20T14:45:00Z",
+    transactionHash: "0x9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b",
+    blockNumber: 123456,
+    parties: [
+      {
+        id: "party-001",
+        name: "TechCorp Inc.",
+        walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
+        role: "licensor",
+        email: "legal@techcorp.com",
+      },
+      {
+        id: "party-002",
+        name: "AppDev Solutions",
+        walletAddress: "0xabcdef1234567890abcdef1234567890abcdef12",
+        role: "licensee",
+        email: "contracts@appdev.com",
+      },
+    ],
+    signatures: [
+      {
+        id: "sig-001",
+        name: "TechCorp Inc.",
+        walletAddress: "0x1234567890abcdef1234567890abcdef12345678",
+        timestamp: "2023-11-16T09:15:00Z",
+        signatureHash: "0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+      },
+      {
+        id: "sig-002",
+        name: "AppDev Solutions",
+        walletAddress: "0xabcdef1234567890abcdef1234567890abcdef12",
+        timestamp: "2023-11-18T11:30:00Z",
+        signatureHash: "0x2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3",
+      },
+    ],
+    terms: {
+      duration: "2_years",
+      territory: "worldwide",
+      rights:
+      "The licensee is granted the non-exclusive right to use, modify, and create derivative works from the licensed software for the purpose of developing a mobile application. The licensee may not sublicense or distribute the original source code.",
+      royalties:
+      "The licensee agrees to pay 5% of net revenue generated from the mobile application to the licensor on a quarterly basis. Minimum annual payment of $10,000 is required regardless of revenue.",
+      termination:
+      "This agreement may be terminated by either party with 90 days written notice. Upon termination, the licensee must cease all use of the licensed software and destroy all copies in their possession.",
+    },
+  },
+  {
     id: "0x0319add86ecf6d25c850fdb2110f4f68971868224ebf25dd3c5e9166105cd72f",
     title: "Digital Content Licensing Agreement",
     type: "Content License",

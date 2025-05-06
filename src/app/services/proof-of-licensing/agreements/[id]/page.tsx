@@ -2,7 +2,6 @@
 
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AgreementDetails } from "@/app/services/proof-of-licensing/components/agreement-details"
 import { AgreementParties } from "@/app/services/proof-of-licensing/components/agreement-parties"
@@ -17,6 +16,7 @@ import { useEffect, useMemo, useState } from "react"
 import { formatDate } from "@/lib/utils"
 import { decToHexAddress, hexToDecAddress } from "@/utils/utils"
 import { Party, Signature } from "@/types/agreement"
+import { AgreementStatusBadge } from "../../components/agreement-badge"
 
 
 export default function AgreementPage() {
@@ -34,7 +34,16 @@ export default function AgreementPage() {
   const [type, setType] = useState<string>("Unknown");
   const [status, setStatus] = useState<string>("draft");
   const [parties, setParties] = useState<Party[]>([]);
+  const [terms, setTerms] = useState<Record<string, string>>({});
   const [signatures, setSignatures] = useState<Signature[]>([]);
+
+  const getPartyNameByAddress = (walletAddress: string): string => {
+    console.log("parties", parties)
+    const party = parties.find(
+      (p) => p.walletAddress == walletAddress,
+    );
+    return party?.name || walletAddress;
+  };
   
   const { contract } = useContract({
     abi: ip_licensing_agreement as Abi,
@@ -42,7 +51,7 @@ export default function AgreementPage() {
   });
 
 
-  const { sendAsync: signAgreement, isPending: isSignLoading, error: signAgreementError } = useSendTransaction({
+  const { sendAsync: signAgreement, data: signAgreementData, isPending: isSignLoading, error: signAgreementError } = useSendTransaction({
     calls:
       contract && address
         ? [contract.populate("sign_agreement", [])]
@@ -127,9 +136,11 @@ export default function AgreementPage() {
                 entrypoint: "get_signature_timestamp",
                 calldata: [signer],
               });
-              console.log(timestampResult)
+              console.log("timestamp",timestampResult)
+              console.log(Number(timestampResult[0]))
               return {
-                walletAddress: signer,
+                name: getPartyNameByAddress(decToHexAddress(signer)),
+                walletAddress: decToHexAddress(signer),
                 timestamp: Number(timestampResult[0]),
               };
             }
@@ -159,7 +170,7 @@ export default function AgreementPage() {
       setTitle(title);
       setDescription(description);
       
-      let details: { type: string; parties: Party[] } = { type: "Unknown", parties: [] };
+      let details: { type: string; parties: Party[]; terms?: Record<string, string> } = { type: "Unknown", parties: [] };
       try {
         details = JSON.parse(detailsJson || "{}");
       } catch (error) {
@@ -176,6 +187,7 @@ export default function AgreementPage() {
       setParties(enrichedParties);
       console.log("Enriched parties:", enrichedParties);
 
+      setTerms(details.terms || {});
       const date = new Date(Number(timestamp) * 1000);
       setDateString(date.toISOString());
     }
@@ -197,25 +209,27 @@ export default function AgreementPage() {
     }
   }, [isFullySigned, signatureCount, isFullySignedLoading, signatureCountLoading]);
 
-const canSign = useMemo(
-  () =>
-    address &&
-    !hasSignedLoading &&
-    !currentUserHasSigned &&
-    signers?.some((signer) => address.toLowerCase() === decToHexAddress(signer).toLowerCase()),
-  [address, hasSignedLoading, currentUserHasSigned, signers, isSignLoading]
-);
+  const canSign = useMemo(
+    () =>
+      address &&
+      status !== "completed" && 
+      !hasSignedLoading &&
+      !currentUserHasSigned && 
+      signers?.some((signer) => address == decToHexAddress(signer)),
+    [address, status, hasSignedLoading, currentUserHasSigned, signers, isSignLoading]
+  );
 
-const canFinalize = useMemo(
-  () =>
-    address &&
-    isFullySigned &&
-    signers &&
-    signatures.length === signers.length &&
-    owner &&
-    address.toLowerCase() === decToHexAddress(owner).toLowerCase(),
-  [address, status, signers, isFullySigned, signatures, owner, isFinalizeLoading]
-);
+  const canFinalize = useMemo(
+    () =>
+      address &&
+      status === "pending" && 
+      isFullySigned && 
+      signers &&
+      signatures.length === signers.length && 
+      owner &&
+      address == decToHexAddress(owner), 
+    [address, status, isFullySigned, signers, signatures, owner, isFinalizeLoading]
+  );
 
   const handleSign = async () => {
     try {
@@ -326,11 +340,11 @@ const canFinalize = useMemo(
         </TabsContent>
 
         <TabsContent value="parties">
-          <AgreementParties agreement={agreement} />
+          <AgreementParties parties={parties} signatures={signatures} />
         </TabsContent>
 
         <TabsContent value="terms">
-          <AgreementTerms agreement={agreement} />
+          <AgreementTerms terms={terms} />
         </TabsContent>
 
         {status === "completed" && (
@@ -341,21 +355,4 @@ const canFinalize = useMemo(
       </Tabs>
     </div>
   )
-}
-
-function AgreementStatusBadge({ status }: { status: string }) {
-  switch (status) {
-    case "draft":
-      return <Badge variant="outline">Unsigned</Badge>
-    case "pending":
-      return <Badge variant="secondary">Pending Signatures</Badge>
-    case "completed":
-      return (
-        <Badge variant="default" className="bg-green-500">
-          Completed
-        </Badge>
-      )
-    default:
-      return <Badge variant="outline">{status}</Badge>
-  }
 }

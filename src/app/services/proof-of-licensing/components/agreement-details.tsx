@@ -11,15 +11,7 @@ interface AgreementDetailsProps {
   signatures: Signature[];
 }
 
-export function AgreementDetails({ agreement, description, parties, createdAt, status, signatures }: AgreementDetailsProps) {
-    
-    const getPartyNameByAddress = (walletAddress: string): string => {
-      console.log("parties", parties)
-      const party = parties.find(
-        (p) => p.walletAddress == walletAddress,
-      );
-      return party?.name || walletAddress;
-    };
+export function AgreementDetails({ agreement, description, createdAt, status, signatures }: AgreementDetailsProps) {
   
   return (
     <div className="space-y-6">
@@ -56,7 +48,7 @@ export function AgreementDetails({ agreement, description, parties, createdAt, s
                   {index + 2}
                 </div>
                 <div>
-                  <h4 className="font-medium">Signed by {getPartyNameByAddress(signature.walletAddress)}</h4>
+                  <h4 className="font-medium">Signed by {signature.name}</h4>
                   <p className="text-sm text-muted-foreground">{new Date(Number(signature.timestamp)*1000).toLocaleString()}</p>
                 </div>
               </div>
