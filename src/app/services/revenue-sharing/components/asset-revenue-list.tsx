@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,8 +13,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ArrowUpDown, ExternalLink, History, Settings } from "lucide-react";
-import { Abi, useAccount, useReadContract } from "@starknet-react/core";
+import { Abi, useAccount, useProvider, useReadContract } from "@starknet-react/core";
 import { ip_revenue_abi } from "@/abis/ip_revenue";
+import { uint256 } from "starknet";
+
+interface TokenId {
+  low: bigint;
+  high: bigint;
+}
 
 interface Asset {
   id: string;
@@ -34,10 +40,15 @@ export default function AssetRevenueList() {
   const { address } = useAccount();
 
   const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_REVENUE_CONTRACT_ADDRESS as `0x${string}`;
+  if (!CONTRACT_ADDRESS) {
+    throw new Error("Contract address not found in environment variables");
+  }
 
-  const { data: assetCountData, isLoading: isCountLoading } = useReadContract({
+  const { provider } = useProvider();
+
+  const { data: assetCountData, isLoading: isAssetCountLoading } = useReadContract({
     functionName: "get_user_ip_asset_count",
-    args: [address],
+    args: address ? [address.toString()] : undefined,
     abi: ip_revenue_abi as Abi,
     address: CONTRACT_ADDRESS,
     watch: true,
@@ -53,53 +64,79 @@ export default function AssetRevenueList() {
     [assetCount]
   );
 
-  const { data: assetsData } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: ip_revenue_abi as Abi,
-    functionName: "get_user_ip_assets_batch",
-    args: [address, indices],
-    watch: true,
-  });
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const listingsArgs = useMemo(() => {
-    if (!assetsData) return [];
-    return assetsData.map((asset: any) => ({
-      nft_contract: asset[0],
-      token_id: asset[1],
-    }));
-  }, [assetsData]);
-  
-  const { data: listingsData } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: ip_revenue_abi as Abi,
-    functionName: "get_listings_batch",
-    args: [listingsArgs],
-    watch: true,
-  });
+  useEffect(() => {
+    if (provider && assetCountData && !isAssetCountLoading && assetCount > 0) {
+      const fetchAssets = async () => {
+        setIsLoading(true);
+        try {
+          const assetPromises = indices.map(async (index) => {
+            const { low, high } = uint256.bnToUint256(BigInt(index));
+            try {
+              if (!address) return null;
+              
+              const assetResult = await provider.callContract({
+                contractAddress: CONTRACT_ADDRESS,
+                entrypoint: "get_user_ip_asset",
+                calldata: [address.toString(), low.toString(), high.toString()],
+              });
+              console.log(assetResult)
 
-  const assets: Asset[] = useMemo(() => {
-    if (!assetsData || !listingsData) return [];
-    
-    return assetsData
-      .map((assetData: any, index: number) => {
-        const [nft_contract, token_id] = assetData;
-        const listing = listingsData[index];
-        if (!listing) return null;
+              if (!assetResult || !assetResult[0] || !assetResult[1]) return null;
+              
+              const nft_contract = assetResult[0].toString();
+              const token_id = assetResult[1];
+              const { low: token_low, high: token_high } = uint256.bnToUint256(BigInt(token_id));
+              
+              if (!nft_contract || !token_low || !token_high) return null;
+              
+              // Fetch additional asset data if needed
+              const [fractionalShares, contractBalance] = await Promise.all([
+                provider.callContract({
+                  contractAddress: CONTRACT_ADDRESS,
+                  entrypoint: "get_fractional_shares",
+                  calldata: [nft_contract, token_low.toString(), token_high.toString(), address],
+                }),
+                provider.callContract({
+                  contractAddress: CONTRACT_ADDRESS,
+                  entrypoint: "get_contract_balance",
+                  calldata: [nft_contract],
+                }),
+              ]);
+              console.log(fractionalShares, contractBalance)
 
-        return {
-          id: `${nft_contract}_${token_id.low}_${token_id.high}`,
-          title: `Asset ${index + 1}`,
-          imageUrl: "/placeholder.svg",
-          totalShares: Number(listing.fractional.total_shares.low),
-          creatorShare: 0,
-          pendingRevenue: Number(listing.fractional.accrued_revenue.low) / 1e18,
-          status: listing.active ? "Active" : "Inactive",
-          nft_contract: nft_contract.toString(),
-          token_id: `${token_id.low}_${token_id.high}`,
-        };
-      })
-      .filter((asset: Asset): asset is Asset => asset !== null);
-  }, [assetsData, listingsData]);
+              return {
+                id: index?.toString(),
+                title: `Asset ${index + 1}`,
+                imageUrl: "/placeholder.svg",
+                totalShares: 0,
+                creatorShare: Number(fractionalShares[0]) || 0,
+                pendingRevenue: Number(contractBalance[0]) || 0,
+                status: "Active",
+                nft_contract,
+                token_id: `${token_low}_${token_high}`,
+              };
+            } catch (error) {
+              console.error(`Error fetching asset at index ${index}:`, error);
+              return null;
+            }
+          });
+
+          const assetData = await Promise.all(assetPromises);
+          console.log(assetData)
+          setAssets(assetData.filter((asset): asset is Asset => asset !== null));
+        } catch (error) {
+          console.error("Error fetching assets:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchAssets();
+    }
+  }, [provider, assetCountData, isAssetCountLoading, assetCount, address, indices, CONTRACT_ADDRESS]);
 
   const sortedAssets = useMemo(() => [...assets].sort((a, b) => {
     const aValue = a[sortField as keyof Asset];
@@ -123,7 +160,7 @@ export default function AssetRevenueList() {
     }
   };
 
-  if (isCountLoading) {
+  if (isLoading) {
     return <div>Loading assets...</div>;
   }
 
@@ -196,7 +233,7 @@ export default function AssetRevenueList() {
                   <div>
                     <div className="font-medium">{asset.title}</div>
                     <div className="text-xs text-gray-500">
-                      ID: {asset.id.substring(0, 8)}...
+                      ID: {asset.nft_contract.substring(0, 8)}...
                     </div>
                   </div>
                 </div>

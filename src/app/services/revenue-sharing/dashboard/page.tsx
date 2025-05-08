@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Download, BarChart3, PieChart, LineChart } from "lucide-react"
 import RevenueNavigation from "@/app/services/revenue-sharing/components/revenue-navigation"
 import { useEffect, useState } from "react"
-import { Abi, useAccount, useContract } from "@starknet-react/core"
+import { Abi, useAccount, useContract, useReadContract } from "@starknet-react/core"
 import { ip_revenue_abi } from "@/abis/ip_revenue"
 
 export default function RevenueDashboard() {
@@ -49,14 +49,25 @@ export default function RevenueDashboard() {
 
       try {
         // Fetch revenue data
+        console.log("Starting to fetch data...");
+        console.log("Address:", address);
+        console.log("Contract:", contract);
+        
         const assetCountResponse = await contract.call('get_user_ip_asset_count', [address]);
+        console.log("Asset count response:", assetCountResponse);
         const assetCount = Number(assetCountResponse);
+        console.log("Asset count:", assetCount);
         const assets = [];
         for (let i = 0; i < assetCount; i++) {
-          const [nftContract, tokenId] = await contract.call('get_user_ip_asset', [address, i]);
+          console.log("Fetching asset", i);
+          const assetResponse = await contract.call('get_user_ip_asset', [address, i]);
+          console.log("Asset response:", assetResponse);
+          // The response should be an array with two elements
+          const nftContract = assetResponse[0];
+          const tokenId = assetResponse[1];
           assets.push({ nftContract: nftContract.toString(), tokenId: tokenId.toString() });
         }
-
+        console.log("assets", assets)
         let totalRevenue = 0;
         let totalClaimed = 0;
         let claimableAmount = 0;
@@ -64,23 +75,27 @@ export default function RevenueDashboard() {
         const claimableBreakdown = [];
 
         for (const { nftContract, tokenId } of assets) {
+          console.log("Processing asset:", { nftContract, tokenId });
           const sharesResponse = await contract.call('get_fractional_shares', [nftContract, tokenId, address]);
-          const claimedResponse = await contract.call('get_claimed_revenue', [nftContract, tokenId, address]);
-          const listingResponse = await contract.call('get_listing', [nftContract, tokenId]);
-
-          const shares = Number(sharesResponse);
-          const claimed = Number(claimedResponse);
-          const listing = listingResponse as any; // Adjust based on ABI structure
-          const totalShares = Number(listing.fractional.total_shares);
-          const accruedRevenue = Number(listing.fractional.accrued_revenue);
-
-          const userRevenue = (accruedRevenue * shares) / totalShares;
-          const claimable = userRevenue - claimed;
+          const ownerCountResponse = await contract.call('get_fractional_owner_count', [nftContract, tokenId]);
+          const contractBalanceResponse = await contract.call('get_contract_balance', [nftContract]);
+          
+          console.log("sharesResponse", sharesResponse)
+          console.log("ownerCountResponse", ownerCountResponse)
+          console.log("contractBalanceResponse", contractBalanceResponse)
+          
+          const shares = Number(sharesResponse);  
+          const ownerCount = Number(ownerCountResponse);
+          const contractBalance = Number(contractBalanceResponse);
+          
+          // Calculate user's share of the balance
+          const userRevenue = (contractBalance * shares) / (ownerCount * 100); // Assuming 100 is the total shares per owner
+          const claimable = userRevenue;
 
           totalRevenue += userRevenue / 1e18;
-          totalClaimed += claimed / 1e18;
+          totalClaimed += 0; // We don't have a way to track claimed amounts yet
           claimableAmount += claimable / 1e18;
-          pendingRevenue += claimable > 0 ? 0 : userRevenue / 1e18;
+          pendingRevenue += 0; // We don't have a way to track pending amounts yet
 
           if (claimable > 0) {
             claimableBreakdown.push({
@@ -99,6 +114,7 @@ export default function RevenueDashboard() {
           pendingRevenue: Number(pendingRevenue.toFixed(4)),
           claimableBreakdown,
         });
+        console.log("revenueData", revenueData)
 
         // Fetch analytics data
         const bySource = [];
