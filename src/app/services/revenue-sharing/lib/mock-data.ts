@@ -99,7 +99,7 @@ export function getUserRevenue(): RevenueData {
 export function getUserAssets(): Array<Asset & { metadataHash: string; licenseHash: string; nftContract: string }> {
   return [
       {
-        id: "101",
+        id: "65",
         title: "Digital Art Series: Future Cities",
         description: "A collection of digital artwork depicting futuristic cityscapes.",
         imageUrl: "/placeholder.svg?height=100&width=100",

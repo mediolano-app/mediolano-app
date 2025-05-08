@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { getUserAssets } from "@/app/services/revenue-sharing/lib/mock-data";
-import { Loader2, Plus, Trash2, AlertCircle, Info } from "lucide-react";
+import { Loader2, Plus, Trash2, AlertCircle, Info, ExternalLink, Check, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
@@ -34,6 +34,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Abi, useAccount, useContract, useSendTransaction, useTransactionReceipt } from "@starknet-react/core";
 import { ConnectWallet } from "@/components/ConnectWallet";
 import { ip_revenue_abi } from "@/abis/ip_revenue";
+import Link from "next/link";
 
 // Form schema
 const formSchema = z.object({
@@ -85,6 +86,7 @@ const formSchema = z.object({
 export default function SetupRevenueForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [transactionHash, setTransactionHash] = useState<string | undefined>();
   const { status, address } = useAccount();
   const router = useRouter();
   const assets = getUserAssets();
@@ -151,11 +153,13 @@ const calls = useMemo(() => {
     console.warn("Missing required fields for contract call");
     return [];
   }
-
+  console.log(selectedAsset);
+  console.log(contract);
+  
   return [
     contract.populate("create_ip_asset", [
       selectedAsset.nftContract,
-      selectedAsset.id,
+      Number(selectedAsset?.id),
       selectedAsset.metadataHash,
       selectedAsset.licenseHash,
       form.getValues().totalShares.toString(),
@@ -164,14 +168,59 @@ const calls = useMemo(() => {
 }, [selectedAsset, address, contract]);
 
 
-  const { sendAsync, data: createData, isPending: isCreatingAsset } = useSendTransaction({
+  const { sendAsync } = useSendTransaction({
     calls,
   });
 
-  const {data: waitData, status: waitStatus,  } = useTransactionReceipt({ 
+  const {data: waitData, status: waitStatus} = useTransactionReceipt({ 
     watch: true, 
-    hash: createData?.hash
+    hash: transactionHash,
+    enabled: !!transactionHash,
   });
+
+  useEffect(() => {
+    if (waitStatus === 'success' && waitData && transactionHash) {
+      console.log('Transaction status:', waitData.execution_status);
+      
+      // Handle all possible execution statuses
+      switch (waitData.execution_status) {
+        case 'SUCCEEDED':
+          setCurrentStep(4);
+          setIsSubmitting(false);
+          toast({
+            title: "Transaction Confirmed",
+            description: "Your revenue sharing has been successfully set up!",
+            variant: "default",
+          });
+          break;
+        case 'REVERTED':
+          setIsSubmitting(false);
+          toast({
+            title: "Transaction Failed",
+            description: "The transaction was reverted. Please try again.",
+            variant: "destructive",
+          });
+          break;
+        case 'REJECTED':
+          setIsSubmitting(false);
+          toast({
+            title: "Transaction Rejected",
+            description: "The transaction was rejected by the network. Please try again.",
+            variant: "destructive",
+          });
+          break;
+        default:
+          console.log('Unknown transaction status:', waitData.execution_status);
+      }
+    } else if (waitStatus === 'error') {
+      setIsSubmitting(false);
+      toast({
+        title: "Error",
+        description: "Failed to fetch transaction receipt. Please check the transaction manually on the explorer.",
+        variant: "destructive",
+      });
+    }
+  }, [waitStatus, waitData, transactionHash]);
 
   const handleSubmit = async () => {
     if (status === "disconnected") {
@@ -180,7 +229,6 @@ const calls = useMemo(() => {
         description: "Please connect your wallet to proceed.",
         variant: "destructive",
       });
-      setIsSubmitting(false);
       return;
     }
 
@@ -190,7 +238,6 @@ const calls = useMemo(() => {
         description: "Please select an asset.",
         variant: "destructive",
       });
-      setIsSubmitting(false);
       return;
     }
 
@@ -198,11 +245,12 @@ const calls = useMemo(() => {
 
     try {
       const result = await sendAsync();
+      console.log('Transaction hash:', result.transaction_hash);
+      setTransactionHash(result.transaction_hash);
       toast({
-        title: "Success",
-        description: `IP Asset created! Transaction hash: ${result.transaction_hash}`,
+        title: "Transaction Submitted",
+        description: "Your transaction has been submitted to the network and is being processed.",
       });
-      router.push("/services/revenue-sharing/management");
     } catch (err) {
       console.error("Submission error:", err);
       toast({
@@ -216,6 +264,77 @@ const calls = useMemo(() => {
   };
 
   const nextStep = () => {
+    // Validate step 1
+    if (currentStep === 1) {
+      const assetId = form.getValues("assetId");
+      const totalShares = form.getValues("totalShares");
+      
+      if (!assetId || !totalShares) {
+        toast({
+          title: "Missing Information",
+          description: "Please select an asset and specify total shares before proceeding.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // Validate step 2
+    if (currentStep === 2) {
+      const creatorShare = form.getValues("creatorShare");
+      const recipients = form.getValues("recipients") || [];
+      
+      // Check if all recipient addresses are filled
+      const hasEmptyAddresses = recipients.some(recipient => !recipient.address);
+      if (hasEmptyAddresses) {
+        toast({
+          title: "Missing Information",
+          description: "Please fill in all recipient addresses.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Check if percentages add up to 100%
+      if (!isPercentageValid) {
+        toast({
+          title: "Invalid Percentages",
+          description: "Total percentage must equal 100%. Please adjust the shares.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // Validate step 3
+    if (currentStep === 3) {
+      const claimPeriod = form.getValues("claimPeriod");
+      const autoDistribute = form.getValues("autoDistribute");
+      
+      if (!claimPeriod) {
+        toast({
+          title: "Missing Information",
+          description: "Please select a claim period.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (autoDistribute) {
+        const distributionFrequency = form.getValues("distributionFrequency");
+        const minimumDistributionAmount = form.getValues("minimumDistributionAmount");
+        
+        if (!distributionFrequency || minimumDistributionAmount === undefined) {
+          toast({
+            title: "Missing Information",
+            description: "Please fill in all auto-distribution settings.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+    }
+    
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
@@ -225,6 +344,40 @@ const calls = useMemo(() => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const isStepValid = () => {
+    // Validate step 1
+    if (currentStep === 1) {
+      const assetId = form.getValues("assetId");
+      const totalShares = form.getValues("totalShares");
+      return !!(assetId && totalShares);
+    }
+
+    // Validate step 2
+    if (currentStep === 2) {
+      const recipients = form.getValues("recipients") || [];
+      const hasEmptyAddresses = recipients.some(recipient => !recipient.address);
+      return !hasEmptyAddresses && isPercentageValid;
+    }
+
+    // Validate step 3
+    if (currentStep === 3) {
+      const claimPeriod = form.getValues("claimPeriod");
+      const autoDistribute = form.getValues("autoDistribute");
+      
+      if (!claimPeriod) return false;
+      
+      if (autoDistribute) {
+        const distributionFrequency = form.getValues("distributionFrequency");
+        const minimumDistributionAmount = form.getValues("minimumDistributionAmount");
+        return !!(distributionFrequency && minimumDistributionAmount !== undefined);
+      }
+      
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -249,16 +402,20 @@ const calls = useMemo(() => {
           <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
             <div className="mb-8">
               <div className="flex justify-between mb-2">
-                <div className="text-sm font-medium">Step {currentStep} of 3</div>
+                <div className="text-sm font-medium">
+                  {currentStep < 4 ? `Step ${currentStep} of 3` : "Complete"}
+                </div>
                 <div className="text-sm text-gray-500">
                   {currentStep === 1
                     ? "Asset Selection"
                     : currentStep === 2
                     ? "Revenue Distribution"
-                    : "Claim Settings"}
+                    : currentStep === 3
+                    ? "Claim Settings"
+                    : "Success"}
                 </div>
               </div>
-              <Progress value={(currentStep / 3) * 100} className="h-2" />
+              <Progress value={currentStep === 4 ? 100 : (currentStep / 3) * 100} className="h-2" />
             </div>
 
             {currentStep === 1 && (
@@ -301,7 +458,8 @@ const calls = useMemo(() => {
                         <Input
                           type="number"
                           {...field}
-                          onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
+                          onChange={(e) => field.onChange(Number.parseInt(e.target.value) || 0)}
+                          value={field.value || 0}
                         />
                       </FormControl>
                       <FormDescription>
@@ -394,7 +552,8 @@ const calls = useMemo(() => {
                               <Input
                                 type="number"
                                 {...field}
-                                onChange={(e) => field.onChange(Number.parseInt(e.target.value))}
+                                onChange={(e) => field.onChange(Number.parseInt(e.target.value) || 0)}
+                                value={field.value || 0}
                               />
                             </FormControl>
                             <FormMessage />
@@ -537,7 +696,8 @@ const calls = useMemo(() => {
                                 type="number"
                                 step="0.01"
                                 {...field}
-                                onChange={(e) => field.onChange(Number.parseFloat(e.target.value))}
+                                onChange={(e) => field.onChange(Number.parseFloat(e.target.value) || 0)}
+                                value={field.value || 0}
                               />
                             </FormControl>
                             <FormDescription>
@@ -563,8 +723,64 @@ const calls = useMemo(() => {
               </div>
             )}
 
+            {currentStep === 4 && (
+              <div className="space-y-6 py-8">
+                <div className="text-center space-y-4">
+                  <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
+                    <Check className="w-8 h-8 text-emerald-600" />
+                  </div>
+                  <h2 className="text-2xl font-bold">Revenue Sharing Setup Complete!</h2>
+                  <p className="text-gray-600 max-w-md mx-auto">
+                    Your revenue sharing contract has been successfully configured on the blockchain.
+                  </p>
+                  
+                  <div className="rounded-md bg-gray-50 p-4 my-6 text-left">
+                    <h3 className="font-medium mb-2">Transaction Details:</h3>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">Transaction Hash:</span>
+                      <div className="flex items-center">
+                        <span className="text-xs font-mono truncate max-w-[200px]">
+                          {transactionHash}
+                        </span>
+                        <Link 
+                          href={`${process.env.NEXT_PUBLIC_EXPLORER_URL}/tx/${transactionHash}`} 
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-2 text-emerald-600 hover:text-emerald-700"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mt-2">
+                      <span className="text-gray-500">Status:</span>
+                      <span className="text-emerald-600 font-medium">Confirmed</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col space-y-3 pt-4">
+                    <Button
+                      type="button"
+                      onClick={() => router.push("/services/revenue-sharing/management")}
+                      className="bg-emerald-600 hover:bg-emerald-700 w-full"
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" /> Go to Revenue Dashboard
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => router.push("/")}
+                      className="w-full"
+                    >
+                      Return to Home
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex justify-between pt-4">
-              {currentStep > 1 ? (
+              {currentStep > 1 && currentStep < 4 ? (
                 <Button type="button" variant="outline" onClick={prevStep}>
                   Previous
                 </Button>
@@ -576,16 +792,16 @@ const calls = useMemo(() => {
                 <Button
                   type="button"
                   onClick={nextStep}
-                  disabled={isSubmitting || !isPercentageValid}
+                  disabled={isSubmitting || !isStepValid()}
                   className="bg-emerald-600 hover:bg-emerald-700"
                 >
                   Next
                 </Button>
-              ) : (
+              ) : currentStep === 3 ? (
                 <Button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={isSubmitting || !isPercentageValid}
+                  disabled={isSubmitting || !isStepValid()}
                   className="bg-emerald-600 hover:bg-emerald-700"
                 >
                   {isSubmitting ? (
@@ -597,7 +813,7 @@ const calls = useMemo(() => {
                     "Set Up Revenue Sharing"
                   )}
                 </Button>
-              )}
+              ) : null}
             </div>
           </form>
         </Form>
