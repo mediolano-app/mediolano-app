@@ -266,6 +266,7 @@ export default function AssetPage({ params }: AssetPageProps) {
               </div>
             </div>
           </div>
+          
 
           {/* Right column - Content */}
           <div className="lg:col-span-3">
