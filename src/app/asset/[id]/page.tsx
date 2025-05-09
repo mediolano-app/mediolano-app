@@ -35,6 +35,7 @@ import { Abi } from "starknet"
 import { useConnect, useAccount, useDisconnect } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "@/lib/constants"
 import { NFTMetadata } from "@/lib/types";
+import { IPTypeInfo } from "@/components/ip-type-info";
 
 interface AssetPageProps {
     params: Promise<{
@@ -186,7 +187,7 @@ const { data: nftSymbol } = useReadContract({
           
           {/* Left column - Image */}
           <div className="lg:col-span-3">
-            <div className="sticky top-24">
+            <div className="top-24">
               <div className="relative overflow-hidden rounded-xl border bg-muted/20 p-2">
                 <Image
                   src={asset.image || "/background.jpg"}
@@ -210,6 +211,13 @@ const { data: nftSymbol } = useReadContract({
                 ))}
               </div>
             </div>
+
+                <div className="mt-6">
+                   <IPTypeInfo asset={asset} />
+                  </div>
+
+
+
           </div>
 
           {/* Right column - Content */}
