@@ -115,3 +115,26 @@ export function formatDate(dateString: string) {
     // Otherwise, show the date
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
   }
+
+
+  // Utility function to convert decimal string (felt252) to hex string
+  export const decToHexAddress = (decimal: string): string => {
+    try {
+      const bigIntValue = BigInt(decimal);
+      const hex = bigIntValue.toString(16).padStart(64, "0"); // Pad to 64 chars (32 bytes)
+      return `0x${hex}`;
+    } catch (error) {
+      console.error(`Error converting decimal ${decimal} to hex:`, error);
+      return "";
+    }
+  };
+
+  export function hexToDecAddress(hex: string): string {
+    try {
+      if (!hex.startsWith("0x")) return "0";
+      return BigInt(hex).toString(10);
+    } catch (error) {
+      console.error(`Error converting hex ${hex} to decimal:`, error);
+      return "0";
+    }
+  }

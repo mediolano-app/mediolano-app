@@ -53,4 +53,3 @@ export function useAgreements(options: UseAgreementsOptions = {}) {
 
   return { agreements, isLoading }
 }
-
