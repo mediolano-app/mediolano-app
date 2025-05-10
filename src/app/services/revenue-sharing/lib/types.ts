@@ -35,6 +35,7 @@ export interface MonthlyRevenue {
 
 export interface ClaimableRevenueItem {
   id: string
+  nftContract: string
   assetName: string
   description: string
   amount: number

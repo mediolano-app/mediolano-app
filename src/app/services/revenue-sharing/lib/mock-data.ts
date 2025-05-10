@@ -43,57 +43,6 @@ export function getRecentAssets() {
   ]
 }
 
-// Mock data for user assets
-export function getUserAssets(): Asset[] {
-  return [
-    {
-      id: "asset-101",
-      title: "Digital Art Series: Future Cities",
-      description: "A collection of digital artwork depicting futuristic cityscapes.",
-      imageUrl: "/placeholder.svg?height=100&width=100",
-      categories: ["artwork", "digital"],
-      revenueShare: 70,
-      ownerCount: 5,
-      status: "Active",
-    },
-    {
-      id: "asset-102",
-      title: "Electronic Music Album",
-      description: "A full-length electronic music album with 12 tracks.",
-      imageUrl: "/placeholder.svg?height=100&width=100",
-      categories: ["music", "electronic"],
-      revenueShare: 85,
-      ownerCount: 3,
-      status: "Active",
-    },
-    {
-      id: "asset-103",
-      title: "AI Model: Text Generator",
-      description: "An AI model trained for creative text generation.",
-      imageUrl: "/placeholder.svg?height=100&width=100",
-      categories: ["ai-model", "software"],
-      revenueShare: 60,
-      ownerCount: 8,
-      status: "Active",
-    },
-    {
-      id: "asset-104",
-      title: "Short Story Collection",
-      description: "A collection of science fiction short stories.",
-      imageUrl: "/placeholder.svg?height=100&width=100",
-      categories: ["literature", "fiction"],
-      revenueShare: 75,
-      ownerCount: 2,
-      status: "Pending",
-    },
-  ]
-}
-
-// Get asset by ID
-export function getAssetById(id: string): Asset | undefined {
-  return getUserAssets().find((asset) => asset.id === id)
-}
-
 // Mock data for user revenue
 export function getUserRevenue(): RevenueData {
   return {
@@ -113,113 +62,95 @@ export function getUserRevenue(): RevenueData {
     ],
     claimableBreakdown: [
       {
-        id: "claim-001",
+        id: "001",
         assetName: "Digital Art Series: Future Cities",
         description: "Revenue from NFT marketplace sales",
         amount: 1.2,
         source: "OpenSea",
         generatedAt: "2023-08-15T10:30:00Z",
         expiresAt: "2023-09-15T10:30:00Z",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
       },
       {
-        id: "claim-002",
+        id: "002",
         assetName: "Electronic Music Album",
         description: "Streaming royalties",
         amount: 0.8,
         source: "Spotify",
         generatedAt: "2023-08-10T14:45:00Z",
         expiresAt: "2023-09-10T14:45:00Z",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
       },
       {
-        id: "claim-003",
+        id: "003",
         assetName: "AI Model: Text Generator",
         description: "Usage fees",
         amount: 1.2,
         source: "API Access",
         generatedAt: "2023-08-05T09:15:00Z",
         expiresAt: "2023-09-05T09:15:00Z",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
       },
     ],
   }
 }
 
-// Mock data for marketplace listings
-export function getMarketplaceListings(): MarketplaceListing[] {
+// Mock data for user assets
+export function getUserAssets(): Array<Asset & { metadataHash: string; licenseHash: string; nftContract: string }> {
   return [
-    {
-      id: "listing-001",
-      title: "Abstract Digital Art Collection",
-      description:
-        "A collection of 10 abstract digital artworks with revenue sharing enabled. Each piece explores themes of technology and nature.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      categories: ["artwork", "digital"],
-      price: 0.25,
-      revenueShare: 5,
-      totalShares: 100,
-      availableShares: 65,
-      featured: true,
-    },
-    {
-      id: "listing-002",
-      title: "Indie Rock Album Rights",
-      description: "Revenue sharing for a newly released indie rock album with growing streaming numbers.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      categories: ["music", "rock"],
-      price: 0.15,
-      revenueShare: 3,
-      totalShares: 200,
-      availableShares: 120,
-      featured: false,
-    },
-    {
-      id: "listing-003",
-      title: "Fantasy Novel Series",
-      description: "Rights for a fantasy novel series with potential for adaptation to other media formats.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      categories: ["literature", "fiction"],
-      price: 0.3,
-      revenueShare: 4,
-      totalShares: 150,
-      availableShares: 90,
-      featured: true,
-    },
-    {
-      id: "listing-004",
-      title: "AI Image Generator",
-      description: "A sophisticated AI model for generating high-quality images from text descriptions.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      categories: ["software", "ai-model"],
-      price: 0.5,
-      revenueShare: 7,
-      totalShares: 80,
-      availableShares: 45,
-      featured: true,
-    },
-    {
-      id: "listing-005",
-      title: "Documentary Film Rights",
-      description: "Revenue sharing for an award-winning documentary film about climate change.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      categories: ["video", "documentary"],
-      price: 0.35,
-      revenueShare: 4.5,
-      totalShares: 120,
-      availableShares: 70,
-      featured: false,
-    },
-    {
-      id: "listing-006",
-      title: "Mobile Game IP",
-      description: "Intellectual property rights for a popular mobile game with in-app purchases.",
-      imageUrl: "/placeholder.svg?height=200&width=300",
-      categories: ["software", "game"],
-      price: 0.4,
-      revenueShare: 6,
-      totalShares: 100,
-      availableShares: 60,
-      featured: false,
-    },
-  ]
+      {
+        id: "65",
+        title: "Digital Art Series: Future Cities",
+        description: "A collection of digital artwork depicting futuristic cityscapes.",
+        imageUrl: "/placeholder.svg?height=100&width=100",
+        categories: ["artwork", "digital"],
+        revenueShare: 70,
+        ownerCount: 5,
+        status: "Active",
+        metadataHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc",
+        licenseHash: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
+      },
+      {
+        id: "102",
+        title: "Electronic Music Album",
+        description: "A full-length electronic music album with 12 tracks.",
+        imageUrl: "/placeholder.svg?height=100&width=100",
+        categories: ["music", "electronic"],
+        revenueShare: 85,
+        ownerCount: 3,
+        status: "Active",
+        metadataHash: "0x234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd",
+        licenseHash: "0xbcdef1234567890abcdef1234567890abcdef1234567890abcdef123456789",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
+      },
+      {
+        id: "103",
+        title: "AI Model: Text Generator",
+        description: "An AI model trained for creative text generation.",
+        imageUrl: "/placeholder.svg?height=100&width=100",
+        categories: ["ai-model", "software"],
+        revenueShare: 60,
+        ownerCount: 8,
+        status: "Active",
+        metadataHash: "0x34567890abcdef1234567890abcdef1234567890abcdef1234567890abcde",
+        licenseHash: "0xcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
+      },
+      {
+        id: "104",
+        title: "Short Story Collection",
+        description: "A collection of science fiction short stories.",
+        imageUrl: "/placeholder.svg?height=100&width=100",
+        categories: ["literature", "fiction"],
+        revenueShare: 75,
+        ownerCount: 2,
+        status: "Pending",
+        metadataHash: "0x4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        licenseHash: "0xdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890a",
+        nftContract: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0", 
+      },
+    ];
 }
 
 // Mock data for claim history
@@ -232,7 +163,7 @@ export function getClaimHistory(): ClaimHistoryItem[] {
       date: "2023-08-01T14:30:00Z",
       source: "OpenSea",
       status: "Completed",
-      transactionHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      transactionHash: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
     },
     {
       id: "claim-history-002",
@@ -292,7 +223,7 @@ export function getDistributionHistory(): DistributionHistoryItem[] {
       date: "2023-08-01T12:00:00Z",
       recipientCount: 5,
       status: "Completed",
-      transactionHash: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      transactionHash: "0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0",
       recipients: [
         {
           wallet: "0x1234567890abcdef1234567890abcdef12345678",
