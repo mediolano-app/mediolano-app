@@ -10,6 +10,11 @@ import type {
   AssetDistributionData,
 } from "./types"
 
+// Get asset by ID
+export function getAssetById(id: string): Asset | undefined {
+  return getUserAssets().find((asset) => asset.id === id)
+}
+
 // Mock data for recent assets
 export function getRecentAssets() {
   return [
