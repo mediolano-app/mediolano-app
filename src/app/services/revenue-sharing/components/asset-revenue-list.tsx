@@ -16,11 +16,8 @@ import { ArrowUpDown, ExternalLink, History, Settings } from "lucide-react";
 import { Abi, useAccount, useProvider, useReadContract } from "@starknet-react/core";
 import { ip_revenue_abi } from "@/abis/ip_revenue";
 import { uint256 } from "starknet";
+import { IP_REVENUE_CONTRACT_ADDRESS } from "@/lib/constants";
 
-interface TokenId {
-  low: bigint;
-  high: bigint;
-}
 
 interface Asset {
   id: string;
@@ -39,7 +36,7 @@ export default function AssetRevenueList() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const { address } = useAccount();
 
-  const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_REVENUE_CONTRACT_ADDRESS as `0x${string}`;
+  const CONTRACT_ADDRESS = IP_REVENUE_CONTRACT_ADDRESS as `0x${string}`;
   if (!CONTRACT_ADDRESS) {
     throw new Error("Contract address not found in environment variables");
   }
