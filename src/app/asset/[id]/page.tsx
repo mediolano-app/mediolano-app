@@ -36,6 +36,8 @@ import { useConnect, useAccount, useDisconnect } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "@/lib/constants"
 import { NFTMetadata } from "@/lib/types";
 import { IPTypeInfo } from "@/components/ip-type-info";
+//add this import to get the known Cids
+import { getKnownCids } from "@/utils/ipfs";
 
 interface AssetPageProps {
     params: Promise<{
@@ -52,11 +54,14 @@ interface AssetPageProps {
   const tokenId = id || 42;
     
 const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
-
-
 const { account, address } = useAccount();
-
 const userAddress = address || "Loading";
+
+//Add new consts to recognize the Cids 
+const knownCids = getKnownCids();
+const ipfsCid = knownCids[id] || null
+
+
 
 // Read basic NFT information (name, symbol)
 const { data: nftSymbol } = useReadContract({
@@ -111,6 +116,7 @@ const { data: nftSymbol } = useReadContract({
 
     fetchMetadata();
   }, [tokenURI]);
+  
   
   const nftData = {
     title: metadata?.name || nftName || "Loading IP",
@@ -170,7 +176,16 @@ const { data: nftSymbol } = useReadContract({
       requireAttribution: true,
       royaltyPercentage: 5,
     },
+    // add specification to display the correct information on IPTypeInfo
+    ipfsCid: ipfsCid,
+    type: id === "1" ? "Art":
+          id === "2" ? "Software":
+          id === "3" ? "Audio":
+          id === "4" ? "Video":
+          id === "5" ? "Patens": "NFT",
+
   }
+  console.log(asset);
 
   return (
     <div className="min-h-screen bg-background">
@@ -786,4 +801,3 @@ function Instagram({ className, ...props }: React.ComponentProps<"svg">) {
     </svg>
   )
 }
-
