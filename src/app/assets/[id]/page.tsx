@@ -38,7 +38,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { TransferAssetDialog } from "@/components/transfer-asset-dialog"
 
 import { IPTypeInfo } from "@/components/ip-type-info"
-import { getKnownCids, AssetType } from "@/utils/ipfs"
+import { determineIPType, fetchIPFSMetadata, getKnownCids, AssetType } from "@/utils/ipfs"
 
 interface AssetPageProps {
   params: {
@@ -63,17 +63,68 @@ interface TransferHistoryItem {
 }
 
 /**
+ * Determine the IP type dynamically
+ * @param {string} id 
+ * @param {string|null} ipfsCid 
+ * @param {string} name 
+ * @returns {Promise<string>} 
+ */
+async function determineAssetType(id: string, ipfsCid: string | null, name: string): Promise<string> {
+  // if there exists an IPFS CID, get the metadata
+  if (ipfsCid) {
+    try {
+      const metadata = await fetchIPFSMetadata(ipfsCid);
+      if (metadata) {
+        // Use determineIPType func to detect the type in metadata-based 
+        const detectedType = determineIPType(metadata);
+        console.log(detectedType);
+        if (detectedType) {
+          return detectedType;
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching IPFS metadata for type detection:", error);
+    }
+  }
+  
+  // second try, try to infer the type from the name
+  const lowerName = name.toLowerCase();
+  if (lowerName.includes("audio") || lowerName.includes("music") || lowerName.includes("sound")) return "Audio";
+  if (lowerName.includes("art") || lowerName.includes("painting")) return "Art";
+  if (lowerName.includes("video") || lowerName.includes("film")) return "Video";
+  if (lowerName.includes("software") || lowerName.includes("code") || lowerName.includes("app")) return "Software";
+  if (lowerName.includes("patent") || lowerName.includes("invention")) return "Patents";
+  if (lowerName.includes("post") || lowerName.includes("article") || lowerName.includes("blog")) return "Posts";
+  if (lowerName.includes("book") || lowerName.includes("publication")) return "Publications";
+  
+  // if there isn't determined it yet, use fallback based on the id
+  const numId = parseInt(id, 10);
+  const types = [
+    "Art", "Software", "Audio", "Video", "Patents", 
+    "Posts", "Documents", "Publications", "RWA", "NFT"
+  ];
+  return types[numId % types.length];
+}
+
+
+/**
  * Retrieve data, IPFS CDI if exists
  * @param {string} id 
- * @returns {AssetType} 
+ * @returns {Promise<AssetType>} 
  */
-function getAssetData(id: string): AssetType {
+async function getAssetData(id: string): Promise<AssetType> {
   const knownCids = getKnownCids()
   const ipfsCid = knownCids[id] || null
-
+  
+  // Determine the name that will be search
+  const assetName = `Digital IP Asset #${id}`;
+  
+  // Determine the type dynamically 
+  const assetType = await determineAssetType(id, ipfsCid, assetName);
+  console.log(assetType);
   const mockAsset: AssetType = {
     id,
-    name: `Digital IP Asset #${id}`,
+    name: assetName,
     creator: {
       name: "0xArtist",
       address: "0x1a2b3c4d5e6f7g8h9i0j",
@@ -114,19 +165,16 @@ function getAssetData(id: string): AssetType {
       requireAttribution: true,
       royaltyPercentage: 5,
     },
-    type: id === "1" ? "Art" : 
-          id === "2" ? "Software" : 
-          id === "3" ? "Audio" : 
-          id === "4" ? "Video" : 
-          id === "5" ? "Patents" : "NFT",
+    type: assetType, // change to use the new form of search IP type dynamically
   }
 
   if (ipfsCid) {
-    mockAsset.ipfsCid = ipfsCid
+    mockAsset.ipfsCid = ipfsCid;
   }
 
-  return mockAsset
+  return mockAsset;
 }
+
 
 export default function AssetPage({ params }: AssetPageProps) {
   const { id } = params
@@ -155,7 +203,7 @@ export default function AssetPage({ params }: AssetPageProps) {
     async function loadAsset() {
       setIsLoading(true)
       try {
-        const data = getAssetData(id)
+        const data = await getAssetData(id)
         setAsset(data)
         
         if (data.owner) {

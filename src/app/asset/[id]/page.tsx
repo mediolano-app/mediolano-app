@@ -36,6 +36,8 @@ import { useConnect, useAccount, useDisconnect } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "@/lib/constants"
 import { NFTMetadata } from "@/lib/types";
 import { IPTypeInfo } from "@/components/ip-type-info";
+//add this import to get the known Cids
+import { fetchIPFSMetadata, determineIPType, getKnownCids } from "@/utils/ipfs";
 
 interface AssetPageProps {
     params: Promise<{
@@ -52,11 +54,17 @@ interface AssetPageProps {
   const tokenId = id || 42;
     
 const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
-
-
 const { account, address } = useAccount();
-
 const userAddress = address || "Loading";
+
+//Add new consts to recognize the Cids 
+const [assetType, setAssetType] = useState<string>("NFT"); // use NFT for default 
+const knownCids = getKnownCids();
+const ipfsCid = knownCids[id] || null
+
+
+
+
 
 // Read basic NFT information (name, symbol)
 const { data: nftSymbol } = useReadContract({
@@ -111,6 +119,71 @@ const { data: nftSymbol } = useReadContract({
 
     fetchMetadata();
   }, [tokenURI]);
+
+  useEffect(() => {
+    async function detectAssetType() {
+      // if there exists an IPFS CID, get the metadata
+      if (ipfsCid) {
+        try {
+          const metadata = await fetchIPFSMetadata(ipfsCid);
+          if (metadata) {
+            // Use determineIPType func to detect the type in metadata-based 
+            const detectedType = determineIPType(metadata);
+            if (detectedType) {
+              setAssetType(detectedType);
+              console.log(assetType);
+              return; 
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching IPFS metadata for type detection:", error);
+        }
+      }
+            
+      // second try, try to infer the type from the name
+      const name = (metadata?.name || nftName || "").toLowerCase();
+      if (name.includes("audio") || name.includes("music") || name.includes("sound")) {
+        setAssetType("Audio");
+        return;
+      }
+      if (name.includes("art") || name.includes("painting")) {
+        setAssetType("Art");
+        return;
+      }
+      if (name.includes("video") || name.includes("film")) {
+        setAssetType("Video");
+        return;
+      }
+      if (name.includes("software") || name.includes("code") || name.includes("app")) {
+        setAssetType("Software");
+        return;
+      }
+      if (name.includes("patent") || name.includes("invention")) {
+        setAssetType("Patents");
+        return;
+      }
+      if (name.includes("post") || name.includes("article") || name.includes("blog")) {
+        setAssetType("Posts");
+        return;
+      }
+      if (name.includes("book") || name.includes("publication")) {
+        setAssetType("Publications");
+        return;
+      }
+      console.log(assetType);
+      
+      // if there isn't determined it yet, use fallback based on the id
+      const numId = parseInt(id, 10);
+      const types = [
+        "Art", "Software", "Audio", "Video", "Patents", 
+        "Posts", "Documents", "Publications", "RWA", "NFT"
+      ];
+      setAssetType(types[numId % types.length]);
+    }
+    
+    detectAssetType();
+  }, [id, ipfsCid, metadata, nftName]);
+  
   
   const nftData = {
     title: metadata?.name || nftName || "Loading IP",
@@ -170,6 +243,9 @@ const { data: nftSymbol } = useReadContract({
       requireAttribution: true,
       royaltyPercentage: 5,
     },
+    ipfsCid: ipfsCid,
+    type: assetType, // change to use the new form of search IP type dynamically
+
   }
 
   return (
@@ -786,4 +862,3 @@ function Instagram({ className, ...props }: React.ComponentProps<"svg">) {
     </svg>
   )
 }
-
