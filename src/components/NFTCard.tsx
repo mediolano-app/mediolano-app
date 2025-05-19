@@ -231,7 +231,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 						<Link href={`/asset/dashboard/${tokenId}`}>
 						<DropdownMenuItem>
 							<Gauge className="h-4 w-4 mr-2" />
-							Dashboard
+							Asset Dashboard
 						</DropdownMenuItem>
 						</Link>
 					</DropdownMenuContent>

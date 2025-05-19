@@ -56,11 +56,8 @@ import { useReadContract } from "@starknet-react/core";
 import { abi } from "../../src/abis/abi";
 import { type Abi } from "starknet";
 
-import { useBlockchainPortfolio } from "@/hooks/useBlockchainPortfolio"
-
 type SortOption = "price-high" | "price-low" | "name-asc" | "name-desc" | "date-new" | "date-old"
 
-export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret"
 
 export interface IP{
   name: string,
@@ -133,15 +130,6 @@ export default function NFTPortfolio() {
   //   })
   // ]
 
-  const rarityOptions = [
-    { value: "all", label: "All Rarities" },
-    { value: "Common", label: "Common" },
-    { value: "Uncommon", label: "Uncommon" },
-    { value: "Rare", label: "Rare" },
-    { value: "Epic", label: "Epic" },
-    { value: "Legendary", label: "Legendary" },
-    { value: "Mythic", label: "Mythic" },
-  ]
 
   // Filter NFTs based on search, collection, visibility, and rarity
   // const filteredNFTs = nfts.filter((nft) => {
@@ -252,14 +240,7 @@ export default function NFTPortfolio() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Filter</DropdownMenuLabel>
-                <DropdownMenuRadioGroup value={rarityFilter} onValueChange={setRarityFilter}>
-                  {rarityOptions.map((option) => (
-                    <DropdownMenuRadioItem key={option.value} value={option.value}>
-                      {option.value !== "all" && <Sparkles className="mr-2 h-4 w-4" />}
-                      {option.label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
+               
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -532,9 +513,9 @@ function NFTListItem({ nft, onClick }: { nft: NFT; onClick: () => void }) {
               <Badge variant="outline" className="text-xs">
                 {nft.tokenId}
               </Badge>
-              {nft.rarity && (
+              {nft.name && (
                 <Badge variant="secondary" className="text-xs">
-                  {nft.rarity}
+                  {nft.name}
                 </Badge>
               )}
             </div>

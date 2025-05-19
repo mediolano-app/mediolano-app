@@ -195,30 +195,7 @@ export default function DashboardPage() {
                 {tokenIds.map((tokenId, index) => (
                   <NFTCard key={index} tokenId={tokenId} status={"teste"} />
                 ))}
-                {/*                 
-                {userAssets.slice(0, recentAssetsCount).map((asset) => (
-                  <Card key={asset.id} className="bg-background/80">
-                    <CardHeader>
-                      <CardTitle className="truncate">{asset.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Image
-                        src={asset.image || "/background.jpg"}
-                        alt={asset.name}
-                        width={200}
-                        height={200}
-                        className="w-full h-auto rounded-lg"
-                      />
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <span className="truncate">{asset.collection}</span>
-                      <span className="flex items-center">
-                        <Gem className="h-4 w-4 mr-1" />
-                        {asset.floorPrice} STRK
-                      </span>
-                    </CardFooter>
-                  </Card>
-                ))} */}
+                
               </div>
               {/* {recentAssetsCount < userAssets.length && (
                 <div className="mt-4 text-center">

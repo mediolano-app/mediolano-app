@@ -19,15 +19,15 @@ export default function DappInfo() {
   // Mockup data for app information
   const appInfo = {
     name: "Mediolano",
-    version: "0.1.1 Alpha",
-    description: "Welcome to a sneak peek of Mediolano, a cutting-edge decentralized application (dapp) poised to empower Programmable IP for the Integrity Web. With Mediolano you can seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets. Mediolano ensures decentralization, interoperability and sovereignty to your assets.",
+    version: "0.1.2 Testnet",
+    description: "Mediolano is a decentralized application for creators and organizations to protect and make money from their intellectual property, powered on Starknet.",
     features: [
       "Open-Source",
-      "Low Fees",
-      "Fast Performance",
-      "Self Custody Assets",
-      "Easy to Use",
-      "Powered by Starknet"
+      "Zero Fees",
+      "Fast & Secure",
+      "Self Custody",
+      "Programmable IP",
+      "ZK-Proofs"
     ]
   }
 
