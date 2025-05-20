@@ -6,7 +6,6 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import AnimatedBackground from '@/components/AnimatedBackground'
 import { Toaster } from "@/components/ui/toaster"
-import FluidParticlesBackground from "@/components/ParticlesBackground"
 
 export const metadata: Metadata = {
   title: "Mediolano Dapp",

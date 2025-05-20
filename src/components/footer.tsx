@@ -43,7 +43,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "@/components/ui/use-toast"
 import Image from "next/image";
-import DappInfo from './DappInfo';
+import DappInfo from './dapp-info';
 
 const features = [
   { icon: <Brain className="h-6 w-6" />, title: "Discover", description: "IP for the Integrity Web", link: "/discover" },

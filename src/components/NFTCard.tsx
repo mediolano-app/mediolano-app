@@ -181,7 +181,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 			<CardContent className="p-4">
 				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
 				
-				<p className="text-sm text-muted-foreground mb-5">
+				<p className="text-sm text-muted-foreground mb-5 min-h-[40px]">
 					{ truncateString(metadata.description, 99 ) }</p>
 				
 				
@@ -213,12 +213,12 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 					<Eye className="h-4 w-4 mr-2" />
 					View
 				</Button></Link>
-				{/*
-				<Button variant="outline" size="sm">
+				
+				<Button variant="outline" size="sm" disabled>
 					<FileText className="h-4 w-4 mr-2" />
 					License
 				</Button>
-				*/}
+				
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="outline" size="sm">
@@ -226,7 +226,7 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent>
-						<DropdownMenuLabel>More Actions</DropdownMenuLabel>
+						<DropdownMenuLabel>More</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<Link href={`/asset/dashboard/${tokenId}`}>
 						<DropdownMenuItem>
@@ -234,8 +234,11 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 							Asset Dashboard
 						</DropdownMenuItem>
 						</Link>
+						
 					</DropdownMenuContent>
 				</DropdownMenu>
+				
+
 			</CardFooter>
 		</Card>
 	);

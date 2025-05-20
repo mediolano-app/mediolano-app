@@ -1,6 +1,6 @@
 'use client';
 
-import StartHero from "@/components/discover/StartHero";
+import StartHero from "@/components/discover/start-hero";
 
 export default function Home() {
   return (

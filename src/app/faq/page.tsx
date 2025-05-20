@@ -11,23 +11,23 @@ import { BookOpen, Cpu, DollarSign, Shield, Zap, HelpCircle } from 'lucide-react
 const faqData = [
   {
     category: "general",
-    question: "What is blockchain-based intellectual property management?",
-    answer: "Blockchain-based intellectual property management is a system that uses blockchain technology to securely register, manage, and monetize intellectual property rights. It provides a transparent, immutable record of ownership and transactions related to intellectual property assets."
+    question: "What is Programmable IP?",
+    answer: "Programmable intellectual property uses blockchain technology to securely register and upgrade intellectual property rights with smart contracts. It provides a transparent, immutable record of ownership and transactions related to intellectual property assets."
   },
   {
     category: "registration",
-    question: "How does your dapp help in registering intellectual property?",
-    answer: "Our dapp allows users to easily register their intellectual property by creating a unique digital representation of their work on the blockchain. This creates a timestamped, immutable record of ownership that can be used as proof of creation and existence."
+    question: "How to register intellectual property?",
+    answer: "Our dapp allows users to easily register their intellectual property by creating a unique digital representation of their work on the blockchain. This creates a timestamped, immutable record of Proof of Ownership that can be used in 181 countries."
   },
   {
     category: "management",
     question: "What types of intellectual property can I manage with your dapp?",
-    answer: "Our dapp supports various types of intellectual property, including patents, trademarks, copyrights, and trade secrets. Users can register and manage different IP assets through a unified interface."
+    answer: "Our dapp supports various types of intellectual property, including artworks, patents, trademarks, software. audio, video, rwa (real world assets). Users can register and manage different IP assets through a unified interface."
   },
   {
     category: "monetization",
     question: "How does the monetization feature work?",
-    answer: "The monetization feature allows IP owners to license or sell their assets directly through the platform. Smart contracts automate the process, ensuring secure and transparent transactions. Users can set terms, pricing, and receive payments in cryptocurrency or fiat currency."
+    answer: "The monetization feature allows IP owners to license or sell their assets directly through the platform with smart contracts to automate and secure the process."
   },
   {
     category: "security",
@@ -40,11 +40,6 @@ const faqData = [
     answer: "IP tokenization is the process of creating a digital token that represents ownership or rights to a specific piece of intellectual property. In our dapp, users can tokenize their IP assets, creating unique, tradable tokens on the blockchain. This enables fractional ownership, easier transfer of rights, and new ways to monetize IP."
   },
   {
-    category: "tokenization",
-    question: "What are the benefits of tokenizing my intellectual property?",
-    answer: "Tokenizing your IP offers several benefits: 1) Increased liquidity, as tokens can be easily bought and sold. 2) Fractional ownership, allowing for more flexible investment opportunities. 3) Automated royalty distribution through smart contracts. 4) Enhanced transparency in IP transactions. 5) Potential for reaching a global market of investors and collaborators."
-  },
-  {
     category: "management",
     question: "How does blockchain improve the traditional IP management process?",
     answer: "Blockchain technology enhances IP management by providing: 1) Immutable proof of creation and ownership. 2) Transparent and easily accessible records of IP rights and transactions. 3) Automated licensing and royalty payments through smart contracts. 4) Reduced risk of IP infringement and disputes. 5) Streamlined process for IP registration and transfer."
@@ -53,11 +48,6 @@ const faqData = [
     category: "monetization",
     question: "Can I create custom licensing terms for my intellectual property?",
     answer: "Yes, our dapp allows IP owners to create custom licensing terms using smart contracts. You can define parameters such as usage rights, duration, territorial limitations, and payment structures. These terms are then encoded into the blockchain, ensuring automatic enforcement and transparency for all parties involved."
-  },
-  {
-    category: "security",
-    question: "How does your dapp handle dispute resolution for IP conflicts?",
-    answer: "Our dapp incorporates a multi-layered dispute resolution system: 1) Smart contract-based automated resolution for clear-cut cases. 2) A decentralized arbitration process involving neutral experts from our network. 3) Integration with traditional legal systems when necessary. This approach ensures fair and efficient resolution of IP conflicts while leveraging the benefits of blockchain technology."
   }
 ]
 
