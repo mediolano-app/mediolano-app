@@ -15,9 +15,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useAccount } from "@starknet-react/core"
 
 const StateDisplay = ({ state }: { state: VerificationState }) => {
-  switch (state) {
+  switch (state.connection || state.verification) {
     case "connecting":
       return (
         <Badge variant="secondary">
@@ -60,6 +61,8 @@ const StateDisplay = ({ state }: { state: VerificationState }) => {
 export default function XVerification() {
   const { state, username, error, connect, verify, reset } = useXVerification()
 
+  const { address } = useAccount()
+
   return (
     <Card className="w-[350px]">
       <CardHeader>
@@ -90,26 +93,26 @@ export default function XVerification() {
         <CardDescription>Connect your X account to verify your identity on Mediolano.app</CardDescription>
       </CardHeader>
       <CardContent>
-        {state === "idle" && (
+        {state.connection === "idle" && (
           <Button onClick={connect} className="w-full">
             <Twitter className="mr-2 h-4 w-4" />
             Connect X Account
           </Button>
         )}
-        {(state === "connecting" || state === "verifying") && (
+        {(state.connection === "connecting") && (
           <Button disabled className="w-full">
             <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-            {state === "connecting" ? "Connecting..." : "Verifying..."}
+            {"Connecting..."}
           </Button>
         )}
-        {(state === "connected" || state === "verified") && (
+        {(state.connection === "connected") && (
           <Alert>
             <CheckCircle className="h-4 w-4" />
             <AlertTitle>Connected to X</AlertTitle>
             <AlertDescription>Your account @{username} is connected.</AlertDescription>
           </Alert>
         )}
-        {state === "error" && (
+        {state.connection || state.verification === "error" && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
@@ -128,12 +131,12 @@ export default function XVerification() {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        {state === "connected" && (
+        {state.connection === "connected" && state.verification === "unchecked"  && (
           <Button variant="outline" onClick={() => verify(username)}>
             Verify Now
           </Button>
         )}
-        {(state === "verified" || state === "error") && (
+        {(state.verification === "verified" || state.verification === "error") && (
           <Button variant="outline" onClick={reset}>
             Reset
           </Button>
