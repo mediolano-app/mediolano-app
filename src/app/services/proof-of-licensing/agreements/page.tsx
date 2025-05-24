@@ -11,7 +11,7 @@ export default function AgreementsPage() {
           <h1 className="text-3xl font-bold">My Agreements</h1>
           <p className="text-muted-foreground mt-1">Manage your licensing agreements and track their status</p>
         </div>
-        <Link href="/agreements/create">
+        <Link href="agreements/create">
           <Button>Create New Agreement</Button>
         </Link>
       </div>
