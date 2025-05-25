@@ -35,6 +35,8 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 ## Getting Started
 
+## Running locally
+
 Dapp requirements:
 - Next.js 15
 - React 19
@@ -59,3 +61,19 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Running via Docker
+
+To run the containerized application, there is no dependencies requirement. 
+
+Clone the repository, and run:
+
+```bash
+ docker build -t mediolano-app .     
+```
+
+To build the image. Then, start the container:
+
+```bash
+docker run -p 8080:8080 mediolano-app
+```
