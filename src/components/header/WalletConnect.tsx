@@ -13,11 +13,21 @@ import {
 } from "@/components/ui/dialog";
 import { Wallet, User, Gift, Settings, LogOut, Rocket, Box } from "lucide-react";
 import Link from "next/link"
+import { useState } from "react";
+import { SessionAccountInterface } from "@argent/webwallet-sdk";
+// import { useConnectWebWallet } from "@/hooks/use-connect-web-wallet";
 
 export function WalletConnect() {
   const { connect, connectors } = useConnect();
   const { account, address } = useAccount();
   const { disconnect } = useDisconnect();
+  const [invisibleAccount, setInvisibleAccount] = useState<SessionAccountInterface | undefined>(undefined);
+  	const [withApproval, setWithApproval] = useState<boolean>(true);
+	const [connectStatus, setConnectStatus] = useState<"Connect" | "Connecting" | "Deploying account">("Connect");
+
+
+  // useConnectWebWallet(setInvisibleAccount);
+
   const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -39,7 +49,7 @@ export function WalletConnect() {
           <DialogDescription className="text-sm text-blue-500">
             {account
               ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}`
-              : "Please connect to Starknet Sepolia *"}
+              : "Please connect to Starknet Sepolia b *"}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
@@ -87,6 +97,9 @@ export function WalletConnect() {
                   Connect with {connector.name}
                 </Button>
               ))}
+               <Button onClick={() => console.log("Connect with 123")} className="bg-blue-500 text-white">
+                  Connect with Argent Wallet
+                </Button>
 
           <div className="alert alert-warning">
             <p className="text-sm">
