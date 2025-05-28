@@ -75,13 +75,13 @@ export default function XVerification() {
               <DialogHeader>
                 <DialogTitle>How to Verify Your X Account</DialogTitle>
                 <DialogDescription>
-                  1. Click the "Connect X Account" button.
+                  1. Click the &quot;Connect X Account&quot; button.
                   <br />
-                  2. You'll be redirected to X to authorize the connection.
+                  2. You&apos;ll be redirected to X to authorize the connection.
                   <br />
                   3. Once authorized, your account will be automatically verified.
                   <br />
-                  4. If successful, you'll see a verified badge on your Mediolano.app profile.
+                  4. If successful, you&apos;ll see a verified badge on your Mediolano.app profile.
                 </DialogDescription>
               </DialogHeader>
             </DialogContent>

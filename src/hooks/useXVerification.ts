@@ -7,7 +7,7 @@ const connectXAccount = async () => {
 }
 
 const verifyIdentity = async (username: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 1500)) // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, username.length * 150)) // Simulate API delay
   return { success: true, verified: true }
 }
 
@@ -33,7 +33,7 @@ export const useXVerification = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred")
       setState("error")
-      setUsername(false)
+      setUsername("")
     }
   }, [])
 
