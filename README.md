@@ -1,10 +1,15 @@
 Quick links:
-
+<br>
 <a href="https://mediolano.xyz">Discover: mediolano.xyz</a>
+<br>
 <a href="https://ip.mediolano.app">Mediolano Dapp (Sepolia)</a>
+<br>
 <a href="https://t.me/MediolanoStarknet">Telegram</a>
+<br>
 <a href="https://discord.gg/NhqdTvyA">Discord</a>
+<br>
 <a href="https://x.com/mediolanoapp">X / Twitter</a>
+<br>
 
 ![Mediolano.app](https://mediolano.app/wp-content/uploads/2025/03/Mediolano-Dapp-20250310alpha.png)
 
