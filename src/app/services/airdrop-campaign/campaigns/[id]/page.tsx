@@ -1,368 +1,339 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ArrowLeft, Calendar, CheckCircle, Clock, Copy, ExternalLink, Share2, Users } from "lucide-react"
-import type { Campaign, Task } from "@/app/services/airdrop-campaign/lib/types"
-import { formatDate, truncateAddress } from "@/app/services/airdrop-campaign/lib/utils"
-import { getCampaignById, mockParticipateInCampaign } from "@/app/services/airdrop-campaign/lib/data"
-import Link from "next/link"
-import { toast } from "@/components/ui/use-toast"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  Copyright,
+  DollarSign,
+  Clock,
+  Gavel,
+  Users,
+  LinkIcon,
+  MoreVertical,
+  Eye,
+  Copy,
+  FileSignature,
+} from "lucide-react"
+import { useRouter } from "next/navigation"
 
-export default function CampaignDetails({ params }: { params: { id: string } }) {
+// Mock data for previously registered IPs
+const mockIPs = [
+  {
+    id: 1,
+    name: "Novel: The Cosmic Journey",
+    type: "Book",
+    status: "Listed",
+    price: "0.5 ETH",
+    image: "/background.jpg",
+  },
+  {
+    id: 2,
+    name: "Song: Echoes of Tomorrow",
+    type: "Music",
+    status: "Pending",
+    price: "0.2 ETH",
+    image: "/background.jpg",
+  },
+  {
+    id: 3,
+    name: "Artwork: Nebula Dreams",
+    type: "Image",
+    status: "Listed",
+    price: "1.5 ETH",
+    image: "/background.jpg",
+  },
+  {
+    id: 4,
+    name: "Screenplay: The Last Frontier",
+    type: "Text",
+    status: "Draft",
+    price: "N/A",
+    image: "/background.jpg",
+  },
+  {
+    id: 5,
+    name: "Short Film: Beyond the Stars",
+    type: "Video",
+    status: "Listed",
+    price: "3 ETH",
+    image: "/background.jpg",
+  },
+]
+
+export default function ListingIP() {
   const router = useRouter()
-  const [campaign, setCampaign] = useState<Campaign | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isParticipating, setIsParticipating] = useState(false)
-  const [completedTasks, setCompletedTasks] = useState<string[]>([])
-  const [isJoining, setIsJoining] = useState(false)
 
-  useEffect(() => {
-    const fetchCampaign = async () => {
-      try {
-        if (!params.id) {
-          throw new Error("Campaign ID is missing")
-        }
-
-        const campaignData = await getCampaignById(params.id)
-        setCampaign(campaignData)
-
-        // Check if user is already participating
-        const userParticipation = campaignData.participants > 0 && Math.random() > 0.7
-        setIsParticipating(userParticipation)
-
-        if (userParticipation) {
-          // Simulate some completed tasks
-          const completed = campaignData.tasks.filter(() => Math.random() > 0.5).map((task) => task.id)
-          setCompletedTasks(completed)
-        }
-      } catch (error) {
-        console.error("Failed to fetch campaign:", error)
-        toast({
-          title: "Error loading campaign",
-          description: "There was a problem loading the campaign details",
-          variant: "destructive",
-        })
-        // Instead of redirecting, set an error state that we can display
-        setCampaign(null)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchCampaign()
-  }, [params.id])
-
-  const handleTaskComplete = (taskId: string) => {
-    if (!taskId) return
-
-    setCompletedTasks((prev) => [...prev, taskId])
-    toast({
-      title: "Task completed",
-      description: "You've successfully completed this task",
-    })
+  const handleNavigation = (id: string) => {
+    router.push("/assets/1")
   }
-
-  const handleParticipate = async () => {
-    if (!campaign) return
-
-    setIsJoining(true)
-
-    try {
-      await mockParticipateInCampaign(campaign.id)
-      setIsParticipating(true)
-      toast({
-        title: "Joined campaign",
-        description: "You've successfully joined this campaign",
-      })
-    } catch (error) {
-      console.error("Failed to participate:", error)
-      toast({
-        title: "Failed to join",
-        description: "There was a problem joining this campaign. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsJoining(false)
-    }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6 flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading campaign details...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!campaign) {
-    return (
-      <div className="container mx-auto px-4 py-6">
-        <Alert variant="destructive">
-          <AlertTitle>Campaign not found</AlertTitle>
-          <AlertDescription>The campaign you're looking for doesn't exist or has been removed.</AlertDescription>
-        </Alert>
-        <Button asChild className="mt-4">
-          <Link href="/">Go back home</Link>
-        </Button>
-      </div>
-    )
-  }
-
-  const progress = Math.round((campaign.participants / campaign.maxParticipants) * 100)
-  const allTasksCompleted = isParticipating && completedTasks.length === campaign.tasks.length
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex items-center mb-6">
-        <Button variant="ghost" size="icon" asChild className="mr-2">
-          <Link href="/">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-        <h1 className="text-3xl font-bold">Campaign Details</h1>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <div className="relative h-64 w-full">
-              <img
-                src={campaign.image || "/placeholder.svg"}
-                alt={campaign.name}
-                className="h-full w-full object-cover"
-              />
-              <Badge
-                variant={campaign.status === "active" ? "default" : "secondary"}
-                className="absolute top-4 right-4"
+    <div className="container mx-auto p-4 mt-10 mb-20">
+      <h1 className="text-3xl font-bold mb-10 text-center">IP Listing</h1>
+      <div className="grid lg:grid-cols-2 gap-8 mb-12">
+        {/* Left column: List of previously registered IPs */}
+        <div>
+          <h2 className="text-1xl font-semibold mb-4">Your Intellectual Property Listings</h2>
+          <div className="space-y-4">
+            {mockIPs.map((ip) => (
+              <Card
+                key={ip.id}
+                className="hover:shadow transition-shadow duration-300 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75 text-foreground"
               >
-                {campaign.status}
-              </Badge>
-            </div>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-2xl">{campaign.name}</CardTitle>
-                  <CardDescription className="flex items-center gap-1 mt-1">
-                    <Calendar className="h-4 w-4" />
-                    Ends on {formatDate(campaign.endDate)}
-                  </CardDescription>
-                </div>
-                <Button variant="outline" size="icon">
-                  <Share2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-6">{campaign.description}</p>
-
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium mb-2">Campaign Progress</h3>
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span>{campaign.participants} participants</span>
-                    </div>
-                    <span className="text-muted-foreground">{campaign.maxParticipants} max</span>
-                  </div>
-                  <Progress value={progress} className="h-2" />
-                </div>
-
-                <div className="flex flex-wrap gap-4">
-                  <div className="bg-muted p-3 rounded-lg flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-primary" />
+                <CardHeader className="flex flex-row items-center space-y-0 pb-2">
+                  <CardTitle className="text-lg">{ip.name}</CardTitle>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0 ml-auto">
+                        <span className="sr-only">Open menu</span>
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <Eye className="mr-2 h-4 w-4" />
+                        <Button key={ip.id} onClick={() => handleNavigation(ip.name)}>
+                          View Details
+                        </Button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Copy className="mr-2 h-4 w-4" />
+                        <span>Create New Listing</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <FileSignature className="mr-2 h-4 w-4" />
+                        <span>Create License</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center space-x-4">
+                    <img src={ip.image} alt={ip.name} className="w-24 h-24 object-cover rounded-md" />
                     <div>
-                      <div className="text-sm font-medium">Reward</div>
-                      <div className="text-lg font-bold">{campaign.reward} NFTs</div>
+                      <p className="text-sm text-muted-foreground mb-1">{ip.type}</p>
+                      <p
+                        className={`text-sm font-medium ${
+                          ip.status === "Listed"
+                            ? "text-green-500"
+                            : ip.status === "Pending"
+                              ? "text-yellow-500"
+                              : "text-gray-500"
+                        }`}
+                      >
+                        Status: {ip.status}
+                      </p>
+                      <p className="text-sm font-semibold mt-1">{ip.price}</p>
                     </div>
                   </div>
-
-                  <div className="bg-muted p-3 rounded-lg flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-primary" />
-                    <div>
-                      <div className="text-sm font-medium">Tasks</div>
-                      <div className="text-lg font-bold">{campaign.tasks.length} required</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Campaign Tasks</CardTitle>
-              <CardDescription>Complete these tasks to be eligible for the airdrop</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {campaign.tasks.length > 0 ? (
-                <div className="space-y-4">
-                  {campaign.tasks.map((task) => (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      isCompleted={completedTasks.includes(task.id)}
-                      onComplete={() => handleTaskComplete(task.id)}
-                      isParticipating={isParticipating}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center p-6">
-                  <p className="text-muted-foreground">No tasks defined for this campaign</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Participation Status</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isParticipating ? (
-                <div className="space-y-4">
-                  <Alert>
-                    <CheckCircle className="h-4 w-4" />
-                    <AlertTitle>You're participating!</AlertTitle>
-                    <AlertDescription>Complete all tasks to be eligible for the airdrop</AlertDescription>
-                  </Alert>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Tasks completed:</span>
-                      <span className="font-medium">
-                        {completedTasks.length} / {campaign.tasks.length}
-                      </span>
-                    </div>
-                    <Progress value={(completedTasks.length / campaign.tasks.length) * 100} className="h-2" />
-                  </div>
-
-                  {allTasksCompleted && (
-                    <Alert className="bg-primary/20 text-primary border-primary">
-                      <CheckCircle className="h-4 w-4" />
-                      <AlertTitle>All tasks completed!</AlertTitle>
-                      <AlertDescription>
-                        You're eligible to receive {campaign.reward} NFTs when the campaign ends
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-muted-foreground">
-                    You haven't joined this campaign yet. Join now to participate in the airdrop!
-                  </p>
-                  <Button
-                    className="w-full"
-                    onClick={handleParticipate}
-                    disabled={campaign.status !== "active" || isJoining}
-                  >
-                    {isJoining ? "Joining..." : "Join Campaign"}
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Campaign Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Creator</div>
-                <div className="flex items-center gap-2">
-                  <div className="h-6 w-6 rounded-full bg-primary/20"></div>
-                  <div className="font-medium">{truncateAddress(campaign.creator)}</div>
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Contract Address</div>
-                <div className="flex items-center gap-2">
-                  <div className="font-medium">{truncateAddress(campaign.contractAddress)}</div>
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-6 w-6">
-                    <ExternalLink className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">Created On</div>
-                <div className="font-medium">{formatDate(campaign.createdAt)}</div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-interface TaskItemProps {
-  task: Task
-  isCompleted: boolean
-  onComplete: () => void
-  isParticipating: boolean
-}
-
-function TaskItem({ task, isCompleted, onComplete, isParticipating }: TaskItemProps) {
-  return (
-    <div className="border rounded-lg p-4">
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <h3 className="font-medium">{task.title}</h3>
-          <p className="text-sm text-muted-foreground">{task.description}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <Badge variant="outline" className="text-xs">
-              {task.type}
-            </Badge>
-            {task.verificationUrl && (
-              <Button variant="link" size="sm" className="h-auto p-0" asChild>
-                <a
-                  href={task.verificationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1"
-                >
-                  <span className="text-xs">Verify</span>
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </Button>
-            )}
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
 
-        {isParticipating &&
-          (isCompleted ? (
-            <Button variant="outline" size="sm" className="gap-1" disabled>
-              <CheckCircle className="h-4 w-4 text-primary" />
-              Completed
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm" onClick={onComplete}>
-              Mark as Complete
-            </Button>
-          ))}
+        {/* Right column: Form to register new IP */}
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Create a new listing</CardTitle>
+              <CardDescription>Enter the details of your intellectual property to create an NFT.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form>
+                <div className="grid w-full items-center gap-4">
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="ip">IP</Label>
+                    <Select>
+                      <SelectTrigger id="ip">
+                        <SelectValue placeholder="Select Your IP" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="1">IP I</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" placeholder="Enter the name of your IP" />
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="type">Type</Label>
+                    <Select>
+                      <SelectTrigger id="type">
+                        <SelectValue placeholder="Select IP type" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="book">Book</SelectItem>
+                        <SelectItem value="music">Music</SelectItem>
+                        <SelectItem value="image">Image</SelectItem>
+                        <SelectItem value="text">Text</SelectItem>
+                        <SelectItem value="video">Video</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea id="description" placeholder="Describe your intellectual property" />
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="file">Upload File</Label>
+                    <Input id="file" type="file" />
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="price">Price</Label>
+                    <Input id="price" type="number" placeholder="Enter price" />
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="currency">Currency</Label>
+                    <Select>
+                      <SelectTrigger id="currency">
+                        <SelectValue placeholder="Select currency" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="eth">ETH</SelectItem>
+                        <SelectItem value="usdc">USDC</SelectItem>
+                        <SelectItem value="dai">DAI</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="duration">Duration</Label>
+                    <Input id="duration" type="number" placeholder="Enter duration in days" />
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="saleMethod">Sale Method</Label>
+                    <Select>
+                      <SelectTrigger id="saleMethod">
+                        <SelectValue placeholder="Select sale method" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="fixed">Fixed Price</SelectItem>
+                        <SelectItem value="auction">Auction</SelectItem>
+                        <SelectItem value="crowdfunding">Crowdfunding</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch id="privateSale" />
+                    <Label htmlFor="privateSale">Private Sale</Label>
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="reserveAddress">Reserve for Specific Address</Label>
+                    <Input id="reserveAddress" placeholder="Enter Ethereum address" />
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="tokenType">Token Type</Label>
+                    <Select>
+                      <SelectTrigger id="tokenType">
+                        <SelectValue placeholder="Select token type" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="erc721">ERC721</SelectItem>
+                        <SelectItem value="erc1155">ERC1155</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="blockchain">Blockchain</Label>
+                    <Select>
+                      <SelectTrigger id="blockchain">
+                        <SelectValue placeholder="Select blockchain" />
+                      </SelectTrigger>
+                      <SelectContent position="popper">
+                        <SelectItem value="starknet">Starknet</SelectItem>
+                        <SelectItem value="ethereum">Ethereum</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </form>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline">Cancel</Button>
+              <Button>Register NFT</Button>
+            </CardFooter>
+          </Card>
+        </div>
       </div>
+
+      <section className="mt-32">
+        <h2 className="text-2xl font-bold mb-10 text-center">Why Tokenize Your Intellectual Property?</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Copyright className="h-6 w-6 ml-blue" />
+                Protect Your Rights
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Secure and immutable proof of ownership on the blockchain, enhancing copyright protection.</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-6 w-6 ml-blue" />
+                Monetize Your Work
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Create new revenue streams through NFT sales, licensing, and royalties.</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-6 w-6 ml-blue" />
+                Expand Your Audience
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Reach a global market of collectors and enthusiasts in the growing NFT ecosystem.</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gavel className="h-6 w-6 ml-blue" />
+                Flexible Sales Options
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Choose from various sale methods including fixed price, auctions, and crowdfunding.</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-6 w-6 ml-blue" />
+                Provenance Tracking
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Maintain a transparent and verifiable history of ownership and transactions.</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/90 text-foreground">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LinkIcon className="h-6 w-6 ml-blue" />
+                Interoperability
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Leverage cross-platform compatibility and integration with various blockchain ecosystems.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     </div>
   )
 }
