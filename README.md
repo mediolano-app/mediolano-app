@@ -1,3 +1,11 @@
+Quick links:
+
+<a href="https://mediolano.xyz">Discover: mediolano.xyz</a>
+<a href="https://ip.mediolano.app">Mediolano Dapp (Sepolia)</a>
+<a href="https://t.me/MediolanoStarknet">Telegram</a>
+<a href="https://discord.gg/NhqdTvyA">Discord</a>
+<a href="https://x.com/mediolanoapp">X / Twitter</a>
+
 ![Mediolano.app](https://mediolano.app/wp-content/uploads/2025/03/Mediolano-Dapp-20250310alpha.png)
 
 > [!IMPORTANT]
@@ -25,12 +33,6 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 - High-Speed & Low-Cost: Leverage Starknet's unparalleled speed and cost-efficiency with ZERO FEES on Mediolano Protocol.
 
 [![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
-
-<h3 align="center">
-  <a href="https://mediolano.app">Learn more</a>
-  &nbsp; | &nbsp;
-  <a href="https://ip.mediolano.app">Open Dapp</a>
-</h3>
 
 
 ## Getting Started
