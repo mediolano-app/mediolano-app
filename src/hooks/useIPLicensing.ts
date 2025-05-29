@@ -1,6 +1,6 @@
 import { useContract } from '@starknet-react/core';
 import { useCallback } from 'react';
-import IPLicensingABI from '../abis/ip_licensing';
+import IPLicensingABI from '../abis/ip_licensing_nft_nft';
 
 export const useIPLicensing = () => {
     // Initialize contract
