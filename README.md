@@ -1,8 +1,8 @@
 Quick links:
 <br>
-<a href="https://mediolano.xyz">Discover: mediolano.xyz</a>
-<br>
 <a href="https://ip.mediolano.app">Mediolano Dapp (Sepolia)</a>
+<br>
+<a href="https://mediolano.xyz">Website mediolano.xyz</a>
 <br>
 <a href="https://t.me/MediolanoStarknet">Telegram</a>
 <br>
