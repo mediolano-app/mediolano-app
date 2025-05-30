@@ -89,16 +89,29 @@ import { ToastAction } from "@/components/ui/toast";
 
 interface Asset {
   title: string;
-  description: string;
-  author: string;
-  type: string;
   mediaUrl: string;
-  externalUrl: string;
-  tags: string[];
   license: string;
   limited: boolean;
   totalSupply: number;
+
+  name: string;
+  author: string;
+  description: string;
+  type: string;
+  template: string;
   collection: string;
+  tags: string[];
+  image: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  licenseDuration: string;
+  licenseTerritory: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  registrationDate: string;
+
   version: string;
 }
 
@@ -140,17 +153,18 @@ const formSchema = z.object({
     .min(10, { message: "Description must be at least 10 characters" })
     .max(1000),
   type: z.enum([
+    "basic",
     "3d-model",
     "ai-model",
     "artwork",
     "audio",
     "document",
     "literary",
+    "nft",
     "post",
     "rwa",
     "software",
     "video",
-    "other",
   ]),
   collection: z.string().optional(),
   tags: z.array(z.string()).optional().default([]),
@@ -163,6 +177,8 @@ const formSchema = z.object({
     "custom",
   ]),
   licenseDetails: z.string().optional(),
+  licenseDuration: z.string().optional(),
+  licenseTerritory: z.string().optional(),
   version: z.string().optional(),
   commercialUse: z.boolean().default(false),
   modifications: z.boolean().default(false),
@@ -188,7 +204,7 @@ const fileTypeIcons = {
   default: FileText,
 };
 
-// Mock blockchain data
+// need to pull blockchain data
 const mockBlockchainData = {
   gas: 0.000342,
   gasPrice: "0.01 STRK",
@@ -231,10 +247,12 @@ export default function CreateIPPage() {
   }
 
   const [asset, setAsset] = useState<Asset>({
-    title: "",
-    description: "",
+    title: "", //name
+    name: "", // <-- Add this line to satisfy the Asset interface
     author: "",
+    description: "",
     type: "",
+    template: "",
     mediaUrl: "",
     externalUrl: "",
     tags: [],
@@ -243,7 +261,22 @@ export default function CreateIPPage() {
     totalSupply: 1,
     collection: "MIP Collection",
     version: "1",
+    image: "",
+    licenseType: "all-rights",
+    licenseDetails: "",
+    licenseDuration: "50 years",
+    licenseTerritory: "Worldwide",
+    commercialUse: false,
+    modifications: false,
+    attribution: true,
+    registrationDate: new Date().toISOString(),
   });
+
+
+
+
+
+
 
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
@@ -1312,6 +1345,7 @@ export default function CreateIPPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
+                  
                     <div className="space-y-4">
                       <Label htmlFor="version">IP Version</Label>
                       <Input
@@ -1326,6 +1360,34 @@ export default function CreateIPPage() {
                     </div>
 
                     <Separator />
+
+
+
+                  <div className="space-y-4">
+                      <Label htmlFor="licenseDuration">License Duration</Label>
+                      <Input
+                        id="licenseDuration"
+                        placeholder="50 years"
+                        {...form.register("licenseDuration")}
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        License duration to specify how long the license is valid
+                      </p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <Label htmlFor="licenseTerritory">License Territory</Label>
+                      <Input
+                        id="licenseTerritory"
+                        placeholder="Worldwide"
+                        {...form.register("licenseTerritory")}
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        License territory to specify where the license is valid
+                      </p>
+                    </div>
+
+
 
                     <div className="space-y-4">
                       <Label htmlFor="license-type">License Type</Label>
@@ -1393,6 +1455,7 @@ export default function CreateIPPage() {
                             </p>
                           </div>
                         </div>
+                       
                         <div className="flex items-start space-x-2">
                           <RadioGroupItem
                             value="custom"

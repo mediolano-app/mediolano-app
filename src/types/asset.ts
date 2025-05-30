@@ -54,7 +54,7 @@ export interface assetIP  {
   externalUrl: string;
   licenseType: string;
   licenseDetails: string;
-  ipVersion: string;
+  version: string;
   commercialUse: boolean;
   modifications: boolean;
   attribution: boolean;
@@ -81,7 +81,7 @@ export interface artworkIP  {
   externalUrl: string;
   licenseType: string;
   licenseDetails: string;
-  ipVersion: string;
+  version: string;
   commercialUse: boolean;
   modifications: boolean;
   attribution: boolean;
@@ -110,7 +110,7 @@ export interface audioIP  {
   externalUrl: string;
   licenseType: string;
   licenseDetails: string;
-  ipVersion: string;
+  version: string;
   commercialUse: boolean;
   modifications: boolean;
   attribution: boolean;
@@ -138,7 +138,7 @@ export interface documentIP  {
   externalUrl: string;
   licenseType: string;
   licenseDetails: string;
-  ipVersion: string;
+  version: string;
   commercialUse: boolean;
   modifications: boolean;
   attribution: boolean;
@@ -167,7 +167,7 @@ export interface patentIP  {
       externalUrl: string;
       licenseType: string;
       licenseDetails: string;
-      ipVersion: string;
+      version: string;
       commercialUse: boolean;
       modifications: boolean;
       attribution: boolean;
@@ -196,7 +196,7 @@ export interface publicationIP  {
       externalUrl: string;
       licenseType: string;
       licenseDetails: string;
-      ipVersion: string;
+      version: string;
       commercialUse: boolean;
       modifications: boolean;
       attribution: boolean;
@@ -225,7 +225,7 @@ export interface rwaIP  {
       externalUrl: string;
       licenseType: string;
       licenseDetails: string;
-      ipVersion: string;
+      version: string;
       commercialUse: boolean;
       modifications: boolean;
       attribution: boolean;
@@ -256,7 +256,7 @@ export interface softwareIP  {
       externalUrl: string;
       licenseType: string;
       licenseDetails: string;
-      ipVersion: string;
+      version: string;
       commercialUse: boolean;
       modifications: boolean;
       attribution: boolean;
@@ -284,7 +284,7 @@ export interface trademarkIP  {
       externalUrl: string;
       licenseType: string;
       licenseDetails: string;
-      ipVersion: string;
+      version: string;
       commercialUse: boolean;
       modifications: boolean;
       attribution: boolean;

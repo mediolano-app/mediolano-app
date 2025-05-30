@@ -22,6 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import { useMIP } from "@/hooks/contracts/use-mip"
+
 import { useReadContract } from "@starknet-react/core";
 import { abi } from "@/abis/abi"
 import { Abi } from "starknet"
@@ -44,7 +45,7 @@ interface AssetPageProps {
     const resolvedParams = use(params)
     const { id } = resolvedParams
 
-  const tokenId = id || 42;
+  const tokenId = id || 0; // Default to 0 if id is not provided // need improve
     
 const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
 const { account, address } = useAccount();
@@ -188,24 +189,32 @@ const { data: nftSymbol } = useReadContract({
     owner: tokenOwner || "",
     tokenStandard: "ERC721",
     collection: nftName || "MIP",
-    creator: (metadata?.author || tokenOwner || "Unknown").toString(),
+    author: (metadata?.author || tokenOwner || "Unknown").toString(),
     imageUrl: metadata?.image || "/background.jpg",
     blockchain: "Starknet",
     contractAddress: CONTRACT_ADDRESS || "",
     ipfsUrl: tokenURI || "",
-    externalUrl: metadata?.external_url || ""
+    externalUrl: metadata?.externalUrl || ""
   };
 
-  // In a real application, you would fetch the NFT data based on the ID
+  
   const asset = {
     id,
     name: metadata?.name || nftName || "Loading IP",
+    author: {
+      name: (metadata?.author || tokenOwnerAddress || "Unknown").toString(),
+      address: tokenOwnerAddress,
+      avatar: metadata?.image || "/background.jpg",
+      verified: false,
+      bio: "author bio (Preview).",
+      website: "https://ip.mediolano.app",
+    },
     creator: {
       name: (metadata?.author || tokenOwnerAddress || "Unknown").toString(),
       address: tokenOwnerAddress,
       avatar: metadata?.image || "/background.jpg",
-      verified: true,
-      bio: "Creator bio (Preview).",
+      verified: false,
+      bio: "author bio (Preview).",
       website: "https://ip.mediolano.app",
     },
     owner: {
@@ -216,13 +225,19 @@ const { data: nftSymbol } = useReadContract({
       acquired: "(Preview)",
     },
     description: metadata?.description || "",
+    template: metadata?.type || "Asset",
     image: metadata?.image || "/background.jpg",
     createdAt: "(Preview)",
     collection: "MIP",
     blockchain: "Starknet",
     tokenStandard: "ERC-721",
-    licenseType: metadata?.name || nftName,
-    licenseTerms: "(Preview)",
+    licenseType: metadata?.licenseType || "NFT",
+    licenseDetails: metadata?.licenseDetails || "Undefined",
+    version: metadata?.version || "1.0",
+    commercialUse: metadata?.commercialUse || false,
+    modifications: metadata?.modifications || false,
+    attribution: metadata?.attribution || false,
+    licenseTerms:  metadata?.licenseDetails || "Undefined",
     contract: CONTRACT_ADDRESS,
     attributes: [
       { trait_type: "Asset", value: "Programmable IP" },
@@ -391,7 +406,7 @@ const { data: nftSymbol } = useReadContract({
                                   image: asset.image,
                                   attributes: asset.attributes,
                                   tokenId: asset.id,
-                                  creator: asset.creator.name,
+                                  author: asset.author.name,
                                   licenseType: asset.licenseType,
                                   licenseTerms: asset.licenseTerms,
                                 },
@@ -439,6 +454,16 @@ const { data: nftSymbol } = useReadContract({
                   </div>
                 </div>
               </TabsContent>
+
+
+
+
+
+
+
+
+
+
 
               {/* License Tab */}
               <TabsContent value="license" className="mt-6">
@@ -489,6 +514,7 @@ const { data: nftSymbol } = useReadContract({
                           </ul>
                         </div>
 
+                        {/* Case Royalty  
                         <div>
                           <h3 className="font-medium mb-3">Royalty Information</h3>
                           <div className="space-y-3">
@@ -502,10 +528,13 @@ const { data: nftSymbol } = useReadContract({
 
                             <p className="text-sm text-muted-foreground">
                               This asset requires a {asset.licenseInfo.royaltyPercentage}% royalty payment for
-                              commercial use, payable to the original creator.
+                              commercial use, payable to the original author.
                             </p>
                           </div>
-                        </div>
+                        </div>*/}
+
+
+                        
                       </div>
                     </CardContent>
                   </Card>
@@ -604,7 +633,7 @@ const { data: nftSymbol } = useReadContract({
                             <span>%</span>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Percentage of revenue that will be paid to the creator
+                            Percentage of revenue that will be paid to the author
                           </p>
                         </div>
 
@@ -659,20 +688,20 @@ const { data: nftSymbol } = useReadContract({
 
                   <Card>
                     <CardHeader>
-                      <CardTitle>Creator</CardTitle>
+                      <CardTitle>author</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="flex items-start gap-4">
                         <Avatar className="h-16 w-16">
-                          <AvatarImage src={asset.creator.avatar} alt={asset.creator.name} />
-                          <AvatarFallback>{asset.creator.name.substring(0, 2)}</AvatarFallback>
+                          <AvatarImage src={asset.author.avatar} alt={asset.author.name} />
+                          <AvatarFallback>{asset.author.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                           <h3 className="text-sm font-semibold truncate">{tokenOwnerAddress?.slice(0,20)}...</h3>
-                            {/* asset.creator.verified && <Badge variant="secondary">Verified</Badge> */}
+                            {/* asset.author.verified && <Badge variant="secondary">Verified</Badge> */}
                           </div>
-                          <p className="text-sm text-muted-foreground">{asset.creator.bio}</p>
+                          <p className="text-sm text-muted-foreground">{asset.author.bio}</p>
 
                           <div className="mt-4">
                             <div className="flex gap-2">

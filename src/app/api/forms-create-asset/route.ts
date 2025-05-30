@@ -18,16 +18,15 @@ export async function POST(request: NextRequest) {
       externalUrl,
       licenseType,
       licenseDetails,
-      ipVersion,
+      version,
       commercialUse,
       modifications,
       attribution,
       filesCount,
       transaction,
       registrationDate,
-      protectionStatus,
-      protectionScope,
-      protectionDuration,
+      licenseDuration,
+      licenseTerritory,
     } = data;
 
     let tagsArray: string[] = [];
@@ -64,21 +63,20 @@ export async function POST(request: NextRequest) {
     }
 
     const attributes = [
-     
       { trait_type: "Type", value: type },
       { trait_type: "Template", value: template },
       { trait_type: "Author", value: author },
       { trait_type: "Collection", value: collection },
       { trait_type: "License", value: licenseType },
       { trait_type: "License Details", value: licenseDetails },
-      { trait_type: "IP Version", value: ipVersion },
+      { trait_type: "IP Version", value: version },
       { trait_type: "Commercial Use", value: commercialUse ? "Yes" : "No" },
       { trait_type: "Modifications", value: modifications },
       { trait_type: "Attribution", value: attribution },
       { trait_type: "Files Count", value: filesCount.toString() },
-      { trait_type: "Protection Status", value: protectionStatus },
-      { trait_type: "Protection Scope", value: protectionScope },
-      { trait_type: "Protection Duration", value: protectionDuration },
+      { trait_type: "Tags", value: tagsArray.join(", ") },
+      { trait_type: "License Duration", value: licenseDuration || "N/A" },
+      { trait_type: "License Territory", value: licenseTerritory || "N/A" },
       { trait_type: "Registration Date", value: registrationDate },
     ];
 
