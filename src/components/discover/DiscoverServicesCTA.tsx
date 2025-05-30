@@ -42,6 +42,8 @@ export default function DiscoverServicesCTA() {
 
   return (
     <section id="services" className="py-20">
+      
+      
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Start Now</h2>
@@ -81,7 +83,7 @@ export default function DiscoverServicesCTA() {
                 <span>Low-cost, high-speed processing</span>
               </li>
             </ul>
-            <Button>Tokenize Your IP</Button>
+            
           </motion.div>
 
           <motion.div
@@ -114,9 +116,14 @@ export default function DiscoverServicesCTA() {
                 <span>Complete sovereignty over your IP assets</span>
               </li>
             </ul>
-            <Button>Explore Licensing</Button>
+            
           </motion.div>
         </div>
+
+
+
+
+
 
         <div className="text-center mb-20 mt-40">
           <h3 className="text-2xl font-bold mb-4">Supported Asset Types</h3>

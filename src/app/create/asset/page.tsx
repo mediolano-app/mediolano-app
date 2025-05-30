@@ -153,7 +153,6 @@ const formSchema = z.object({
     .min(10, { message: "Description must be at least 10 characters" })
     .max(1000),
   type: z.enum([
-    "basic",
     "3d-model",
     "ai-model",
     "artwork",
@@ -165,6 +164,7 @@ const formSchema = z.object({
     "rwa",
     "software",
     "video",
+    "other",
   ]),
   collection: z.string().optional(),
   tags: z.array(z.string()).optional().default([]),
