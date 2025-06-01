@@ -62,8 +62,15 @@ import { useToast } from "@/hooks/use-toast"
 
 import { useAccount, useNetwork, useContract, useSendTransaction } from '@starknet-react/core'
 
+//load title, author, desc, type, mediaUrl, externalUrl, licenseType, licenseDetails, licenseDuration, licenseTerritory, version, commercialUse, modifications, attribution from original asset
+//import { useEffect } from 'react';
+//import { useRouter } from 'next/navigation';
+//import { useQuery } from '@tanstack/react-query';
+//import { getAssetDetails } from '@/lib/api'; 
+//import { AssetDetails } from '@/types/asset';
+
 const formSchema = z.object({
-  IPID: z.string(),
+  IPID: z.string(), //original asset unique identifier
   title: z.string(),
   author: z.string(),
   description: z.string(),
@@ -80,7 +87,6 @@ const formSchema = z.object({
   modifications: z.boolean(),
   attribution: z.boolean(),
   registrationDate: z.string(),
-  
 });
 
 export default function IPLicensingForm() {
@@ -144,6 +150,36 @@ export default function IPLicensingForm() {
                   <Input placeholder="IP ID" {...field} />
                 </FormControl>
                 <FormDescription>Enter the unique identifier for your intellectual property.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input placeholder="Title" {...field} />
+                </FormControl>
+                <FormDescription>Set the title of your intellectual property.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="author"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Author</FormLabel>
+                <FormControl>
+                  <Input placeholder="Author" {...field} />
+                </FormControl>
+                <FormDescription>Set the author of your intellectual property.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

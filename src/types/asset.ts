@@ -19,6 +19,28 @@ export interface Asset {
   licensingTerms?: LicensingTerms
 }
 
+// asset type definitions
+
+export interface AssetDetails {
+  id: string;
+  title: string;
+  author: string;
+  description: string;
+  type: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  licenseDuration: string;
+  licenseTerritory: string;
+  version: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  registrationDate: string;
+  collection: string;
+}
+
 export interface IP {
   id: string;
   name: string;
