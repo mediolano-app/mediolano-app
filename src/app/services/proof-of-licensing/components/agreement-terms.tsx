@@ -1,11 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import type { Agreement } from "@/types/agreement"
 
 interface AgreementTermsProps {
-  agreement: Agreement
+  terms: Terms
 }
 
-export function AgreementTerms({ agreement }: AgreementTermsProps) {
+interface Terms {
+  duration: string;
+  territory: string;
+  rights: string;
+  royalties: string;
+  termination?: string;
+}
+
+export function AgreementTerms({ terms }: AgreementTermsProps) {
   const getDurationText = (duration: string) => {
     switch (duration) {
       case "1_year":
@@ -55,27 +62,27 @@ export function AgreementTerms({ agreement }: AgreementTermsProps) {
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Duration</h3>
-              <p>{getDurationText(agreement.terms.duration)}</p>
+              <p>{getDurationText(terms.duration)}</p>
             </div>
 
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Territory</h3>
-              <p>{getTerritoryText(agreement.terms.territory)}</p>
+              <p>{getTerritoryText(terms.territory)}</p>
             </div>
 
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Licensed Rights</h3>
-              <p className="whitespace-pre-line">{agreement.terms.rights}</p>
+              <p className="whitespace-pre-line">{terms.rights}</p>
             </div>
 
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Royalties & Payments</h3>
-              <p className="whitespace-pre-line">{agreement.terms.royalties}</p>
+              <p className="whitespace-pre-line">{terms.royalties}</p>
             </div>
 
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-1">Termination Conditions</h3>
-              <p className="whitespace-pre-line">{agreement.terms.termination}</p>
+              <p className="whitespace-pre-line">{terms.termination}</p>
             </div>
           </div>
         </CardContent>

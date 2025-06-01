@@ -318,7 +318,7 @@ export default function CreateAgreementPage() {
   return (
     <div className="container max-w-5xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <Button variant="ghost" size="sm" className="mb-4" onClick={() => router.push("/agreements")}>
+        <Button variant="ghost" size="sm" className="mb-4" onClick={() => router.push("/services/proof-of-licensing/agreements")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Agreements
         </Button>

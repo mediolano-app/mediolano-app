@@ -1,13 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import type { Agreement } from "@/types/agreement"
+import type { Agreement, Party, Signature } from "@/types/agreement"
 import { CheckCircle, Clock } from "lucide-react"
 
 interface AgreementPartiesProps {
-  agreement: Agreement
+  parties: Party[]
+  signatures: Signature[]
 }
 
-export function AgreementParties({ agreement }: AgreementPartiesProps) {
+export function AgreementParties({ parties, signatures }: AgreementPartiesProps) {
+
   return (
     <div className="space-y-6">
       <Card>
@@ -17,9 +19,9 @@ export function AgreementParties({ agreement }: AgreementPartiesProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
-            {agreement.parties.map((party) => {
-              const hasSigned = agreement.signatures.some(
-                (sig) => sig.walletAddress.toLowerCase() === party.walletAddress.toLowerCase(),
+            {parties.map((party) => {
+              const hasSigned = signatures.some(
+                (sig) => sig.walletAddress == party.walletAddress,
               )
 
               return (
@@ -63,13 +65,13 @@ export function AgreementParties({ agreement }: AgreementPartiesProps) {
           <CardDescription>Cryptographic signatures for this agreement</CardDescription>
         </CardHeader>
         <CardContent>
-          {agreement.signatures.length === 0 ? (
+          {signatures.length === 0 ? (
             <div className="text-center py-8 border rounded-lg bg-muted/50">
               <p className="text-muted-foreground">No signatures collected yet</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {agreement.signatures.map((signature) => (
+              {signatures.map((signature) => (
                 <div key={signature.id} className="p-4 border rounded-lg">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <div>
