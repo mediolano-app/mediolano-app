@@ -11,6 +11,19 @@ Quick links:
 <a href="https://x.com/mediolanoapp">X / Twitter</a>
 <br>
 
+## 🚀 NEW: AVNU Paymaster Integration
+
+**Experience frictionless transactions with gas fee abstraction!**
+
+- ✅ **Sponsored Transactions**: Mint NFTs for FREE with Mediolano sponsorship
+- ✅ **Gasless Payments**: Pay gas fees with USDC, USDT, or other tokens
+- ✅ **Meta-Transactions**: Enhanced UX with account abstraction
+- ✅ **Seamless Onboarding**: No ETH required for new users
+
+**[Try the Paymaster Demo](/paymaster-demo)** | **[Integration Guide](docs/PAYMASTER_INTEGRATION.md)**
+
+---
+
 ![Mediolano.app](https://mediolano.app/wp-content/uploads/2025/03/Mediolano-Dapp-20250310alpha.png)
 
 > [!IMPORTANT]
@@ -37,7 +50,47 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 - High-Speed & Low-Cost: Leverage Starknet's unparalleled speed and cost-efficiency with ZERO FEES on Mediolano Protocol.
 
+- **Gas Fee Abstraction**: Revolutionary AVNU Paymaster integration eliminates gas fee barriers for seamless user experience.
+
 [![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
+
+## 🎯 Paymaster Features
+
+### 🎁 Sponsored Transactions
+- **Zero gas fees** for eligible transactions
+- **Free NFT minting** for new users
+- **Sponsored marketplace** interactions
+- **Revenue claiming** without gas costs
+
+### ⛽ Gasless Payments
+- Pay gas with **USDC, USDT, ETH, or STRK**
+- **No ETH required** for transactions
+- **Real-time price conversion**
+- **Flexible token selection**
+
+### 🔄 Meta-Transactions
+- **Sign messages** instead of transactions
+- **Enhanced security** with account abstraction
+- **Improved UX** for complex operations
+- **Batch transaction** support
+
+### 🚀 Quick Start with Paymaster
+
+```bash
+# 1. Clone and install
+git clone https://github.com/mediolano-app/mediolano-app.git
+cd mediolano-app
+npm install
+
+# 2. Configure environment
+cp .env.example .env.local
+# Add your AVNU Paymaster API key
+
+# 3. Run the app
+npm run dev
+
+# 4. Visit /paymaster-demo to try it out!
+```
 
 
 ## Getting Started
