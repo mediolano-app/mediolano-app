@@ -2078,7 +2078,7 @@ export default function CreateIPPage() {
                   Mint Programmable IP
                 </Button>
                 <p className="text-xs text-center text-muted-foreground mt-2 mb-4">
-                  By clicking "Mint Programmable IP", you confirm that you are
+                  By clicking &quot;Mint Programmable IP&quot;, you confirm that you are
                   the lawful owner of this intellectual property and have the
                   right to register it.
                 </p>

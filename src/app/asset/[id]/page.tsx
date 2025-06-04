@@ -1,7 +1,6 @@
 "use client";
 
 import { use, useEffect, useState } from "react"
-import type { ComponentProps } from "react"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Share2, FileCheck, DollarSign, Users, Box } from "lucide-react"
 import Image from "next/image"
@@ -176,7 +175,7 @@ const { data: nftSymbol } = useReadContract({
     }
     
     detectAssetType();
-  }, [id, ipfsCid, metadata, nftName]);
+  }, [id, ipfsCid, metadata, nftName,assetType]);
   
   
   const nftData = {
