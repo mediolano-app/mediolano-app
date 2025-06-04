@@ -35,6 +35,7 @@ import {
   MoreHorizontal,
   Star,
   Filter,
+  Box,
 } from "lucide-react"
 
 type SortOption = "value-high" | "value-low" | "name-asc" | "name-desc" | "size-high" | "size-low"
@@ -216,23 +217,23 @@ interface CollectionCardProps {
 function CollectionCard({ collection, nftCount, totalValue, onClick }: CollectionCardProps) {
   // Get a random image from the collection to display as cover
   const nfts = getNFTs().filter((nft) => nft.collection.id === collection.id)
-  const coverImage = nfts.length > 0 ? nfts[0].image : "/placeholder.svg?height=400&width=600"
+  const coverImage = nfts.length > 0 ? nfts[0].image : "/background.jpg"
 
   // Check if this is a featured collection (mock data)
   const isFeatured = collection.id === "bored-ape" || collection.id === "cryptopunks"
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group" onClick={onClick}>
-      <div className="relative h-40 w-full">
+      <div className="relative h-64 w-full">
         <Image
-          src={coverImage || "/placeholder.svg"}
+          src={coverImage || "/background.jpg"}
           alt={collection.name}
           fill
           className="object-cover transition-all duration-300 group-hover:brightness-90"
         />
         {collection.floorPrice && (
           <div className="absolute bottom-2 right-2">
-            <Badge className="bg-background/80 backdrop-blur-sm">Floor: {collection.floorPrice} ETH</Badge>
+            <Badge className="bg-blue/80 backdrop-blur-sm">Floor: {collection.floorPrice} STRK</Badge>
           </div>
         )}
         {isFeatured && (
@@ -258,13 +259,13 @@ function CollectionCard({ collection, nftCount, totalValue, onClick }: Collectio
       </CardContent>
       <CardFooter>
         <div className="flex justify-between w-full">
-          <div className="flex items-center gap-1 text-sm">
+          <div className="flex items-center gap-1 text-sm mt-4">
             <Grid3X3 className="h-4 w-4 text-muted-foreground" />
-            <span>{nftCount} NFTs</span>
+            <span>{nftCount} Assets</span>
           </div>
           <div className="flex items-center gap-1 text-sm">
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            <span>{totalValue.toFixed(2)} ETH</span>
+            <Box className="h-4 w-4 text-muted-foreground" />
+            <span>IP Type</span>
           </div>
         </div>
       </CardFooter>
@@ -286,7 +287,7 @@ function CollectionListItem({ collection, nftCount, totalValue, onClick }: Colle
       onClick={onClick}
     >
       <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
-        <Image src={coverImage || "/placeholder.svg"} alt={collection.name} fill className="object-cover" />
+        <Image src={coverImage || "/backgroound.jpg"} alt={collection.name} fill className="object-cover" />
       </div>
 
       <div className="flex-grow min-w-0">
@@ -319,7 +320,7 @@ function CollectionListItem({ collection, nftCount, totalValue, onClick }: Colle
           </div>
           <div className="flex items-center gap-1 text-sm">
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            <span>{totalValue.toFixed(2)} ETH</span>
+            <span>{totalValue.toFixed(2)} STRK</span>
           </div>
         </div>
         <CollectionActionDropdown collectionId={collection.id} />
@@ -333,13 +334,13 @@ function FeaturedCollectionCard({ collection, nftCount, totalValue, onClick }: C
   const nfts = getNFTs()
     .filter((nft) => nft.collection.id === collection.id)
     .slice(0, 4)
-  const coverImage = nfts.length > 0 ? nfts[0].image : "/placeholder.svg?height=400&width=600"
+  const coverImage = nfts.length > 0 ? nfts[0].image : "/background.jpg"
 
   return (
     <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all" onClick={onClick}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
         <div className="relative h-64 md:h-auto">
-          <Image src={coverImage || "/placeholder.svg"} alt={collection.name} fill className="object-cover" />
+          <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
           <div className="absolute top-4 left-4">
             <Badge
               variant="secondary"
@@ -362,17 +363,17 @@ function FeaturedCollectionCard({ collection, nftCount, totalValue, onClick }: C
 
             <div className="grid grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
               <div className="space-y-1">
-                <p className="text-xs md:text-sm text-muted-foreground">Total NFTs</p>
+                <p className="text-xs md:text-sm text-muted-foreground">Total Assets</p>
                 <p className="text-lg md:text-xl font-bold">{nftCount}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-xs md:text-sm text-muted-foreground">Total Value</p>
-                <p className="text-lg md:text-xl font-bold">{totalValue.toFixed(2)} ETH</p>
+                <p className="text-lg md:text-xl font-bold">{totalValue.toFixed(2)} STRK</p>
               </div>
               {collection.floorPrice && (
                 <div className="space-y-1">
                   <p className="text-xs md:text-sm text-muted-foreground">Floor Price</p>
-                  <p className="text-lg md:text-xl font-bold">{collection.floorPrice} ETH</p>
+                  <p className="text-lg md:text-xl font-bold">{collection.floorPrice} STRK</p>
                 </div>
               )}
             </div>
@@ -384,7 +385,7 @@ function FeaturedCollectionCard({ collection, nftCount, totalValue, onClick }: C
               {nfts.map((nft, index) => (
                 <div key={nft.id} className="relative h-12 w-12 rounded-md overflow-hidden">
                   <Image
-                    src={nft.image || "/placeholder.svg"}
+                    src={nft.image || "/background.jpg"}
                     alt={`${collection.name} NFT ${index + 1}`}
                     fill
                     className="object-cover"
@@ -422,11 +423,11 @@ function CollectionActionDropdown({ collectionId }: { collectionId: string }) {
           onClick={(e) => {
             e.stopPropagation()
             // Handle add NFT action
-            console.log("Add NFT to Collection:", collectionId)
+            console.log("Add Programmable IP to Collection:", collectionId)
           }}
         >
           <Plus className="mr-2 h-4 w-4" />
-          Add NFT
+          Create New Asset
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
