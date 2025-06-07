@@ -125,14 +125,23 @@ export function AssetsTab({
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {previewUrls[file.name] && (
+                        { previewUrls[file.name] && (
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
                             onClick={(e) => {
                               e.stopPropagation();
-                              window.open(previewUrls[file.name], "_blank");
+                             const url = previewUrls[file.name];
+                             // Validate URL before opening
+                             try {
+                               const validUrl = new URL(url);
+                               if (validUrl.protocol === 'http:' || validUrl.protocol === 'https:') {
+                                 window.open(url, "_blank", "noopener,noreferrer");
+                               }
+                             } catch (error) {
+                               console.error('Invalid URL:', url, error);
+                             }
                             }}
                           >
                             <Image className="h-4 w-4" />
@@ -191,9 +200,19 @@ export function AssetsTab({
                       variant="outline"
                       size="icon"
                       className="ml-2"
-                      onClick={() =>
-                        window.open(form.getValues("mediaUrl"), "_blank")
-                      }
+                      onClick={() => {
+                         const url = form.getValues("mediaUrl");
+                         if (!url) return;
+
+                         try {
+                           const validUrl = new URL(url);
+                           if (validUrl.protocol === 'http:' || validUrl.protocol === 'https:') {
+                             window.open(url, "_blank", "noopener,noreferrer");
+                           }
+                         } catch (error) {
+                           console.error('Invalid URL:', url, error);
+                         }
+                       }}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>

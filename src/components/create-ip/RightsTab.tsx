@@ -144,13 +144,13 @@ export function RightsTab({ form }: RightsTabProps) {
                   Allow others to use your IP for commercial purposes
                 </p>
               </div>
-              <Checkbox
-                id="commercial-use"
-                checked={form.watch("commercialUse")}
-                onCheckedChange={(checked) =>
-                  form.setValue("commercialUse", checked as boolean)
-                }
-              />
+                <Checkbox
+                    id="commercial-use"
+                    checked={form.watch("commercialUse")}
+                    onCheckedChange={(checked) =>
+                    form.setValue("commercialUse", checked as boolean)
+                    }
+                />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">

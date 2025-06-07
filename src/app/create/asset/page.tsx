@@ -236,12 +236,14 @@ export default function CreateIPPage() {
     address: CONTRACT_ADDRESS,
   });
 
-  const { send, error: transactionError } = useSendTransaction({
-    calls:
-      contract && address
-        ? [contract.populate("mint_item", [address, ipfsHash])]
-        : undefined,
-  });
+const buildCalls = () =>
+  contract && address && ipfsHash
+    ? [contract.populate("mint_item", [address, ipfsHash])]
+    : undefined;
+
+const { send, error: transactionError } = useSendTransaction({
+  calls: buildCalls(),
+});
 
   const handleMintNFT = async () => {
     if (!ipfsHash) {
@@ -255,7 +257,7 @@ export default function CreateIPPage() {
         description: "Confirm your Mint on your wallet.",
       });
     } catch (error) {
-      console.log("mint error", transactionError);
+      console.log("mint error", transactionError, error);
       toast({ title: "Error", description: "Error minting asset." });
     }
   };
