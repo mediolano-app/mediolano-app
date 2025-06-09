@@ -28,6 +28,79 @@ export async function mockDisconnectWallet(): Promise<void> {
   })
 }
 
+// Real blockchain integration functions
+import { useIPAirdropContract } from "@/hooks/useIPAirdropContract"
+import type { CreateCampaignData } from "./types"
+
+const {
+  createCampaign: createCampaignContract,
+  addTask: addTaskContract,
+  joinCampaign: joinCampaignContract,
+  completeTask: completeTaskContract,
+  claimRewards: claimRewardsContract,
+} = useIPAirdropContract()
+
+// Function to create a campaign
+export async function createCampaign(campaignData: CreateCampaignData): Promise<string> {
+  try {
+    // Create the campaign
+    const campaignId = await createCampaignContract({
+      tokenAddress: campaignData.tokenAddress,
+      name: campaignData.name,
+      description: campaignData.description,
+      image: campaignData.image,
+      rewardPerUser: campaignData.reward,
+      maxParticipants: campaignData.maxParticipants,
+      endDate: campaignData.endDate,
+    })
+
+    // Add tasks to the campaign
+    for (const task of campaignData.tasks) {
+      await addTaskContract(campaignId, {
+        title: task.title,
+        description: task.description,
+        type: task.type,
+        verificationUrl: task.verificationUrl,
+      })
+    }
+
+    return campaignId
+  } catch (error) {
+    console.error("Failed to create campaign:", error)
+    throw new Error("Failed to create campaign. Please try again.")
+  }
+}
+
+// Function to join a campaign
+export async function joinCampaign(campaignId: string): Promise<void> {
+  try {
+    await joinCampaignContract(campaignId)
+  } catch (error) {
+    console.error("Failed to join campaign:", error)
+    throw new Error("Failed to join campaign. Please try again.")
+  }
+}
+
+// Function to complete a task
+export async function completeTask(campaignId: string, taskId: string): Promise<void> {
+  try {
+    await completeTaskContract(campaignId, taskId)
+  } catch (error) {
+    console.error("Failed to complete task:", error)
+    throw new Error("Failed to complete task. Please try again.")
+  }
+}
+
+// Function to claim rewards
+export async function claimRewards(campaignId: string): Promise<void> {
+  try {
+    await claimRewardsContract(campaignId)
+  } catch (error) {
+    console.error("Failed to claim rewards:", error)
+    throw new Error("Failed to claim rewards. Please try again.")
+  }
+}
+
 // Mock function to create a campaign
 export async function mockCreateCampaign(campaignData: any): Promise<string> {
   return new Promise((resolve, reject) => {
