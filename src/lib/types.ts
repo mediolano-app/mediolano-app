@@ -96,32 +96,47 @@ export interface Licensing {
 
 export interface NFTMetadata {
   name: string;
-  description: string;
   author: string;
+  description: string;
   type: string;
+  template: string;
+  collection: string;
+  tags: string;
   image: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
   version: string;
-  external_url: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
 }
 
 
 export interface Asset {
-  id: string
-  name: string
-  description: string
-  image: string
-  tokenId: string
-  collection: Collection
-  price: number
-  rarity?: string
-  attributes?: {
-    trait_type: string
-    value: string
-  }[]
-  createdAt: string
-  lastSale?: {
-    price: number
-    date: string
-  }
-  licensing?: Licensing[]
+  name: string;
+  author: string;
+  description: string;
+  type: string;
+  template: string;
+  collection: string;
+  tags: string;
+  image: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  licenseDuration: string;
+  licenseTerritory: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
+  version: string;
 }

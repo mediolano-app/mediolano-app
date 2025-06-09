@@ -8,3 +8,4 @@ export const IP_REVENUE_CONTRACT_ADDRESS="0x055f444b1ace8bec6d79ceb815a8733958e9
 export const paymasterParams = !process.env.NEXT_PUBLIC_AVNU_PAYMASTER_API_KEY ? undefined : {
 	apiKey: process.env.NEXT_PUBLIC_AVNU_PAYMASTER_API_KEY,
 }
+
