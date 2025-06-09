@@ -15,7 +15,7 @@ import { Wallet, User, Gift, Settings, LogOut, Rocket, Box } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect, useCallback } from "react";
 import { RpcProvider, constants } from "starknet";
-import { ArgentWebWallet, deployAndExecuteWithPaymaster, SessionAccountInterface } from "@argent/invisible-sdk";
+import type { ArgentWebWallet, SessionAccountInterface } from "@argent/invisible-sdk";
 
 const envName = (process.env.NEXT_PUBLIC_ENV_NAME) as "mainnet" | "sepolia"
 const isMainnet = envName === "mainnet";
@@ -36,39 +36,60 @@ export function WalletConnect() {
   const { disconnect } = useDisconnect();
   
   // Argent Invisible Wallet states
-  const [invisibleAccount, setInvisibleAccount] = useState<any>(undefined);
+  const [invisibleAccount, setInvisibleAccount] = useState<SessionAccountInterface | undefined>(undefined);
   const [withApproval, setWithApproval] = useState<boolean>(true);
   const [connectStatus, setConnectStatus] = useState<"Connect" | "Connecting" | "Deploying account">("Connect");
   const [isLoading, setIsLoading] = useState(false);
+  const [argentWebWallet, setArgentWebWallet] = useState<ArgentWebWallet | null>(null);
 
   const [open, setOpen] = React.useState(false);
 
   // Initialize RPC Provider
-  const provider = new RpcProvider({
-    chainId: chainId,
-    nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
-    headers: JSON.parse(process.env.NEXT_PUBLIC_RPC_HEADERS || "{}"),
-  });
+  const provider = React.useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    
+    return new RpcProvider({
+      chainId: chainId,
+      nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
+      headers: JSON.parse(process.env.NEXT_PUBLIC_RPC_HEADERS || "{}"),
+    });
+  }, []);
 
-  // Initialize Argent Web Wallet
-  const argentWebWallet = ArgentWebWallet.init({
-    appName: "Mediolano Dapp",
-    environment: envName || "sepolia",
-    sessionParams: {
-      allowedMethods: [
-        {
-          contract: ARGENT_DUMMY_CONTRACT_ADDRESS,
-          selector: ARGENT_DUMMY_CONTRACT_ENTRYPOINT,
-        },
-      ],
-      validityDays: Number(process.env.NEXT_PUBLIC_VALIDITY_DAYS) || undefined,
-    },
-    paymasterParams,
-  });
+  // Initialize Argent Web Wallet on client side only
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const initializeArgentWallet = async () => {
+      try {
+        const { ArgentWebWallet } = await import("@argent/invisible-sdk");
+        
+        const wallet = ArgentWebWallet.init({
+          appName: "Mediolano Dapp",
+          environment: envName || "sepolia",
+          sessionParams: {
+            allowedMethods: [
+              {
+                contract: ARGENT_DUMMY_CONTRACT_ADDRESS,
+                selector: ARGENT_DUMMY_CONTRACT_ENTRYPOINT,
+              },
+            ],
+            validityDays: Number(process.env.NEXT_PUBLIC_VALIDITY_DAYS) || undefined,
+          },
+          paymasterParams,
+        });
+
+        setArgentWebWallet(wallet);
+      } catch (error) {
+        console.error("Failed to initialize Argent Web Wallet:", error);
+      }
+    };
+
+    initializeArgentWallet();
+  }, []);
 
   // Auto-connect on component mount
   useEffect(() => {
-    if (!argentWebWallet) {
+    if (!argentWebWallet || !provider) {
       return
     }
 
@@ -101,21 +122,21 @@ export function WalletConnect() {
       .catch((err) => {
         console.error("Failed to connect to ArgentWebWallet", err);
       });
-  }, []);
+  }, [argentWebWallet, provider]);
 
   // Handle Argent Invisible Wallet connection
   const handleInvisibleWalletConnect = async () => {
     try {
       console.log("Start connect to Argent Invisible Wallet, with approval requests: ", withApproval);
 
-      if (!provider) {
-        throw new Error("No provider provided");
+      if (!provider || !argentWebWallet) {
+        throw new Error("Provider or Argent wallet not initialized");
       }
 
       setConnectStatus("Connecting")
       setIsLoading(true);
 
-      const response = await argentWebWallet?.requestConnection({
+      const response = await argentWebWallet.requestConnection({
         callbackData: "mediolano_dapp_callback",
         approvalRequests: withApproval ? [
           {
@@ -134,6 +155,7 @@ export function WalletConnect() {
           console.log("Deploying an account");
           setConnectStatus("Deploying account")
 
+          const { deployAndExecuteWithPaymaster } = await import("@argent/invisible-sdk");
           const resp = await deployAndExecuteWithPaymaster(sessionAccount, paymasterParams, response.deploymentPayload, response.approvalRequestsCalls)
 
           if (resp) {
@@ -224,20 +246,6 @@ export function WalletConnect() {
                 </Button>
               </Link>
         
-              {/* Account Menu
-              <Button variant="outline" className="justify-start">
-                <User className="mr-2 h-4 w-4" />
-                My Account
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Gift className="mr-2 h-4 w-4" />
-                Rewards
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-               */}
               <Button variant="destructive" onClick={handleDisconnect} className="justify-start">
                 <LogOut className="mr-2 h-4 w-4" />
                 Disconnect
@@ -267,9 +275,10 @@ export function WalletConnect() {
                 <Button 
                   onClick={handleInvisibleWalletConnect} 
                   className="bg-blue-500 text-white w-full"
-                  disabled={connectStatus !== "Connect" || isLoading}
+                  disabled={connectStatus !== "Connect" || isLoading || !argentWebWallet}
                 >
-                  {connectStatus === "Connecting" ? "Connecting..." : 
+                  {!argentWebWallet ? "Initializing..." :
+                   connectStatus === "Connecting" ? "Connecting..." : 
                    connectStatus === "Deploying account" ? "Deploying Account..." :
                    "Connect with Argent Invisible Wallet"}
                 </Button>
