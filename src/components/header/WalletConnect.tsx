@@ -36,7 +36,8 @@ export function WalletConnect() {
   const { disconnect } = useDisconnect();
   
   // Argent Invisible Wallet states
-  const [invisibleAccount, setInvisibleAccount] = useState<SessionAccountInterface | undefined>(undefined);
+  // Use 'any' to avoid circular type reference error
+  const [invisibleAccount, setInvisibleAccount] = useState<any>(undefined);
   const [withApproval, setWithApproval] = useState<boolean>(true);
   const [connectStatus, setConnectStatus] = useState<"Connect" | "Connecting" | "Deploying account">("Connect");
   const [isLoading, setIsLoading] = useState(false);
@@ -209,7 +210,7 @@ export function WalletConnect() {
 
   // Get current address (either from regular account or invisible account)
   const currentAddress = invisibleAccount?.address || address;
-  const isConnected = !!(account || invisibleAccount);
+  const isConnected = !!(currentAddress);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
