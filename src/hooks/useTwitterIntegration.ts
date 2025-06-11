@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import type { 
   TwitterUser, 
   TwitterPost, 
@@ -8,119 +8,97 @@ import type {
   TwitterConnectionState 
 } from "@/types/twitter"
 
-// Mock API functions for Twitter integration
-const connectTwitterAccount = async (): Promise<{ success: boolean; user: TwitterUser }> => {
-  await new Promise((resolve) => setTimeout(resolve, 1500))
-  
-  const mockUser: TwitterUser = {
-    id: "123456789",
-    username: "exampleUser",
-    name: "Example User",
-    profile_image_url: "https://pbs.twimg.com/profile_images/example.jpg",
-    verified: false,
-    public_metrics: {
-      followers_count: 1250,
-      following_count: 850,
-      tweet_count: 3420
+// Real API functions for Twitter integration
+const connectTwitterAccount = async (): Promise<{ success: boolean; user?: TwitterUser; authUrl?: string }> => {
+  try {
+    // First, check if user is already authenticated
+    const sessionResponse = await fetch('/api/twitter?action=session')
+    const sessionData = await sessionResponse.json()
+    
+    if (sessionData.authenticated) {
+      // User is already authenticated, fetch their profile
+      const userResponse = await fetch('/api/twitter?action=user-profile')
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        return { success: true, user: userData }
+      }
+    }
+
+    // Generate auth URL for new authentication
+    const response = await fetch('/api/twitter?action=auth-url')
+    const data = await response.json()
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to generate auth URL')
+    }
+
+    // Redirect to Twitter OAuth
+    window.location.href = data.authUrl
+    
+    return { success: true, authUrl: data.authUrl }
+  } catch (error) {
+    console.error('Connection error:', error)
+    return { 
+      success: false, 
+      user: undefined,
+      authUrl: undefined
     }
   }
-  
-  return { success: true, user: mockUser }
 }
 
-const verifyTwitterIdentity = async (username: string) => {
-  await new Promise((resolve) => setTimeout(resolve, username.length * 100))
-  return { success: true, verified: true }
+const checkAuthenticationStatus = async (): Promise<{ success: boolean; user?: TwitterUser }> => {
+  try {
+    const response = await fetch('/api/twitter?action=session')
+    const data = await response.json()
+    
+    if (!data.authenticated) {
+      return { success: false }
+    }
+
+    // If authenticated, we can create a user object from session data
+    const user: TwitterUser = {
+      id: data.userId,
+      username: data.username,
+      name: data.username, // We'll fetch full profile later if needed
+      profile_image_url: '',
+      verified: false,
+      public_metrics: {
+        followers_count: 0,
+        following_count: 0,
+        tweet_count: 0
+      }
+    }
+
+    return { success: true, user }
+  } catch (error) {
+    console.error('Authentication check error:', error)
+    return { success: false }
+  }
 }
 
 const fetchUserTwitterPosts = async (userId: string): Promise<TwitterPostsResponse> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-  
-  const mockPosts: TwitterPost[] = [
-    {
-      id: "1001",
-      text: "Just launched my new NFT collection! 🚀 Check out these amazing digital artworks that represent the future of creativity. #NFT #DigitalArt #Blockchain",
-      author_id: userId,
-      created_at: "2024-01-15T10:30:00.000Z",
-      public_metrics: {
-        retweet_count: 15,
-        like_count: 42,
-        reply_count: 8,
-        quote_count: 3
-      },
-      entities: {
-        hashtags: [
-          { tag: "NFT" },
-          { tag: "DigitalArt" },
-          { tag: "Blockchain" }
-        ]
-      }
-    },
-    {
-      id: "1002", 
-      text: "Working on some exciting new features for our DApp. The future of decentralized applications is here! 💻⚡",
-      author_id: userId,
-      created_at: "2024-01-14T15:45:00.000Z",
-      public_metrics: {
-        retweet_count: 8,
-        like_count: 23,
-        reply_count: 4,
-        quote_count: 1
-      }
-    },
-    {
-      id: "1003",
-      text: "Amazing sunset today! Sometimes you need to step away from the computer and appreciate nature 🌅 #sunset #nature #photography",
-      author_id: userId,
-      created_at: "2024-01-13T18:20:00.000Z", 
-      public_metrics: {
-        retweet_count: 3,
-        like_count: 18,
-        reply_count: 2,
-        quote_count: 0
-      },
-      entities: {
-        hashtags: [
-          { tag: "sunset" },
-          { tag: "nature" },
-          { tag: "photography" }
-        ]
-      }
-    },
-    {
-      id: "1004",
-      text: "Thoughts on the latest developments in AI and machine learning. The intersection with blockchain technology is fascinating! 🤖🔗",
-      author_id: userId,
-      created_at: "2024-01-12T09:15:00.000Z",
-      public_metrics: {
-        retweet_count: 22,
-        like_count: 67,
-        reply_count: 12,
-        quote_count: 5
-      }
-    },
-    {
-      id: "1005",
-      text: "Coffee + Code = Productivity ☕️👨‍💻 What's your favorite coding fuel?",
-      author_id: userId,
-      created_at: "2024-01-11T08:00:00.000Z",
-      public_metrics: {
-        retweet_count: 5,
-        like_count: 31,
-        reply_count: 15,
-        quote_count: 2
-      }
-    }
-  ]
+  const params = new URLSearchParams({
+    max_results: '20',
+    exclude_replies: 'true',
+    exclude_retweets: 'false'
+  })
 
-  return {
-    data: mockPosts,
-    meta: {
-      result_count: mockPosts.length,
-      newest_id: mockPosts[0]?.id,
-      oldest_id: mockPosts[mockPosts.length - 1]?.id
-    }
+  const response = await fetch(`/api/twitter?action=user-posts&${params.toString()}`)
+  
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.message || 'Failed to fetch posts')
   }
+
+  return response.json()
+}
+
+const logoutTwitter = async (): Promise<void> => {
+  await fetch('/api/twitter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'logout' })
+  })
 }
 
 const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promise<TokenizedPost> => {
@@ -200,17 +178,53 @@ export const useTwitterIntegration = () => {
   const [isTokenizing, setIsTokenizing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Check authentication status on mount and when URL changes (for OAuth callback)
+  useEffect(() => {
+    const checkAuth = async () => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const success = urlParams.get('success')
+      const username = urlParams.get('username')
+      const error = urlParams.get('error')
+      const errorDescription = urlParams.get('error_description')
+
+      if (error) {
+        setState("error")
+        setError(errorDescription || error)
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname)
+        return
+      }
+
+      if (success && username) {
+        // OAuth callback success
+        const result = await checkAuthenticationStatus()
+        if (result.success && result.user) {
+          setUser(result.user)
+          setState("verified")
+        }
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname)
+        return
+      }
+
+      // Check existing session
+      const result = await checkAuthenticationStatus()
+      if (result.success && result.user) {
+        setUser(result.user)
+        setState("verified")
+      }
+    }
+
+    checkAuth()
+  }, [])
+
   const verify = useCallback(async (username: string) => {
+    // This function is kept for compatibility but not used in OAuth flow
     setState("verifying")
     setError(null)
     try {
-      const result = await verifyTwitterIdentity(username)
-      if (result.success && result.verified) {
-        setState("verified")
-        return true
-      } else {
-        throw new Error("Failed to verify identity")
-      }
+      setState("verified")
+      return true
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred")
       setState("error")
@@ -224,25 +238,19 @@ export const useTwitterIntegration = () => {
     try {
       const result = await connectTwitterAccount()
       if (result.success) {
-        setUser(result.user)
-        setState("connected")
-        
-        // Small delay to ensure state update
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
-        // Automatically verify the user
-        setState("verifying")
-        const verifyResult = await verifyTwitterIdentity(result.user.username)
-        if (verifyResult.success && verifyResult.verified) {
+        if (result.user) {
+          // User was already authenticated
+          setUser(result.user)
           setState("verified")
-        } else {
-          throw new Error("Failed to verify identity")
+        } else if (result.authUrl) {
+          // User will be redirected to Twitter OAuth
+          // State will be updated after redirect
         }
       } else {
         throw new Error("Failed to connect Twitter account")
       }
     } catch (err) {
-      console.error("Connection/verification error:", err)
+      console.error("Connection error:", err)
       setError(err instanceof Error ? err.message : "An unknown error occurred")
       setState("error")
       setUser(null)
@@ -259,7 +267,7 @@ export const useTwitterIntegration = () => {
     setError(null)
     try {
       const response = await fetchUserTwitterPosts(user.id)
-      setPosts(response.data)
+      setPosts(response.data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load posts")
     } finally {
@@ -292,7 +300,8 @@ export const useTwitterIntegration = () => {
     }
   }, [selectedPost, user])
 
-  const reset = useCallback(() => {
+  const reset = useCallback(async () => {
+    await logoutTwitter()
     setState("idle")
     setUser(null)
     setPosts([])

@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
+import { TwitterOAuth, TwitterAPI, RateLimiter } from "@/lib/twitter-api"
+import { TwitterSessionManager, PKCEStateManager } from "@/lib/twitter-session"
+import crypto from 'crypto'
 
-// Mock Twitter OAuth endpoints (in production, these would connect to actual Twitter API)
+// Rate limiter for API requests
+const rateLimiter = new RateLimiter()
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const action = searchParams.get('action')
@@ -8,60 +13,17 @@ export async function GET(request: NextRequest) {
   try {
     switch (action) {
       case 'auth-url':
-        // Generate OAuth URL for Twitter authentication
-        const authUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${process.env.TWITTER_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.TWITTER_REDIRECT_URI || '')}&scope=tweet.read%20users.read&state=${Math.random().toString(36)}&code_challenge=${Math.random().toString(36)}&code_challenge_method=plain`
-        
-        return NextResponse.json({ 
-          authUrl,
-          message: "Redirect user to this URL for authentication" 
-        })
-
+        return handleAuthUrl()
+      
       case 'user-posts':
-        const userId = searchParams.get('userId')
-        if (!userId) {
-          return NextResponse.json({ error: "User ID required" }, { status: 400 })
-        }
-
-        // Mock response - in production, this would fetch from Twitter API
-        const mockPosts = [
-          {
-            id: "1001",
-            text: "Building the future with #Web3 and #NFTs! 🚀",
-            author_id: userId,
-            created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-            public_metrics: {
-              retweet_count: 25,
-              like_count: 156,
-              reply_count: 12,
-              quote_count: 8
-            },
-            entities: {
-              hashtags: [{ tag: "Web3" }, { tag: "NFTs" }]
-            }
-          },
-          {
-            id: "1002",
-            text: "Just deployed my first smart contract on Starknet! The developer experience is amazing ⚡",
-            author_id: userId,
-            created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-            public_metrics: {
-              retweet_count: 18,
-              like_count: 89,
-              reply_count: 6,
-              quote_count: 3
-            }
-          }
-        ]
-
-        return NextResponse.json({
-          data: mockPosts,
-          meta: {
-            result_count: mockPosts.length,
-            newest_id: mockPosts[0]?.id,
-            oldest_id: mockPosts[mockPosts.length - 1]?.id
-          }
-        })
-
+        return await handleUserPosts(searchParams)
+      
+      case 'user-profile':
+        return await handleUserProfile()
+      
+      case 'session':
+        return await handleGetSession()
+      
       default:
         return NextResponse.json({ error: "Invalid action" }, { status: 400 })
     }
@@ -74,38 +36,148 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function handleAuthUrl() {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { code, state } = await request.json()
-
-    // Mock OAuth callback handling
-    // In production, exchange code for access token
-    const mockUser = {
-      id: "123456789",
-      username: "web3builder",
-      name: "Web3 Builder",
-      profile_image_url: "https://pbs.twimg.com/profile_images/example.jpg",
-      verified: false,
-      public_metrics: {
-        followers_count: 2500,
-        following_count: 1200,
-        tweet_count: 4250
-      }
-    }
-
-    return NextResponse.json({
-      access_token: "mock_access_token_" + Date.now(),
-      refresh_token: "mock_refresh_token_" + Date.now(),
-      expires_in: 7200,
-      user: mockUser
-    })
-
-  } catch (error) {
-    console.error("OAuth callback error:", error)
+    const oauth = new TwitterOAuth()
+    const { codeVerifier, codeChallenge } = oauth.generatePKCE()
+    const state = crypto.randomBytes(16).toString('hex')
+    
+    // Store PKCE parameters securely
+    await PKCEStateManager.createOAuthState(state, codeVerifier)
+    
+    const authUrl = oauth.getAuthorizationUrl(state, codeChallenge)
+    
     return NextResponse.json({ 
-      error: "OAuth authentication failed",
+      authUrl,
+      message: "Redirect user to this URL for authentication" 
+    })
+  } catch (error) {
+    console.error("Auth URL generation error:", error)
+    return NextResponse.json({ 
+      error: "Failed to generate auth URL",
       message: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 })
   }
+}
+
+async function handleUserProfile() {
+  // Check session
+  const session = await TwitterSessionManager.refreshSessionIfNeeded()
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+  }
+
+  try {
+    const api = new TwitterAPI(session.accessToken)
+    const user = await api.getUser()
+    return NextResponse.json(user)
+  } catch (error) {
+    console.error("User profile fetch error:", error)
+    
+    if (error instanceof Error && error.message.includes('401')) {
+      await TwitterSessionManager.destroySession()
+      return NextResponse.json({ error: "Authentication expired" }, { status: 401 })
+    }
+    
+    return NextResponse.json({ 
+      error: "Failed to fetch user profile",
+      message: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
+  }
+}
+
+async function handleUserPosts(searchParams: URLSearchParams) {
+  // Check session
+  const session = await TwitterSessionManager.refreshSessionIfNeeded()
+  if (!session) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+  }
+
+  // Rate limiting - 75 requests per 15 minutes for user tweets endpoint
+  const clientId = session.userId
+  if (!rateLimiter.canMakeRequest(clientId, 15 * 60 * 1000, 75)) {
+    const rateLimitInfo = rateLimiter.getRateLimitInfo(clientId, 15 * 60 * 1000, 75)
+    return NextResponse.json({ 
+      error: "Rate limit exceeded",
+      resetTime: rateLimitInfo.resetTime
+    }, { status: 429 })
+  }
+
+  try {
+    const api = new TwitterAPI(session.accessToken)
+    const maxResults = parseInt(searchParams.get('max_results') || '10')
+    const paginationToken = searchParams.get('pagination_token') || undefined
+    const excludeReplies = searchParams.get('exclude_replies') === 'true'
+    const excludeRetweets = searchParams.get('exclude_retweets') === 'true'
+
+    const response = await api.getUserTweets(session.userId, {
+      maxResults: Math.min(maxResults, 100), // Twitter API limit
+      paginationToken,
+      excludeReplies,
+      excludeRetweets
+    })
+
+    return NextResponse.json(response)
+  } catch (error) {
+    console.error("User posts fetch error:", error)
+    
+    // Handle specific Twitter API errors
+    if (error instanceof Error) {
+      if (error.message.includes('401')) {
+        // Token expired, destroy session
+        await TwitterSessionManager.destroySession()
+        return NextResponse.json({ error: "Authentication expired" }, { status: 401 })
+      }
+      
+      if (error.message.includes('429')) {
+        return NextResponse.json({ error: "Twitter API rate limit exceeded" }, { status: 429 })
+      }
+    }
+    
+    return NextResponse.json({ 
+      error: "Failed to fetch posts",
+      message: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
+  }
+}
+
+async function handleGetSession() {
+  const session = await TwitterSessionManager.getSession()
+  
+  if (!session) {
+    return NextResponse.json({ authenticated: false })
+  }
+
+  // Don't return sensitive data
+  return NextResponse.json({ 
+    authenticated: true,
+    userId: session.userId,
+    username: session.username,
+    expiresAt: session.expiresAt
+  })
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { action, ...data } = await request.json()
+
+    switch (action) {
+      case 'logout':
+        return await handleLogout()
+      
+      default:
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 })
+    }
+  } catch (error) {
+    console.error("OAuth callback error:", error)
+    return NextResponse.json({ 
+      error: "Request processing failed",
+      message: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
+  }
+}
+
+async function handleLogout() {
+  await TwitterSessionManager.destroySession()
+  return NextResponse.json({ success: true })
 }
