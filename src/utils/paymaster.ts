@@ -45,10 +45,15 @@ export async function checkAccountCompatibility(
 export async function getGasTokenPrices(): Promise<GasTokenPrice[]> {
   try {
     const prices = await fetchGasTokenPrices();
-    return prices;
+    // Map SDK GasTokenPrice to local GasTokenPrice type
+    return prices.map((p: any) => ({
+      ...p,
+      gasTokenPrice: p.gasTokenPrice ?? p.price, // fallback if needed
+      gasUnitPrice: p.gasUnitPrice ?? p.unitPrice, // fallback if needed
+    }));
   } catch (error) {
     console.error("Error fetching gas token prices:", error);
-    throw new PaymasterError("Failed to fetch gas token prices");
+    throw new Error("Failed to fetch gas token prices");
   }
 }
 
@@ -64,8 +69,6 @@ export async function executeGaslessTransaction(
     const response = await executeCalls(account, calls, {
       gasTokenAddress: options.gasTokenAddress,
       maxGasTokenAmount: options.maxGasTokenAmount,
-      gasTokenPrices: options.gasTokenPrices,
-      estimatedGasFees: options.estimatedGasFees,
     });
 
     return {
@@ -114,7 +117,7 @@ export async function buildSponsoredTypedData(
   calls: Call[]
 ): Promise<any> {
   if (!AVNU_PAYMASTER_CONFIG.API_KEY) {
-    throw new PaymasterError("API key required for sponsored transactions");
+    throw new Error("API key required for sponsored transactions");
   }
 
   try {
@@ -137,7 +140,7 @@ export async function buildSponsoredTypedData(
     return response.data;
   } catch (error) {
     console.error("Error building sponsored typed data:", error);
-    throw new PaymasterError("Failed to build sponsored transaction data");
+    throw new Error("Failed to build sponsored transaction data");
   }
 }
 
@@ -148,7 +151,7 @@ export async function executeSponsoredTransaction(
   data: SponsoredTransactionData
 ): Promise<PaymasterResponse> {
   if (!AVNU_PAYMASTER_CONFIG.API_KEY) {
-    throw new PaymasterError("API key required for sponsored transactions");
+    throw new Error("API key required for sponsored transactions");
   }
 
   try {

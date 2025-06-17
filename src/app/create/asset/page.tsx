@@ -85,7 +85,7 @@ interface Asset {
 //   { id: "4", name: "GNU General Public License" },
 // ];
 
-const collections = [{ id: "1", name: "Programmable IP Collection" }];
+const collections = [{ id: "1", name: "IP Collection" }];
 
 // Define the form schema with zod
 const formSchema = z.object({

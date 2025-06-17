@@ -12,7 +12,7 @@ export default function CollectionsPage() {
       <div className="container py-10 space-y-8">
         <div className="space-y-2">
           <h1 className="text-4xl font-bold tracking-tight">Collections</h1>
-          <p className="text-muted-foreground">Browse and manage your Programmable IP collections</p>
+          <p className="text-muted-foreground">Browse and manage your IP Collections</p>
         </div>
 
         <Suspense fallback={<StatsSkeleton />}>
