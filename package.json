@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@argent/invisible-sdk": "^1.0.0",
     "@avnu/gasless-sdk": "^0.1.8",
     "@clerk/nextjs": "^6.0.2",
     "@hookform/resolvers": "^3.9.1",
