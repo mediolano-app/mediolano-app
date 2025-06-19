@@ -95,7 +95,7 @@ async function handleUserPosts(searchParams: URLSearchParams) {
 
   // Rate limiting - 75 requests per 15 minutes for user tweets endpoint
   const clientId = session.userId
-  if (!rateLimiter.canMakeRequest(clientId, 15 * 60 * 1000, 75)) {
+  if (!rateLimiter.canMakeRequest(clientId, 15 * 60 * 1000, 1)) {
     const rateLimitInfo = rateLimiter.getRateLimitInfo(clientId, 15 * 60 * 1000, 75)
     return NextResponse.json({ 
       error: "Rate limit exceeded",
@@ -159,7 +159,7 @@ async function handleGetSession() {
 
 export async function POST(request: NextRequest) {
   try {
-    const { action, ...data } = await request.json()
+    const { action } = await request.json()
 
     switch (action) {
       case 'logout':

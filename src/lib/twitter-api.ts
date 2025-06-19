@@ -6,8 +6,8 @@ export class TwitterOAuth {
   private redirectUri: string
   
   constructor() {
-    this.clientId = process.env.TWITTER_CLIENT_ID!
-    this.redirectUri = process.env.NEXT_PUBLIC_TWITTER_REDIRECT_URI!
+    this.clientId = process.env.X_CLIENT_ID!
+    this.redirectUri = process.env.NEXT_PUBLIC_X_REDIRECT_URI!
   }
 
   // Generate code verifier and challenge for PKCE
@@ -33,40 +33,67 @@ export class TwitterOAuth {
       code_challenge_method: 'S256'
     })
 
-    return `https://twitter.com/i/oauth2/authorize?${params.toString()}`
+    return `https://x.com/i/oauth2/authorize?${params.toString()}`
   }
 
   // Exchange authorization code for access token
   async exchangeCodeForToken(code: string, codeVerifier: string) {
-    const response = await fetch('https://api.twitter.com/2/oauth2/token', {
+    // Add debugging for credentials
+    console.log('=== Token Exchange Debug ===')
+    console.log('Client ID length:', this.clientId.length)
+    console.log('Client ID format:', /^[a-zA-Z0-9_-]+$/.test(this.clientId) ? 'Valid' : 'Invalid')
+    console.log('Redirect URI:', this.redirectUri)
+    
+    // Check if we have proper OAuth 2.0 credentials
+    if (this.clientId.length < 20 || /^\d+$/.test(this.clientId)) {
+      throw new Error('Invalid OAuth 2.0 Client ID. You appear to be using OAuth 1.0a credentials. Please get OAuth 2.0 Client ID and Secret from X Developer Portal.')
+    }
+
+    const authString = `${this.clientId}:${process.env.X_API_KEY_SECRET}`
+    const base64Auth = Buffer.from(authString).toString('base64')
+    
+    console.log('Auth string length:', authString.length)
+    console.log('Base64 auth preview:', base64Auth.substring(0, 20) + '...')
+
+    const requestBody = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: this.redirectUri,
+      code_verifier: codeVerifier
+    })
+
+    console.log('Request body:', requestBody.toString())
+
+    const response = await fetch('https://api.x.com/2/oauth2/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${this.clientId}:${process.env.TWITTER_CLIENT_SECRET}`).toString('base64')}`
+        'Authorization': `Basic ${base64Auth}`
       },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: this.redirectUri,
-        code_verifier: codeVerifier
-      })
+      body: requestBody
     })
+
+    console.log('Response status:', response.status)
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()))
 
     if (!response.ok) {
       const error = await response.text()
+      console.error('Token exchange error response:', error)
       throw new Error(`Token exchange failed: ${error}`)
     }
 
-    return response.json()
+    const tokenData = await response.json()
+    console.log('Token exchange successful:', Object.keys(tokenData))
+    return tokenData
   }
 
   // Refresh access token
   async refreshToken(refreshToken: string) {
-    const response = await fetch('https://api.twitter.com/2/oauth2/token', {
+    const response = await fetch('https://api.x.com/2/oauth2/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${this.clientId}:${process.env.TWITTER_CLIENT_SECRET}`).toString('base64')}`
+        'Authorization': `Basic ${Buffer.from(`${this.clientId}:${process.env.X_API_KEY_SECRET}`).toString('base64')}`
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
@@ -94,8 +121,8 @@ export class TwitterAPI {
   // Get user information
   async getUser(userId?: string) {
     const endpoint = userId 
-      ? `https://api.twitter.com/2/users/${userId}`
-      : 'https://api.twitter.com/2/users/me'
+      ? `https://api.x.com/2/users/${userId}`
+      : 'https://api.x.com/2/users/me'
     
     const params = new URLSearchParams({
       'user.fields': 'id,username,name,profile_image_url,verified,public_metrics'
@@ -144,7 +171,7 @@ export class TwitterAPI {
     }
 
     const response = await fetch(
-      `https://api.twitter.com/2/users/${userId}/tweets?${params.toString()}`,
+      `https://api.x.com/2/users/${userId}/tweets?${params.toString()}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
@@ -170,7 +197,7 @@ export class TwitterAPI {
     })
 
     const response = await fetch(
-      `https://api.twitter.com/2/tweets/${tweetId}?${params.toString()}`,
+      `https://api.x.com/2/tweets/${tweetId}?${params.toString()}`,
       {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,

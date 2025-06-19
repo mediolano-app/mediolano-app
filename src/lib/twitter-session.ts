@@ -111,42 +111,74 @@ export class PKCEStateManager {
   private static readonly VERIFIER_COOKIE = 'twitter-code-verifier'
 
   static async createOAuthState(state: string, codeVerifier: string): Promise<void> {
+    console.log('=== Creating PKCE State ===')
+    console.log('State:', state)
+    console.log('Code verifier length:', codeVerifier.length)
+    
     const cookieStore = await cookies()
     
     // Store state and code verifier for 10 minutes
     const maxAge = 10 * 60 // 10 minutes
     
-    cookieStore.set(this.STATE_COOKIE, state, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+    // More permissive cookie settings for development
+    const cookieOptions = {
+      httpOnly: false, // Allow access for debugging in development
+      secure: false, // Don't require HTTPS in development
+      sameSite: 'lax' as const,
       maxAge,
       path: '/'
-    })
+    }
 
-    cookieStore.set(this.VERIFIER_COOKIE, codeVerifier, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge,
-      path: '/'
-    })
+    console.log('Setting cookies with options:', cookieOptions)
+    
+    cookieStore.set(this.STATE_COOKIE, state, cookieOptions)
+    cookieStore.set(this.VERIFIER_COOKIE, codeVerifier, cookieOptions)
+    
+    console.log('Cookies set successfully')
   }
 
   static async validateAndGetVerifier(state: string): Promise<string | null> {
+    console.log('=== Validating PKCE State ===')
+    console.log('Received state:', state)
+    
     const cookieStore = await cookies()
     
     const storedState = cookieStore.get(this.STATE_COOKIE)?.value
     const codeVerifier = cookieStore.get(this.VERIFIER_COOKIE)?.value
 
-    // Clear cookies
-    cookieStore.delete(this.STATE_COOKIE)
-    cookieStore.delete(this.VERIFIER_COOKIE)
+    console.log('Stored state:', storedState)
+    console.log('Code verifier found:', codeVerifier ? 'YES' : 'NO')
+    console.log('Code verifier length:', codeVerifier?.length || 0)
+    
+    // Check all cookies for debugging
+    const allCookies = cookieStore.getAll()
+    console.log('All cookies:', allCookies.map(c => ({ name: c.name, hasValue: !!c.value })))
 
-    if (!storedState || !codeVerifier || storedState !== state) {
+    // Clear cookies after reading
+    try {
+      cookieStore.delete(this.STATE_COOKIE)
+      cookieStore.delete(this.VERIFIER_COOKIE)
+      console.log('Cookies deleted')
+    } catch (error) {
+      console.error('Error deleting cookies:', error)
+    }
+
+    if (!storedState) {
+      console.error('No stored state found - cookie may have expired or not been set')
       return null
     }
 
+    if (!codeVerifier) {
+      console.error('No code verifier found - cookie may have expired or not been set')
+      return null
+    }
+
+    if (storedState !== state) {
+      console.error('State mismatch:', { expected: state, received: storedState })
+      return null
+    }
+
+    console.log('PKCE validation successful')
     return codeVerifier
   }
 }
