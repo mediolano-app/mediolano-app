@@ -1,3 +1,4 @@
+import { useIPAirdropContract } from "@/hooks/useIPAirdropContract"
 import type { Campaign } from "./types"
 
 // Mock data for campaigns
@@ -204,97 +205,79 @@ const mockUserCampaigns = {
 }
 
 // Get all campaigns
-export function getCampaigns() {
+export async function getAllCampaigns(): Promise<Campaign[]> {
+  const { getAllCampaigns } = useIPAirdropContract()
   try {
-    const activeCampaigns = mockCampaigns.filter((campaign) => campaign.status === "active")
-    const popularCampaigns = [...mockCampaigns].sort((a, b) => b.participants - a.participants)
-    const myCampaigns = [...mockUserCampaigns.created, ...mockUserCampaigns.participating]
-
-    return {
-      activeCampaigns,
-      popularCampaigns,
-      myCampaigns,
-    }
+    return await getAllCampaigns()
   } catch (error) {
-    console.error("Error getting campaigns:", error)
-    // Return empty arrays as fallback
-    return {
-      activeCampaigns: [],
-      popularCampaigns: [],
-      myCampaigns: [],
-    }
+    console.error("Failed to get all campaigns:", error)
+    throw new Error("Failed to fetch campaigns. Please try again.")
+  }
+}
+
+// Get user campaigns
+export async function getUserCampaigns(): Promise<Campaign[]> {
+  const { getUserCampaigns } = useIPAirdropContract()
+  try {
+    return await getUserCampaigns()
+  } catch (error) {
+    console.error("Failed to get user campaigns:", error)
+    throw new Error("Failed to fetch your campaigns. Please try again.")
   }
 }
 
 // Get campaign by ID
-export function getCampaignById(id: string): Promise<Campaign> {
-  return new Promise((resolve, reject) => {
-    try {
-      if (!id) {
-        reject(new Error("Invalid campaign ID"))
-        return
-      }
+export async function getCampaignById(campaignId: string): Promise<Campaign> {
+  const { getCampaign } = useIPAirdropContract()
+  try {
+    const campaign = await getCampaign(campaignId)
 
-      setTimeout(() => {
-        // Try to find the campaign by exact ID match
-        let campaign = mockCampaigns.find((c) => c.id === id)
-
-        // If not found, try to match by string conversion (in case of numeric IDs)
-        if (!campaign) {
-          campaign = mockCampaigns.find((c) => c.id === String(id))
-        }
-
-        if (campaign) {
-          resolve(campaign)
-        } else {
-          // For demo purposes, return the first campaign if ID not found
-          // This prevents the "Campaign not found" error in the demo
-          resolve(mockCampaigns[0])
-
-          // In a real app, you might want to reject instead:
-          // reject(new Error("Campaign not found"))
-        }
-      }, 500)
-    } catch (error) {
-      reject(new Error(`Error fetching campaign: ${error}`))
+    if (!campaign) {
+      throw new Error("Campaign not found")
     }
-  })
+
+    return campaign
+  } catch (error) {
+    console.error(`Failed to get campaign ${campaignId}:`, error)
+    throw new Error("Failed to fetch campaign details. Please try again.")
+  }
 }
 
-// Get user campaigns
-export function getUserCampaigns() {
-  return new Promise<typeof mockUserCampaigns>((resolve, reject) => {
-    try {
-      setTimeout(() => {
-        resolve(mockUserCampaigns)
-      }, 1000)
-    } catch (error) {
-      reject(new Error(`Error fetching user campaigns: ${error}`))
-    }
-  })
+// Participate in a campaign
+export async function participateInCampaign(campaignId: string): Promise<void> {
+  const { joinCampaign } = useIPAirdropContract()
+  try {
+    await joinCampaign(campaignId)
+  } catch (error) {
+    console.error("Failed to participate in campaign:", error)
+    throw new Error("Failed to join campaign. Please try again.")
+  }
 }
 
-// Mock function to participate in a campaign
-export function mockParticipateInCampaign(campaignId: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    try {
-      if (!campaignId) {
-        reject(new Error("Invalid campaign ID"))
-        return
-      }
+// Complete a task
+export async function completeTask(campaignId: string, taskId: string): Promise<void> {
+  const { completeTask } = useIPAirdropContract()
+  try {
+    await completeTask(campaignId, taskId)
+  } catch (error) {
+    console.error("Failed to complete task:", error)
+    throw new Error("Failed to complete task. Please try again.")
+  }
+}
 
-      setTimeout(() => {
-        const campaign = mockCampaigns.find((c) => c.id === campaignId)
-        if (campaign) {
-          campaign.participants += 1
-          resolve()
-        } else {
-          reject(new Error("Campaign not found"))
-        }
-      }, 1000)
-    } catch (error) {
-      reject(new Error(`Error participating in campaign: ${error}`))
-    }
-  })
+// Claim rewards
+export async function claimRewards(campaignId: string): Promise<void> {
+  const { claimRewards } = useIPAirdropContract()
+  try {
+    await claimRewards(campaignId)
+  } catch (error) {
+    console.error("Failed to claim rewards:", error)
+    throw new Error("Failed to claim rewards. Please try again.")
+  }
+}
+
+// For backward compatibility with existing code
+export async function mockParticipateInCampaign(campaignId: string): Promise<void> {
+  return participateInCampaign(campaignId)
 }
 
