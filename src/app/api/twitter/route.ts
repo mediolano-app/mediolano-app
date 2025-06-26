@@ -24,6 +24,9 @@ export async function GET(request: NextRequest) {
       case 'session':
         return await handleGetSession()
       
+      case 'create-session':
+        return await handleCreateSession(request)
+      
       default:
         return NextResponse.json({ error: "Invalid action" }, { status: 400 })
     }
@@ -38,19 +41,63 @@ export async function GET(request: NextRequest) {
 
 async function handleAuthUrl() {
   try {
+    console.log('=== Starting Auth URL Generation ===')
+    
     const oauth = new TwitterOAuth()
     const { codeVerifier, codeChallenge } = oauth.generatePKCE()
     const state = crypto.randomBytes(16).toString('hex')
     
-    // Store PKCE parameters securely
-    await PKCEStateManager.createOAuthState(state, codeVerifier)
+    console.log('Generated state:', state)
+    console.log('Generated code verifier length:', codeVerifier.length)
+    console.log('Generated code challenge:', codeChallenge)
     
-    const authUrl = oauth.getAuthorizationUrl(state, codeChallenge)
+    // Store PKCE data in a more reliable way - encode in the state parameter
+    const stateData = {
+      state: state,
+      codeVerifier: codeVerifier,
+      timestamp: Date.now()
+    }
     
-    return NextResponse.json({ 
+    // Base64 encode the state data to include in the OAuth state parameter
+    const encodedState = Buffer.from(JSON.stringify(stateData)).toString('base64url')
+    
+    const authUrl = oauth.getAuthorizationUrl(encodedState, codeChallenge)
+    console.log('Generated auth URL:', authUrl)
+    
+    // Still try to set cookies as backup, but don't rely on them
+    const response = NextResponse.json({ 
       authUrl,
-      message: "Redirect user to this URL for authentication" 
+      message: "Redirect user to this URL for authentication",
+      debug: {
+        state: encodedState,
+        codeVerifierLength: codeVerifier.length
+      }
     })
+
+    // Set cookies as backup (but we'll primarily use the encoded state)
+    const maxAge = 10 * 60 // 10 minutes
+    
+    console.log('Setting backup PKCE cookies...')
+    
+    response.cookies.set('twitter-oauth-state', state, {
+      httpOnly: false,
+      secure: false,
+      sameSite: 'lax',
+      maxAge,
+      path: '/'
+    })
+
+    response.cookies.set('twitter-code-verifier', codeVerifier, {
+      httpOnly: false,
+      secure: false,
+      sameSite: 'lax',
+      maxAge,
+      path: '/'
+    })
+
+    console.log('Backup cookies set, primary data encoded in state parameter')
+    
+    return response
   } catch (error) {
     console.error("Auth URL generation error:", error)
     return NextResponse.json({ 
@@ -93,17 +140,27 @@ async function handleUserPosts(searchParams: URLSearchParams) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
   }
 
-  // Rate limiting - 75 requests per 15 minutes for user tweets endpoint
+  // Rate limiting - Basic plan: 1 request per 15 minutes for user tweets endpoint
   const clientId = session.userId
-  if (!rateLimiter.canMakeRequest(clientId, 15 * 60 * 1000, 1)) {
-    const rateLimitInfo = rateLimiter.getRateLimitInfo(clientId, 15 * 60 * 1000, 75)
+  const windowMs = 15 * 60 * 1000 // 15 minutes
+  const maxRequests = 1 // Basic plan limit
+  
+  if (!rateLimiter.canMakeRequest(clientId, windowMs, maxRequests)) {
+    const rateLimitInfo = rateLimiter.getRateLimitInfo(clientId, windowMs, maxRequests)
+    const resetTimeMinutes = Math.ceil((rateLimitInfo.resetTime - Date.now()) / (1000 * 60))
+    
+    console.log(`Rate limit exceeded for user ${clientId}. Reset in ${resetTimeMinutes} minutes.`)
+    
     return NextResponse.json({ 
-      error: "Rate limit exceeded",
-      resetTime: rateLimitInfo.resetTime
+      error: "Twitter API rate limit exceeded",
+      message: `Basic plan allows 1 request per 15 minutes. Please wait ${resetTimeMinutes} minutes before trying again.`,
+      resetTime: rateLimitInfo.resetTime,
+      resetInMinutes: resetTimeMinutes
     }, { status: 429 })
   }
 
   try {
+    console.log(`Making Twitter API request for user ${session.userId}`)
     const api = new TwitterAPI(session.accessToken)
     const maxResults = parseInt(searchParams.get('max_results') || '10')
     const paginationToken = searchParams.get('pagination_token') || undefined
@@ -117,6 +174,7 @@ async function handleUserPosts(searchParams: URLSearchParams) {
       excludeRetweets
     })
 
+    console.log(`Twitter API request successful. Retrieved ${response.data?.length || 0} posts`)
     return NextResponse.json(response)
   } catch (error) {
     console.error("User posts fetch error:", error)
@@ -130,7 +188,11 @@ async function handleUserPosts(searchParams: URLSearchParams) {
       }
       
       if (error.message.includes('429')) {
-        return NextResponse.json({ error: "Twitter API rate limit exceeded" }, { status: 429 })
+        return NextResponse.json({ 
+          error: "Twitter API rate limit exceeded",
+          message: "Your Twitter API plan has reached its rate limit. Please wait before making another request.",
+          details: "Basic plan: 1 request per 15 minutes"
+        }, { status: 429 })
       }
     }
     
@@ -142,19 +204,75 @@ async function handleUserPosts(searchParams: URLSearchParams) {
 }
 
 async function handleGetSession() {
-  const session = await TwitterSessionManager.getSession()
+  console.log('=== Session Endpoint Debug ===')
   
-  if (!session) {
-    return NextResponse.json({ authenticated: false })
-  }
+  try {
+    const session = await TwitterSessionManager.getSession()
+    console.log('TwitterSessionManager.getSession() result:', session)
+    
+    if (!session) {
+      console.log('No session found, returning not authenticated')
+      return NextResponse.json({ authenticated: false })
+    }
 
-  // Don't return sensitive data
-  return NextResponse.json({ 
-    authenticated: true,
-    userId: session.userId,
-    username: session.username,
-    expiresAt: session.expiresAt
-  })
+    console.log('Session found, returning authenticated with user data')
+    // Don't return sensitive data
+    return NextResponse.json({ 
+      authenticated: true,
+      userId: session.userId,
+      username: session.username,
+      expiresAt: session.expiresAt
+    })
+  } catch (error) {
+    console.error('Session endpoint error:', error)
+    return NextResponse.json({ 
+      authenticated: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
+}
+
+async function handleCreateSession(request: NextRequest) {
+  try {
+    console.log('=== Creating Session from OAuth Data ===')
+    const { searchParams } = new URL(request.url)
+    const sessionDataParam = searchParams.get('session_data')
+    
+    if (!sessionDataParam) {
+      return NextResponse.json({ error: "Missing session data" }, { status: 400 })
+    }
+
+    // Decode the session data from the URL parameter
+    console.log('Decoding session data from URL parameter...')
+    const decodedSessionJson = Buffer.from(sessionDataParam, 'base64url').toString()
+    const sessionData = JSON.parse(decodedSessionJson)
+    
+    console.log('Session data decoded:', { 
+      userId: sessionData.userId, 
+      username: sessionData.username,
+      hasAccessToken: !!sessionData.accessToken 
+    })
+
+    // Create the session using the createSession method that works with cookies()
+    const response = NextResponse.json({ 
+      success: true,
+      message: "Session created successfully",
+      userId: sessionData.userId,
+      username: sessionData.username
+    })
+
+    // Use the createSessionWithResponse method to properly set the session cookie
+    await TwitterSessionManager.createSessionWithResponse(sessionData, response)
+    console.log('Session created and cookie set successfully')
+    
+    return response
+  } catch (error) {
+    console.error('Create session error:', error)
+    return NextResponse.json({ 
+      error: "Failed to create session",
+      message: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
+  }
 }
 
 export async function POST(request: NextRequest) {

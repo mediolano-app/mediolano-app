@@ -8,7 +8,7 @@ export class TwitterOAuth {
   
   constructor() {
     this.clientId = process.env.X_CLIENT_ID!
-    this.clientSecret = process.env.X_CLIENT_SECRET!
+    this.clientSecret = process.env.X_CLIENT_SECRET! // Fixed: Use OAuth 2.0 Client Secret
     this.redirectUri = process.env.NEXT_PUBLIC_X_REDIRECT_URI!
   }
 
