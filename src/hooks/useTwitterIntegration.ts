@@ -7,6 +7,8 @@ import type {
   TwitterIntegrationState,
   TwitterConnectionState 
 } from "@/types/twitter"
+import { useStarknetWallet } from "@/hooks/useStarknetWallet"
+import { StarknetMintingService } from "@/lib/starknet-minting"
 
 // Real API functions for Twitter integration
 const connectTwitterAccount = async (): Promise<{ success: boolean; user?: TwitterUser; authUrl?: string }> => {
@@ -103,8 +105,9 @@ const checkAuthenticationStatus = async (): Promise<{ success: boolean; user?: T
 }
 
 const fetchUserTwitterPosts = async (userId: string): Promise<TwitterPostsResponse> => {
-  const params = new URLSearchParams({
-    max_results: '20',
+    const params = new URLSearchParams({
+    // MAX POSTS RESULTS FROM X API FETCH CALL
+    max_results: '10',
     exclude_replies: 'true',
     exclude_retweets: 'false'
   })
@@ -127,7 +130,29 @@ const logoutTwitter = async (): Promise<void> => {
   })
 }
 
-const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promise<TokenizedPost> => {
+const tokenizeTwitterPost = async (
+  post: TwitterPost, 
+  user: TwitterUser, 
+  walletAddress: string, 
+  contractAddress: string
+): Promise<TokenizedPost> => {
+  console.log("🚀 Starting Twitter post tokenization with real blockchain minting...")
+  console.log("📋 TOKENIZATION DEBUG INFO:")
+  console.log("  - Post ID:", post.id)
+  console.log("  - Post text preview:", post.text.substring(0, 50) + "...")
+  console.log("  - User:", user.username)
+  console.log("  - Wallet Address:", walletAddress)
+  console.log("  - Contract Address:", contractAddress)
+  console.log("  - Contract Address Type:", typeof contractAddress)
+  console.log("  - Contract Address Length:", contractAddress?.length || 0)
+  console.log("  - Is Contract Address Valid:", contractAddress && contractAddress !== "0x0" && contractAddress.startsWith("0x"))
+  
+  // Log environment variables for debugging
+  console.log("🌍 ENVIRONMENT VARIABLES DEBUG:")
+  console.log("  - NEXT_PUBLIC_CONTRACT_ADDRESS_MIP:", process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP)
+  console.log("  - NEXT_PUBLIC_MIP_CONTRACT_ADDRESS:", process.env.NEXT_PUBLIC_MIP_CONTRACT_ADDRESS)
+  console.log("  - NEXT_PUBLIC_IPCOLLECTION_ADDRESS:", process.env.NEXT_PUBLIC_IPCOLLECTION_ADDRESS)
+  
   const postData = {
     postId: post.id,
     text: post.text,
@@ -139,11 +164,19 @@ const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promis
     mentions: post.entities?.mentions?.map(m => m.username) || [],
     urls: post.entities?.urls?.map(u => u.expanded_url) || [],
     mediaUrls: [],
+    // Add wallet and contract info for real minting
+    walletAddress,
+    contractAddress
   }
 
+  console.log("📤 POST DATA TO BE SENT:")
+  console.log("  - Contract Address in payload:", postData.contractAddress)
+  console.log("  - Wallet Address in payload:", postData.walletAddress)
+
   try {
-    console.log("Starting tokenization process for post:", post.id)
+    console.log("📤 Step 1: Uploading metadata to IPFS...")
     
+    // Upload to IPFS via API
     const response = await fetch("/api/twitter/tokenize", {
       method: "POST",
       headers: {
@@ -152,37 +185,47 @@ const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promis
       body: JSON.stringify(postData),
     })
 
+    console.log("📡 API Response Status:", response.status)
+    console.log("📡 API Response Headers:", Object.fromEntries(response.headers.entries()))
+
     if (!response.ok) {
-      throw new Error("Failed to tokenize post")
+      const errorData = await response.json()
+      console.error("❌ API Error Response:", errorData)
+      throw new Error(errorData.message || "Failed to upload metadata to IPFS")
     }
 
     const data = await response.json()
-    console.log("Tokenization API response:", data)
+    console.log("✅ IPFS upload completed:", data)
+
+    if (!data.success || !data.ipfsData) {
+      throw new Error("IPFS upload failed")
+    }
+
+    console.log("⛓️ Step 2: Minting NFT on Starknet blockchain...")
     
-    // Simulate blockchain transaction (in real implementation, this would mint the NFT)
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    
-    // Generate mock transaction data (replace with actual blockchain interaction)
-    const tokenId = `token_${Date.now()}`
-    const transactionHash = `0x${Math.random().toString(16).slice(2, 66)}`
-    
-    // Create Starknet explorer URL
-    const starknetUrl = `https://starkscan.co/tx/${transactionHash}`
-    
+    // Note: Real minting will be handled by the frontend component
+    // since we need access to the user's wallet account
     return {
       postId: post.id,
-      tokenId,
-      transactionHash,
-      ipfsHash: data.uploadData?.IpfsHash || `Qm${Math.random().toString(36).slice(2, 48)}`,
+      tokenId: `pending_${Date.now()}`, // Will be updated after minting
+      transactionHash: `pending_${Date.now()}`, // Will be updated after minting
+      ipfsHash: data.ipfsData.hash,
       createdAt: new Date().toISOString(),
-      status: 'confirmed',
-      // Add the URLs from the IPFS upload response
-      ipfsUrl: data.uploadData?.ipfsUrl,
-      pinataUrl: data.uploadData?.pinataUrl,
-      starknetUrl
+      status: 'pending', // Will be updated to confirmed after minting
+      ipfsUrl: data.ipfsData.url,
+      pinataUrl: data.ipfsData.pinataUrl,
+      starknetUrl: undefined, // Will be set after minting
+      // Add metadata for frontend minting
+      _mintingData: {
+        contractAddress,
+        recipientAddress: walletAddress,
+        metadata: data.metadata,
+        ipfsHash: data.ipfsData.hash,
+        ipfsUrl: data.ipfsData.url
+      }
     }
   } catch (error) {
-    console.error("Tokenization error:", error)
+    console.error("❌ Tokenization error:", error)
     throw error
   }
 }
@@ -204,6 +247,7 @@ export interface TwitterIntegrationContextType {
   selectPost: (post: TwitterPost | null) => void
   tokenizeSelectedPost: () => Promise<TokenizedPost | undefined>
   getIntegrationState: () => TwitterIntegrationState
+  setTokenizedPosts: React.Dispatch<React.SetStateAction<TokenizedPost[]>> // Add this line
 }
 
 export const useTwitterIntegration = () => {
@@ -215,6 +259,42 @@ export const useTwitterIntegration = () => {
   const [isLoadingPosts, setIsLoadingPosts] = useState(false)
   const [isTokenizing, setIsTokenizing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Get Starknet wallet info
+  const { 
+    account, 
+    address: walletAddress, 
+    isConnected: isWalletConnected,
+    mipContract 
+  } = useStarknetWallet()
+
+  // Load tokenized posts from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedTokenizedPosts = localStorage.getItem('twitter-tokenized-posts')
+        if (storedTokenizedPosts) {
+          const parsedPosts = JSON.parse(storedTokenizedPosts) as TokenizedPost[]
+          setTokenizedPosts(parsedPosts)
+          console.log('Loaded tokenized posts from localStorage:', parsedPosts.length)
+        }
+      } catch (error) {
+        console.error('Failed to load tokenized posts from localStorage:', error)
+      }
+    }
+  }, [])
+
+  // Save tokenized posts to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && tokenizedPosts.length > 0) {
+      try {
+        localStorage.setItem('twitter-tokenized-posts', JSON.stringify(tokenizedPosts))
+        console.log('Saved tokenized posts to localStorage:', tokenizedPosts.length)
+      } catch (error) {
+        console.error('Failed to save tokenized posts to localStorage:', error)
+      }
+    }
+  }, [tokenizedPosts])
 
   // Check authentication status on mount and when URL changes (for OAuth callback)
   useEffect(() => {
@@ -399,7 +479,15 @@ export const useTwitterIntegration = () => {
     setIsTokenizing(true)
     setError(null)
     try {
-      const tokenizedPost = await tokenizeTwitterPost(selectedPost, user)
+      // Ensure wallet is connected before tokenization
+      if (!isWalletConnected) {
+        setError("Please connect your Starknet wallet first")
+        setIsTokenizing(false)
+        return
+      }
+
+      // Perform tokenization with real minting
+      const tokenizedPost = await tokenizeTwitterPost(selectedPost, user, walletAddress, mipContract?.address || "")
       setTokenizedPosts(prev => [...prev, tokenizedPost])
       setSelectedPost(null)
       return tokenizedPost
@@ -409,7 +497,7 @@ export const useTwitterIntegration = () => {
     } finally {
       setIsTokenizing(false)
     }
-  }, [selectedPost, user])
+  }, [selectedPost, user, isWalletConnected, walletAddress, mipContract])
 
   const reset = useCallback(async () => {
     await logoutTwitter()
@@ -419,6 +507,16 @@ export const useTwitterIntegration = () => {
     setSelectedPost(null)
     setTokenizedPosts([])
     setError(null)
+    
+    // Clear tokenized posts from localStorage when disconnecting
+    // if (typeof window !== 'undefined') {
+    //   try {
+    //     localStorage.removeItem('twitter-tokenized-posts')
+    //     console.log('Cleared tokenized posts from localStorage')
+    //   } catch (error) {
+    //     console.error('Failed to clear tokenized posts from localStorage:', error)
+    //   }
+    // }
   }, [])
 
   const getIntegrationState = useCallback((): TwitterIntegrationState => ({
@@ -437,6 +535,7 @@ export const useTwitterIntegration = () => {
     posts,
     selectedPost,
     tokenizedPosts,
+    setTokenizedPosts, // Add this line
     isLoadingPosts,
     isTokenizing,
     error, 

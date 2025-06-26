@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react"
 import { useTwitterIntegrationContext } from "./TwitterIntegrationProvider"
-import type { TwitterPost } from "@/types/twitter"
+import { useStarknetWallet } from "@/hooks/useStarknetWallet"
+import { StarknetMintingService } from "@/lib/starknet-minting"
+import type { TwitterPost, TokenizedPost } from "@/types/twitter"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Heart, MessageCircle, Repeat2, Share, Calendar, Hash, ExternalLink, Loader2, CheckCircle2 } from "lucide-react"
+import { Heart, MessageCircle, Repeat2, Share, Calendar, Hash, ExternalLink, Loader2, CheckCircle2, Wallet } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
@@ -33,10 +35,20 @@ export default function TwitterPostBrowser({
     error,
     loadUserPosts,
     selectPost,
-    tokenizeSelectedPost
+    tokenizeSelectedPost,
+    setTokenizedPosts // Add setTokenizedPosts to context
   } = useTwitterIntegrationContext()
+
+  // Get Starknet wallet info
+  const { 
+    account, 
+    address: walletAddress, 
+    isConnected: isWalletConnected,
+    mipContract 
+  } = useStarknetWallet()
   
   console.log("TwitterPostBrowser - received state:", state, "user:", user?.username, "posts:", posts.length)
+  console.log("Wallet connected:", isWalletConnected, "address:", walletAddress)
   
   const { toast } = useToast()
   const [hasLoadedPosts, setHasLoadedPosts] = useState(false)
@@ -47,7 +59,7 @@ export default function TwitterPostBrowser({
     resetInMinutes?: number
     message?: string
   }>({ isLimited: false })
-  const [nextPageToken, setNextPageToken] = useState<string | null>(null)
+  const [pendingMints, setPendingMints] = useState<Set<string>>(new Set())
 
   // Load first batch of posts when user is verified
   useEffect(() => {
@@ -56,6 +68,122 @@ export default function TwitterPostBrowser({
       handleLoadPosts(true)
     }
   }, [state, user, hasLoadedPosts, posts.length])
+
+  // Process pending mints and update their status
+  useEffect(() => {
+    const processPendingMints = async () => {
+      if (!account || !mipContract || pendingMints.size === 0) return
+
+      console.log("Processing pending mints:", Array.from(pendingMints))
+      
+      for (const postId of pendingMints) {
+        const tokenizedPost = tokenizedPosts.find(tp => tp.postId === postId && tp.status === 'pending')
+        
+        if (tokenizedPost && tokenizedPost._mintingData) {
+          console.log(`🔄 Processing mint for post ${postId}...`)
+          
+          try {
+            // Perform real Starknet minting
+            const mintResult = await StarknetMintingService.mintTwitterPostNFT({
+              account,
+              contractAddress: tokenizedPost._mintingData.contractAddress,
+              recipientAddress: tokenizedPost._mintingData.recipientAddress,
+              tokenMetadata: tokenizedPost._mintingData.metadata,
+              ipfsHash: tokenizedPost._mintingData.ipfsHash,
+              ipfsUrl: tokenizedPost._mintingData.ipfsUrl
+            })
+
+            if (mintResult.success) {
+              console.log(`✅ Successfully minted NFT for post ${postId}:`, mintResult)
+              
+              // Update the tokenized post with real blockchain data
+              const updatedPost: TokenizedPost = {
+                ...tokenizedPost,
+                tokenId: mintResult.tokenId || tokenizedPost.tokenId,
+                transactionHash: mintResult.transactionHash || tokenizedPost.transactionHash,
+                status: 'confirmed',
+                starknetUrl: StarknetMintingService.getTransactionUrl(
+                  mintResult.transactionHash || tokenizedPost.transactionHash,
+                  'sepolia' // or 'mainnet' based on your network
+                ),
+                contractAddress: tokenizedPost._mintingData.contractAddress,
+                network: 'sepolia', // or 'mainnet'
+                // Remove minting data as it's no longer needed
+                _mintingData: undefined
+              }
+
+              // Update the tokenizedPosts state in the Twitter integration context
+              // We need to update the state in the parent context, not just localStorage
+              setTokenizedPosts(prev => {
+                const updated = prev.map(tp => 
+                  tp.postId === postId ? updatedPost : tp
+                )
+                
+                // Also update localStorage
+                localStorage.setItem('twitter-tokenized-posts', JSON.stringify(updated))
+                console.log('✅ Updated tokenized posts state and localStorage')
+                
+                return updated
+              })
+              
+              // Remove from pending
+              setPendingMints(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(postId)
+                return newSet
+              })
+
+              toast({
+                title: "NFT Minted Successfully! 🎉",
+                description: `Your post has been minted as NFT on Starknet. Token ID: ${updatedPost.tokenId}`,
+              })
+            } else {
+              console.error(`❌ Failed to mint NFT for post ${postId}:`, mintResult.error)
+              
+              // Update status to failed
+              setTokenizedPosts(prev => {
+                const updated = prev.map(tp => 
+                  tp.postId === postId ? { ...tp, status: 'failed' as const } : tp
+                )
+                localStorage.setItem('twitter-tokenized-posts', JSON.stringify(updated))
+                return updated
+              })
+              
+              setPendingMints(prev => {
+                const newSet = new Set(prev)
+                newSet.delete(postId)
+                return newSet
+              })
+
+              toast({
+                title: "Minting Failed ❌",
+                description: `Failed to mint NFT: ${mintResult.error}`,
+                variant: "destructive"
+              })
+            }
+          } catch (error) {
+            console.error(`❌ Error minting NFT for post ${postId}:`, error)
+            
+            setPendingMints(prev => {
+              const newSet = new Set(prev)
+              newSet.delete(postId)
+              return newSet
+            })
+
+            toast({
+              title: "Minting Error ❌",
+              description: `Unexpected error during minting: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              variant: "destructive"
+            })
+          }
+        }
+      }
+    }
+
+    if (account && mipContract) {
+      processPendingMints()
+    }
+  }, [account, mipContract, pendingMints, tokenizedPosts, toast, setTokenizedPosts]) // Add setTokenizedPosts to dependencies
 
   const handleLoadPosts = async (isInitialLoad = false) => {
     console.log(isInitialLoad ? "Loading initial posts" : "Loading more posts")
@@ -117,16 +245,42 @@ export default function TwitterPostBrowser({
   const handleTokenizePost = async () => {
     if (!selectedPost) return
 
+    // Check wallet connection first
+    if (!isWalletConnected) {
+      toast({
+        title: "Wallet Required 🔗",
+        description: "Please connect your Starknet wallet to tokenize posts as NFTs.",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!mipContract?.address) {
+      toast({
+        title: "Contract Not Available 📄",
+        description: "MIP Collection contract is not configured. Please check your setup.",
+        variant: "destructive"
+      })
+      return
+    }
+
     try {
       const tokenizedPost = await tokenizeSelectedPost()
+      
+      if (tokenizedPost) {
+        // Add to pending mints for real blockchain processing
+        setPendingMints(prev => new Set([...prev, tokenizedPost.postId]))
+        
+        toast({
+          title: "Post Queued for Minting! ⏳",
+          description: "Your post metadata has been uploaded to IPFS. NFT minting is in progress...",
+        })
+      }
+    } catch (error) {
+      console.error("Tokenization error:", error)
       toast({
-        title: "Post Tokenized Successfully!",
-        description: `Your post has been converted to an NFT. Transaction: ${tokenizedPost?.transactionHash.slice(0, 10)}...`,
-      })
-    } catch {
-      toast({
-        title: "Tokenization Failed",
-        description: "There was an error tokenizing your post. Please try again.",
+        title: "Tokenization Failed ❌",
+        description: error instanceof Error ? error.message : "There was an error tokenizing your post. Please try again.",
         variant: "destructive"
       })
     }
@@ -219,7 +373,7 @@ export default function TwitterPostBrowser({
             <AlertDescription>{error}</AlertDescription>
           </Alert>
           <Button 
-            onClick={handleLoadPosts} 
+            onClick={() => handleLoadPosts()} 
             className="mt-4"
             variant="outline"
           >
@@ -256,7 +410,7 @@ export default function TwitterPostBrowser({
             </div>
           )}
           <Button 
-            onClick={handleLoadPosts} 
+            onClick={() => handleLoadPosts()} 
             disabled={isLoadingPosts}
             variant="outline"
           >
@@ -326,7 +480,7 @@ export default function TwitterPostBrowser({
             </p>
             {!hasLoadedPosts && (
               <Button 
-                onClick={handleLoadPosts} 
+                onClick={() => handleLoadPosts()} 
                 variant="default"
               >
                 Load Your Posts

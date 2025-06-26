@@ -14,9 +14,12 @@ import {
   User, 
   Zap,
   ArrowRight,
-  RefreshCw
+  RefreshCw,
+  Wallet,
+  ExternalLink
 } from "lucide-react"
 import { TwitterIntegrationProvider, useTwitterIntegrationContext } from "./TwitterIntegrationProvider"
+import { useStarknetWallet } from "@/hooks/useStarknetWallet"
 import type { TokenizedPost } from "@/types/twitter"
 import TwitterPostBrowser from "./TwitterPostBrowser"
 import XVerificationComponent from "./XVerification"
@@ -38,6 +41,14 @@ function TwitterIntegrationContent({
     connect,
     reset,
   } = useTwitterIntegrationContext()
+
+  // Get Starknet wallet info
+  const { 
+    address: walletAddress, 
+    isConnected: isWalletConnected,
+    connect: connectWallet,
+    connectors 
+  } = useStarknetWallet()
 
   const [activeTab, setActiveTab] = useState("connect")
   
@@ -126,9 +137,9 @@ function TwitterIntegrationContent({
           <div className="text-center space-y-4">
             <CheckCircle className="h-12 w-12 mx-auto text-green-500" />
             <div>
-              <h3 className="text-lg font-semibold">Verification Complete!</h3>
+              <h3 className="text-lg font-semibold">X Account Verified! ✅</h3>
               <p className="text-muted-foreground">
-                Your X account is now verified and ready to use
+                Your X account is now connected and verified
               </p>
             </div>
             {user && (
@@ -152,6 +163,50 @@ function TwitterIntegrationContent({
                 </div>
               </div>
             )}
+
+            {/* Wallet Connection Status */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <Wallet className="h-4 w-4" />
+                  <span className="text-sm font-medium">Starknet Wallet</span>
+                </div>
+                {isWalletConnected ? (
+                  <div className="flex items-center space-x-2">
+                    <Badge variant="default" className="text-xs">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Connected
+                    </Badge>
+                    <span className="text-xs text-muted-foreground font-mono">
+                      {walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <Badge variant="outline" className="text-xs">
+                      Not Connected
+                    </Badge>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => connectWallet({ connector: connectors[0] })}
+                    >
+                      Connect Wallet
+                    </Button>
+                  </div>
+                )}
+              </div>
+              
+              {!isWalletConnected && (
+                <Alert>
+                  <Wallet className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Wallet Required for NFT Minting:</strong> Connect your Starknet wallet to tokenize posts as NFTs on the blockchain.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
+
             <div className="flex space-x-2">
               <Button 
                 onClick={reset} 
@@ -202,43 +257,64 @@ function TwitterIntegrationContent({
       <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4">
         <CardTitle className="text-base flex items-center">
           <Zap className="mr-2 h-4 w-4" /> 
-          Tokenized Post
+          NFT #{post.tokenId}
         </CardTitle>
         <CardDescription className="text-white/80 text-xs">
-          Transaction: {post.transactionHash.substring(0, 10)}...
+          {post.status === 'confirmed' ? 'Minted on Starknet' : 'Processing...'}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-4 space-y-3">
         <div className="flex justify-between items-center">
-          <Badge>Token #{post.tokenId}</Badge>
-          <span className="text-xs text-muted-foreground">
-            {new Date(post.createdAt).toLocaleDateString()}
-          </span>
-        </div>
-        <Alert variant="default" className="bg-muted/50">
-          <AlertDescription className="text-xs font-mono break-all">
-            IPFS: {post.ipfsHash}
-          </AlertDescription>
-        </Alert>
-        <div className="text-right">
-          <Badge 
-            variant={post.status === 'confirmed' ? "default" : 
-                   post.status === 'pending' ? "outline" : "destructive"}
-            className="text-xs"
-          >
+          <Badge variant={post.status === 'confirmed' ? 'default' : post.status === 'pending' ? 'outline' : 'destructive'}>
             {post.status === 'confirmed' && <CheckCircle className="mr-1 h-3 w-3" />}
             {post.status === 'pending' && <RefreshCw className="mr-1 h-3 w-3 animate-spin" />}
             {post.status}
           </Badge>
+          <span className="text-xs text-muted-foreground">
+            {new Date(post.createdAt).toLocaleDateString()}
+          </span>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="text-xs">
+            <span className="text-muted-foreground">Post ID: </span>
+            <span className="font-mono">{post.postId}</span>
+          </div>
+          {post.transactionHash && post.transactionHash !== `pending_${post.postId}` && (
+            <div className="text-xs">
+              <span className="text-muted-foreground">Tx Hash: </span>
+              <span className="font-mono">{post.transactionHash.slice(0, 10)}...</span>
+            </div>
+          )}
+          <div className="text-xs">
+            <span className="text-muted-foreground">IPFS: </span>
+            <span className="font-mono">{post.ipfsHash.slice(0, 10)}...</span>
+          </div>
         </div>
       </CardContent>
       <CardFooter className="bg-muted/20 p-3 flex justify-between">
-        <Button variant="ghost" size="sm" className="text-xs">
-          View on Starknet
-        </Button>
-        <Button variant="ghost" size="sm" className="text-xs">
-          View on IPFS
-        </Button>
+        {post.starknetUrl && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-xs"
+            onClick={() => window.open(post.starknetUrl, '_blank')}
+          >
+            <ExternalLink className="w-3 h-3 mr-1" />
+            Starknet
+          </Button>
+        )}
+        {post.ipfsUrl && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-xs"
+            onClick={() => window.open(post.ipfsUrl, '_blank')}
+          >
+            <ExternalLink className="w-3 h-3 mr-1" />
+            IPFS
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )
