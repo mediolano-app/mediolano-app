@@ -89,6 +89,9 @@ export interface TokenizedPost {
   ipfsHash: string;
   createdAt: string;
   status: 'pending' | 'confirmed' | 'failed';
+  ipfsUrl?: string;
+  pinataUrl?: string;
+  starknetUrl?: string;
 }
 
 /**

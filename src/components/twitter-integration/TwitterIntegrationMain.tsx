@@ -39,8 +39,6 @@ function TwitterIntegrationContent({
     reset,
   } = useTwitterIntegrationContext()
 
-//   console.log("TwitterIntegrationMain - received state:", state, "user:", user?.username)
-
   const [activeTab, setActiveTab] = useState("connect")
   
   // Effect to automatically switch to browse tab after verification
@@ -299,7 +297,7 @@ function TwitterIntegrationContent({
               Browse Posts
             </TabsTrigger>
             <TabsTrigger value="tokenize" disabled={state !== "verified"}>
-              Tokenize
+              Tokenized Posts
             </TabsTrigger>
           </TabsList>
           

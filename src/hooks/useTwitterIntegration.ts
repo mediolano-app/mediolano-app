@@ -48,18 +48,44 @@ const connectTwitterAccount = async (): Promise<{ success: boolean; user?: Twitt
 
 const checkAuthenticationStatus = async (): Promise<{ success: boolean; user?: TwitterUser }> => {
   try {
+    console.log('=== checkAuthenticationStatus: Starting ===')
     const response = await fetch('/api/twitter?action=session')
+    console.log('Session API response status:', response.status)
+    console.log('Session API response ok:', response.ok)
+    
     const data = await response.json()
+    console.log('Session API response data:', data)
     
     if (!data.authenticated) {
+      console.log('Session shows not authenticated')
       return { success: false }
     }
 
-    // If authenticated, we can create a user object from session data
+    console.log('Session shows authenticated, fetching user profile...')
+    // If authenticated, fetch the complete user profile
+    try {
+      const userResponse = await fetch('/api/twitter?action=user-profile')
+      console.log('User profile API response status:', userResponse.status)
+      console.log('User profile API response ok:', userResponse.ok)
+      
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        console.log('User profile data received:', userData)
+        return { success: true, user: userData }
+      } else {
+        const errorText = await userResponse.text()
+        console.error('User profile API error:', errorText)
+      }
+    } catch (profileError) {
+      console.error('Failed to fetch user profile:', profileError)
+    }
+
+    // Fallback: create minimal user object from session data
+    console.log('Using fallback user object from session data')
     const user: TwitterUser = {
       id: data.userId,
       username: data.username,
-      name: data.username, // We'll fetch full profile later if needed
+      name: data.username,
       profile_image_url: '',
       verified: false,
       public_metrics: {
@@ -116,6 +142,8 @@ const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promis
   }
 
   try {
+    console.log("Starting tokenization process for post:", post.id)
+    
     const response = await fetch("/api/twitter/tokenize", {
       method: "POST",
       headers: {
@@ -129,11 +157,17 @@ const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promis
     }
 
     const data = await response.json()
+    console.log("Tokenization API response:", data)
     
+    // Simulate blockchain transaction (in real implementation, this would mint the NFT)
     await new Promise((resolve) => setTimeout(resolve, 2000))
     
+    // Generate mock transaction data (replace with actual blockchain interaction)
     const tokenId = `token_${Date.now()}`
     const transactionHash = `0x${Math.random().toString(16).slice(2, 66)}`
+    
+    // Create Starknet explorer URL
+    const starknetUrl = `https://starkscan.co/tx/${transactionHash}`
     
     return {
       postId: post.id,
@@ -141,7 +175,11 @@ const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promis
       transactionHash,
       ipfsHash: data.uploadData?.IpfsHash || `Qm${Math.random().toString(36).slice(2, 48)}`,
       createdAt: new Date().toISOString(),
-      status: 'confirmed'
+      status: 'confirmed',
+      // Add the URLs from the IPFS upload response
+      ipfsUrl: data.uploadData?.ipfsUrl,
+      pinataUrl: data.uploadData?.pinataUrl,
+      starknetUrl
     }
   } catch (error) {
     console.error("Tokenization error:", error)
@@ -181,13 +219,21 @@ export const useTwitterIntegration = () => {
   // Check authentication status on mount and when URL changes (for OAuth callback)
   useEffect(() => {
     const checkAuth = async () => {
+      console.log('=== useTwitterIntegration: checkAuth started ===')
+      console.log('Current URL:', window.location.href)
+      console.log('Current state:', state)
+      console.log('Current user:', user?.username || 'none')
+      
       const urlParams = new URLSearchParams(window.location.search)
       const success = urlParams.get('success')
       const username = urlParams.get('username')
       const error = urlParams.get('error')
       const errorDescription = urlParams.get('error_description')
 
+      console.log('URL parameters:', { success, username, error, errorDescription })
+
       if (error) {
+        console.log('OAuth error detected, setting error state')
         setState("error")
         setError(errorDescription || error)
         // Clean URL
@@ -196,22 +242,80 @@ export const useTwitterIntegration = () => {
       }
 
       if (success && username) {
+        console.log('OAuth success detected, checking for session data...')
         // OAuth callback success
-        const result = await checkAuthenticationStatus()
-        if (result.success && result.user) {
-          setUser(result.user)
-          setState("verified")
+        setState("verifying")
+        
+        // Check if we have session data in the URL
+        const sessionDataParam = urlParams.get('session_data')
+        if (sessionDataParam) {
+          console.log('Session data found in URL, creating session...')
+          try {
+            // Create session from the encoded data
+            const createSessionResponse = await fetch(`/api/twitter?action=create-session&session_data=${encodeURIComponent(sessionDataParam)}`)
+            const createSessionResult = await createSessionResponse.json()
+            
+            if (createSessionResponse.ok && createSessionResult.success) {
+              console.log('Session created successfully via API')
+              
+              // Now check authentication status
+              const result = await checkAuthenticationStatus()
+              console.log('Authentication check result:', result)
+              
+              if (result.success && result.user) {
+                console.log('Setting user and verified state:', result.user.username)
+                setUser(result.user)
+                setState("verified")
+                console.log('State should now be verified')
+              } else {
+                console.log('Authentication check failed after session creation')
+                setState("error")
+                setError("Failed to verify authentication after session creation")
+              }
+            } else {
+              console.error('Failed to create session:', createSessionResult)
+              setState("error")
+              setError("Failed to create session")
+            }
+          } catch (sessionError) {
+            console.error('Error creating session:', sessionError)
+            setState("error")
+            setError("Failed to create session")
+          }
+        } else {
+          console.log('No session data in URL, falling back to authentication check...')
+          // Fallback to old method
+          const result = await checkAuthenticationStatus()
+          console.log('Authentication check result:', result)
+          
+          if (result.success && result.user) {
+            console.log('Setting user and verified state:', result.user.username)
+            setUser(result.user)
+            setState("verified")
+            console.log('State should now be verified')
+          } else {
+            console.log('Authentication check failed despite success parameter')
+            setState("error")
+            setError("Failed to verify authentication")
+          }
         }
+        
         // Clean URL
         window.history.replaceState({}, '', window.location.pathname)
         return
       }
 
       // Check existing session
+      console.log('Checking existing session...')
       const result = await checkAuthenticationStatus()
+      console.log('Existing session check result:', result)
+      
       if (result.success && result.user) {
+        console.log('Found existing session, setting verified state:', result.user.username)
         setUser(result.user)
         setState("verified")
+      } else {
+        console.log('No existing session found, staying in idle state')
       }
     }
 
@@ -269,7 +373,14 @@ export const useTwitterIntegration = () => {
       const response = await fetchUserTwitterPosts(user.id)
       setPosts(response.data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load posts")
+      console.error("Failed to load posts:", err)
+      
+      // Handle rate limit errors specifically
+      if (err instanceof Error && err.message.includes('429')) {
+        setError("Twitter API rate limit exceeded. Basic plan allows 1 request per 15 minutes. Please wait before trying again.")
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to load posts")
+      }
     } finally {
       setIsLoadingPosts(false)
     }

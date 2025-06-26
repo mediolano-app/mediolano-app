@@ -41,33 +41,71 @@ export default function TwitterPostBrowser({
   const { toast } = useToast()
   const [hasLoadedPosts, setHasLoadedPosts] = useState(false)
   const [filter, setFilter] = useState<string>("all")
+  const [rateLimitInfo, setRateLimitInfo] = useState<{
+    isLimited: boolean
+    resetTime?: number
+    resetInMinutes?: number
+    message?: string
+  }>({ isLimited: false })
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null)
 
-  // Load posts when user is verified and posts haven't been loaded yet
+  // Load first batch of posts when user is verified
   useEffect(() => {
     if (state === "verified" && user && !hasLoadedPosts && posts.length === 0) {
-      console.log("Auto-loading posts for verified user")
-      loadUserPosts().then(() => {
-        setHasLoadedPosts(true)
-      })
+      console.log("Auto-loading first batch of posts for verified user")
+      handleLoadPosts(true)
     }
-  }, [state, user, hasLoadedPosts, posts.length, loadUserPosts])
+  }, [state, user, hasLoadedPosts, posts.length])
 
-  const handleLoadPosts = async () => {
-    console.log("Manually loading posts")
+  const handleLoadPosts = async (isInitialLoad = false) => {
+    console.log(isInitialLoad ? "Loading initial posts" : "Loading more posts")
+    
+    // Clear previous rate limit errors if this is a manual retry
+    if (!isInitialLoad) {
+      setRateLimitInfo({ isLimited: false })
+    }
+    
     try {
       await loadUserPosts()
       setHasLoadedPosts(true)
-      toast({
-        title: "Posts Loaded",
-        description: "Your X posts have been loaded successfully.",
-      })
+      setRateLimitInfo({ isLimited: false })
+      
+      if (!isInitialLoad) {
+        toast({
+          title: "Posts Loaded",
+          description: "More posts have been loaded successfully.",
+        })
+      }
     } catch (error) {
       console.error("Error loading posts:", error)
-      toast({
-        title: "Error Loading Posts",
-        description: "There was an error loading your posts. Please try again.",
-        variant: "destructive"
-      })
+      
+      // Check if it's a rate limit error
+      if (error instanceof Error && error.message.includes('429')) {
+        // Try to extract rate limit info from the error message
+        const resetTimeMatch = error.message.match(/wait (\d+) minutes/)
+        const resetMinutes = resetTimeMatch ? parseInt(resetTimeMatch[1]) : 15
+        
+        setRateLimitInfo({
+          isLimited: true,
+          resetTime: Date.now() + (resetMinutes * 60 * 1000),
+          resetInMinutes: resetMinutes,
+          message: `Rate limit reached. You can load more posts in ${resetMinutes} minutes.`
+        })
+        
+        if (!isInitialLoad) {
+          toast({
+            title: "Rate Limit Reached",
+            description: `Please wait ${resetMinutes} minutes before loading more posts.`,
+            variant: "destructive"
+          })
+        }
+      } else {
+        toast({
+          title: "Error Loading Posts",
+          description: "There was an error loading your posts. Please try again.",
+          variant: "destructive"
+        })
+      }
     }
   }
 
@@ -114,6 +152,39 @@ export default function TwitterPostBrowser({
       return post.public_metrics.like_count > 100 || post.public_metrics.retweet_count > 50
     return true
   })
+
+  // Rate Limit Countdown Component
+  function RateLimitCountdown({ resetTime }: { resetTime?: number }) {
+    const [timeLeft, setTimeLeft] = useState<string>("")
+
+    useEffect(() => {
+      if (!resetTime) return
+
+      const interval = setInterval(() => {
+        const now = Date.now()
+        const remaining = resetTime - now
+
+        if (remaining <= 0) {
+          setTimeLeft("Ready now!")
+          clearInterval(interval)
+        } else {
+          const minutes = Math.floor(remaining / (1000 * 60))
+          const seconds = Math.floor((remaining % (1000 * 60)) / 1000)
+          setTimeLeft(`${minutes}:${seconds.toString().padStart(2, '0')}`)
+        }
+      }, 1000)
+
+      return () => clearInterval(interval)
+    }, [resetTime])
+
+    if (!resetTime) return null
+
+    return (
+      <Badge variant="outline" className="font-mono">
+        {timeLeft || "Calculating..."}
+      </Badge>
+    )
+  }
 
   if (state !== "verified") {
     return (
@@ -371,6 +442,43 @@ export default function TwitterPostBrowser({
         </div>
       )}
 
+      {/* Rate Limit Info */}
+      {rateLimitInfo.isLimited && (
+        <Alert variant="destructive">
+          <AlertDescription className="flex items-center justify-between">
+            <div>
+              <strong>Rate Limit Reached</strong>
+              <p className="text-sm mt-1">
+                Basic plan allows 1 request per 15 minutes. 
+                {rateLimitInfo.resetInMinutes && ` Wait ${rateLimitInfo.resetInMinutes} minutes to load more posts.`}
+              </p>
+            </div>
+            <RateLimitCountdown resetTime={rateLimitInfo.resetTime} />
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Load More Button */}
+      {posts.length > 0 && !isLoadingPosts && !rateLimitInfo.isLimited && (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <p className="text-muted-foreground mb-4">
+              Showing {posts.length} posts. Load more to see additional posts.
+            </p>
+            <Button 
+              onClick={() => handleLoadPosts(false)} 
+              variant="outline"
+              className="w-full"
+            >
+              Load More Posts
+              <span className="ml-2 text-xs text-muted-foreground">
+                (Uses 1 API request)
+              </span>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Selected Post Summary */}
       {selectedPost && (
         <Card className="border-primary">
@@ -402,21 +510,65 @@ export default function TwitterPostBrowser({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="space-y-4">
               {tokenizedPosts.map((tokenizedPost) => (
                 <div 
                   key={tokenizedPost.postId}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted"
+                  className="p-4 rounded-lg bg-muted space-y-3"
                 >
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">Post {tokenizedPost.postId}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Token ID: {tokenizedPost.tokenId}
-                    </p>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">Post {tokenizedPost.postId}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Token ID: {tokenizedPost.tokenId}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        IPFS Hash: {tokenizedPost.ipfsHash}
+                      </p>
+                    </div>
+                    <Badge variant={tokenizedPost.status === 'confirmed' ? 'default' : 'secondary'}>
+                      {tokenizedPost.status}
+                    </Badge>
                   </div>
-                  <Badge variant={tokenizedPost.status === 'confirmed' ? 'default' : 'secondary'}>
-                    {tokenizedPost.status}
-                  </Badge>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex items-center space-x-2">
+                    {tokenizedPost.starknetUrl && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open(tokenizedPost.starknetUrl, '_blank')}
+                        className="flex items-center space-x-1"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>View on Starknet</span>
+                      </Button>
+                    )}
+                    
+                    {tokenizedPost.ipfsUrl && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open(tokenizedPost.ipfsUrl, '_blank')}
+                        className="flex items-center space-x-1"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>View on IPFS</span>
+                      </Button>
+                    )}
+                    
+                    {tokenizedPost.pinataUrl && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => window.open(tokenizedPost.pinataUrl, '_blank')}
+                        className="flex items-center space-x-1 text-xs"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Pinata Dashboard</span>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
