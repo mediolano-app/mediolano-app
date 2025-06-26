@@ -74,32 +74,78 @@ export async function POST(request: NextRequest) {
 
     console.log("Uploading Twitter post metadata to IPFS...")
     
-    // Try to upload to IPFS, but provide fallback if it fails
+    // Check if PINATA_JWT is properly configured
+    const pinataJWT = process.env.PINATA_JWT
+    console.log("PINATA_JWT configured:", !!pinataJWT)
+    console.log("PINATA_JWT length:", pinataJWT?.length || 0)
+    
     let uploadData
     try {
-      console.log("PINATA_JWT is configured, uploading to IPFS...", process.env.PINATA_JWT)
-      // Only try to import pinataClient if environment variables are configured
-      if (process.env.PINATA_JWT) {
+      if (pinataJWT && pinataJWT.length > 0) {
+        console.log("Attempting IPFS upload via Pinata...")
         const { pinataClient } = await import("@/utils/pinataClient")
-        uploadData = await pinataClient.upload.json(formattedAsset)
-        console.log("Successfully uploaded to IPFS:", uploadData.IpfsHash)
-      } else {
-        console.log("PINATA_JWT not configured, using mock IPFS hash")
-        // Generate a mock IPFS hash for development
+        
+        // Upload the metadata to IPFS
+        const result = await pinataClient.upload.json(formattedAsset, {
+          metadata: { 
+            name: `twitter-post-${postId}-metadata.json`,
+            keyValues: {
+              postId: postId,
+              author: authorUsername,
+              platform: "x",
+              tokenizedAt: new Date().toISOString()
+            }
+          }
+        })
+        
         uploadData = {
-          IpfsHash: `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`,
+          IpfsHash: result.IpfsHash,
+          PinSize: result.PinSize,
+          Timestamp: result.Timestamp,
+          ipfsUrl: `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`,
+          pinataUrl: `https://app.pinata.cloud/pinmanager?search=${result.IpfsHash}`
+        }
+        
+        console.log("Successfully uploaded to IPFS:", {
+          hash: uploadData.IpfsHash,
+          size: uploadData.PinSize,
+          url: uploadData.ipfsUrl
+        })
+      } else {
+        console.log("PINATA_JWT not configured or empty, using mock IPFS hash")
+        // Generate a mock IPFS hash for development
+        const mockHash = `QmTEST${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`
+        uploadData = {
+          IpfsHash: mockHash,
           PinSize: JSON.stringify(formattedAsset).length,
-          Timestamp: new Date().toISOString()
+          Timestamp: new Date().toISOString(),
+          ipfsUrl: `https://gateway.pinata.cloud/ipfs/${mockHash}`,
+          pinataUrl: `https://app.pinata.cloud/pinmanager?search=${mockHash}`,
+          warning: "Mock IPFS hash - PINATA_JWT not configured"
         }
       }
     } catch (error) {
-      console.error("IPFS upload failed, using fallback:", error)
+      console.error("IPFS upload failed:", error)
+      
+      // Create detailed error information
+      const errorDetails = error instanceof Error ? {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      } : { message: "Unknown error" }
+      
+      console.log("Error details:", errorDetails)
+      
       // Fallback to mock data if IPFS upload fails
+      const fallbackHash = `QmERROR${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`
       uploadData = {
-        IpfsHash: `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`,
+        IpfsHash: fallbackHash,
         PinSize: JSON.stringify(formattedAsset).length,
         Timestamp: new Date().toISOString(),
-        error: "IPFS upload failed - using mock hash for development"
+        ipfsUrl: `https://gateway.pinata.cloud/ipfs/${fallbackHash}`,
+        pinataUrl: `https://app.pinata.cloud/pinmanager?search=${fallbackHash}`,
+        error: "IPFS upload failed - using fallback hash",
+        errorDetails
       }
     }
 

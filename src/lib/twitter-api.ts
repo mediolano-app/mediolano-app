@@ -3,10 +3,12 @@ import crypto from 'crypto'
 // Twitter OAuth 2.0 with PKCE utilities
 export class TwitterOAuth {
   private clientId: string
+  private clientSecret: string
   private redirectUri: string
   
   constructor() {
     this.clientId = process.env.X_CLIENT_ID!
+    this.clientSecret = process.env.X_CLIENT_SECRET!
     this.redirectUri = process.env.NEXT_PUBLIC_X_REDIRECT_URI!
   }
 
@@ -41,6 +43,7 @@ export class TwitterOAuth {
     // Add debugging for credentials
     console.log('=== Token Exchange Debug ===')
     console.log('Client ID length:', this.clientId.length)
+    console.log('Client Secret length:', this.clientSecret.length)
     console.log('Client ID format:', /^[a-zA-Z0-9_-]+$/.test(this.clientId) ? 'Valid' : 'Invalid')
     console.log('Redirect URI:', this.redirectUri)
     
@@ -49,7 +52,11 @@ export class TwitterOAuth {
       throw new Error('Invalid OAuth 2.0 Client ID. You appear to be using OAuth 1.0a credentials. Please get OAuth 2.0 Client ID and Secret from X Developer Portal.')
     }
 
-    const authString = `${this.clientId}:${process.env.X_API_KEY_SECRET}`
+    if (!this.clientSecret || this.clientSecret.length < 40) {
+      throw new Error('Invalid or missing OAuth 2.0 Client Secret. Please check X_CLIENT_SECRET environment variable.')
+    }
+
+    const authString = `${this.clientId}:${this.clientSecret}`
     const base64Auth = Buffer.from(authString).toString('base64')
     
     console.log('Auth string length:', authString.length)
@@ -93,7 +100,7 @@ export class TwitterOAuth {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${Buffer.from(`${this.clientId}:${process.env.X_API_KEY_SECRET}`).toString('base64')}`
+        'Authorization': `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',

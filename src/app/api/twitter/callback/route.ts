@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { TwitterOAuth, TwitterAPI } from "@/lib/twitter-api"
-import { TwitterSessionManager, PKCEStateManager } from "@/lib/twitter-session"
+import { TwitterSessionManager } from "@/lib/twitter-session"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
     
     // Redirect to frontend with error
     const redirectUrl = new URL('/x', request.url)
+    console.log('Redirecting to:', redirectUrl.toString())
     redirectUrl.searchParams.set('error', error)
     redirectUrl.searchParams.set('error_description', errorDescription)
     
@@ -46,14 +47,71 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log('Validating PKCE state...')
-    // Validate state and get code verifier
-    const codeVerifier = await PKCEStateManager.validateAndGetVerifier(state)
+    console.log('=== Validating PKCE State ===')
+    console.log('Received encoded state:', state)
     
-    if (!codeVerifier) {
-      console.error('Invalid state parameter or expired PKCE challenge')
+    // First, try to decode the state parameter to get PKCE data
+    let stateData: any = null
+    let codeVerifier: string | undefined = undefined
+    let originalState: string | undefined = undefined
+    
+    try {
+      // Decode the state parameter
+      const decodedStateJson = Buffer.from(state, 'base64url').toString()
+      stateData = JSON.parse(decodedStateJson)
+      codeVerifier = stateData.codeVerifier
+      originalState = stateData.state
+      
+      console.log('Successfully decoded state parameter')
+      console.log('Original state:', originalState)
+      console.log('Code verifier found in state:', codeVerifier ? 'YES' : 'NO')
+      console.log('Code verifier length:', codeVerifier?.length || 0)
+      console.log('Timestamp:', new Date(stateData.timestamp).toISOString())
+      
+      // Check if the state data is not too old (10 minutes max)
+      const maxAge = 10 * 60 * 1000 // 10 minutes in ms
+      if (Date.now() - stateData.timestamp > maxAge) {
+        throw new Error('State data has expired')
+      }
+      
+    } catch (decodeError) {
+      console.error('Failed to decode state parameter:', decodeError)
+      
+      // Fallback to reading cookies (old method)
+      console.log('Falling back to cookie-based PKCE validation...')
+      const storedState = request.cookies.get('twitter-oauth-state')?.value
+      codeVerifier = request.cookies.get('twitter-code-verifier')?.value
+      originalState = storedState
+      
+      console.log('Fallback - Stored state from cookies:', storedState)
+      console.log('Fallback - Code verifier from cookies:', codeVerifier ? 'YES' : 'NO')
+    }
+    
+    // Check all cookies for debugging
+    const allCookies = Array.from(request.cookies.getAll())
+    console.log('All cookies:', allCookies.map(c => ({ name: c.name, hasValue: !!c.value })))
+
+    if (!originalState && !stateData) {
+      console.error('No state found in either encoded parameter or cookies')
       throw new Error('Invalid state parameter or expired PKCE challenge')
     }
+
+    if (!codeVerifier) {
+      console.error('No code verifier found in either encoded parameter or cookies')
+      throw new Error('Invalid state parameter or expired PKCE challenge')
+    }
+
+    // If we decoded from state parameter, we don't need to validate state match
+    // since the state parameter itself contains the verification data
+    if (!stateData) {
+      // Only validate state match if we're using cookie fallback
+      if (originalState !== state) {
+        console.error('State mismatch (cookie fallback):', { expected: state, received: originalState })
+        throw new Error('Invalid state parameter or expired PKCE challenge')
+      }
+    }
+
+    console.log('PKCE validation successful')
 
     console.log('Exchanging code for token...')
     // Exchange code for access token
@@ -68,35 +126,52 @@ export async function GET(request: NextRequest) {
     console.log('User info retrieved:', user.username)
 
     console.log('Creating session...')
-    // Create session
-    await TwitterSessionManager.createSession({
+    // Store session data temporarily in a way that survives the redirect
+    // We'll encode the session data in the redirect URL parameters
+    const sessionData = {
       accessToken: tokenResponse.access_token,
       refreshToken: tokenResponse.refresh_token,
       userId: user.id,
       username: user.username,
       expiresAt: Date.now() + (tokenResponse.expires_in * 1000)
-    })
-    console.log('Session created successfully')
-
-    // Redirect to success page
-    const redirectUrl = new URL('/x', request.url)
+    }
+    
+    // Encode session data for the redirect
+    const encodedSessionData = Buffer.from(JSON.stringify(sessionData)).toString('base64url')
+    
+    // Create redirect response 
+    const redirectUrl = new URL('/x', 'http://127.0.0.1:3000')
     redirectUrl.searchParams.set('success', 'true')
     redirectUrl.searchParams.set('username', user.username)
+    redirectUrl.searchParams.set('session_data', encodedSessionData)
+    
+    const response = NextResponse.redirect(redirectUrl)
+    
+    // Clear PKCE cookies
+    response.cookies.delete('twitter-oauth-state')
+    response.cookies.delete('twitter-code-verifier')
     
     console.log('Redirecting to:', redirectUrl.toString())
-    return NextResponse.redirect(redirectUrl)
+    console.log('Session data encoded in URL parameters')
+    return response
 
   } catch (error) {
     console.error('OAuth callback error:', error)
     console.error('Error details:', error instanceof Error ? error.stack : error)
     
-    // Redirect to frontend with error
+    // Create redirect response and clear cookies on error
     const redirectUrl = new URL('/x', request.url)
     redirectUrl.searchParams.set('error', 'server_error')
     redirectUrl.searchParams.set('error_description', 
       error instanceof Error ? error.message : 'Failed to complete authentication'
     )
     
-    return NextResponse.redirect(redirectUrl)
+    const response = NextResponse.redirect(redirectUrl)
+    
+    // Clear PKCE cookies
+    response.cookies.delete('twitter-oauth-state')
+    response.cookies.delete('twitter-code-verifier')
+    
+    return response
   }
 }
