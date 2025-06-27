@@ -444,6 +444,41 @@ function TwitterIntegrationContent({
           </TabsContent>
         </Tabs>
       </CardContent>
+      
+      {state === "verified" && (
+        <CardFooter className="bg-muted/20 border-t">
+          <div className="w-full space-y-3">
+            {/* User Info Summary */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                  <Twitter className="h-4 w-4 text-white" />
+                </div>
+                <div className="text-sm">
+                  <p className="font-medium">Connected as @{user?.username}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {tokenizedPosts.length} post{tokenizedPosts.length !== 1 ? 's' : ''} tokenized
+                  </p>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-xs">
+                <CheckCircle className="w-3 h-3 mr-1" />
+                Verified
+              </Badge>
+            </div>
+            
+            {/* Disconnect Button */}
+            <Button 
+              onClick={reset} 
+              variant="outline" 
+              className="w-full border-red-200 text-red-600 hover:bg-red-500 hover:text-white hover:border-red-300"
+            >
+              <Twitter className="mr-2 h-4 w-4" />
+              Disconnect X Account
+            </Button>
+          </div>
+        </CardFooter>
+      )}
     </Card>
   )
 }
