@@ -102,7 +102,7 @@ const licenses = [
 ];
 
 const collections = [
-  { id: "1", name: "Programmable IP Collection" },
+  { id: "1", name: "IP Collection" },
 ];
 
 // Define the form schema with zod

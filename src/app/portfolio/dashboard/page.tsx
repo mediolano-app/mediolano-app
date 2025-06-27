@@ -108,7 +108,7 @@ export default function DashboardPage() {
             <CardContent>
               <div className="text-2xl font-bold">1</div>
               <p className="text-xs text-muted-foreground">
-                Programmable IP Collection
+                IP Collection
               </p>
             </CardContent>
           </Card>
@@ -141,7 +141,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-1xl font-bold">
-                Programmable IP Collection
+                IP Collection
               </div>
               <p className="text-xs text-muted-foreground">
                 {address && isLoading ? "" : "(New collections soon)"}

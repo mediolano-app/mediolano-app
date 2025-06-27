@@ -118,7 +118,7 @@ export function PortfolioStats({ useBlockchainData = false }: PortfolioStatsProp
               <div className="text-2xl font-bold">
                 1
               </div>
-              <p className="text-xs text-muted-foreground">Programmable IP Collection</p>
+              <p className="text-xs text-muted-foreground">IP Collection</p>
             </CardContent>
           </Card>
           <Card className="bg-background/80">
@@ -140,7 +140,7 @@ export function PortfolioStats({ useBlockchainData = false }: PortfolioStatsProp
             </CardHeader>
             <CardContent>
               <div className="text-1xl font-bold">
-                   Programmable IP Collection
+                   IP Collection
               </div>
               <p className="text-xs text-muted-foreground">
                 {address && isLoading ? "" : "(New collections soon)"}

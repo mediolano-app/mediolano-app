@@ -1,26 +1,12 @@
+
 Quick links:
 <br>
 <a href="https://ip.mediolano.app">Mediolano Dapp (Sepolia)</a>
 <br>
 <a href="https://mediolano.xyz">Website mediolano.xyz</a>
 <br>
-<a href="https://t.me/MediolanoStarknet">Telegram</a>
+<a href="https://t.me/MediolanoStarknet">Telegram</a> | <a href="https://discord.gg/NhqdTvyA">Discord</a> | <a href="https://x.com/mediolanoapp">X / Twitter</a>
 <br>
-<a href="https://discord.gg/NhqdTvyA">Discord</a>
-<br>
-<a href="https://x.com/mediolanoapp">X / Twitter</a>
-<br>
-
-## 🚀 NEW: AVNU Paymaster Integration
-
-**Experience frictionless transactions with gas fee abstraction!**
-
-- ✅ **Sponsored Transactions**: Mint NFTs for FREE with Mediolano sponsorship
-- ✅ **Gasless Payments**: Pay gas fees with USDC, USDT, or other tokens
-- ✅ **Meta-Transactions**: Enhanced UX with account abstraction
-- ✅ **Seamless Onboarding**: No ETH required for new users
-
-**[Try the Paymaster Demo](/paymaster-demo)** | **[Integration Guide](docs/PAYMASTER_INTEGRATION.md)**
 
 ---
 
@@ -50,52 +36,52 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 - High-Speed & Low-Cost: Leverage Starknet's unparalleled speed and cost-efficiency with ZERO FEES on Mediolano Protocol.
 
-- **Gas Fee Abstraction**: Revolutionary AVNU Paymaster integration eliminates gas fee barriers for seamless user experience.
+- **Gas Fee Abstraction**: AVNU Paymaster integration eliminates gas fee barriers for seamless user experience.
+
 
 [![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
 
-## 🎯 Paymaster Features
 
-### 🎁 Sponsored Transactions
-- **Zero gas fees** for eligible transactions
-- **Free NFT minting** for new users
-- **Sponsored marketplace** interactions
-- **Revenue claiming** without gas costs
 
-### ⛽ Gasless Payments
-- Pay gas with **USDC, USDT, ETH, or STRK**
-- **No ETH required** for transactions
-- **Real-time price conversion**
-- **Flexible token selection**
+## Roadmap
 
-### 🔄 Meta-Transactions
-- **Sign messages** instead of transactions
-- **Enhanced security** with account abstraction
-- **Improved UX** for complex operations
-- **Batch transaction** support
+- [x] Starknet Ignition **24.9**
 
-### 🚀 Quick Start with Paymaster
+- [x] MIP Protocol @ Starknet Sepolia **24.11**
 
-```bash
-# 1. Clone and install
-git clone https://github.com/mediolano-app/mediolano-app.git
-cd mediolano-app
-npm install
+- [x] Mediolano Dapp @ Starknet Sepolia **24.11**
 
-# 2. Configure environment
-cp .env.example .env.local
-# Add your AVNU Paymaster API key
+- [x] Programmable IP Contracts **25.02**
 
-# 3. Run the app
-npm run dev
+- [x] MIP Dapp @ Starknet Sepolia **25.06**
 
-# 4. Visit /paymaster-demo to try it out!
-```
+- [ ] MIP Protocol v2 @ Starknet Sepolia **25.06**
 
+- [ ] MIP Protocol v2 @ Starknet Mainnet **25.07**
+
+- [ ] MIP Dapp @ Starknet Mainnet **25.07**
+
+- [ ] Mediolano Dapp @ Starknet Mainnet **25.07**
+
+
+## Contributing
+
+We are building open-source Integrity Web with the amazing **OnlyDust** platform. Check https://app.onlydust.com/p/mediolano for more information.
+
+We also have a Telegram group focused to support development: https://t.me/mediolanoapp
+
+Ccontributions are **greatly appreciated**. If you have a feature or suggestion that would our plattform better, please fork the repo and create a pull request with the tag "enhancement".
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/Feature`)
+3. Commit your Changes (`git commit -m 'Add some Feature'`)
+4. Push to the Branch (`git push origin feature/YourFeature`)
+5. Open a Pull Request
 
 ## Getting Started
 
-## Running locally
+
+### Running locally
 
 Dapp requirements:
 - Next.js 15
@@ -111,7 +97,7 @@ git clone https://github.com/mediolano-app/mediolano-app.git
 Install dependencies for Next.js 15 + React 19:
 
 ```bash
-npm install
+npm install --force
 ```
 
 Run the development server:
@@ -122,10 +108,10 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Running via Docker
+
+### Running via Docker
 
 To run the containerized application, there is no dependencies requirement. 
-
 Clone the repository, and run:
 
 ```bash
@@ -136,4 +122,22 @@ To build the image. Then, start the container:
 
 ```bash
 docker run -p 8080:8080 mediolano-app
+```
+
+### Quick Start with Paymaster
+
+```bash
+# 1. Clone and install
+git clone https://github.com/mediolano-app/mediolano-app.git
+cd mediolano-app
+npm install
+
+# 2. Configure environment
+cp .env.example .env.local
+# Add your AVNU Paymaster API key
+
+# 3. Run the app
+npm run dev
+
+# 4. Visit /paymaster-demo to try it out!
 ```
