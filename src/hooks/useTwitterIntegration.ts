@@ -402,7 +402,7 @@ export const useTwitterIntegration = () => {
       
       // Handle rate limit errors specifically
       if (err instanceof Error && err.message.includes('429')) {
-        setError("Twitter API rate limit exceeded. Basic plan allows 1 request per 15 minutes. Please wait before trying again.")
+        setError("Twitter API rate limit exceeded. Free plan allows 1 request per 15 minutes. Please wait before trying again.")
       } else {
         setError(err instanceof Error ? err.message : "Failed to load posts")
       }
