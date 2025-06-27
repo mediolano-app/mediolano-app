@@ -8,7 +8,6 @@ import type {
   TwitterConnectionState 
 } from "@/types/twitter"
 import { useStarknetWallet } from "@/hooks/useStarknetWallet"
-import { StarknetMintingService } from "@/lib/starknet-minting"
 
 // Real API functions for Twitter integration
 const connectTwitterAccount = async (): Promise<{ success: boolean; user?: TwitterUser; authUrl?: string }> => {
@@ -52,27 +51,19 @@ const checkAuthenticationStatus = async (): Promise<{ success: boolean; user?: T
   try {
     console.log('=== checkAuthenticationStatus: Starting ===')
     const response = await fetch('/api/twitter?action=session')
-    console.log('Session API response status:', response.status)
-    console.log('Session API response ok:', response.ok)
-    
     const data = await response.json()
-    console.log('Session API response data:', data)
     
     if (!data.authenticated) {
       console.log('Session shows not authenticated')
       return { success: false }
     }
 
-    console.log('Session shows authenticated, fetching user profile...')
     // If authenticated, fetch the complete user profile
     try {
       const userResponse = await fetch('/api/twitter?action=user-profile')
-      console.log('User profile API response status:', userResponse.status)
-      console.log('User profile API response ok:', userResponse.ok)
       
       if (userResponse.ok) {
         const userData = await userResponse.json()
-        console.log('User profile data received:', userData)
         return { success: true, user: userData }
       } else {
         const errorText = await userResponse.text()
@@ -131,28 +122,11 @@ const logoutTwitter = async (): Promise<void> => {
 }
 
 const tokenizeTwitterPost = async (
-  post: TwitterPost, 
-  user: TwitterUser, 
-  walletAddress: string, 
+  post: TwitterPost,
+  user: TwitterUser,
+  walletAddress: `0x${string}`,
   contractAddress: string
 ): Promise<TokenizedPost> => {
-  console.log("🚀 Starting Twitter post tokenization with real blockchain minting...")
-  console.log("📋 TOKENIZATION DEBUG INFO:")
-  console.log("  - Post ID:", post.id)
-  console.log("  - Post text preview:", post.text.substring(0, 50) + "...")
-  console.log("  - User:", user.username)
-  console.log("  - Wallet Address:", walletAddress)
-  console.log("  - Contract Address:", contractAddress)
-  console.log("  - Contract Address Type:", typeof contractAddress)
-  console.log("  - Contract Address Length:", contractAddress?.length || 0)
-  console.log("  - Is Contract Address Valid:", contractAddress && contractAddress !== "0x0" && contractAddress.startsWith("0x"))
-  
-  // Log environment variables for debugging
-  console.log("🌍 ENVIRONMENT VARIABLES DEBUG:")
-  console.log("  - NEXT_PUBLIC_CONTRACT_ADDRESS_MIP:", process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP)
-  console.log("  - NEXT_PUBLIC_MIP_CONTRACT_ADDRESS:", process.env.NEXT_PUBLIC_MIP_CONTRACT_ADDRESS)
-  console.log("  - NEXT_PUBLIC_IPCOLLECTION_ADDRESS:", process.env.NEXT_PUBLIC_IPCOLLECTION_ADDRESS)
-  
   const postData = {
     postId: post.id,
     text: post.text,
@@ -164,14 +138,9 @@ const tokenizeTwitterPost = async (
     mentions: post.entities?.mentions?.map(m => m.username) || [],
     urls: post.entities?.urls?.map(u => u.expanded_url) || [],
     mediaUrls: [],
-    // Add wallet and contract info for real minting
     walletAddress,
     contractAddress
   }
-
-  console.log("📤 POST DATA TO BE SENT:")
-  console.log("  - Contract Address in payload:", postData.contractAddress)
-  console.log("  - Wallet Address in payload:", postData.walletAddress)
 
   try {
     console.log("📤 Step 1: Uploading metadata to IPFS...")
@@ -184,9 +153,6 @@ const tokenizeTwitterPost = async (
       },
       body: JSON.stringify(postData),
     })
-
-    console.log("📡 API Response Status:", response.status)
-    console.log("📡 API Response Headers:", Object.fromEntries(response.headers.entries()))
 
     if (!response.ok) {
       const errorData = await response.json()
@@ -203,8 +169,7 @@ const tokenizeTwitterPost = async (
 
     console.log("⛓️ Step 2: Minting NFT on Starknet blockchain...")
     
-    // Note: Real minting will be handled by the frontend component
-    // since we need access to the user's wallet account
+    // Minting will be handled by frontend component since we need access to the user's wallet account
     return {
       postId: post.id,
       tokenId: `pending_${Date.now()}`, // Will be updated after minting
@@ -215,7 +180,6 @@ const tokenizeTwitterPost = async (
       ipfsUrl: data.ipfsData.url,
       pinataUrl: data.ipfsData.pinataUrl,
       starknetUrl: undefined, // Will be set after minting
-      // Add metadata for frontend minting
       _mintingData: {
         contractAddress,
         recipientAddress: walletAddress,
@@ -299,21 +263,13 @@ export const useTwitterIntegration = () => {
   // Check authentication status on mount and when URL changes (for OAuth callback)
   useEffect(() => {
     const checkAuth = async () => {
-      console.log('=== useTwitterIntegration: checkAuth started ===')
-      console.log('Current URL:', window.location.href)
-      console.log('Current state:', state)
-      console.log('Current user:', user?.username || 'none')
-      
       const urlParams = new URLSearchParams(window.location.search)
       const success = urlParams.get('success')
       const username = urlParams.get('username')
       const error = urlParams.get('error')
       const errorDescription = urlParams.get('error_description')
 
-      console.log('URL parameters:', { success, username, error, errorDescription })
-
       if (error) {
-        console.log('OAuth error detected, setting error state')
         setState("error")
         setError(errorDescription || error)
         // Clean URL
@@ -322,22 +278,18 @@ export const useTwitterIntegration = () => {
       }
 
       if (success && username) {
-        console.log('OAuth success detected, checking for session data...')
         // OAuth callback success
         setState("verifying")
         
         // Check if we have session data in the URL
         const sessionDataParam = urlParams.get('session_data')
         if (sessionDataParam) {
-          console.log('Session data found in URL, creating session...')
           try {
             // Create session from the encoded data
             const createSessionResponse = await fetch(`/api/twitter?action=create-session&session_data=${encodeURIComponent(sessionDataParam)}`)
             const createSessionResult = await createSessionResponse.json()
             
             if (createSessionResponse.ok && createSessionResult.success) {
-              console.log('Session created successfully via API')
-              
               // Now check authentication status
               const result = await checkAuthenticationStatus()
               console.log('Authentication check result:', result)
@@ -346,9 +298,7 @@ export const useTwitterIntegration = () => {
                 console.log('Setting user and verified state:', result.user.username)
                 setUser(result.user)
                 setState("verified")
-                console.log('State should now be verified')
               } else {
-                console.log('Authentication check failed after session creation')
                 setState("error")
                 setError("Failed to verify authentication after session creation")
               }
@@ -366,15 +316,12 @@ export const useTwitterIntegration = () => {
           console.log('No session data in URL, falling back to authentication check...')
           // Fallback to old method
           const result = await checkAuthenticationStatus()
-          console.log('Authentication check result:', result)
           
           if (result.success && result.user) {
             console.log('Setting user and verified state:', result.user.username)
             setUser(result.user)
             setState("verified")
-            console.log('State should now be verified')
           } else {
-            console.log('Authentication check failed despite success parameter')
             setState("error")
             setError("Failed to verify authentication")
           }
@@ -386,12 +333,9 @@ export const useTwitterIntegration = () => {
       }
 
       // Check existing session
-      console.log('Checking existing session...')
       const result = await checkAuthenticationStatus()
-      console.log('Existing session check result:', result)
-      
+
       if (result.success && result.user) {
-        console.log('Found existing session, setting verified state:', result.user.username)
         setUser(result.user)
         setState("verified")
       } else {
@@ -427,8 +371,9 @@ export const useTwitterIntegration = () => {
           setUser(result.user)
           setState("verified")
         } else if (result.authUrl) {
-          // User will be redirected to Twitter OAuth
-          // State will be updated after redirect
+          // User will be redirected to Twitter OAuth automatically
+          // State will be updated after redirect from OAuth callback
+          console.log("Redirecting to Twitter OAuth")
         }
       } else {
         throw new Error("Failed to connect Twitter account")
@@ -487,7 +432,7 @@ export const useTwitterIntegration = () => {
       }
 
       // Perform tokenization with real minting
-      const tokenizedPost = await tokenizeTwitterPost(selectedPost, user, walletAddress, mipContract?.address || "")
+      const tokenizedPost = await tokenizeTwitterPost(selectedPost, user, walletAddress!, mipContract?.address || "")
       setTokenizedPosts(prev => [...prev, tokenizedPost])
       setSelectedPost(null)
       return tokenizedPost
@@ -509,14 +454,14 @@ export const useTwitterIntegration = () => {
     setError(null)
     
     // Clear tokenized posts from localStorage when disconnecting
-    // if (typeof window !== 'undefined') {
-    //   try {
-    //     localStorage.removeItem('twitter-tokenized-posts')
-    //     console.log('Cleared tokenized posts from localStorage')
-    //   } catch (error) {
-    //     console.error('Failed to clear tokenized posts from localStorage:', error)
-    //   }
-    // }
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('twitter-tokenized-posts')
+        console.log('Cleared tokenized posts from localStorage')
+      } catch (error) {
+        console.error('Failed to clear tokenized posts from localStorage:', error)
+      }
+    }
   }, [])
 
   const getIntegrationState = useCallback((): TwitterIntegrationState => ({
@@ -535,7 +480,6 @@ export const useTwitterIntegration = () => {
     posts,
     selectedPost,
     tokenizedPosts,
-    setTokenizedPosts, // Add this line
     isLoadingPosts,
     isTokenizing,
     error, 
@@ -545,6 +489,7 @@ export const useTwitterIntegration = () => {
     loadUserPosts,
     selectPost,
     tokenizeSelectedPost,
+    setTokenizedPosts,
     getIntegrationState
   }
 }

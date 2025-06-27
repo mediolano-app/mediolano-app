@@ -40,13 +40,6 @@ export class TwitterOAuth {
 
   // Exchange authorization code for access token
   async exchangeCodeForToken(code: string, codeVerifier: string) {
-    // Add debugging for credentials
-    console.log('=== Token Exchange Debug ===')
-    console.log('Client ID length:', this.clientId.length)
-    console.log('Client Secret length:', this.clientSecret.length)
-    console.log('Client ID format:', /^[a-zA-Z0-9_-]+$/.test(this.clientId) ? 'Valid' : 'Invalid')
-    console.log('Redirect URI:', this.redirectUri)
-    
     // Check if we have proper OAuth 2.0 credentials
     if (this.clientId.length < 20 || /^\d+$/.test(this.clientId)) {
       throw new Error('Invalid OAuth 2.0 Client ID. You appear to be using OAuth 1.0a credentials. Please get OAuth 2.0 Client ID and Secret from X Developer Portal.')
@@ -58,9 +51,6 @@ export class TwitterOAuth {
 
     const authString = `${this.clientId}:${this.clientSecret}`
     const base64Auth = Buffer.from(authString).toString('base64')
-    
-    console.log('Auth string length:', authString.length)
-    console.log('Base64 auth preview:', base64Auth.substring(0, 20) + '...')
 
     const requestBody = new URLSearchParams({
       grant_type: 'authorization_code',
@@ -68,8 +58,6 @@ export class TwitterOAuth {
       redirect_uri: this.redirectUri,
       code_verifier: codeVerifier
     })
-
-    console.log('Request body:', requestBody.toString())
 
     const response = await fetch('https://api.x.com/2/oauth2/token', {
       method: 'POST',
@@ -80,9 +68,6 @@ export class TwitterOAuth {
       body: requestBody
     })
 
-    console.log('Response status:', response.status)
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()))
-
     if (!response.ok) {
       const error = await response.text()
       console.error('Token exchange error response:', error)
@@ -90,7 +75,6 @@ export class TwitterOAuth {
     }
 
     const tokenData = await response.json()
-    console.log('Token exchange successful:', Object.keys(tokenData))
     return tokenData
   }
 

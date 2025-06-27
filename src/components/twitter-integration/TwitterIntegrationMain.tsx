@@ -58,9 +58,8 @@ function TwitterIntegrationContent({
     if (state === "verified" && activeTab === "connect") {
       // Wait a moment before switching tabs for better UX
       const timer = setTimeout(() => {
-        console.log("Switching to posts tab")
         setActiveTab("posts")
-      }, 1500)
+      }, 500)
       return () => clearTimeout(timer)
     }
   }, [state, activeTab])
@@ -69,7 +68,6 @@ function TwitterIntegrationContent({
   useEffect(() => {
     console.log("Full integration effect - mode:", mode, "state:", state, "activeTab:", activeTab)
     if (mode === "full-integration" && state === "verified" && activeTab === "connect") {
-      console.log("Auto-switching to posts tab for full integration")
       setActiveTab("posts")
     }
   }, [mode, state, activeTab])

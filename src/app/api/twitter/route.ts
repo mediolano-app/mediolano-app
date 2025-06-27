@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { TwitterOAuth, TwitterAPI, RateLimiter } from "@/lib/twitter-api"
-import { TwitterSessionManager, PKCEStateManager } from "@/lib/twitter-session"
+import { TwitterSessionManager } from "@/lib/twitter-session"
 import crypto from 'crypto'
 
 // Rate limiter for API requests
@@ -77,8 +77,6 @@ async function handleAuthUrl() {
     // Set cookies as backup (but we'll primarily use the encoded state)
     const maxAge = 10 * 60 // 10 minutes
     
-    console.log('Setting backup PKCE cookies...')
-    
     response.cookies.set('twitter-oauth-state', state, {
       httpOnly: false,
       secure: false,
@@ -94,8 +92,6 @@ async function handleAuthUrl() {
       maxAge,
       path: '/'
     })
-
-    console.log('Backup cookies set, primary data encoded in state parameter')
     
     return response
   } catch (error) {
@@ -140,10 +136,10 @@ async function handleUserPosts(searchParams: URLSearchParams) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
   }
 
-  // Rate limiting - Basic plan: 1 request per 15 minutes for user tweets endpoint
+  // Rate limiting - Free plan: 1 request per 15 minutes for user tweets endpoint
   const clientId = session.userId
   const windowMs = 15 * 60 * 1000 // 15 minutes
-  const maxRequests = 1 // Basic plan limit
+  const maxRequests = 1 // Free plan limit
   
   if (!rateLimiter.canMakeRequest(clientId, windowMs, maxRequests)) {
     const rateLimitInfo = rateLimiter.getRateLimitInfo(clientId, windowMs, maxRequests)
@@ -153,14 +149,13 @@ async function handleUserPosts(searchParams: URLSearchParams) {
     
     return NextResponse.json({ 
       error: "Twitter API rate limit exceeded",
-      message: `Basic plan allows 1 request per 15 minutes. Please wait ${resetTimeMinutes} minutes before trying again.`,
+      message: `Free plan allows 1 request per 15 minutes. Please wait ${resetTimeMinutes} minutes before trying again.`,
       resetTime: rateLimitInfo.resetTime,
       resetInMinutes: resetTimeMinutes
     }, { status: 429 })
   }
 
   try {
-    console.log(`Making Twitter API request for user ${session.userId}`)
     const api = new TwitterAPI(session.accessToken)
     const maxResults = parseInt(searchParams.get('max_results') || '10')
     const paginationToken = searchParams.get('pagination_token') || undefined
@@ -191,7 +186,7 @@ async function handleUserPosts(searchParams: URLSearchParams) {
         return NextResponse.json({ 
           error: "Twitter API rate limit exceeded",
           message: "Your Twitter API plan has reached its rate limit. Please wait before making another request.",
-          details: "Basic plan: 1 request per 15 minutes"
+          details: "Free plan: 1 request per 15 minutes"
         }, { status: 429 })
       }
     }
@@ -204,18 +199,13 @@ async function handleUserPosts(searchParams: URLSearchParams) {
 }
 
 async function handleGetSession() {
-  console.log('=== Session Endpoint Debug ===')
-  
   try {
     const session = await TwitterSessionManager.getSession()
-    console.log('TwitterSessionManager.getSession() result:', session)
     
     if (!session) {
-      console.log('No session found, returning not authenticated')
       return NextResponse.json({ authenticated: false })
     }
 
-    console.log('Session found, returning authenticated with user data')
     // Don't return sensitive data
     return NextResponse.json({ 
       authenticated: true,
@@ -234,7 +224,6 @@ async function handleGetSession() {
 
 async function handleCreateSession(request: NextRequest) {
   try {
-    console.log('=== Creating Session from OAuth Data ===')
     const { searchParams } = new URL(request.url)
     const sessionDataParam = searchParams.get('session_data')
     
@@ -243,15 +232,8 @@ async function handleCreateSession(request: NextRequest) {
     }
 
     // Decode the session data from the URL parameter
-    console.log('Decoding session data from URL parameter...')
     const decodedSessionJson = Buffer.from(sessionDataParam, 'base64url').toString()
     const sessionData = JSON.parse(decodedSessionJson)
-    
-    console.log('Session data decoded:', { 
-      userId: sessionData.userId, 
-      username: sessionData.username,
-      hasAccessToken: !!sessionData.accessToken 
-    })
 
     // Create the session using the createSession method that works with cookies()
     const response = NextResponse.json({ 
@@ -263,7 +245,6 @@ async function handleCreateSession(request: NextRequest) {
 
     // Use the createSessionWithResponse method to properly set the session cookie
     await TwitterSessionManager.createSessionWithResponse(sessionData, response)
-    console.log('Session created and cookie set successfully')
     
     return response
   } catch (error) {

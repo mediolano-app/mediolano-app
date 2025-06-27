@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { StarknetMintingService } from "@/lib/starknet-minting"
-import type { MintNFTParams } from "@/lib/starknet-minting"
 
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
-    console.log("Received Twitter post data:", data)
 
     const {
       postId,
@@ -18,7 +15,6 @@ export async function POST(request: NextRequest) {
       mentions = [],
       urls = [],
       mediaUrls = [],
-      // Add wallet data for minting
       walletAddress,
       contractAddress
     } = data
@@ -141,9 +137,7 @@ export async function POST(request: NextRequest) {
 
     console.log("⛓️ Step 2: Minting NFT on Starknet...")
     
-    // Now mint the actual NFT on Starknet
-    // Note: We can't directly access the user's account from the API
-    // So we return the IPFS data and let the frontend handle the minting
+    // Return IPFS data and let the frontend handle the minting
     return NextResponse.json({ 
       success: true,
       message: "Metadata uploaded to IPFS successfully",

@@ -30,14 +30,13 @@ export class TwitterSessionManager {
 
     // Set cookie on the response object
     response.cookies.set(this.COOKIE_NAME, token, {
-      httpOnly: false, // Allow access for debugging in development
-      secure: false, // Don't require HTTPS in development
+      httpOnly: process.env.X_ENV === "dev" ? false : true, // Allow access for debugging in development
+      secure: process.env.X_ENV === "dev" ? false : true, // Don't require HTTPS in development
       sameSite: 'lax',
       maxAge: this.MAX_AGE,
       path: '/'
     })
 
-    console.log('Session cookie set on response')
     return token
   }
 
@@ -55,13 +54,12 @@ export class TwitterSessionManager {
     try {
       const cookieStore = await cookies()
       cookieStore.set(this.COOKIE_NAME, token, {
-        httpOnly: false, // Allow access for debugging in development
-        secure: false, // Don't require HTTPS in development
+        httpOnly: process.env.X_ENV === "dev" ? false : true, // Allow access for debugging in development
+        secure: process.env.X_ENV === "dev" ? false : true, // Don't require HTTPS in development
         sameSite: 'lax',
         maxAge: this.MAX_AGE,
         path: '/'
       })
-      console.log('Session cookie set via cookies() method')
     } catch (error) {
       console.error('Failed to set session cookie:', error)
     }
@@ -71,15 +69,11 @@ export class TwitterSessionManager {
 
   static async getSession(): Promise<TwitterSession | null> {
     try {
-      console.log('=== Getting Twitter Session ===')
       const cookieStore = await cookies()
       const token = cookieStore.get(this.COOKIE_NAME)?.value
 
-      console.log('Session token found:', token ? 'YES' : 'NO')
-      console.log('Session token length:', token?.length || 0)
 
       if (!token) {
-        console.log('No session token found')
         return null
       }
 
@@ -112,7 +106,6 @@ export class TwitterSessionManager {
     const session = await this.getSession()
     
     if (!session) {
-      console.log('No session found for refresh check')
       return null
     }
 
@@ -157,7 +150,6 @@ export class TwitterSessionManager {
       console.error('Failed to refresh token:', error)
       // Don't destroy session on refresh failure, just return existing session
       // Let the API call fail naturally and handle it there
-      console.log('Returning existing session despite refresh failure')
       return session
     }
   }
@@ -187,36 +179,27 @@ export class PKCEStateManager {
       path: '/'
     }
 
-    console.log('Setting cookies with options:', cookieOptions)
     
     cookieStore.set(this.STATE_COOKIE, state, cookieOptions)
     cookieStore.set(this.VERIFIER_COOKIE, codeVerifier, cookieOptions)
     
-    console.log('Cookies set successfully')
   }
 
   static async validateAndGetVerifier(state: string): Promise<string | null> {
-    console.log('=== Validating PKCE State ===')
-    console.log('Received state:', state)
     
     const cookieStore = await cookies()
     
     const storedState = cookieStore.get(this.STATE_COOKIE)?.value
     const codeVerifier = cookieStore.get(this.VERIFIER_COOKIE)?.value
 
-    console.log('Stored state:', storedState)
-    console.log('Code verifier found:', codeVerifier ? 'YES' : 'NO')
-    console.log('Code verifier length:', codeVerifier?.length || 0)
     
     // Check all cookies for debugging
     const allCookies = cookieStore.getAll()
-    console.log('All cookies:', allCookies.map(c => ({ name: c.name, hasValue: !!c.value })))
 
     // Clear cookies after reading
     try {
       cookieStore.delete(this.STATE_COOKIE)
       cookieStore.delete(this.VERIFIER_COOKIE)
-      console.log('Cookies deleted')
     } catch (error) {
       console.error('Error deleting cookies:', error)
     }
@@ -236,7 +219,6 @@ export class PKCEStateManager {
       return null
     }
 
-    console.log('PKCE validation successful')
     return codeVerifier
   }
 }

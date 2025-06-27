@@ -35,41 +35,17 @@ export class StarknetMintingService {
     const { account, contractAddress, recipientAddress, ipfsUrl } = params
 
     try {
-      console.log("🚀 Starting real Starknet NFT minting with public mint function...")
-      console.log("🔍 STARKNET MINTING DEBUG INFO:")
-      console.log("  - Contract address:", contractAddress)
-      console.log("  - Contract address type:", typeof contractAddress)
-      console.log("  - Contract address length:", contractAddress?.length || 0)
-      console.log("  - Contract address starts with 0x:", contractAddress?.startsWith('0x'))
-      console.log("  - Recipient address:", recipientAddress)
-      console.log("  - Account address:", account.address)
-      console.log("  - IPFS URL:", ipfsUrl)
-      console.log("  - IPFS hash:", params.ipfsHash)
-      
-      // Log detailed account information
-      console.log("👤 ACCOUNT DEBUG INFO:")
-      console.log("  - Account type:", typeof account)
-      console.log("  - Account has address:", !!account.address)
-      console.log("  - Account methods:", Object.getOwnPropertyNames(Object.getPrototypeOf(account)))
-
       // Check if contract address is provided
       if (!contractAddress || contractAddress === "0x0") {
         console.error("❌ INVALID CONTRACT ADDRESS:")
-        console.error("  - Contract address:", contractAddress)
-        console.error("  - Environment NEXT_PUBLIC_CONTRACT_ADDRESS_MIP:", process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP)
         throw new Error("No valid contract address configured. Please set NEXT_PUBLIC_CONTRACT_ADDRESS_MIP in your environment variables.")
       }
 
       // Create contract instance using the MIP ABI (which has mint_item function)
       console.log("📄 Creating contract instance...")
-      console.log("  - Using ABI: MIP ABI (has mint_item function)")
-      console.log("  - Contract address for instance:", contractAddress)
-      
+ 
       const contract = new Contract(mipABI as Abi, contractAddress, account)
-      
       console.log("✅ Contract instance created successfully with MIP ABI")
-      console.log("  - Contract instance address:", contract.address)
-      console.log("  - Contract instance methods:", Object.getOwnPropertyNames(contract))
 
       // Check if the recipient address is valid (not zero address)
       if (!recipientAddress || recipientAddress === "0x0") {
@@ -78,17 +54,10 @@ export class StarknetMintingService {
 
       // First, let's check if the contract exists by trying to call a view function
       try {
-        console.log("🔍 Checking if contract is deployed...")
-        console.log("  - Calling contract.call('name') to test deployment...")
-        const contractName = await contract.call("name")
         console.log("✅ Contract is deployed and accessible")
-        console.log("  - Contract name:", contractName)
+        await contract.call("name")
       } catch (contractCheckError) {
         console.error("❌ Contract check failed:", contractCheckError)
-        console.error("  - Error type:", typeof contractCheckError)
-        console.error("  - Error message:", contractCheckError instanceof Error ? contractCheckError.message : contractCheckError)
-        console.error("  - Error stack:", contractCheckError instanceof Error ? contractCheckError.stack : 'No stack')
-        
         // Check if it's a "contract not deployed" error
         if (contractCheckError instanceof Error && 
             (contractCheckError.message.includes("not deployed") || 
@@ -101,46 +70,21 @@ export class StarknetMintingService {
 Current contract address: ${contractAddress}
 Please contact the administrator to deploy the contract or use a different address.`)
         }
-        
-        // For other errors, let's continue and see if minting works
         console.warn("⚠️ Contract check failed, but continuing with mint attempt...")
       }
-
       // Prepare the metadata URI for the NFT
       const tokenURI = ipfsUrl || `ipfs://${params.ipfsHash}`
       console.log("🏷️ Token URI prepared:", tokenURI)
 
       // Call the mint_item function - this should be publicly accessible
       console.log("📝 Preparing mint_item transaction...")
-      console.log("  - Function to call: mint_item")
-      console.log("  - Parameters: [recipientAddress, tokenURI]")
-      console.log("  - Recipient address param:", recipientAddress)
-      console.log("  - Token URI param:", tokenURI)
-      
       const mintCall = contract.populate("mint_item", [recipientAddress, tokenURI])
-
       console.log("📝 Mint call prepared successfully:")
-      console.log("  - Contract address in call:", mintCall.contractAddress)
-      console.log("  - Entrypoint:", mintCall.entrypoint)
-      console.log("  - Calldata length:", mintCall.calldata?.length || 0)
-      console.log("  - Calldata:", mintCall.calldata)
 
       // Estimate gas first to catch potential failures
       try {
         console.log("⛽ Estimating gas for mint_item transaction...")
-        console.log("  - Account for estimation:", account.address)
-        console.log("  - Call details:", {
-          contractAddress: mintCall.contractAddress,
-          entrypoint: mintCall.entrypoint,
-          calldataLength: mintCall.calldata?.length || 0
-        })
-        
-        const estimate = await account.estimateFee(mintCall)
-        console.log("✅ Gas estimation successful!")
-        console.log("  - Gas consumed:", estimate.gas_consumed)
-        console.log("  - Gas price:", estimate.gas_price)
-        console.log("  - Overall fee:", estimate.overall_fee)
-        
+        const estimate = await account.estimateInvokeFee(mintCall)
       } catch (estimateError) {
         console.error("❌ Gas estimation failed:")
         console.error("  - Error type:", typeof estimateError)
@@ -199,7 +143,7 @@ Function: mint_item`)
       const receipt = await account.waitForTransaction(result.transaction_hash)
 
       console.log("🎉 Transaction confirmed!")
-      console.log("Receipt status:", receipt.execution_status || 'ACCEPTED')
+      console.log("Receipt status:", receipt.isSuccess || 'ACCEPTED')
 
       // Extract token ID from events or return value
       let tokenId: string | undefined
@@ -229,7 +173,7 @@ Function: mint_item`)
         }
       }
 
-      // If we couldn't extract token ID from events, try to get it from return value or total supply
+      // If we couldn't extract token ID from events, try to get it from total supply
       if (!tokenId) {
         try {
           console.log("🔢 Attempting to get token ID from total supply...")

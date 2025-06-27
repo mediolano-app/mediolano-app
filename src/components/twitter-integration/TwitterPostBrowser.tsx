@@ -36,7 +36,7 @@ export default function TwitterPostBrowser({
     loadUserPosts,
     selectPost,
     tokenizeSelectedPost,
-    setTokenizedPosts // Add setTokenizedPosts to context
+    setTokenizedPosts
   } = useTwitterIntegrationContext()
 
   // Get Starknet wallet info
@@ -46,9 +46,6 @@ export default function TwitterPostBrowser({
     isConnected: isWalletConnected,
     mipContract 
   } = useStarknetWallet()
-  
-  console.log("TwitterPostBrowser - received state:", state, "user:", user?.username, "posts:", posts.length)
-  console.log("Wallet connected:", isWalletConnected, "address:", walletAddress)
   
   const { toast } = useToast()
   const [hasLoadedPosts, setHasLoadedPosts] = useState(false)
@@ -64,7 +61,6 @@ export default function TwitterPostBrowser({
   // Load first batch of posts when user is verified
   useEffect(() => {
     if (state === "verified" && user && !hasLoadedPosts && posts.length === 0) {
-      console.log("Auto-loading first batch of posts for verified user")
       handleLoadPosts(true)
     }
   }, [state, user, hasLoadedPosts, posts.length])
@@ -74,14 +70,10 @@ export default function TwitterPostBrowser({
     const processPendingMints = async () => {
       if (!account || !mipContract || pendingMints.size === 0) return
 
-      console.log("Processing pending mints:", Array.from(pendingMints))
-      
       for (const postId of pendingMints) {
         const tokenizedPost = tokenizedPosts.find(tp => tp.postId === postId && tp.status === 'pending')
         
         if (tokenizedPost && tokenizedPost._mintingData) {
-          console.log(`🔄 Processing mint for post ${postId}...`)
-          
           try {
             // Perform real Starknet minting
             const mintResult = await StarknetMintingService.mintTwitterPostNFT({
@@ -94,8 +86,6 @@ export default function TwitterPostBrowser({
             })
 
             if (mintResult.success) {
-              console.log(`✅ Successfully minted NFT for post ${postId}:`, mintResult)
-              
               // Update the tokenized post with real blockchain data
               const updatedPost: TokenizedPost = {
                 ...tokenizedPost,
@@ -112,8 +102,7 @@ export default function TwitterPostBrowser({
                 _mintingData: undefined
               }
 
-              // Update the tokenizedPosts state in the Twitter integration context
-              // We need to update the state in the parent context, not just localStorage
+              // Update the tokenizedPosts state in the Twitter integration context, parent context, and localStorage
               setTokenizedPosts(prev => {
                 const updated = prev.map(tp => 
                   tp.postId === postId ? updatedPost : tp
@@ -121,7 +110,6 @@ export default function TwitterPostBrowser({
                 
                 // Also update localStorage
                 localStorage.setItem('twitter-tokenized-posts', JSON.stringify(updated))
-                console.log('✅ Updated tokenized posts state and localStorage')
                 
                 return updated
               })
@@ -186,8 +174,6 @@ export default function TwitterPostBrowser({
   }, [account, mipContract, pendingMints, tokenizedPosts, toast, setTokenizedPosts]) // Add setTokenizedPosts to dependencies
 
   const handleLoadPosts = async (isInitialLoad = false) => {
-    console.log(isInitialLoad ? "Loading initial posts" : "Loading more posts")
-    
     // Clear previous rate limit errors if this is a manual retry
     if (!isInitialLoad) {
       setRateLimitInfo({ isLimited: false })
