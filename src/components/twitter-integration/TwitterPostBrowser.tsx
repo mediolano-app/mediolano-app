@@ -589,7 +589,7 @@ export default function TwitterPostBrowser({
             <div>
               <strong>Rate Limit Reached</strong>
               <p className="text-sm mt-1">
-                Basic plan allows 1 request per 15 minutes. 
+                Free plan allows 1 request per 15 minutes. 
                 {rateLimitInfo.resetInMinutes && ` Wait ${rateLimitInfo.resetInMinutes} minutes to load more posts.`}
               </p>
             </div>
