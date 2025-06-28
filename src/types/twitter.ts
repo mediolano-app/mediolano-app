@@ -89,6 +89,21 @@ export interface TokenizedPost {
   ipfsHash: string;
   createdAt: string;
   status: 'pending' | 'confirmed' | 'failed';
+  ipfsUrl?: string;
+  pinataUrl?: string;
+  starknetUrl?: string;
+  // Add fields for real blockchain integration
+  contractAddress?: string;
+  network?: 'mainnet' | 'sepolia';
+  blockNumber?: number;
+  // Internal minting data (not persisted)
+  _mintingData?: {
+    contractAddress: string;
+    recipientAddress: string;
+    metadata: any;
+    ipfsHash: string;
+    ipfsUrl: string;
+  };
 }
 
 /**
