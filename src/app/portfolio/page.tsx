@@ -1,41 +1,20 @@
 "use client";
 
 import { Suspense } from "react";
-import NFTPortfolio from "../../components/nft-portfolio";
 import { Skeleton } from "@/components/ui/skeleton";
-// import { useAccount } from "@starknet-react/core";
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-// import { ConnectWallet } from "@/components/ConnectWallet";
+import CreatorNFTPortfolio from "@/components/creator-asset/creator-portfolio";
 
 export default function PortfolioPage() {
-  // const { account } = useAccount();
-
-  // if (!account) {
-  //   return (
-  //     <div className="container mx-auto px-4 py-8 mt-10 mb-20 flex flex-col items-center justify-center min-h-[60vh]">
-  //       <Card className="w-full max-w-md">
-  //         <CardHeader>
-  //           <CardTitle className="text-center">Connect Your Wallet</CardTitle>
-  //           <CardDescription className="text-center">
-  //             Please connect your wallet to view your portfolio
-  //           </CardDescription>
-  //         </CardHeader>
-  //         <CardContent className="flex justify-center pb-6">
-  //           <ConnectWallet />
-  //         </CardContent>
-  //       </Card>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="container mx-auto px-4 py-8 mt-5 mb-20">
       <div className="space-y-1 mb-5">
         <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
-        <p className="text-muted-foreground">Showcase and manage your digital assets</p>
+        <p className="text-muted-foreground">
+          Showcase and manage your digital assets
+        </p>
       </div>
       <Suspense fallback={<PortfolioSkeleton />}>
-        <NFTPortfolio />
+        <CreatorNFTPortfolio />
       </Suspense>
     </div>
   );
@@ -71,4 +50,3 @@ function PortfolioSkeleton() {
     </div>
   );
 }
-
