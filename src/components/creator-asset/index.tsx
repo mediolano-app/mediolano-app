@@ -203,7 +203,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
       address: tokenOwnerAddress,
       avatar: metadata?.image || "/background.jpg",
       verified: false,
-      bio: "author bio (Preview).",
+      bio: "Creator bio (Preview).",
       website: "https://ip.mediolano.app",
     },
     creator: {
@@ -211,7 +211,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
       address: tokenOwnerAddress,
       avatar: metadata?.image || "/background.jpg",
       verified: false,
-      bio: "author bio (Preview).",
+      bio: "Creator bio (Preview).",
       website: "https://ip.mediolano.app",
     },
     owner: {
