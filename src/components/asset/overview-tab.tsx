@@ -117,7 +117,7 @@ export function OverviewTab({ asset, tokenOwnerAddress }: OverviewTabProps) {
             <AccordionTrigger className="py-4">
               <div className="flex items-center">
                 <History className="mr-2 h-4 w-4" />
-                <span>History (Preview)</span>
+                <span>History</span>
               </div>
             </AccordionTrigger>
             <AccordionContent>
