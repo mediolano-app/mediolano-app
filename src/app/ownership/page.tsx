@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Contract, RpcProvider, constants, uint256 } from 'starknet';
 
@@ -40,70 +40,151 @@ const ProofOfOwnership: React.FC<ProofOfOwnershipProps> = ({ defaultAssetId = ''
   const [ownershipData, setOwnershipData] = useState<OwnershipData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [contractAddress, setContractAddress] = useState('');
 
-  const fetchOwnershipData = async (id: string, method: VerificationMethod) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (assetId || contractAddress) {
+      fetchOwnershipData(assetId, activeMethod, contractAddress);
+    }
+  };
+
+  const fetchOwnershipData = async (id: string, method: VerificationMethod, contractAddr?: string) => {
     setLoading(true);
     setError(null);
     setOwnershipData(null);
     try {
       if (method === 'assetId') {
-        // Convert id to u256 (as string or number) using BigInt for robustness
-        let tokenIdU256;
-        try {
-          tokenIdU256 = uint256.bnToUint256(BigInt(id));
-        } catch (e) {
-          setError('Invalid Asset ID format. Please use a valid decimal or hex (0x...) number.');
+        // If both provided, use both
+        if (id && contractAddr) {
+          // Convert id to u256 (as string or number) using BigInt for robustness
+          let tokenIdU256;
+          try {
+            tokenIdU256 = uint256.bnToUint256(BigInt(id));
+          } catch (e) {
+            setError('Invalid Asset ID format. Please use a valid decimal or hex (0x...) number.');
+            setLoading(false);
+            return;
+          }
+          // Use the provided contract address or default
+          const contractToUse = new Contract(CONTRACT_ABI, contractAddr, provider);
+          const owner = await contractToUse.owner_of(tokenIdU256);
+          // Fetch token URI (metadata)
+          let metadataUri = '';
+          try {
+            const uriResult = await contractToUse.token_uri(tokenIdU256);
+            if (uriResult && uriResult.data && Array.isArray(uriResult.data)) {
+              // Convert each bytes31 (FELT) to string (browser-safe, no Buffer)
+              metadataUri = uriResult.data.map((felt: FELT) => {
+                // Convert felt to hex, then to UTF-8 string (strip trailing zeros)
+                let hex = BigInt(felt).toString(16).padStart(62, '0');
+                let str = '';
+                for (let i = 0; i < hex.length; i += 2) {
+                  const byte = parseInt(hex.slice(i, i + 2), 16);
+                  if (byte === 0) break;
+                  str += String.fromCharCode(byte);
+                }
+                return str;
+              }).join('').replace(/\0+$/, '');
+            }
+          } catch (e) {
+            console.warn("Could not fetch or decode token_uri:", e);
+            metadataUri = '';
+          }
+          let creationDate = 'N/A';
+          let licensingTerms = 'N/A';
+          if (metadataUri && metadataUri.startsWith('http')) {
+            try {
+              const resp = await fetch(metadataUri);
+              if (resp.ok) {
+                const meta = await resp.json();
+                creationDate = meta.creation_date || 'N/A';
+                licensingTerms = meta.licensing_terms || 'N/A';
+              } else {
+                console.warn(`Failed to fetch metadata from URI: ${metadataUri}, Status: ${resp.status}`);
+              }
+            } catch (e) {
+              console.error("Error parsing metadata JSON:", e);
+            }
+          }
+          setOwnershipData({
+            owner: owner.toString(),
+            creationDate,
+            licensingTerms,
+            transactionHistory: [],
+            berneConventionCompliant: true,
+            verificationStatus: owner ? 'verified' : 'unverified',
+          });
+        } else if (contractAddr) {
+          // ...fetch contract info, or show message: "Please provide Asset ID to verify a specific token."
+          setError('Please provide an Asset ID to verify a specific token in this contract.');
+          setLoading(false);
+          return;
+        } else if (id) {
+          // ...verify tokenId on default contract...
+          // Convert id to u256 (as string or number) using BigInt for robustness
+          let tokenIdU256;
+          try {
+            tokenIdU256 = uint256.bnToUint256(BigInt(id));
+          } catch (e) {
+            setError('Invalid Asset ID format. Please use a valid decimal or hex (0x...) number.');
+            setLoading(false);
+            return;
+          }
+          // Use the provided contract address or default
+          const contractToUse = new Contract(CONTRACT_ABI, CONTRACT_ADDRESS, provider);
+          const owner = await contractToUse.owner_of(tokenIdU256);
+          // Fetch token URI (metadata)
+          let metadataUri = '';
+          try {
+            const uriResult = await contractToUse.token_uri(tokenIdU256);
+            if (uriResult && uriResult.data && Array.isArray(uriResult.data)) {
+              // Convert each bytes31 (FELT) to string (browser-safe, no Buffer)
+              metadataUri = uriResult.data.map((felt: FELT) => {
+                // Convert felt to hex, then to UTF-8 string (strip trailing zeros)
+                let hex = BigInt(felt).toString(16).padStart(62, '0');
+                let str = '';
+                for (let i = 0; i < hex.length; i += 2) {
+                  const byte = parseInt(hex.slice(i, i + 2), 16);
+                  if (byte === 0) break;
+                  str += String.fromCharCode(byte);
+                }
+                return str;
+              }).join('').replace(/\0+$/, '');
+            }
+          } catch (e) {
+            console.warn("Could not fetch or decode token_uri:", e);
+            metadataUri = '';
+          }
+          let creationDate = 'N/A';
+          let licensingTerms = 'N/A';
+          if (metadataUri && metadataUri.startsWith('http')) {
+            try {
+              const resp = await fetch(metadataUri);
+              if (resp.ok) {
+                const meta = await resp.json();
+                creationDate = meta.creation_date || 'N/A';
+                licensingTerms = meta.licensing_terms || 'N/A';
+              } else {
+                console.warn(`Failed to fetch metadata from URI: ${metadataUri}, Status: ${resp.status}`);
+              }
+            } catch (e) {
+              console.error("Error parsing metadata JSON:", e);
+            }
+          }
+          setOwnershipData({
+            owner: owner.toString(),
+            creationDate,
+            licensingTerms,
+            transactionHistory: [],
+            berneConventionCompliant: true,
+            verificationStatus: owner ? 'verified' : 'unverified',
+          });
+        } else {
+          setError('Please provide at least Asset ID or Contract Address.');
           setLoading(false);
           return;
         }
-        // Fetch owner
-        const owner = await contract.owner_of(tokenIdU256);
-        // Fetch token URI (metadata)
-        let metadataUri = '';
-        try {
-          const uriResult = await contract.token_uri(tokenIdU256);
-          if (uriResult && uriResult.data && Array.isArray(uriResult.data)) {
-            // Convert each bytes31 (FELT) to string (browser-safe, no Buffer)
-            metadataUri = uriResult.data.map((felt: FELT) => {
-              // Convert felt to hex, then to UTF-8 string (strip trailing zeros)
-              let hex = BigInt(felt).toString(16).padStart(62, '0');
-              let str = '';
-              for (let i = 0; i < hex.length; i += 2) {
-                const byte = parseInt(hex.slice(i, i + 2), 16);
-                if (byte === 0) break;
-                str += String.fromCharCode(byte);
-              }
-              return str;
-            }).join('').replace(/\0+$/, '');
-          }
-        } catch (e) {
-          console.warn("Could not fetch or decode token_uri:", e);
-          metadataUri = '';
-        }
-        let creationDate = 'N/A';
-        let licensingTerms = 'N/A';
-        if (metadataUri && metadataUri.startsWith('http')) {
-          try {
-            const resp = await fetch(metadataUri);
-            if (resp.ok) {
-              const meta = await resp.json();
-              creationDate = meta.creation_date || 'N/A';
-              licensingTerms = meta.licensing_terms || 'N/A';
-            } else {
-              console.warn(`Failed to fetch metadata from URI: ${metadataUri}, Status: ${resp.status}`);
-            }
-          } catch (e) {
-            console.error("Error parsing metadata JSON:", e);
-          }
-        }
-        setOwnershipData({
-          owner: owner.toString(),
-          creationDate,
-          licensingTerms,
-          transactionHistory: [],
-          berneConventionCompliant: true,
-          verificationStatus: owner ? 'verified' : 'unverified',
-        });
       } else if (method === 'transactionHash') {
         // Transaction hash verification: fetch transaction and infer asset
         try {
@@ -150,13 +231,6 @@ const ProofOfOwnership: React.FC<ProofOfOwnershipProps> = ({ defaultAssetId = ''
       setOwnershipData(null); // Clear previous data on error
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (assetId) {
-      fetchOwnershipData(assetId, activeMethod);
     }
   };
 
@@ -230,15 +304,14 @@ const ProofOfOwnership: React.FC<ProofOfOwnershipProps> = ({ defaultAssetId = ''
               Verify by {activeMethod === 'assetId' ? 'Asset ID' : activeMethod === 'transactionHash' ? 'Transaction Hash' : 'Certificate ID'}
             </h3>
             <p className="text-[#a0a0a0] mb-4">{getInputLabel()}</p>
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-grow">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:flex-col">
+              <div className="relative">
                 <input
                   type="text"
                   value={assetId}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setAssetId(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-[#12141B] border border-[#343944] rounded-lg text-[var(--foreground)] placeholder-[#808080] focus:outline-none focus:ring-2 focus:ring-[#44588E]"
-                  placeholder={`Enter ${activeMethod === 'assetId' ? 'Asset ID' : activeMethod === 'transactionHash' ? 'Transaction Hash' : 'Certificate ID'} ${getPlaceholderText()}`}
-                  required
+                  placeholder="Asset ID (optional)"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a0a0a0]">
                   <svg
@@ -257,10 +330,17 @@ const ProofOfOwnership: React.FC<ProofOfOwnershipProps> = ({ defaultAssetId = ''
                   </svg>
                 </span>
               </div>
+              <input
+                type="text"
+                value={contractAddress}
+                onChange={e => setContractAddress(e.target.value)}
+                className="w-full px-4 py-3 bg-[#12141B] border border-[#343944] rounded-lg text-[var(--foreground)] placeholder-[#808080] focus:outline-none focus:ring-2 focus:ring-[#44588E]"
+                placeholder="Contract Address (optional)"
+              />
               <button
                 type="submit"
                 className="bg-[#44588E] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#5a70af] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={loading || !assetId}
+                disabled={loading || (!assetId && !contractAddress)}
               >
                 {loading ? 'Verifying...' : 'Verify'}
               </button>
@@ -299,7 +379,7 @@ const ProofOfOwnership: React.FC<ProofOfOwnershipProps> = ({ defaultAssetId = ''
                   </span>
                 </div>
                 <div className="break-all">
-                  <span className="font-semibold text-[#a0a0a0]">Owner Address:</span>{' '}
+                  <span className="font-semibold text-[#a0a0a0]">Owner Address (Current):</span>{' '}
                   <span className="block text-sm sm:inline">{ownershipData.owner}</span>
                 </div>
                 <div>
