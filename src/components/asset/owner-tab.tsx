@@ -80,7 +80,7 @@ export function OwnerTab({ asset, tokenOwnerAddress }: OwnerTabProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Ownership History (Preview)</CardTitle>
+          <CardTitle>Ownership History</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
