@@ -95,7 +95,7 @@ const checkAuthenticationStatus = async (): Promise<{ success: boolean; user?: T
   }
 }
 
-const fetchUserTwitterPosts = async (userId: string): Promise<TwitterPostsResponse> => {
+const fetchUserTwitterPosts = async (): Promise<TwitterPostsResponse> => {
     const params = new URLSearchParams({
     // MAX POSTS RESULTS FROM X API FETCH CALL
     max_results: '10',
@@ -205,7 +205,7 @@ export interface TwitterIntegrationContextType {
   isTokenizing: boolean
   error: string | null
   connect: () => Promise<void>
-  verify: (username: string) => Promise<boolean>
+  verify: () => Promise<boolean>
   reset: () => void
   loadUserPosts: () => Promise<void>
   selectPost: (post: TwitterPost | null) => void
@@ -226,7 +226,6 @@ export const useTwitterIntegration = () => {
 
   // Get Starknet wallet info
   const { 
-    account, 
     address: walletAddress, 
     isConnected: isWalletConnected,
     mipContract 
@@ -346,7 +345,7 @@ export const useTwitterIntegration = () => {
     checkAuth()
   }, [])
 
-  const verify = useCallback(async (username: string) => {
+  const verify = useCallback(async () => {
     // This function is kept for compatibility but not used in OAuth flow
     setState("verifying")
     setError(null)
@@ -395,7 +394,7 @@ export const useTwitterIntegration = () => {
     setIsLoadingPosts(true)
     setError(null)
     try {
-      const response = await fetchUserTwitterPosts(user.id)
+      const response = await fetchUserTwitterPosts()
       setPosts(response.data || [])
     } catch (err) {
       console.error("Failed to load posts:", err)
