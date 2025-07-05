@@ -4,31 +4,87 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, Upload, FolderPlus } from "lucide-react"
+import { ArrowLeft, Upload, FolderPlus, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useCollection, CollectionFormData } from "@/hooks/use-collection"
+import { useToast } from "@/hooks/use-toast"
+import { useAccount } from "@starknet-react/core"
 
 export default function CreateCollectionPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const { createCollection, isCreating, error } = useCollection()
+  const { toast } = useToast()
+  const { address: walletAddress } = useAccount()
   const [coverImage, setCoverImage] = useState<string | null>(null)
+  const [formData, setFormData] = useState<CollectionFormData>({
+    name: '',
+    symbol: '',
+    description: '',
+    type: 'art',
+    visibility: 'private',
+    coverImage: undefined,
+    enableVersioning: true,
+    allowComments: false,
+    requireApproval: false,
+  })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
+    
+    // Only proceed if wallet is connected
+    if (!walletAddress) {
+      return
+    }
+    
+    try {
+      const submitData: CollectionFormData = {
+        ...formData,
+        coverImage: coverImage || undefined,
+      }
+      
+      await createCollection(submitData)
+      
+      toast({
+        title: "Collection Created!",
+        description: "Your collection has been successfully created and uploaded to IPFS.",
+      })
+      
+      // Reset form
+      setFormData({
+        name: '',
+        symbol: '',
+        description: '',
+        type: 'art',
+        visibility: 'private',
+        coverImage: undefined,
+        enableVersioning: true,
+        allowComments: false,
+        requireApproval: false,
+      })
+      setCoverImage(null)
+      
+    } catch (error) {
+      console.error('Error creating collection:', error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create collection",
+        variant: "destructive",
+      })
+    }
+  }
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      // Redirect would happen here in a real app
-      window.alert("Collection created successfully!")
-    }, 1500)
+  const handleInputChange = (field: keyof CollectionFormData, value: string | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
   }
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,20 +122,44 @@ export default function CreateCollectionPage() {
                   <CardDescription>Enter the basic information about your collection</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        {error}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
                   <div className="space-y-2">
                     <Label htmlFor="name">Collection Name</Label>
-                    <Input id="name" placeholder="Enter collection name" required />
+                    <Input 
+                      id="name" 
+                      placeholder="Enter collection name" 
+                      required 
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                    />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="description">Description</Label>
-                    <Textarea id="description" placeholder="Describe your collection" className="min-h-[100px]" />
+                    <Textarea 
+                      id="description" 
+                      placeholder="Describe your collection" 
+                      className="min-h-[100px]"
+                      value={formData.description}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="type">Collection Type</Label>
-                      <Select defaultValue="art">
+                      <Select 
+                        value={formData.type} 
+                        onValueChange={(value) => handleInputChange('type', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
@@ -97,7 +177,10 @@ export default function CreateCollectionPage() {
 
                     <div className="space-y-2">
                       <Label htmlFor="visibility">Visibility</Label>
-                      <Select defaultValue="private">
+                      <Select 
+                        value={formData.visibility} 
+                        onValueChange={(value) => handleInputChange('visibility', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Select visibility" />
                         </SelectTrigger>
@@ -159,9 +242,17 @@ export default function CreateCollectionPage() {
                   <Button variant="outline" type="button">
                     Save as Draft
                   </Button>
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? (
+                  <Button 
+                    type="submit"
+                    disabled={isCreating || !walletAddress}
+                  >
+                    {isCreating ? (
                       <>Creating Collection...</>
+                    ) : !walletAddress ? (
+                      <>
+                        <FolderPlus className="mr-2 h-4 w-4" />
+                        Connect Wallet to Create
+                      </>
                     ) : (
                       <>
                         <FolderPlus className="mr-2 h-4 w-4" />
@@ -187,7 +278,10 @@ export default function CreateCollectionPage() {
                       <p className="font-medium">Enable Versioning</p>
                       <p className="text-sm text-muted-foreground">Track changes to assets in this collection</p>
                     </div>
-                    <Switch defaultChecked />
+                    <Switch 
+                      checked={formData.enableVersioning}
+                      onCheckedChange={(checked) => handleInputChange('enableVersioning', checked)}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -195,7 +289,10 @@ export default function CreateCollectionPage() {
                       <p className="font-medium">Allow Comments</p>
                       <p className="text-sm text-muted-foreground">Enable commenting on collection assets</p>
                     </div>
-                    <Switch />
+                    <Switch 
+                      checked={formData.allowComments}
+                      onCheckedChange={(checked) => handleInputChange('allowComments', checked)}
+                    />
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -203,7 +300,10 @@ export default function CreateCollectionPage() {
                       <p className="font-medium">Require Approval</p>
                       <p className="text-sm text-muted-foreground">Require approval for new assets</p>
                     </div>
-                    <Switch />
+                    <Switch 
+                      checked={formData.requireApproval}
+                      onCheckedChange={(checked) => handleInputChange('requireApproval', checked)}
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -244,7 +344,7 @@ export default function CreateCollectionPage() {
                       </div>
                     </TabsContent>
                     <TabsContent value="custom" className="mt-2">
-                      <p className="text-sm text-muted-foreground">You haven't created any custom templates yet.</p>
+                      <p className="text-sm text-muted-foreground">You haven&apos;t created any custom templates yet.</p>
                       <Button variant="outline" size="sm" className="mt-2">
                         Create Template
                       </Button>
