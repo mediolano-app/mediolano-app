@@ -7,8 +7,29 @@ export interface IPFSMetadata {
   type?: string;
   creator?: string | { name: string; address: string };
   attributes?: Array<{ trait_type: string; value: string }>;
-  registrationDate?: string; 
-  [key: string]: any; 
+  registrationDate?: string;
+  medium?: string;
+  fileType?: string;
+  duration?: number;
+  genre?: string;
+  bpm?: number;
+  resolution?: string;
+  framerate?: number;
+  yearCreated?: number;
+  artistName?: string;
+  version?: string;
+  external_url?: string;
+  repository?: string;
+  patent_number?: string;
+  patent_date?: string;
+  trademark_number?: string;
+  tokenId?: string;
+  tokenStandard?: string;
+  blockchain?: string;
+  pages?: number;
+  authors?: string[];
+  publisher?: string;
+  [key: string]: unknown; 
 }
 
 export interface AssetType {
@@ -18,11 +39,11 @@ export interface AssetType {
   image?: string;
   ipfsCid?: string;
   type?: string;
-  creator: any; 
-  owner: any; 
+  creator: string | { name: string; address: string }; 
+  owner: string | { name: string; address: string }; 
   registrationDate?: string; 
   attributes?: Array<{ trait_type: string; value: string }>;
-  [key: string]: any; 
+  [key: string]: unknown; 
 }
 
 export interface EnhancedAsset extends AssetType {
@@ -148,7 +169,7 @@ export function getKnownCids(): Record<string, string> {
   if (cachedCids) {
     try {
       return JSON.parse(cachedCids);
-    } catch (e) {
+    } catch {
       console.warn('Failed to parse cached CIDs, regenerating');
     }
   }
@@ -180,7 +201,7 @@ export function combineData(ipfsData: IPFSMetadata | null, mockData: AssetType):
   // Combinar los datos, priorizando los datos de IPFS
   const result: AssetType = {
     ...mockData,
-    ...ipfsData as any, 
+    ...(ipfsData as Partial<AssetType>), 
     id: mockData.id, 
     creator: ipfsData.creator || mockData.creator,
     owner: mockData.owner, // Mantener el owner actual
