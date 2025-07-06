@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import type { Collection } from "@/types/asset"
 import { useCollection, CollectionFormData } from "@/hooks/use-collection"
 import { useToast } from "@/hooks/use-toast"
 import { useAccount } from "@starknet-react/core"
@@ -23,6 +24,7 @@ export default function CreateCollectionPage() {
   const { toast } = useToast()
   const { address: walletAddress } = useAccount()
   const [coverImage, setCoverImage] = useState<string | null>(null)
+  
   const [formData, setFormData] = useState<CollectionFormData>({
     name: '',
     symbol: '',

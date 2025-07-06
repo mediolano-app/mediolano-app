@@ -39,7 +39,7 @@ export interface UseCollectionReturn {
 
 
 
-const COLLECTION_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as `0x${string}`;
+const COLLECTION_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_HASH as `0x${string}`;
 const COLLECTION_CONTRACT_ABI = ipCollectionAbi as Abi;
 
 export function useCollection(): UseCollectionReturn {
