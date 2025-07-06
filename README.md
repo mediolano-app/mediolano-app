@@ -5,7 +5,9 @@ Quick links:
 <br>
 <a href="https://mediolano.xyz">Website mediolano.xyz</a>
 <br>
-<a href="https://t.me/MediolanoStarknet">Telegram</a> | <a href="https://discord.gg/NhqdTvyA">Discord</a> | <a href="https://x.com/mediolanoapp">X / Twitter</a>
+<a href="https://t.me/MediolanoStarknet">Telegram</a>
+<br>
+<a href="https://x.com/mediolanoapp">X / Twitter</a>
 <br>
 
 ---
@@ -36,7 +38,7 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 - High-Speed & Low-Cost: Leverage Starknet's unparalleled speed and cost-efficiency with ZERO FEES on Mediolano Protocol.
 
-- **Gas Fee Abstraction**: AVNU Paymaster integration eliminates gas fee barriers for seamless user experience.
+- Gas Fee Abstraction: AVNU Paymaster integration eliminates gas fee barriers for seamless user experience. (Experimental feature)
 
 
 [![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
