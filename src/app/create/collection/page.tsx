@@ -27,10 +27,10 @@ export default function CreateCollectionPage() {
   
   const [formData, setFormData] = useState<CollectionFormData>({
     name: '',
-    symbol: '',
+    symbol: 'MIP',
     description: '',
     type: 'art',
-    visibility: 'private',
+    visibility: 'public',
     coverImage: undefined,
     enableVersioning: true,
     allowComments: false,
@@ -61,10 +61,10 @@ export default function CreateCollectionPage() {
       // Reset form
       setFormData({
         name: '',
-        symbol: '',
+        symbol: 'MIP',
         description: '',
         type: 'art',
-        visibility: 'private',
+        visibility: 'public',
         coverImage: undefined,
         enableVersioning: true,
         allowComments: false,
@@ -288,8 +288,8 @@ export default function CreateCollectionPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Allow Comments</p>
-                      <p className="text-sm text-muted-foreground">Enable commenting on collection assets</p>
+                      <p className="font-medium">Open Edition</p>
+                      <p className="text-sm text-muted-foreground">Enable collaborative minting</p>
                     </div>
                     <Switch 
                       checked={formData.allowComments}
@@ -312,44 +312,47 @@ export default function CreateCollectionPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Collection Templates</CardTitle>
+                  <CardTitle>Collection Guide</CardTitle>
                   <CardDescription>Apply templates to standardize asset creation</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="recommended">
                     <TabsList className="w-full">
                       <TabsTrigger value="recommended" className="flex-1">
-                        Recommended
+                        Collections?
                       </TabsTrigger>
                       <TabsTrigger value="custom" className="flex-1">
-                        Custom
+                        Checklist
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="recommended" className="space-y-2 mt-2">
                       <div className="p-2 border rounded-md flex items-center justify-between">
                         <div>
-                          <p className="font-medium">Art Template</p>
-                          <p className="text-xs text-muted-foreground">For visual artwork</p>
+                          <p className="font-medium">What is a IP collection?</p>
+                          <p className="mt-4 text-sm text-muted-foreground">A Programmable IP Collection (Non-Fungible Token collection) is essentially a series of blockchain-based assets, each with unique identifying programmable code and metadata.</p>
+                          <p className="mt-4 text-sm text-muted-foreground mt-1">Collections allow you to group related assets together, making it easier to manage and interact with them.</p>
+
                         </div>
-                        <Button variant="outline" size="sm">
-                          Apply
-                        </Button>
+                       
                       </div>
-                      <div className="p-2 border rounded-md flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">NFT Template</p>
-                          <p className="text-xs text-muted-foreground">For digital collectibles</p>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          Apply
-                        </Button>
-                      </div>
+   
                     </TabsContent>
                     <TabsContent value="custom" className="mt-2">
-                      <p className="text-sm text-muted-foreground">You haven&apos;t created any custom templates yet.</p>
-                      <Button variant="outline" size="sm" className="mt-2">
-                        Create Template
-                      </Button>
+                      <div className="p-2 border rounded-md flex items-center justify-between">
+                        <div>
+                          <p className="font-medium mb-1">Collections Checklist</p>
+                          <p className="text-xs text-muted-foreground mb-2">
+                            Making the most of your collection page helps others better understand your project.
+                          </p>
+                          <ul className="list-disc list-inside text-xs space-y-1 text-muted-foreground">
+                            <li>Choose a collection name</li>
+                            <li>Fill in your collection details</li>
+                            <li>Add image / media</li>
+                            <li>Link out to your links</li>
+                          </ul>
+                        </div>
+                       
+                      </div>
                     </TabsContent>
                   </Tabs>
                 </CardContent>
