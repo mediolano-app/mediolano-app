@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useMIP } from '@/hooks/contracts/use-mip';
-import { LoadingSkeleton } from '@/components/my-assets/LoadingSkeleton';
-import { ErrorMessage } from '@/components/my-assets/ErrorMessage';
-import { Pagination } from '@/components/my-assets/Pagination';
+import { LoadingSkeleton } from '@/components/my-assets/loading-skeleton';
+import { ErrorMessage } from '@/components/my-assets/error-message';
+import { Pagination } from '@/components/my-assets/pagination';
 import NFTCard from '@/components/NFTCard';
 
 interface MyAssetsProps {
