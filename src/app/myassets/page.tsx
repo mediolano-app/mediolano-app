@@ -104,21 +104,15 @@ export const MyAssets: React.FC<MyAssetsProps> = ({
   }
 
   return (
-    <div className={`w-full ${className}`}>
+    <div className='container mx-auto px-4 py-8 mt-5 mb-10'>
       {/* Header */}
-      <div className="mb-6 mt-4">
+      <div className="mb-6 ">
         <div className="flex items-center gap-3 mb-2 mx-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            My IP Assets
+            My Digital IP Assets
           </h2>
-          <span className="px-2 py-1 bg-blue-100 dark:bg-orange-900 text-blue-800 dark:text-orange-200 text-xs rounded-full">
-            Starknet
-          </span>
-          <span className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full">
-            MIP
-          </span>
         </div>
-        <p className="text-gray-600 dark:text-gray-300 mx-6">
+        <p className="text-gray-500 dark:text-gray-300 mx-6">
           {searchTerm ? `${filteredTokenIds.length} of ${tokenIds.length}` : tokenIds.length} Asset{tokenIds.length !== 1 ? 's' : ''} 
           {searchTerm && ' found'}
           {balance > BigInt(0) && (
@@ -127,8 +121,8 @@ export const MyAssets: React.FC<MyAssetsProps> = ({
             </span>
           )}
         </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mx-6">
-          Contract: Programmable IP Collection
+        <p className="text-xs text-white dark:text-gray-400 mt-1 mx-6">
+          Programmable IP Collections
         </p>
       </div>
 
