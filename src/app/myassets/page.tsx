@@ -6,6 +6,7 @@ import { LoadingSkeleton } from '@/components/my-assets/loading-skeleton';
 import { ErrorMessage } from '@/components/my-assets/error-message';
 import { Pagination } from '@/components/my-assets/pagination';
 import AssetCardList from '@/components/asset-card-list';
+import AssetCard from '@/components/asset-card';
 
 interface MyAssetsListProps {
   userAddress?: string;
@@ -30,7 +31,23 @@ export const MyAssetsList: React.FC<MyAssetsListProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
-  
+  function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+      // Function to check window width
+      const checkMobile = () => setIsMobile(window.innerWidth < 640); // Tailwind 'sm' breakpoint
+
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    return isMobile;
+  }
+
+  const isMobile = useIsMobile();
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
@@ -105,25 +122,19 @@ export const MyAssetsList: React.FC<MyAssetsListProps> = ({
 
   return (
     <div className='container mx-auto px-4 py-8 mt-5 mb-10'>
-      {/* Header */}
+     
       <div className="mb-6 ">
-        <div className="flex items-center gap-3 mb-2 mx-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            My Digital IP Assets
-          </h2>
-        </div>
-        <p className="text-gray-500 dark:text-gray-300 mx-6">
+
+        <p className="mx-6">
           {searchTerm ? `${filteredTokenIds.length} of ${tokenIds.length}` : tokenIds.length} Asset{tokenIds.length !== 1 ? 's' : ''} 
           {searchTerm && ' found'}
           {balance > BigInt(0) && (
-            <span className="ml-2 text-blue-600 dark:text-blue-400">
+            <span className="ml-2  text-foreground">
               (Balance: {balance.toString()})
             </span>
           )}
         </p>
-        <p className="text-xs text-white dark:text-gray-400 mt-1 mx-6">
-          Programmable IP Collections
-        </p>
+        
       </div>
 
       {/* Search Controls */}
@@ -131,10 +142,10 @@ export const MyAssetsList: React.FC<MyAssetsListProps> = ({
         <div className="flex-1">
           <input
             type="text"
-            placeholder="Search by Token ID or title..."
+            placeholder="Search by Token ID or Asset Title..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue bg-background"
             aria-label="Search assets"
           />
         </div>
@@ -142,7 +153,7 @@ export const MyAssetsList: React.FC<MyAssetsListProps> = ({
         <div className="flex gap-2">
           <button
             onClick={() => window.location.reload()}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+            className="px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue bg-background transition-colors"
             aria-label="Refresh assets"
             title="Refresh assets"
           >
@@ -161,10 +172,17 @@ export const MyAssetsList: React.FC<MyAssetsListProps> = ({
                 onClick={() => handleAssetSelect(tokenId)}
                 className="cursor-pointer transition-all duration-200 hover:scale-105"
               >
-                <AssetCardList
-                  tokenId={tokenId} 
-                  status="active" 
-                />
+                {isMobile ? (
+                  <AssetCard
+                    tokenId={tokenId}
+                    status="active"
+                  />
+                ) : (
+                  <AssetCardList
+                    tokenId={tokenId}
+                    status="active"
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -181,7 +199,7 @@ export const MyAssetsList: React.FC<MyAssetsListProps> = ({
         </>
       ) : (
         <div className="text-center py-12 mx-6">
-          <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">🎨</div>
+          <div className="text-gray-400 dark:text-muted text-6xl mb-4">🎨</div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
             No Assets Found
           </h3>
