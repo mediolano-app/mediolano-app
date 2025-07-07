@@ -38,7 +38,7 @@ import { useReadContract } from "@starknet-react/core";
 import { pinataClient } from "@/utils/pinataClient";
 import Link from "next/link";
 
-interface NFTCardProps {
+interface AssetCardListProps {
 	tokenId: BigInt;
 	status: string;
 }
@@ -48,7 +48,6 @@ export interface Attribute {
 	value: string;
 }
 
-export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 
 export interface IP{
 	name: string,
@@ -58,7 +57,7 @@ export interface IP{
 	attributes: Attribute[],
   }
 
-const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
+const AssetCardList: React.FC<AssetCardListProps> = ({ tokenId, status }) => {
 	const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
 	const [metadata, setMetadata] = useState<IP | null>(null);
 	const [isImage, setIsImage] = useState(false);
@@ -158,90 +157,61 @@ const NFTCard: React.FC<NFTCardProps> = ({ tokenId, status }) => {
 
 	return (
 		<Card className="overflow-hidden">
-			<CardHeader className="p-0">
-			  {isImage ? (
-				<Image
-					src={metadata.image}
-					alt={metadata.name}
-					width={400}
-					height={400}
-					className="w-full h-48 object-cover"
-				/> ) : (
-				<Image
-					src={
-						"/background.jpg"
-					} // Add fallback image
-					alt={metadata.name}
-					width={400}
-					height={400}
-					className="w-full h-48 object-cover"
-				/>
-			  )}
-			</CardHeader>
-			<CardContent className="p-4">
-				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
-				
-				<p className="text-sm text-muted-foreground mb-5 min-h-[40px]">
-					{ truncateString(metadata.description, 99 ) }</p>
-				
-				
-				<div className="flex justify-between items-center mb-2">
-
-				<Badge variant="default">
-					{metadata.attributes?.[2]?.value ?? "MIP"}
-				</Badge>
-				<Badge variant="secondary">
-					{metadata.attributes?.[0]?.value ?? "MIP"}
-				</Badge>
+			<CardContent className="p-4 flex flex-row items-start gap-6">
+				{/* Media */}
+				<div className="flex-shrink-0 w-[70px] h-[70px] flex items-center justify-center bg-muted rounded-lg overflow-hidden">
+					{isImage ? (
+						<Image
+							src={metadata.image}
+							alt={metadata.name}
+							width={70}
+							height={70}
+							className="object-cover w-full h-full"
+						/>
+					) : (
+						<span className="text-xs text-gray-500">No image</span>
+					)}
 				</div>
-				{/* <Badge className="text-sm"
-					variant={
-						status === "Protected"
-							? "default"
-							: status === "Licensed"
-								? "secondary"
-								: "outline"
-					}
-				>
-					{status}
-				</Badge>*/}
-			</CardContent>
-			<CardFooter className="p-4 flex flex-wrap gap-2">
-				
-				<Link href={`/asset/${tokenId}`}>
-				<Button variant="outline" size="sm">
-					<Eye className="h-4 w-4 mr-2" />
-					View
-				</Button></Link>
-				
-				<Button variant="outline" size="sm" disabled>
-					<FileText className="h-4 w-4 mr-2" />
-					License
-				</Button>
-				
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="outline" size="sm">
-							<MoreHorizontal className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent>
-						<DropdownMenuLabel>More</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<Link href={`/asset/dashboard/${tokenId}`}>
-						<DropdownMenuItem>
-							<Gauge className="h-4 w-4 mr-2" />
-							Asset Dashboard
-						</DropdownMenuItem>
-						</Link>
-						
-					</DropdownMenuContent>
-				</DropdownMenu>
-				
 
-			</CardFooter>
+				{/* Details */}
+				<div className="flex-1 min-w-0">
+					<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
+					<p className="text-sm text-muted-foreground mb-2">
+						{truncateString(metadata.description, 99)}
+					</p>
+					{/* You can add more details here if needed */}
+				</div>
+
+				{/* Actions */}
+				<div className="flex flex-col gap-2 items-end">
+					<Link href={`/asset/${tokenId}`}>
+						<Button variant="outline" size="sm" className="w-28">
+							<Eye className="h-4 w-4 mr-2" />
+							View
+						</Button>
+					</Link>
+					
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline" size="sm" className="w-28">
+								<MoreHorizontal className="h-4 w-4" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							<DropdownMenuLabel>More</DropdownMenuLabel>
+							<DropdownMenuSeparator />
+							<Link href={`/asset/dashboard/${tokenId}`}>
+								<DropdownMenuItem>
+									<Gauge className="h-4 w-4 mr-2" />
+									Asset Dashboard
+								</DropdownMenuItem>
+							</Link>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
+			</CardContent>
 		</Card>
 	);
 };
 
-export default NFTCard;
+export default AssetCardList;

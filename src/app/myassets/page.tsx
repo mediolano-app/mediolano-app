@@ -5,16 +5,16 @@ import { useMIP } from '@/hooks/contracts/use-mip';
 import { LoadingSkeleton } from '@/components/my-assets/loading-skeleton';
 import { ErrorMessage } from '@/components/my-assets/error-message';
 import { Pagination } from '@/components/my-assets/pagination';
-import NFTCard from '@/components/NFTCard';
+import AssetCardList from '@/components/asset-card-list';
 
-interface MyAssetsProps {
+interface MyAssetsListProps {
   userAddress?: string;
   onAssetSelect?: (tokenId: bigint) => void;
   className?: string;
   itemsPerPage?: number;
 }
 
-export const MyAssets: React.FC<MyAssetsProps> = ({
+export const MyAssetsList: React.FC<MyAssetsListProps> = ({
   onAssetSelect,
   className = '',
   itemsPerPage = 12,
@@ -151,17 +151,17 @@ export const MyAssets: React.FC<MyAssetsProps> = ({
         </div>
       </div>
 
-      {/* Assets Grid */}
+      {/* Assets */}
       {paginatedTokenIds.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8 mx-6">
+          <div className="grid grid-cols-1 gap-6 mb-8 mx-6">
             {paginatedTokenIds.map((tokenId, index) => (
               <div
                 key={`${tokenId.toString()}-${currentPage}`}
                 onClick={() => handleAssetSelect(tokenId)}
                 className="cursor-pointer transition-all duration-200 hover:scale-105"
               >
-                <NFTCard 
+                <AssetCardList
                   tokenId={tokenId} 
                   status="active" 
                 />
@@ -207,4 +207,4 @@ export const MyAssets: React.FC<MyAssetsProps> = ({
   );
 };
 
-export default MyAssets;
+export default MyAssetsList;
