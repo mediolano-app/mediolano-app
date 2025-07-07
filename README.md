@@ -57,7 +57,7 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 - [x] MIP Dapp @ Starknet Sepolia **25.06**
 
-- [ ] MIP Protocol v2 @ Starknet Sepolia **25.06**
+- [X] MIP Protocol v2 @ Starknet Sepolia **25.07**
 
 - [ ] MIP Protocol v2 @ Starknet Mainnet **25.07**
 
