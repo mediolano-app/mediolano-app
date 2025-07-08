@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server"
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
-    console.log("Received Twitter post data:", data)
 
     const {
       postId,
@@ -16,7 +15,24 @@ export async function POST(request: NextRequest) {
       mentions = [],
       urls = [],
       mediaUrls = [],
+      walletAddress,
+      contractAddress
     } = data
+
+    // Validate required fields for blockchain minting
+    if (!walletAddress) {
+      return NextResponse.json({ 
+        error: "Wallet address required for NFT minting",
+        message: "Please connect your Starknet wallet to tokenize posts"
+      }, { status: 400 })
+    }
+
+    if (!contractAddress) {
+      return NextResponse.json({ 
+        error: "Contract address not configured",
+        message: "MIP Collection contract address is missing"
+      }, { status: 500 })
+    }
 
     // Create metadata for the Twitter post NFT
     const attributes = [
@@ -40,18 +56,16 @@ export async function POST(request: NextRequest) {
       { trait_type: "Blockchain", value: "Starknet" },
     ]
 
-    // Generate a preview image for the post (could be enhanced with actual image generation)
+    // Generate a preview image for the post
     let processedImageUrl = "https://via.placeholder.com/600x400/1DA1F2/FFFFFF?text=X+Post+NFT"
     
-    // If media URLs are provided, use the first one as the image
     if (mediaUrls.length > 0) {
       processedImageUrl = mediaUrls[0]
     }
 
-    const formattedAsset = {
+    const tokenMetadata = {
       name: `X Post by @${authorUsername}`,
       description: `Original X post: "${text.substring(0, 100)}${text.length > 100 ? '...' : ''}" - Tokenized from X (formerly Twitter) on ${new Date().toLocaleDateString()}`,
-      external_url: `https://x.com/${authorUsername}/status/${postId}`,
       image: processedImageUrl,
       attributes,
       properties: {
@@ -68,48 +82,80 @@ export async function POST(request: NextRequest) {
           mentions,
           urls
         },
+        external_url: `https://x.com/${authorUsername}/status/${postId}`,
         tokenizedAt: new Date().toISOString()
       }
     }
 
-    console.log("Uploading Twitter post metadata to IPFS...")
+    console.log("📤 Step 1: Uploading metadata to IPFS...")
     
-    // Try to upload to IPFS, but provide fallback if it fails
-    let uploadData
+    // Upload metadata to IPFS first
+    const pinataJWT = process.env.PINATA_JWT
+    let ipfsData
+    
     try {
-      console.log("PINATA_JWT is configured, uploading to IPFS...", process.env.PINATA_JWT)
-      // Only try to import pinataClient if environment variables are configured
-      if (process.env.PINATA_JWT) {
+      if (pinataJWT && pinataJWT.length > 0) {
+        console.log("🌐 Uploading to IPFS via Pinata...")
         const { pinataClient } = await import("@/utils/pinataClient")
-        uploadData = await pinataClient.upload.json(formattedAsset)
-        console.log("Successfully uploaded to IPFS:", uploadData.IpfsHash)
-      } else {
-        console.log("PINATA_JWT not configured, using mock IPFS hash")
-        // Generate a mock IPFS hash for development
-        uploadData = {
-          IpfsHash: `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`,
-          PinSize: JSON.stringify(formattedAsset).length,
-          Timestamp: new Date().toISOString()
+        
+        const result = await pinataClient.upload.json(tokenMetadata, {
+          metadata: { 
+            name: `twitter-post-${postId}-metadata.json`,
+            keyValues: {
+              postId: postId,
+              author: authorUsername,
+              platform: "x",
+              tokenizedAt: new Date().toISOString()
+            }
+          }
+        })
+        
+        ipfsData = {
+          hash: result.IpfsHash,
+          url: `https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`,
+          pinataUrl: `https://app.pinata.cloud/pinmanager?search=${result.IpfsHash}`,
+          size: result.PinSize,
+          timestamp: result.Timestamp
         }
+        
+        console.log("✅ IPFS upload successful:", {
+          hash: ipfsData.hash,
+          size: ipfsData.size,
+          url: ipfsData.url
+        })
+      } else {
+        throw new Error("PINATA_JWT not configured")
       }
-    } catch (error) {
-      console.error("IPFS upload failed, using fallback:", error)
-      // Fallback to mock data if IPFS upload fails
-      uploadData = {
-        IpfsHash: `Qm${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`,
-        PinSize: JSON.stringify(formattedAsset).length,
-        Timestamp: new Date().toISOString(),
-        error: "IPFS upload failed - using mock hash for development"
-      }
+    } catch (ipfsError) {
+      console.error("❌ IPFS upload failed:", ipfsError)
+      return NextResponse.json({ 
+        error: "IPFS upload failed",
+        message: "Failed to upload metadata to IPFS",
+        details: ipfsError instanceof Error ? ipfsError.message : "Unknown IPFS error"
+      }, { status: 500 })
     }
 
+    console.log("⛓️ Step 2: Minting NFT on Starknet...")
+    
+    // Return IPFS data and let the frontend handle the minting
     return NextResponse.json({ 
-      uploadData,
-      metadata: formattedAsset 
+      success: true,
+      message: "Metadata uploaded to IPFS successfully",
+      ipfsData: {
+        hash: ipfsData.hash,
+        url: ipfsData.url,
+        pinataUrl: ipfsData.pinataUrl
+      },
+      metadata: tokenMetadata,
+      mintingInfo: {
+        contractAddress,
+        recipientAddress: walletAddress,
+        instructions: "Frontend should now mint the NFT using the Starknet wallet"
+      }
     }, { status: 200 })
 
   } catch (error) {
-    console.error("Error in Twitter post tokenization:", error)
+    console.error("❌ Error in Twitter post tokenization:", error)
     return NextResponse.json({ 
       error: "Internal Server Error",
       message: error instanceof Error ? error.message : "Unknown error occurred",

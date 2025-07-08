@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import type { 
   TwitterUser, 
   TwitterPost, 
@@ -7,123 +7,126 @@ import type {
   TwitterIntegrationState,
   TwitterConnectionState 
 } from "@/types/twitter"
+import { useStarknetWallet } from "@/hooks/useStarknetWallet"
 
-// Mock API functions for Twitter integration
-const connectTwitterAccount = async (): Promise<{ success: boolean; user: TwitterUser }> => {
-  await new Promise((resolve) => setTimeout(resolve, 1500))
-  
-  const mockUser: TwitterUser = {
-    id: "123456789",
-    username: "exampleUser",
-    name: "Example User",
-    profile_image_url: "https://pbs.twimg.com/profile_images/example.jpg",
-    verified: false,
-    public_metrics: {
-      followers_count: 1250,
-      following_count: 850,
-      tweet_count: 3420
+// Real API functions for Twitter integration
+const connectTwitterAccount = async (): Promise<{ success: boolean; user?: TwitterUser; authUrl?: string }> => {
+  try {
+    // First, check if user is already authenticated
+    const sessionResponse = await fetch('/api/twitter?action=session')
+    const sessionData = await sessionResponse.json()
+    
+    if (sessionData.authenticated) {
+      // User is already authenticated, fetch their profile
+      const userResponse = await fetch('/api/twitter?action=user-profile')
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        return { success: true, user: userData }
+      }
+    }
+
+    // Generate auth URL for new authentication
+    const response = await fetch('/api/twitter?action=auth-url')
+    const data = await response.json()
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to generate auth URL')
+    }
+
+    // Redirect to Twitter OAuth
+    window.location.href = data.authUrl
+    
+    return { success: true, authUrl: data.authUrl }
+  } catch (error) {
+    console.error('Connection error:', error)
+    return { 
+      success: false, 
+      user: undefined,
+      authUrl: undefined
     }
   }
-  
-  return { success: true, user: mockUser }
 }
 
-const verifyTwitterIdentity = async (username: string) => {
-  await new Promise((resolve) => setTimeout(resolve, username.length * 100))
-  return { success: true, verified: true }
+const checkAuthenticationStatus = async (): Promise<{ success: boolean; user?: TwitterUser }> => {
+  try {
+    console.log('=== checkAuthenticationStatus: Starting ===')
+    const response = await fetch('/api/twitter?action=session')
+    const data = await response.json()
+    
+    if (!data.authenticated) {
+      console.log('Session shows not authenticated')
+      return { success: false }
+    }
+
+    // If authenticated, fetch the complete user profile
+    try {
+      const userResponse = await fetch('/api/twitter?action=user-profile')
+      
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        return { success: true, user: userData }
+      } else {
+        const errorText = await userResponse.text()
+        console.error('User profile API error:', errorText)
+      }
+    } catch (profileError) {
+      console.error('Failed to fetch user profile:', profileError)
+    }
+
+    // Fallback: create minimal user object from session data
+    console.log('Using fallback user object from session data')
+    const user: TwitterUser = {
+      id: data.userId,
+      username: data.username,
+      name: data.username,
+      profile_image_url: '',
+      verified: false,
+      public_metrics: {
+        followers_count: 0,
+        following_count: 0,
+        tweet_count: 0
+      }
+    }
+
+    return { success: true, user }
+  } catch (error) {
+    console.error('Authentication check error:', error)
+    return { success: false }
+  }
 }
 
 const fetchUserTwitterPosts = async (userId: string): Promise<TwitterPostsResponse> => {
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-  
-  const mockPosts: TwitterPost[] = [
-    {
-      id: "1001",
-      text: "Just launched my new NFT collection! 🚀 Check out these amazing digital artworks that represent the future of creativity. #NFT #DigitalArt #Blockchain",
-      author_id: userId,
-      created_at: "2024-01-15T10:30:00.000Z",
-      public_metrics: {
-        retweet_count: 15,
-        like_count: 42,
-        reply_count: 8,
-        quote_count: 3
-      },
-      entities: {
-        hashtags: [
-          { tag: "NFT" },
-          { tag: "DigitalArt" },
-          { tag: "Blockchain" }
-        ]
-      }
-    },
-    {
-      id: "1002", 
-      text: "Working on some exciting new features for our DApp. The future of decentralized applications is here! 💻⚡",
-      author_id: userId,
-      created_at: "2024-01-14T15:45:00.000Z",
-      public_metrics: {
-        retweet_count: 8,
-        like_count: 23,
-        reply_count: 4,
-        quote_count: 1
-      }
-    },
-    {
-      id: "1003",
-      text: "Amazing sunset today! Sometimes you need to step away from the computer and appreciate nature 🌅 #sunset #nature #photography",
-      author_id: userId,
-      created_at: "2024-01-13T18:20:00.000Z", 
-      public_metrics: {
-        retweet_count: 3,
-        like_count: 18,
-        reply_count: 2,
-        quote_count: 0
-      },
-      entities: {
-        hashtags: [
-          { tag: "sunset" },
-          { tag: "nature" },
-          { tag: "photography" }
-        ]
-      }
-    },
-    {
-      id: "1004",
-      text: "Thoughts on the latest developments in AI and machine learning. The intersection with blockchain technology is fascinating! 🤖🔗",
-      author_id: userId,
-      created_at: "2024-01-12T09:15:00.000Z",
-      public_metrics: {
-        retweet_count: 22,
-        like_count: 67,
-        reply_count: 12,
-        quote_count: 5
-      }
-    },
-    {
-      id: "1005",
-      text: "Coffee + Code = Productivity ☕️👨‍💻 What's your favorite coding fuel?",
-      author_id: userId,
-      created_at: "2024-01-11T08:00:00.000Z",
-      public_metrics: {
-        retweet_count: 5,
-        like_count: 31,
-        reply_count: 15,
-        quote_count: 2
-      }
-    }
-  ]
+    const params = new URLSearchParams({
+    // MAX POSTS RESULTS FROM X API FETCH CALL
+    max_results: '10',
+    exclude_replies: 'true',
+    exclude_retweets: 'false'
+  })
 
-  return {
-    data: mockPosts,
-    meta: {
-      result_count: mockPosts.length,
-      newest_id: mockPosts[0]?.id,
-      oldest_id: mockPosts[mockPosts.length - 1]?.id
-    }
+  const response = await fetch(`/api/twitter?action=user-posts&${params.toString()}`)
+  
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.message || 'Failed to fetch posts')
   }
+
+  return response.json()
 }
 
-const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promise<TokenizedPost> => {
+const logoutTwitter = async (): Promise<void> => {
+  await fetch('/api/twitter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'logout' })
+  })
+}
+
+const tokenizeTwitterPost = async (
+  post: TwitterPost,
+  user: TwitterUser,
+  walletAddress: `0x${string}`,
+  contractAddress: string
+): Promise<TokenizedPost> => {
   const postData = {
     postId: post.id,
     text: post.text,
@@ -135,9 +138,14 @@ const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promis
     mentions: post.entities?.mentions?.map(m => m.username) || [],
     urls: post.entities?.urls?.map(u => u.expanded_url) || [],
     mediaUrls: [],
+    walletAddress,
+    contractAddress
   }
 
   try {
+    console.log("📤 Step 1: Uploading metadata to IPFS...")
+    
+    // Upload to IPFS via API
     const response = await fetch("/api/twitter/tokenize", {
       method: "POST",
       headers: {
@@ -147,26 +155,41 @@ const tokenizeTwitterPost = async (post: TwitterPost, user: TwitterUser): Promis
     })
 
     if (!response.ok) {
-      throw new Error("Failed to tokenize post")
+      const errorData = await response.json()
+      console.error("❌ API Error Response:", errorData)
+      throw new Error(errorData.message || "Failed to upload metadata to IPFS")
     }
 
     const data = await response.json()
+    console.log("✅ IPFS upload completed:", data)
+
+    if (!data.success || !data.ipfsData) {
+      throw new Error("IPFS upload failed")
+    }
+
+    console.log("⛓️ Step 2: Minting NFT on Starknet blockchain...")
     
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    
-    const tokenId = `token_${Date.now()}`
-    const transactionHash = `0x${Math.random().toString(16).slice(2, 66)}`
-    
+    // Minting will be handled by frontend component since we need access to the user's wallet account
     return {
       postId: post.id,
-      tokenId,
-      transactionHash,
-      ipfsHash: data.uploadData?.IpfsHash || `Qm${Math.random().toString(36).slice(2, 48)}`,
+      tokenId: `pending_${Date.now()}`, // Will be updated after minting
+      transactionHash: `pending_${Date.now()}`, // Will be updated after minting
+      ipfsHash: data.ipfsData.hash,
       createdAt: new Date().toISOString(),
-      status: 'confirmed'
+      status: 'pending', // Will be updated to confirmed after minting
+      ipfsUrl: data.ipfsData.url,
+      pinataUrl: data.ipfsData.pinataUrl,
+      starknetUrl: undefined, // Will be set after minting
+      _mintingData: {
+        contractAddress,
+        recipientAddress: walletAddress,
+        metadata: data.metadata,
+        ipfsHash: data.ipfsData.hash,
+        ipfsUrl: data.ipfsData.url
+      }
     }
   } catch (error) {
-    console.error("Tokenization error:", error)
+    console.error("❌ Tokenization error:", error)
     throw error
   }
 }
@@ -188,6 +211,7 @@ export interface TwitterIntegrationContextType {
   selectPost: (post: TwitterPost | null) => void
   tokenizeSelectedPost: () => Promise<TokenizedPost | undefined>
   getIntegrationState: () => TwitterIntegrationState
+  setTokenizedPosts: React.Dispatch<React.SetStateAction<TokenizedPost[]>> // Add this line
 }
 
 export const useTwitterIntegration = () => {
@@ -200,17 +224,135 @@ export const useTwitterIntegration = () => {
   const [isTokenizing, setIsTokenizing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Get Starknet wallet info
+  const { 
+    account, 
+    address: walletAddress, 
+    isConnected: isWalletConnected,
+    mipContract 
+  } = useStarknetWallet()
+
+  // Load tokenized posts from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedTokenizedPosts = localStorage.getItem('twitter-tokenized-posts')
+        if (storedTokenizedPosts) {
+          const parsedPosts = JSON.parse(storedTokenizedPosts) as TokenizedPost[]
+          setTokenizedPosts(parsedPosts)
+          console.log('Loaded tokenized posts from localStorage:', parsedPosts.length)
+        }
+      } catch (error) {
+        console.error('Failed to load tokenized posts from localStorage:', error)
+      }
+    }
+  }, [])
+
+  // Save tokenized posts to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && tokenizedPosts.length > 0) {
+      try {
+        localStorage.setItem('twitter-tokenized-posts', JSON.stringify(tokenizedPosts))
+        console.log('Saved tokenized posts to localStorage:', tokenizedPosts.length)
+      } catch (error) {
+        console.error('Failed to save tokenized posts to localStorage:', error)
+      }
+    }
+  }, [tokenizedPosts])
+
+  // Check authentication status on mount and when URL changes (for OAuth callback)
+  useEffect(() => {
+    const checkAuth = async () => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const success = urlParams.get('success')
+      const username = urlParams.get('username')
+      const error = urlParams.get('error')
+      const errorDescription = urlParams.get('error_description')
+
+      if (error) {
+        setState("error")
+        setError(errorDescription || error)
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname)
+        return
+      }
+
+      if (success && username) {
+        // OAuth callback success
+        setState("verifying")
+        
+        // Check if we have session data in the URL
+        const sessionDataParam = urlParams.get('session_data')
+        if (sessionDataParam) {
+          try {
+            // Create session from the encoded data
+            const createSessionResponse = await fetch(`/api/twitter?action=create-session&session_data=${encodeURIComponent(sessionDataParam)}`)
+            const createSessionResult = await createSessionResponse.json()
+            
+            if (createSessionResponse.ok && createSessionResult.success) {
+              // Now check authentication status
+              const result = await checkAuthenticationStatus()
+              console.log('Authentication check result:', result)
+              
+              if (result.success && result.user) {
+                console.log('Setting user and verified state:', result.user.username)
+                setUser(result.user)
+                setState("verified")
+              } else {
+                setState("error")
+                setError("Failed to verify authentication after session creation")
+              }
+            } else {
+              console.error('Failed to create session:', createSessionResult)
+              setState("error")
+              setError("Failed to create session")
+            }
+          } catch (sessionError) {
+            console.error('Error creating session:', sessionError)
+            setState("error")
+            setError("Failed to create session")
+          }
+        } else {
+          console.log('No session data in URL, falling back to authentication check...')
+          // Fallback to old method
+          const result = await checkAuthenticationStatus()
+          
+          if (result.success && result.user) {
+            console.log('Setting user and verified state:', result.user.username)
+            setUser(result.user)
+            setState("verified")
+          } else {
+            setState("error")
+            setError("Failed to verify authentication")
+          }
+        }
+        
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname)
+        return
+      }
+
+      // Check existing session
+      const result = await checkAuthenticationStatus()
+
+      if (result.success && result.user) {
+        setUser(result.user)
+        setState("verified")
+      } else {
+        console.log('No existing session found, staying in idle state')
+      }
+    }
+
+    checkAuth()
+  }, [])
+
   const verify = useCallback(async (username: string) => {
+    // This function is kept for compatibility but not used in OAuth flow
     setState("verifying")
     setError(null)
     try {
-      const result = await verifyTwitterIdentity(username)
-      if (result.success && result.verified) {
-        setState("verified")
-        return true
-      } else {
-        throw new Error("Failed to verify identity")
-      }
+      setState("verified")
+      return true
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred")
       setState("error")
@@ -224,25 +366,20 @@ export const useTwitterIntegration = () => {
     try {
       const result = await connectTwitterAccount()
       if (result.success) {
-        setUser(result.user)
-        setState("connected")
-        
-        // Small delay to ensure state update
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
-        // Automatically verify the user
-        setState("verifying")
-        const verifyResult = await verifyTwitterIdentity(result.user.username)
-        if (verifyResult.success && verifyResult.verified) {
+        if (result.user) {
+          // User was already authenticated
+          setUser(result.user)
           setState("verified")
-        } else {
-          throw new Error("Failed to verify identity")
+        } else if (result.authUrl) {
+          // User will be redirected to Twitter OAuth automatically
+          // State will be updated after redirect from OAuth callback
+          console.log("Redirecting to Twitter OAuth")
         }
       } else {
         throw new Error("Failed to connect Twitter account")
       }
     } catch (err) {
-      console.error("Connection/verification error:", err)
+      console.error("Connection error:", err)
       setError(err instanceof Error ? err.message : "An unknown error occurred")
       setState("error")
       setUser(null)
@@ -259,9 +396,16 @@ export const useTwitterIntegration = () => {
     setError(null)
     try {
       const response = await fetchUserTwitterPosts(user.id)
-      setPosts(response.data)
+      setPosts(response.data || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load posts")
+      console.error("Failed to load posts:", err)
+      
+      // Handle rate limit errors specifically
+      if (err instanceof Error && err.message.includes('429')) {
+        setError("Twitter API rate limit exceeded. Free plan allows 1 request per 15 minutes. Please wait before trying again.")
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to load posts")
+      }
     } finally {
       setIsLoadingPosts(false)
     }
@@ -280,7 +424,15 @@ export const useTwitterIntegration = () => {
     setIsTokenizing(true)
     setError(null)
     try {
-      const tokenizedPost = await tokenizeTwitterPost(selectedPost, user)
+      // Ensure wallet is connected before tokenization
+      if (!isWalletConnected) {
+        setError("Please connect your Starknet wallet first")
+        setIsTokenizing(false)
+        return
+      }
+
+      // Perform tokenization with real minting
+      const tokenizedPost = await tokenizeTwitterPost(selectedPost, user, walletAddress!, mipContract?.address || "")
       setTokenizedPosts(prev => [...prev, tokenizedPost])
       setSelectedPost(null)
       return tokenizedPost
@@ -290,15 +442,26 @@ export const useTwitterIntegration = () => {
     } finally {
       setIsTokenizing(false)
     }
-  }, [selectedPost, user])
+  }, [selectedPost, user, isWalletConnected, walletAddress, mipContract])
 
-  const reset = useCallback(() => {
+  const reset = useCallback(async () => {
+    await logoutTwitter()
     setState("idle")
     setUser(null)
     setPosts([])
     setSelectedPost(null)
     setTokenizedPosts([])
     setError(null)
+    
+    // Clear tokenized posts from localStorage when disconnecting
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('twitter-tokenized-posts')
+        console.log('Cleared tokenized posts from localStorage')
+      } catch (error) {
+        console.error('Failed to clear tokenized posts from localStorage:', error)
+      }
+    }
   }, [])
 
   const getIntegrationState = useCallback((): TwitterIntegrationState => ({
@@ -326,6 +489,7 @@ export const useTwitterIntegration = () => {
     loadUserPosts,
     selectPost,
     tokenizeSelectedPost,
+    setTokenizedPosts,
     getIntegrationState
   }
 }
