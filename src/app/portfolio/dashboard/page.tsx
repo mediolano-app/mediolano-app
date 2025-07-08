@@ -42,7 +42,7 @@ import {
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { useMIP } from "@/hooks/contracts/use-mip";
 import { useRouter } from "next/navigation";
-import NFTCard from "@/components/NFTCard";
+import NFTCard from "@/components/asset-card";
 
 export default function DashboardPage() {
   // const { userAssets, userCollections, portfolioStats, isLoading, account, error, refetch } = usePortfolio();

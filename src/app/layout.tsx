@@ -4,12 +4,12 @@ import { StarknetProvider } from "@/components/starknet-provider";
 import { ThemeProvider } from "@/components/theme-provider"
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import AnimatedBackground from '@/components/AnimatedBackground'
+import AnimatedBackground from '@/components/animated-bg'
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: "Mediolano Dapp",
-  description: "Programmable IP for the Integrity Web. Powered by Starknet",
+  description: "Programmable IP for the Integrity Web. Powered on Starknet",
 };
 
 export default function RootLayout({

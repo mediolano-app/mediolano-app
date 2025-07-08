@@ -2,6 +2,8 @@ import { useAccount, useContract, useReadContract } from "@starknet-react/core";
 import { useEffect, useState } from "react";
 import { abi } from "@/abis/abi";
 import { type Abi } from "starknet";
+import { CONTRACT_ADDRESS } from "@/lib/constants";
+import { pinataClient } from "@/utils/pinataClient";
 
 export function useMIP() {
   const { address } = useAccount();
@@ -97,5 +99,72 @@ export function useMIP() {
     tokenIds,
     tokenIdsError,
     isLoading,
+  };
+}
+
+type SortOption =
+  | "price-high"
+  | "price-low"
+  | "name-asc"
+  | "name-desc"
+  | "date-new"
+  | "date-old";
+
+export interface IP {
+  tokenId: number;
+  name: string;
+  description: string;
+  external_url: string;
+  image: string;
+  attributes: any[];
+}
+
+export function useCreatorNFTPortfolio() {
+  const [metadata, setMetadata] = useState<IP[]>([]);
+  const [sortOption, setSortOption] = useState<SortOption>("price-high");
+
+  const { contract } = useContract({ abi, address: CONTRACT_ADDRESS });
+  const { tokenIds } = useMIP();
+
+  useEffect(() => {
+    const fetchAllMetadata = async () => {
+      try {
+        const allMeta = await Promise.all(
+          tokenIds.map(async (id) => {
+            const tokenURI = await contract?.call("tokenURI", [id], {
+              parseRequest: true,
+              parseResponse: true,
+            });
+
+            const response = await pinataClient.gateways.get(
+              tokenURI as string
+            );
+
+            const parsed =
+              typeof response.data === "string"
+                ? JSON.parse(response.data)
+                : response.data;
+
+            return { tokenId: id, ...parsed };
+          })
+        );
+
+        setMetadata(allMeta);
+      } catch (err) {
+        console.error("Metadata fetch failed", err);
+      }
+    };
+
+    if (tokenIds.length > 0) {
+      fetchAllMetadata();
+    }
+  }, [tokenIds, contract]);
+
+  return {
+    metadata,
+    setMetadata,
+    sortOption,
+    setSortOption,
+    tokenIds,
   };
 }
