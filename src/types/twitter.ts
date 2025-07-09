@@ -82,6 +82,14 @@ export interface TwitterPostsResponse {
  * Tokenized Post types for NFTs
  */
 
+export interface TokenMetadata {
+  name: string
+  description: string
+  image: string
+  attributes: Record<string, string | number>[]
+  properties: Record<string, string | number>
+}
+
 export interface TokenizedPost {
   postId: string;
   tokenId: string;
@@ -92,7 +100,6 @@ export interface TokenizedPost {
   ipfsUrl?: string;
   pinataUrl?: string;
   starknetUrl?: string;
-  // Add fields for real blockchain integration
   contractAddress?: string;
   network?: 'mainnet' | 'sepolia';
   blockNumber?: number;
@@ -100,7 +107,7 @@ export interface TokenizedPost {
   _mintingData?: {
     contractAddress: string;
     recipientAddress: string;
-    metadata: any;
+    metadata: TokenMetadata;
     ipfsHash: string;
     ipfsUrl: string;
   };

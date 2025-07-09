@@ -9,9 +9,7 @@ export const useStarknetWallet = () => {
   const { disconnect } = useDisconnect()
 
   // Use a known deployed contract address or fall back to a test approach
-  // For Sepolia testnet, let's use one of your other deployed contracts temporarily
   const contractAddress = useMemo(() => {
-    const userSettingsAddress = process.env.NEXT_PUBLIC_USER_SETTINGS_CONTRACT_ADDRESS
     const mipAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP
     
     // For now, return the MIP address but we'll handle the "not deployed" error gracefully

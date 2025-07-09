@@ -44,7 +44,7 @@ function TwitterIntegrationContent({
 
   // Get Starknet wallet info
   const { 
-    address: walletAddress, 
+    address: walletAddress,
     isConnected: isWalletConnected,
     connect: connectWallet,
     connectors 

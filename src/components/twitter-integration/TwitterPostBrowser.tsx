@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useTwitterIntegrationContext } from "./TwitterIntegrationProvider"
 import { useStarknetWallet } from "@/hooks/useStarknetWallet"
 import { StarknetMintingService } from "@/lib/starknet-minting"
@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Heart, MessageCircle, Repeat2, Share, Calendar, Hash, ExternalLink, Loader2, CheckCircle2, Wallet } from "lucide-react"
+import { Heart, MessageCircle, Repeat2, Share, Calendar, Hash, ExternalLink, Loader2, CheckCircle2 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
@@ -42,7 +42,6 @@ export default function TwitterPostBrowser({
   // Get Starknet wallet info
   const { 
     account, 
-    address: walletAddress, 
     isConnected: isWalletConnected,
     mipContract 
   } = useStarknetWallet()
@@ -58,12 +57,62 @@ export default function TwitterPostBrowser({
   }>({ isLimited: false })
   const [pendingMints, setPendingMints] = useState<Set<string>>(new Set())
 
+  const handleLoadPosts = useCallback(async (isInitialLoad = false) => {
+    // Clear previous rate limit errors if this is a manual retry
+    if (!isInitialLoad) {
+      setRateLimitInfo({ isLimited: false })
+    }
+    
+    try {
+      await loadUserPosts()
+      setHasLoadedPosts(true)
+      setRateLimitInfo({ isLimited: false })
+      
+      if (!isInitialLoad) {
+        toast({
+          title: "Posts Loaded",
+          description: "More posts have been loaded successfully.",
+        })
+      }
+    } catch (error) {
+      console.error("Error loading posts:", error)
+      
+      // Check if it's a rate limit error
+      if (error instanceof Error && error.message.includes('429')) {
+        // Try to extract rate limit info from the error message
+        const resetTimeMatch = error.message.match(/wait (\d+) minutes/)
+        const resetMinutes = resetTimeMatch ? parseInt(resetTimeMatch[1]) : 15
+        
+        setRateLimitInfo({
+          isLimited: true,
+          resetTime: Date.now() + (resetMinutes * 60 * 1000),
+          resetInMinutes: resetMinutes,
+          message: `Rate limit reached. You can load more posts in ${resetMinutes} minutes.`
+        })
+        
+        if (!isInitialLoad) {
+          toast({
+            title: "Rate Limit Reached",
+            description: `Please wait ${resetMinutes} minutes before loading more posts.`,
+            variant: "destructive"
+          })
+        }
+      } else {
+        toast({
+          title: "Error Loading Posts",
+          description: "There was an error loading your posts. Please try again.",
+          variant: "destructive"
+        })
+      }
+    }
+  }, [loadUserPosts, toast])
+
   // Load first batch of posts when user is verified
   useEffect(() => {
     if (state === "verified" && user && !hasLoadedPosts && posts.length === 0) {
       handleLoadPosts(true)
     }
-  }, [state, user, hasLoadedPosts, posts.length])
+  }, [state, user, hasLoadedPosts, posts.length, handleLoadPosts])
 
   // Process pending mints and update their status
   useEffect(() => {
@@ -172,56 +221,6 @@ export default function TwitterPostBrowser({
       processPendingMints()
     }
   }, [account, mipContract, pendingMints, tokenizedPosts, toast, setTokenizedPosts]) // Add setTokenizedPosts to dependencies
-
-  const handleLoadPosts = async (isInitialLoad = false) => {
-    // Clear previous rate limit errors if this is a manual retry
-    if (!isInitialLoad) {
-      setRateLimitInfo({ isLimited: false })
-    }
-    
-    try {
-      await loadUserPosts()
-      setHasLoadedPosts(true)
-      setRateLimitInfo({ isLimited: false })
-      
-      if (!isInitialLoad) {
-        toast({
-          title: "Posts Loaded",
-          description: "More posts have been loaded successfully.",
-        })
-      }
-    } catch (error) {
-      console.error("Error loading posts:", error)
-      
-      // Check if it's a rate limit error
-      if (error instanceof Error && error.message.includes('429')) {
-        // Try to extract rate limit info from the error message
-        const resetTimeMatch = error.message.match(/wait (\d+) minutes/)
-        const resetMinutes = resetTimeMatch ? parseInt(resetTimeMatch[1]) : 15
-        
-        setRateLimitInfo({
-          isLimited: true,
-          resetTime: Date.now() + (resetMinutes * 60 * 1000),
-          resetInMinutes: resetMinutes,
-          message: `Rate limit reached. You can load more posts in ${resetMinutes} minutes.`
-        })
-        
-        if (!isInitialLoad) {
-          toast({
-            title: "Rate Limit Reached",
-            description: `Please wait ${resetMinutes} minutes before loading more posts.`,
-            variant: "destructive"
-          })
-        }
-      } else {
-        toast({
-          title: "Error Loading Posts",
-          description: "There was an error loading your posts. Please try again.",
-          variant: "destructive"
-        })
-      }
-    }
-  }
 
   const handlePostSelect = (post: TwitterPost) => {
     selectPost(post)

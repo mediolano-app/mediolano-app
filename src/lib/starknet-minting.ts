@@ -1,14 +1,7 @@
-import { Contract, uint256, AccountInterface } from "starknet"
+import { AccountInterface, Contract } from "starknet"
 import type { Abi } from "starknet"
 import { abi as mipABI } from "@/abis/abi" // Use the main MIP ABI instead of ipcollection
-
-export interface TokenMetadata {
-  name: string
-  description: string
-  image: string
-  attributes: Record<string, string | number>[]
-  properties: Record<string, string | number>
-}
+import { TokenMetadata } from "../types/twitter"
 
 export interface MintNFTParams {
   account: AccountInterface
@@ -84,7 +77,8 @@ Please contact the administrator to deploy the contract or use a different addre
       // Estimate gas first to catch potential failures
       try {
         console.log("⛽ Estimating gas for mint_item transaction...")
-        const estimate = await account.estimateInvokeFee(mintCall)
+        const estimate = (await account.estimateInvokeFee(mintCall)).overall_fee
+        console.log("⛽ Gas estimate for mint_item transaction is: ", estimate)
       } catch (estimateError) {
         console.error("❌ Gas estimation failed:")
         console.error("  - Error type:", typeof estimateError)
