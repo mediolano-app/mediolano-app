@@ -147,9 +147,7 @@ export function Footer() {
                   <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
                   <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> Portfolio</Link></li>
                   <li><Link href="/licensing" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Licensing</Link></li>
-                  <li><Link href="/monetize" className="flex items-center hover:underline"><Coins className="w-4 h-4 mr-2 ml-blue" /> Monetize</Link></li>
                   <li><Link href="/transfer" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" /> Transfer</Link></li>
-                  <li><Link href="/marketplace" className="flex items-center hover:underline"><LayoutGrid className="w-4 h-4 mr-2 ml-blue" /> Marketplace</Link></li>
                 </ul>
             </div>
 
@@ -174,7 +172,6 @@ export function Footer() {
                 <ul className="space-y-4">
                     <li><Link href="/portfolio/dashboard" className="flex items-center hover:underline"><LayoutDashboard className="w-4 h-4 mr-2 ml-blue" /> Assets Dashboard</Link></li>
                     <li><Link href="/account" className="flex items-center hover:underline"><User className="w-4 h-4 mr-2 ml-blue" /> My Account</Link></li>
-                    <li><Link href="/transfer" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" /> Transfer Asset</Link></li>
                     <li><Link href="/settings" className="flex items-center hover:underline"><Cog className="w-4 h-4 mr-2 ml-blue" /> Settings</Link></li>
                 </ul>
                 </div>
@@ -346,17 +343,17 @@ export function Footer() {
             &copy; 2025 Mediolano. All rights reserved.
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-          <Link href="/faq" className="hover:underline">
+            <Link href="/faq" className="hover:underline">
               FAQ
             </Link>
             <Link href="#" className="hover:underline">
-              Privacy Policy
+              Terms of Privacy
             </Link>
             <Link href="#" className="hover:underline">
-              Terms of Service
+              Terms of Use
             </Link>
             <Link href="#" className="hover:underline">
-              Cookie Policy
+              Community Guidelines
             </Link>
             
           </div>

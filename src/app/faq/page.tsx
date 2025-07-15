@@ -128,15 +128,7 @@ export default function Component() {
             </Card>
           )}
 
-          <Card className="mt-8 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
-            <CardHeader>
-              <CardTitle>Need More Help?</CardTitle>
-              <CardDescription>If you can't find the answer you're looking for, our support team is here to assist you.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full sm:w-auto">Contact Support</Button>
-            </CardContent>
-          </Card>
+          
         </div>
       </main>
     </div>

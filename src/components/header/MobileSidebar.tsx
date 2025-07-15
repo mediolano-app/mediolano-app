@@ -40,18 +40,15 @@ const navigationItems = [
       { title: 'Assets Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
       { title: 'Transfer Asset', href: '/transfer', icon: ArrowRightLeft },
       { title: 'Licensing', href: '/licensing', icon: FileText },
-      { title: 'Listings', href: '/listing', icon: Banknote },
     ],
   },
   {
-    title: 'Services (Preview)',
+    title: 'Services',
     items: [
 
       { title: 'Proof of Ownership', href: '/services/proof-of-ownership', icon: FileBadge },
       { title: 'Proof of Licensing', href: '/services/proof-of-licensing', icon: FileCheck },
-      { title: 'Monetize', href: '/monetize', icon: Gem },
-      { title: 'Sharing Revenue', href: '/services/revenue-sharing', icon: DollarSign },
-      { title: 'Business', href: '/business', icon: Briefcase },
+      { title: 'Listings', href: '/listing', icon: Banknote },
     ],
   },
 ]
