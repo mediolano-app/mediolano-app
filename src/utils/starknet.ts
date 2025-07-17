@@ -2,7 +2,7 @@
 import { Contract, RpcProvider, Account } from "starknet";
 import ipcollectionABI from "../abis/ipcollection";
 
-const COLLECTION_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_IPCOLLECTION_ADDRESS as string;
+const COLLECTION_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as string;
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 
 export async function mintToken(account: Account): Promise<string> {
