@@ -106,13 +106,13 @@ export default function CreateCollectionPage() {
         <Link href="/create">
           <Button variant="ghost" size="sm" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Create Options
+            Back to create dashboard
           </Button>
         </Link>
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Create New Collection</h1>
-          <p className="text-muted-foreground">Create a new collection to organize your intellectual property assets</p>
+          <p className="text-muted-foreground">Mint a new collection to organize your intellectual property assets onchain</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -168,11 +168,12 @@ export default function CreateCollectionPage() {
                         <SelectContent>
                           <SelectItem value="art">Art</SelectItem>
                           <SelectItem value="audio">Audio</SelectItem>
-                          <SelectItem value="video">Video</SelectItem>
                           <SelectItem value="document">Document</SelectItem>
-                          <SelectItem value="software">Software</SelectItem>
-                          <SelectItem value="nft">NFT</SelectItem>
                           <SelectItem value="mixed">Mixed</SelectItem>
+                          <SelectItem value="photo">Photo</SelectItem>
+                          <SelectItem value="nft">NFT</SelectItem>
+                          <SelectItem value="software">Software</SelectItem>
+                          <SelectItem value="video">Video</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -189,7 +190,6 @@ export default function CreateCollectionPage() {
                         <SelectContent>
                           <SelectItem value="public">Public</SelectItem>
                           <SelectItem value="private">Private</SelectItem>
-                          <SelectItem value="shared">Shared</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -241,9 +241,7 @@ export default function CreateCollectionPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-between">
-                  <Button variant="outline" type="button">
-                    Save as Draft
-                  </Button>
+                  
                   <Button 
                     type="submit"
                     disabled={isCreating || !walletAddress}
