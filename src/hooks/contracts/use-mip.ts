@@ -20,7 +20,11 @@ export function useMIP() {
     address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
   });
 
-  const { data: myTotalBalance, error: balanceError } = useReadContract({
+  const {
+    data: myTotalBalance,
+    error: balanceError,
+    isError,
+  } = useReadContract({
     abi: abi as Abi,
     functionName: "balance_of",
     address: contractAddress as `0x${string}`,
@@ -56,6 +60,8 @@ export function useMIP() {
   }
 
   useEffect(() => {
+    console.log(isError, "isError", balanceError);
+    if (isError) return;
     if (tBalance > 0) {
       const fetchTokenIds = async () => {
         setIsLoading(true);
@@ -90,7 +96,7 @@ export function useMIP() {
 
       fetchTokenIds(); // Execute the async function
     }
-  }, [tBalance, address]);
+  }, [tBalance, address, isError]);
 
   return {
     address,
@@ -120,6 +126,9 @@ export interface IP {
 }
 
 export function useCreatorNFTPortfolio() {
+  const { address } = useAccount();
+  const [loading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
   const [metadata, setMetadata] = useState<IP[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("price-high");
 
@@ -128,43 +137,82 @@ export function useCreatorNFTPortfolio() {
 
   useEffect(() => {
     const fetchAllMetadata = async () => {
+      if (!contract || !tokenIds.length || !address) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        const allMeta = await Promise.all(
+        setIsLoading(true);
+        setError(null);
+
+        const allMeta = await Promise.allSettled(
           tokenIds.map(async (id) => {
-            const tokenURI = await contract?.call("tokenURI", [id], {
-              parseRequest: true,
-              parseResponse: true,
-            });
+            try {
+              const tokenURI = await contract.call("get_token", [String(id)], {
+                parseRequest: true,
+                parseResponse: true,
+              });
 
-            const response = await pinataClient.gateways.get(
-              tokenURI as string
-            );
+              if (!tokenURI) {
+                throw new Error(`No URI found for token ${id}`);
+              }
 
-            const parsed =
-              typeof response.data === "string"
-                ? JSON.parse(response.data)
-                : response.data;
+              const response = await pinataClient.gateways.get(
+                tokenURI.token_id.toString()
+              );
 
-            return { tokenId: id, ...parsed };
+              const parsed =
+                typeof response.data === "string"
+                  ? JSON.parse(response.data)
+                  : response.data;
+
+              return { tokenId: id, ...parsed };
+            } catch (error) {
+              console.error(`Failed to fetch metadata for token ${id}:`, error);
+              return {
+                tokenId: id,
+                error: error instanceof Error ? error.message : String(error),
+              };
+            }
           })
         );
 
-        setMetadata(allMeta);
+        const successfulResults = allMeta
+          .filter((result) => result.status === "fulfilled")
+          .map((result) => result.value);
+
+        const failedResults = allMeta
+          .filter((result) => result.status === "rejected")
+          .map((result) => result.reason);
+
+        if (failedResults.length > 0) {
+          console.warn(
+            `Failed to fetch ${failedResults.length} token(s):`,
+            failedResults
+          );
+        }
+
+        setMetadata(successfulResults);
       } catch (err) {
-        console.error("Metadata fetch failed", err);
+        console.error("Metadata fetch failed:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to fetch metadata"
+        );
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (tokenIds.length > 0) {
-      fetchAllMetadata();
-    }
-  }, [tokenIds, contract]);
-
+    fetchAllMetadata();
+  }, [tokenIds, contract, address]);
   return {
     metadata,
     setMetadata,
     sortOption,
     setSortOption,
     tokenIds,
+    error,
+    loading,
   };
 }
