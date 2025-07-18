@@ -137,7 +137,7 @@ export function MainNav() {
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <Layers className="mr-2 h-4 w-4  text-blue-600" />
-                      My Portfolio
+                      Portfolio
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
                       Total control over your assets onchain.
@@ -151,7 +151,7 @@ export function MainNav() {
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <LayoutDashboard className="mr-2 h-4 w-4  text-blue-600" />
-                      Assets Dashboard
+                      Dashboard
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
                       Advanced assets management.
@@ -165,7 +165,7 @@ export function MainNav() {
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <ArrowRightLeft className="mr-2 h-4 w-4  text-blue-600" />
-                      Transfer Asset
+                      Transfer
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
                       Transfer your Programmable IP to another account.
@@ -227,20 +227,7 @@ export function MainNav() {
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/monetize"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <Gem className="mr-2 h-4 w-4  text-blue-600" />
-                      Monetize
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Permissionless services to monetize Programmable IP (Preview) 
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+              
                 
                 <NavigationMenuLink asChild>
                   <Link
@@ -271,49 +258,7 @@ export function MainNav() {
                   </Link>
                 </NavigationMenuLink>
 
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/services/revenue-sharing"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <Rocket className="mr-2 h-4 w-4  text-blue-600" />
-                      Revenue Sharing
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Share revenue and monetize your IP
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
-
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/business"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <Building className="mr-2 h-4 w-4  text-blue-600" />
-                      Business Services
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Enterprise-grade services for organizations (Preview)
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/rewards"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <Coins className="mr-2 h-4 w-4  text-blue-600" />
-                      Rewards
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Mediolano token rewards (Preview)
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+                
                 
               </div>
             </NavigationMenuContent>

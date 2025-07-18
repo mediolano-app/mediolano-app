@@ -326,6 +326,29 @@ export type LicenseType = "Creative Commons" | "Commercial Use" | "Personal Use"
 
 
 
+export interface Creator {
+  id: string
+  username: string
+  name: string
+  avatar: string
+  banner?: string
+  verified: boolean
+  wallet: string
+  bio: string
+  location?: string
+  website?: string
+  twitter?: string
+  instagram?: string
+  followers: number
+  following: number
+  assets: number
+  collections?: number
+  joined: string
+  specialties?: string[]
+  achievements?: string[]
+}
+
+
 export interface OwnershipRecord {
   owner: string
   acquiredDate: string
@@ -343,15 +366,55 @@ export interface LicensingTerms {
 
 export interface Collection {
   id: string
+  slug: string
   name: string
+  type: string
   description: string
-  assetCount: number
-  totalValue: string
-  creator: string
-  creationDate: string
   coverImage: string
-  type: IPType
+  bannerImage?: string
+  creator: {
+    id: string
+    username: string
+    name: string
+    avatar: string
+    verified: boolean
+    wallet: string
+  }
+  assets: number
+  floorPrice?: string
+  totalVolume?: string
+  createdAt: string
+  updatedAt: string
+  category: string
+  tags: string
+  isPublic: boolean
+  isFeatured: boolean
+  blockchain: string
+  contractAddress?: string
 }
+
+
+
+
+
+export interface Activity {
+  id: string
+  type: "mint" | "transfer_in" | "transfer_out" | "sale" | "license" | "update" | "collection_create" | "collection_add"
+  title: string
+  description: string
+  timestamp: string
+  network: string
+  status: "completed" | "pending" | "failed"
+  value?: string
+  txHash?: string
+  assetId?: string
+  collectionId?: string
+  fromAddress?: string
+  toAddress?: string
+}
+
+
+
 
 export interface ActivityRecord {
   id: string

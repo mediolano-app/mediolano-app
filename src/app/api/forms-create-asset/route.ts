@@ -68,16 +68,16 @@ export async function POST(request: NextRequest) {
       { trait_type: "Author", value: author },
       { trait_type: "Collection", value: collection },
       { trait_type: "License", value: licenseType },
-      { trait_type: "License Details", value: licenseDetails },
-      { trait_type: "IP Version", value: version },
-      { trait_type: "Commercial Use", value: commercialUse ? "Yes" : "No" },
+      { trait_type: "License-Details", value: licenseDetails },
+      { trait_type: "Version", value: version },
+      { trait_type: "Commercial", value: commercialUse ? "Yes" : "No" },
       { trait_type: "Modifications", value: modifications },
       { trait_type: "Attribution", value: attribution },
-      { trait_type: "Files Count", value: filesCount.toString() },
+      { trait_type: "Files", value: filesCount.toString() },
       { trait_type: "Tags", value: tagsArray.join(", ") },
-      { trait_type: "License Duration", value: licenseDuration || "N/A" },
-      { trait_type: "License Territory", value: licenseTerritory || "N/A" },
-      { trait_type: "Registration Date", value: registrationDate },
+      { trait_type: "Duration", value: licenseDuration || "N/A" },
+      { trait_type: "Territory", value: licenseTerritory || "N/A" },
+      { trait_type: "Registration", value: registrationDate },
     ];
 
 
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       // attributes.push({ trait_type: "Transaction Hash", value: transaction.hash });
       // attributes.push({ trait_type: "Block Number", value: transaction.blockNumber.toString() });
       attributes.push({ trait_type: "Network", value: transaction.network });
-      attributes.push({ trait_type: "Contract Address", value: transaction.contractAddress });
+      attributes.push({ trait_type: "Address", value: transaction.contractAddress });
     }
 
     const formattedAsset = {

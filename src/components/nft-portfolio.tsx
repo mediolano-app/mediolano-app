@@ -47,7 +47,7 @@ import {
   Send,
   RefreshCw,
 } from "lucide-react"
-import NFTCard from "./NFTCard"
+import NFTCard from "./asset-card"
 import { PortfolioStats } from "./portfolio-stats"
 import { NFTLicensings } from "./nft-licensings"
 import { useMIP } from "@/hooks/contracts/use-mip"

@@ -2,6 +2,22 @@
 
 import type React from "react";
 
+import { useState } from "react"
+import Link from "next/link"
+import { ArrowLeft, Upload, FolderPlus, AlertCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import type { Collection } from "@/types/asset"
+import { useCollection, CollectionFormData } from "@/hooks/use-collection"
+import { useToast } from "@/hooks/use-toast"
+import { useAccount } from "@starknet-react/core"
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, FolderPlus, AlertCircle } from "lucide-react";
@@ -49,6 +65,17 @@ export default function CreateCollectionPage() {
     description: "",
     type: "art",
     visibility: "private",
+  const { createCollection, isCreating, error } = useCollection()
+  const { toast } = useToast()
+  const { address: walletAddress } = useAccount()
+  const [coverImage, setCoverImage] = useState<string | null>(null)
+  
+  const [formData, setFormData] = useState<CollectionFormData>({
+    name: '',
+    symbol: 'MIP',
+    description: '',
+    type: 'art',
+    visibility: 'public',
     coverImage: undefined,
     enableVersioning: true,
     allowComments: false,
@@ -102,6 +129,11 @@ export default function CreateCollectionPage() {
         description: "",
         type: "art",
         visibility: "private",
+        name: '',
+        symbol: 'MIP',
+        description: '',
+        type: 'art',
+        visibility: 'public',
         coverImage: undefined,
         enableVersioning: true,
         allowComments: false,
@@ -137,7 +169,7 @@ export default function CreateCollectionPage() {
         <Link href="/create">
           <Button variant="ghost" size="sm" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Create Options
+            Back to create dashboard
           </Button>
         </Link>
 
@@ -147,6 +179,7 @@ export default function CreateCollectionPage() {
             Create a new collection to organize your intellectual property
             assets
           </p>
+          <p className="text-muted-foreground">Mint a new collection to organize your intellectual property assets onchain</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -208,11 +241,12 @@ export default function CreateCollectionPage() {
                         <SelectContent>
                           <SelectItem value="art">Art</SelectItem>
                           <SelectItem value="audio">Audio</SelectItem>
-                          <SelectItem value="video">Video</SelectItem>
                           <SelectItem value="document">Document</SelectItem>
-                          <SelectItem value="software">Software</SelectItem>
-                          <SelectItem value="nft">NFT</SelectItem>
                           <SelectItem value="mixed">Mixed</SelectItem>
+                          <SelectItem value="photo">Photo</SelectItem>
+                          <SelectItem value="nft">NFT</SelectItem>
+                          <SelectItem value="software">Software</SelectItem>
+                          <SelectItem value="video">Video</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -231,7 +265,6 @@ export default function CreateCollectionPage() {
                         <SelectContent>
                           <SelectItem value="public">Public</SelectItem>
                           <SelectItem value="private">Private</SelectItem>
-                          <SelectItem value="shared">Shared</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -247,6 +280,8 @@ export default function CreateCollectionPage() {
                     Save as Draft
                   </Button>
                   <Button
+                  
+                  <Button 
                     type="submit"
                     disabled={isCreating || !walletAddress || upload_loading}
                   >
@@ -337,10 +372,10 @@ export default function CreateCollectionPage() {
                   <Tabs defaultValue="recommended">
                     <TabsList className="w-full">
                       <TabsTrigger value="recommended" className="flex-1">
-                        Recommended
+                        Collections?
                       </TabsTrigger>
                       <TabsTrigger value="custom" className="flex-1">
-                        Custom
+                        Checklist
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="recommended" className="space-y-2 mt-2">
@@ -351,10 +386,11 @@ export default function CreateCollectionPage() {
                             For visual artwork
                           </p>
                         </div>
-                        <Button variant="outline" size="sm">
-                          Apply
-                        </Button>
+                       
                       </div>
+   
+                    </TabsContent>
+                    <TabsContent value="custom" className="mt-2">
                       <div className="p-2 border rounded-md flex items-center justify-between">
                         <div>
                           <p className="font-medium">NFT Template</p>
@@ -362,9 +398,7 @@ export default function CreateCollectionPage() {
                             For digital collectibles
                           </p>
                         </div>
-                        <Button variant="outline" size="sm">
-                          Apply
-                        </Button>
+                       
                       </div>
                     </TabsContent>
                     <TabsContent value="custom" className="mt-2">

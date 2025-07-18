@@ -10,7 +10,7 @@ export async function uploadMetadataToPinata(metadata: Record<string, any>): Pro
   
   const combinedMetadata = {
     ...metadata,
-    contractAddress: process.env.NEXT_PUBLIC_IPCOLLECTION_ADDRESS || "",
+    contractAddress: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS || "",
     timestamp: new Date().toISOString(),
   };
 
