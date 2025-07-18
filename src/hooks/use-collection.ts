@@ -7,7 +7,7 @@ import {
 import { Abi } from "starknet";
 import { IPFSMetadata } from "@/utils/ipfs";
 import { ipCollectionAbi } from "@/abis/ip_collection";
-import { MIP_CONTRACT } from "@/services/constants";
+import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
 
 export interface ICreateCollection {
   name: string;
@@ -55,7 +55,7 @@ export function useCollection(): UseCollectionReturn {
 
   const { contract } = useContract({
     abi: COLLECTION_CONTRACT_ABI as Abi,
-    address: MIP_CONTRACT as `0x${string}`,
+    address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
   });
 
   const { sendAsync: createCollectionSend } = useSendTransaction({

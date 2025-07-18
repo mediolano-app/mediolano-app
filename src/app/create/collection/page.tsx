@@ -2,25 +2,10 @@
 
 import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { ArrowLeft, Upload, FolderPlus, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import type { Collection } from "@/types/asset"
-import { useCollection, CollectionFormData } from "@/hooks/use-collection"
-import { useToast } from "@/hooks/use-toast"
-import { useAccount } from "@starknet-react/core"
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, FolderPlus, AlertCircle } from "lucide-react";
+import { ArrowLeft, AlertCircle, FolderPlus } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -51,31 +36,21 @@ import {
   CoverImageUploaderRef,
 } from "@/components/mediaUploader";
 import { useIpfsUpload } from "@/hooks/useIpfs";
-import { MIP_CONTRACT } from "@/services/constants";
+import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
 
 export default function CreateCollectionPage() {
   const { uploadToIpfs, loading: upload_loading } = useIpfsUpload();
+  const uploaderRef = useRef<CoverImageUploaderRef>(null);
   const { createCollection, isCreating, error } = useCollection();
   const { toast } = useToast();
   const { address: walletAddress } = useAccount();
-  const uploaderRef = useRef<CoverImageUploaderRef>(null);
-  const [formData, setFormData] = useState({
+
+  const [formData, setFormData] = useState<CollectionFormData>({
     name: "",
-    symbol: "",
+    symbol: "MIP",
     description: "",
     type: "art",
-    visibility: "private",
-  const { createCollection, isCreating, error } = useCollection()
-  const { toast } = useToast()
-  const { address: walletAddress } = useAccount()
-  const [coverImage, setCoverImage] = useState<string | null>(null)
-  
-  const [formData, setFormData] = useState<CollectionFormData>({
-    name: '',
-    symbol: 'MIP',
-    description: '',
-    type: 'art',
-    visibility: 'public',
+    visibility: "public",
     coverImage: undefined,
     enableVersioning: true,
     allowComments: false,
@@ -95,7 +70,7 @@ export default function CreateCollectionPage() {
         ...formData,
         creator: walletAddress,
         createdAt: new Date().toISOString(),
-        contractAddress: MIP_CONTRACT,
+        contractAddress: COLLECTION_CONTRACT_ADDRESS,
       };
 
       const file = uploaderRef.current?.getFile();
@@ -125,15 +100,10 @@ export default function CreateCollectionPage() {
       // Reset form
       setFormData({
         name: "",
-        symbol: "",
+        symbol: "MIP",
         description: "",
         type: "art",
-        visibility: "private",
-        name: '',
-        symbol: 'MIP',
-        description: '',
-        type: 'art',
-        visibility: 'public',
+        visibility: "public",
         coverImage: undefined,
         enableVersioning: true,
         allowComments: false,
@@ -176,10 +146,9 @@ export default function CreateCollectionPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Create New Collection</h1>
           <p className="text-muted-foreground">
-            Create a new collection to organize your intellectual property
-            assets
+            Mint a new collection to organize your intellectual property assets
+            onchain
           </p>
-          <p className="text-muted-foreground">Mint a new collection to organize your intellectual property assets onchain</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -276,12 +245,7 @@ export default function CreateCollectionPage() {
                   />
                 </CardContent>
                 <CardFooter className="flex justify-between">
-                  <Button variant="outline" type="button">
-                    Save as Draft
-                  </Button>
                   <Button
-                  
-                  <Button 
                     type="submit"
                     disabled={isCreating || !walletAddress || upload_loading}
                   >
@@ -331,9 +295,9 @@ export default function CreateCollectionPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Allow Comments</p>
+                      <p className="font-medium">Open Edition</p>
                       <p className="text-sm text-muted-foreground">
-                        Enable commenting on collection assets
+                        Enable collaborative minting
                       </p>
                     </div>
                     <Switch
@@ -363,7 +327,7 @@ export default function CreateCollectionPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Collection Templates</CardTitle>
+                  <CardTitle>Collection Guide</CardTitle>
                   <CardDescription>
                     Apply templates to standardize asset creation
                   </CardDescription>
@@ -381,33 +345,41 @@ export default function CreateCollectionPage() {
                     <TabsContent value="recommended" className="space-y-2 mt-2">
                       <div className="p-2 border rounded-md flex items-center justify-between">
                         <div>
-                          <p className="font-medium">Art Template</p>
-                          <p className="text-xs text-muted-foreground">
-                            For visual artwork
+                          <p className="font-medium">
+                            What is a IP collection?
+                          </p>
+                          <p className="mt-4 text-sm text-muted-foreground">
+                            A Programmable IP Collection (Non-Fungible Token
+                            collection) is essentially a series of
+                            blockchain-based assets, each with unique
+                            identifying programmable code and metadata.
+                          </p>
+                          <p className="mt-4 text-sm text-muted-foreground mt-1">
+                            Collections allow you to group related assets
+                            together, making it easier to manage and interact
+                            with them.
                           </p>
                         </div>
-                       
                       </div>
-   
                     </TabsContent>
                     <TabsContent value="custom" className="mt-2">
                       <div className="p-2 border rounded-md flex items-center justify-between">
                         <div>
-                          <p className="font-medium">NFT Template</p>
-                          <p className="text-xs text-muted-foreground">
-                            For digital collectibles
+                          <p className="font-medium mb-1">
+                            Collections Checklist
                           </p>
+                          <p className="text-xs text-muted-foreground mb-2">
+                            Making the most of your collection page helps others
+                            better understand your project.
+                          </p>
+                          <ul className="list-disc list-inside text-xs space-y-1 text-muted-foreground">
+                            <li>Choose a collection name</li>
+                            <li>Fill in your collection details</li>
+                            <li>Add image / media</li>
+                            <li>Link out to your links</li>
+                          </ul>
                         </div>
-                       
                       </div>
-                    </TabsContent>
-                    <TabsContent value="custom" className="mt-2">
-                      <p className="text-sm text-muted-foreground">
-                        You haven&apos;t created any custom templates yet.
-                      </p>
-                      <Button variant="outline" size="sm" className="mt-2">
-                        Create Template
-                      </Button>
                     </TabsContent>
                   </Tabs>
                 </CardContent>
