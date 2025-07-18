@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
 import {
   Music,
   Palette,
@@ -16,10 +15,8 @@ import {
   Building,
   Code,
   Settings,
-  CheckCircle,
   Shield,
   Sparkles,
-  ExternalLink,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -33,11 +30,11 @@ interface Template {
   features: string[]
 }
 
-interface TemplateDetailsProps {
+interface TemplateInfoCardProps {
   template: Template
 }
 
-export function TemplateDetails({ template }: TemplateDetailsProps) {
+export function TemplateInfoCard({ template }: TemplateInfoCardProps) {
   // Map template icon string to the actual icon component
   const IconComponent = getIconComponent(template.icon)
 
@@ -65,26 +62,24 @@ export function TemplateDetails({ template }: TemplateDetailsProps) {
             </div>
           </div>
 
-          <CardTitle className="text-xl mb-2">{template.name} Template</CardTitle>
-          <div className="flex items-center gap-3 text-sm">
-            <Badge variant="outline" className="text-xs bg-white/20 border-white/30">
-              {template.category}
-            </Badge>
-          </div>
+          <CardTitle className="text-lg mb-2">{template.name}</CardTitle>
+          <Badge variant="outline" className="text-xs bg-white/20 border-white/30">
+            {template.category}
+          </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 space-y-6">
-        <p className="text-muted-foreground leading-relaxed">{template.description}</p>
+      <CardContent className="p-4 space-y-4">
+        <p className="text-sm text-muted-foreground leading-relaxed">{template.description}</p>
 
         <Separator />
 
         <div>
-          <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-green-500" />
-            Key Features
+          <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+            <Shield className="h-4 w-4 text-green-500" />
+            Template Features
           </h4>
-          <div className="grid gap-2">
+          <div className="space-y-1">
             {template.features.map((feature, index) => (
               <div key={index} className="flex items-center gap-2 text-sm">
                 <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
@@ -94,29 +89,16 @@ export function TemplateDetails({ template }: TemplateDetailsProps) {
           </div>
         </div>
 
-        <Separator />
-
-        <div className={cn("rounded-lg p-4 text-sm", colorClasses.bgLight)}>
-          <div className="flex items-start gap-3">
-            <div className={cn("p-2 rounded-lg", colorClasses.iconBg)}>
-              <Shield className={cn("h-4 w-4", colorClasses.iconColor)} />
-            </div>
+        <div className={cn("rounded-lg p-3 text-sm", colorClasses.bgLight)}>
+          <div className="flex items-start gap-2">
+            <Shield className={cn("h-4 w-4 mt-0.5", colorClasses.iconColor)} />
             <div>
-              <p className="font-semibold mb-1">Blockchain Protection</p>
+              <p className="font-medium text-xs">Blockchain Protection</p>
               <p className="text-xs opacity-90 leading-relaxed">
-                This template includes specialized fields and validation designed for optimal{" "}
-                {template.name.toLowerCase()}
-                intellectual property registration and blockchain-based proof of ownership.
+                Optimized for {template.name.toLowerCase()} IP registration with immutable proof of ownership.
               </p>
             </div>
           </div>
-        </div>
-
-        <div className="pt-2">
-          <Button variant="outline" size="sm" className="w-full bg-transparent">
-            <ExternalLink className="h-4 w-4 mr-2" />
-            View Template Documentation
-          </Button>
         </div>
       </CardContent>
     </Card>
@@ -162,7 +144,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/50",
         iconBg: "bg-white/90 dark:bg-blue-900/50",
         iconColor: "text-blue-600 dark:text-blue-400",
-        border: "border-blue-200 dark:border-blue-800",
       }
     case "purple":
       return {
@@ -170,7 +151,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-purple-50/50 dark:bg-purple-950/20 border border-purple-200/50 dark:border-purple-800/50",
         iconBg: "bg-white/90 dark:bg-purple-900/50",
         iconColor: "text-purple-600 dark:text-purple-400",
-        border: "border-purple-200 dark:border-purple-800",
       }
     case "teal":
       return {
@@ -178,7 +158,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-teal-50/50 dark:bg-teal-950/20 border border-teal-200/50 dark:border-teal-800/50",
         iconBg: "bg-white/90 dark:bg-teal-900/50",
         iconColor: "text-teal-600 dark:text-teal-400",
-        border: "border-teal-200 dark:border-teal-800",
       }
     case "violet":
       return {
@@ -186,7 +165,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200/50 dark:border-violet-800/50",
         iconBg: "bg-white/90 dark:bg-violet-900/50",
         iconColor: "text-violet-600 dark:text-violet-400",
-        border: "border-violet-200 dark:border-violet-800",
       }
     case "red":
       return {
@@ -194,7 +172,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-red-50/50 dark:bg-red-950/20 border border-red-200/50 dark:border-red-800/50",
         iconBg: "bg-white/90 dark:bg-red-900/50",
         iconColor: "text-red-600 dark:text-red-400",
-        border: "border-red-200 dark:border-red-800",
       }
     case "amber":
       return {
@@ -202,7 +179,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/50",
         iconBg: "bg-white/90 dark:bg-amber-900/50",
         iconColor: "text-amber-600 dark:text-amber-400",
-        border: "border-amber-200 dark:border-amber-800",
       }
     case "sky":
       return {
@@ -210,7 +186,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-sky-50/50 dark:bg-sky-950/20 border border-sky-200/50 dark:border-sky-800/50",
         iconBg: "bg-white/90 dark:bg-sky-900/50",
         iconColor: "text-sky-600 dark:text-sky-400",
-        border: "border-sky-200 dark:border-sky-800",
       }
     case "indigo":
       return {
@@ -218,7 +193,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/50 dark:border-indigo-800/50",
         iconBg: "bg-white/90 dark:bg-indigo-900/50",
         iconColor: "text-indigo-600 dark:text-indigo-400",
-        border: "border-indigo-200 dark:border-indigo-800",
       }
     case "emerald":
       return {
@@ -226,7 +200,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/50 dark:border-emerald-800/50",
         iconBg: "bg-white/90 dark:bg-emerald-900/50",
         iconColor: "text-emerald-600 dark:text-emerald-400",
-        border: "border-emerald-200 dark:border-emerald-800",
       }
     case "gray":
       return {
@@ -234,7 +207,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-gray-50/50 dark:bg-gray-950/20 border border-gray-200/50 dark:border-gray-700/50",
         iconBg: "bg-white/90 dark:bg-gray-800/50",
         iconColor: "text-gray-600 dark:text-gray-400",
-        border: "border-gray-200 dark:border-gray-700",
       }
     case "slate":
       return {
@@ -242,7 +214,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-slate-50/50 dark:bg-slate-950/20 border border-slate-200/50 dark:border-slate-700/50",
         iconBg: "bg-white/90 dark:bg-slate-800/50",
         iconColor: "text-slate-600 dark:text-slate-400",
-        border: "border-slate-200 dark:border-slate-700",
       }
     default:
       return {
@@ -250,7 +221,6 @@ function getColorClasses(color: string) {
         bgLight: "bg-gray-50/50 dark:bg-gray-950/20 border border-gray-200/50 dark:border-gray-700/50",
         iconBg: "bg-white/90 dark:bg-gray-800/50",
         iconColor: "text-gray-600 dark:text-gray-400",
-        border: "border-gray-200 dark:border-gray-700",
       }
   }
 }

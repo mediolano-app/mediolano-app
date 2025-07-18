@@ -1,0 +1,494 @@
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Search,
+  Filter,
+  Grid3X3,
+  List,
+  Sparkles,
+  TrendingUp,
+  ArrowRight,
+  CheckCircle,
+  Shield,
+  Music,
+  Palette,
+  FileText,
+  Video,
+  Code,
+} from "lucide-react"
+import Link from "next/link"
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { CreationOptionCard } from "@/components/create/creation-option-card"
+import { CreationOptionDetails } from "@/components/create/creation-option-details"
+
+const creationOptions = [
+  {
+    id: "asset",
+    title: "Create IP Asset",
+    description: "Register and protect your intellectual property with comprehensive metadata and licensing options.",
+    icon: "Shield",
+    color: "blue",
+    category: "core",
+    trending: true,
+    popular: true,
+    estimatedTime: "5-10 min",
+    successRate: 98,
+    userCount: "15.2k",
+    benefits: [
+      "Comprehensive IP protection",
+      "Flexible licensing options",
+      "Automated royalty tracking",
+      "Global recognition",
+    ],
+    process: [
+      "Upload your asset and add basic information",
+      "Configure metadata and licensing terms",
+      "Review and confirm registration",
+      "Receive your IP certificate",
+    ],
+    href: "/create2/asset",
+    useCase: "Perfect for creators who want to protect their original work with full legal backing.",
+    gradient: "from-blue-500 to-blue-700",
+    iconColor: "text-blue-500",
+    requirements: ["Original work", "Metadata"],
+    timeEstimate: "5-10 min",
+    tags: ["IP", "Asset", "Protection"],
+    featured: true,
+  },
+  {
+    id: "templates",
+    title: "Use Template",
+    description: "Choose from optimized templates designed for specific types of intellectual property.",
+    icon: "Grid3X3",
+    color: "purple",
+    category: "core",
+    trending: true,
+    popular: true,
+    estimatedTime: "3-7 min",
+    successRate: 99,
+    userCount: "28.7k",
+    benefits: [
+      "Pre-configured for your asset type",
+      "Industry-specific metadata fields",
+      "Optimized licensing templates",
+      "Faster registration process",
+    ],
+    process: [
+      "Select the template that matches your asset type",
+      "Fill in template-specific information",
+      "Customize licensing and metadata",
+      "Complete registration with optimized settings",
+    ],
+    href: "/create2/templates",
+    useCase: "Ideal for creators working with specific asset types who want streamlined registration.",
+    gradient: "from-purple-500 to-purple-700",
+    iconColor: "text-purple-500",
+    requirements: ["Template selection"],
+    timeEstimate: "3-7 min",
+    tags: ["Template", "IP", "Fast"],
+    featured: false,
+  },
+  {
+    id: "collection",
+    title: "Create Collection",
+    description: "Group related assets together for better organization and batch management.",
+    icon: "BookOpen",
+    color: "green",
+    category: "organization",
+    trending: false,
+    popular: false,
+    estimatedTime: "2-5 min",
+    successRate: 97,
+    userCount: "8.9k",
+    benefits: ["Organize related assets", "Batch licensing options", "Unified branding", "Easier portfolio management"],
+    process: [
+      "Define collection details and theme",
+      "Set collection-wide licensing terms",
+      "Add assets to your collection",
+      "Publish and manage your collection",
+    ],
+    href: "/create2/collection",
+    useCase: "Great for creators with multiple related works or series of assets.",
+    gradient: "from-green-500 to-green-700",
+    iconColor: "text-green-500",
+    requirements: ["Multiple assets"],
+    timeEstimate: "2-5 min",
+    tags: ["Collection", "Batch", "Organization"],
+    featured: false,
+  },
+]
+
+const templates = [
+  {
+    id: "audio",
+    name: "Audio",
+    icon: "Music",
+    description: "Music, podcasts, sound effects, and audio content",
+    color: "blue",
+    category: "media",
+    count: "4.2k",
+  },
+  {
+    id: "art",
+    name: "Art",
+    icon: "Palette",
+    description: "Digital art, illustrations, paintings, and visual creations",
+    color: "purple",
+    category: "media",
+    count: "12.8k",
+  },
+  {
+    id: "video",
+    name: "Video",
+    icon: "Video",
+    description: "Films, animations, tutorials, and video content",
+    color: "red",
+    category: "media",
+    count: "6.1k",
+  },
+  {
+    id: "software",
+    name: "Software",
+    icon: "Code",
+    description: "Applications, code, algorithms, and digital tools",
+    color: "violet",
+    category: "tech",
+    count: "3.7k",
+  },
+  {
+    id: "documents",
+    name: "Documents",
+    icon: "FileText",
+    description: "Contracts, agreements, manuals, and written content",
+    color: "gray",
+    category: "legal",
+    count: "2.9k",
+  },
+  {
+    id: "nft",
+    name: "NFT",
+    icon: "Hexagon",
+    description: "Non-fungible tokens and blockchain assets",
+    color: "teal",
+    category: "blockchain",
+    count: "8.4k",
+  },
+]
+
+const categories = [
+  { id: "all", name: "All Options", count: 6 },
+  { id: "core", name: "Core Features", count: 3 },
+  { id: "organization", name: "Organization", count: 1 },
+  { id: "advanced", name: "Advanced", count: 2 },
+]
+
+export default function CreatePage() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("all")
+  const [sortBy, setSortBy] = useState("popularity")
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [selectedOption, setSelectedOption] = useState<string | null>(null)
+
+  const filteredOptions = creationOptions.filter((option) => {
+    const matchesSearch =
+      option.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      option.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      option.useCase?.toLowerCase().includes(searchQuery.toLowerCase())
+
+    const matchesCategory = selectedCategory === "all" || option.category === selectedCategory
+
+    return matchesSearch && matchesCategory
+  })
+
+  const sortedOptions = [...filteredOptions].sort((a, b) => {
+    switch (sortBy) {
+      case "popularity":
+        return Number.parseInt(b.userCount.replace("k", "")) - Number.parseInt(a.userCount.replace("k", ""))
+      case "time":
+        return Number.parseInt(a.estimatedTime.split("-")[0]) - Number.parseInt(b.estimatedTime.split("-")[0])
+      case "success":
+        return b.successRate - a.successRate
+      case "name":
+        return a.title.localeCompare(b.title)
+      default:
+        return 0
+    }
+  })
+
+  // ✨ NEW – always search in the full list to guarantee a match
+  const selectedOptionData = creationOptions.find((opt) => opt.id === selectedOption)
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    
+
+      <main className="container mx-auto p-4 max-w-7xl">
+        {/* Hero Section */}
+        <div className="text-center py-8 md:py-12">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
+            <Sparkles className="h-4 w-4" />
+            Trusted by 50,000+ creators worldwide
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">
+            Protect Your{" "}
+            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Creative Work
+            </span>
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Register, protect, and monetize your intellectual property with our comprehensive platform. Zero fees, full
+            ownership, instant protection.
+          </p>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">50k+</div>
+              <div className="text-sm text-muted-foreground">Assets Protected</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">$2.5M+</div>
+              <div className="text-sm text-muted-foreground">Royalties Earned</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">99.8%</div>
+              <div className="text-sm text-muted-foreground">Success Rate</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary">24/7</div>
+              <div className="text-sm text-muted-foreground">Protection</div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+            <Link href="/create2/asset">
+              <Button size="lg" className="w-full sm:w-auto">
+                <Shield className="mr-2 h-5 w-5" />
+                Create IP Asset
+              </Button>
+            </Link>
+            <Link href="/create2/templates">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent">
+                <Grid3X3 className="mr-2 h-5 w-5" />
+                Browse Templates
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search creation options..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-12"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-[140px] h-12">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name} ({category.count})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[120px] h-12">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="popularity">Popular</SelectItem>
+                  <SelectItem value="time">Fastest</SelectItem>
+                  <SelectItem value="success">Success Rate</SelectItem>
+                  <SelectItem value="name">Name</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="hidden md:flex border rounded-lg p-1">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Category Pills */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {categories.map((category) => (
+              <Button
+                key={category.id}
+                variant={selectedCategory === category.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category.id)}
+                className="h-8"
+              >
+                {category.name}
+                <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
+                  {category.count}
+                </Badge>
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Options Grid */}
+          <div className="lg:col-span-3">
+            {sortedOptions.length === 0 ? (
+              <Card className="p-8 text-center">
+                <div className="text-muted-foreground mb-4">
+                  <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No options found matching your search.</p>
+                  <p className="text-sm">Try adjusting your filters or search terms.</p>
+                </div>
+                <Button variant="outline" onClick={() => setSearchQuery("")}>
+                  Clear Search
+                </Button>
+              </Card>
+            ) : (
+              <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-4"}>
+                {sortedOptions.map((option) => (
+                  <CreationOptionCard
+                    key={option.id}
+                    option={option}
+                    viewMode={viewMode}
+                    isSelected={selectedOption === option.id}
+                    onSelect={() => setSelectedOption(selectedOption === option.id ? null : option.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 space-y-6">
+              {selectedOptionData ? (
+                <CreationOptionDetails option={selectedOptionData} />
+              ) : (
+                <>
+                  {/* Popular Templates */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-primary" />
+                        Popular Templates
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {templates.slice(0, 4).map((template) => {
+                        const getIconComponent = (iconName: string) => {
+                          switch (iconName) {
+                            case "Music":
+                              return <Music className="h-4 w-4" />
+                            case "Palette":
+                              return <Palette className="h-4 w-4" />
+                            case "Video":
+                              return <Video className="h-4 w-4" />
+                            case "Code":
+                              return <Code className="h-4 w-4" />
+                            default:
+                              return <FileText className="h-4 w-4" />
+                          }
+                        }
+
+                        return (
+                          <Link key={template.id} href={`/create2/templates/${template.id}`}>
+                            <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+                              <div className="p-1.5 rounded-md bg-primary/10 text-primary">
+                                {getIconComponent(template.icon)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium text-sm">{template.name}</div>
+                                <div className="text-xs text-muted-foreground">{template.count} created</div>
+                              </div>
+                              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+                            </div>
+                          </Link>
+                        )
+                      })}
+                      <Link href="/create2/templates">
+                        <Button variant="outline" size="sm" className="w-full mt-2 bg-transparent">
+                          View All Templates
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+
+                  {/* Help Card */}
+                  <Card>
+                    <CardContent className="p-4">
+                      <h4 className="font-medium mb-2 flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        Need Help?
+                      </h4>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        New to IP protection? Our guide will help you choose the right option for your needs.
+                      </p>
+                      <Button variant="outline" size="sm" className="w-full bg-transparent">
+                        View Getting Started Guide
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Benefits */}
+                  <Card>
+                    <CardContent className="p-4">
+                      <h4 className="font-medium mb-3">Why Choose Our Platform?</h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span>Zero platform fees</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span>Full ownership rights</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span>Instant protection</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span>Global recognition</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  )
+}

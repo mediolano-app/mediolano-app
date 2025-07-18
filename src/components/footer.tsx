@@ -144,7 +144,7 @@ export function Footer() {
                 <ul className="space-y-4">
                   <li><Link href="/create" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
                   <li><Link href="/create/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
-                  <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
+                  <li><Link href="/create2/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
                   <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> Portfolio</Link></li>
                   <li><Link href="/licensing" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Licensing</Link></li>
                   <li><Link href="/transfer" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" /> Transfer</Link></li>

@@ -4,636 +4,478 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Database, Info, Layers, Clock, Plus, X } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Plus, X, Info, HelpCircle, Database } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface AssetMetadataFormProps {
   formState: any
   updateFormField: (section: string, field: string, value: any) => void
-  template: { id: string; name: string; icon: string; color: string }
+  template?: {
+    id: string
+    name: string
+    icon: string
+    description: string
+    color: string
+  }
 }
 
 export function AssetMetadataForm({ formState, updateFormField, template }: AssetMetadataFormProps) {
-  const [activeTab, setActiveTab] = useState("standard")
-  const [customField, setCustomField] = useState({ name: "", value: "" })
-  const [customFields, setCustomFields] = useState<{ name: string; value: string }[]>([])
+  const [customFields, setCustomFields] = useState<Array<{ key: string; value: string; type: string }>>([])
+  const [newFieldKey, setNewFieldKey] = useState("")
+  const [newFieldValue, setNewFieldValue] = useState("")
+  const [newFieldType, setNewFieldType] = useState("text")
+  const [showCustomFields, setShowCustomFields] = useState(false)
 
   const addCustomField = () => {
-    if (customField.name && customField.value) {
-      const newFields = [...customFields, { ...customField }]
-      setCustomFields(newFields)
-      setCustomField({ name: "", value: "" })
-
-      // Update the main form state with the custom fields
-      const updatedMetadataFields = { ...formState.metadataFields }
-      updatedMetadataFields[customField.name] = customField.value
-      updateFormField("metadata", "customFields", updatedMetadataFields)
+    if (newFieldKey && newFieldValue) {
+      const newField = { key: newFieldKey, value: newFieldValue, type: newFieldType }
+      const updatedFields = [...customFields, newField]
+      setCustomFields(updatedFields)
+      updateFormField("metadata", "customFields", updatedFields)
+      setNewFieldKey("")
+      setNewFieldValue("")
+      setNewFieldType("text")
     }
   }
 
-  const removeCustomField = (fieldName: string) => {
-    const newFields = customFields.filter((field) => field.name !== fieldName)
-    setCustomFields(newFields)
-
-    // Also remove from the form state
-    const updatedMetadataFields = { ...formState.metadataFields }
-    delete updatedMetadataFields[fieldName]
-    updateFormField("metadata", "customFields", updatedMetadataFields)
+  const removeCustomField = (index: number) => {
+    const updatedFields = customFields.filter((_, i) => i !== index)
+    setCustomFields(updatedFields)
+    updateFormField("metadata", "customFields", updatedFields)
   }
 
-  // Render appropriate form fields based on template type
-  const renderTemplateFields = () => {
+  // Template-specific fields based on the template type
+  const getTemplateFields = () => {
+    if (!template) return []
+
     switch (template.id) {
       case "audio":
-        return (
-          <div className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duration</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="duration"
-                    value={formState.metadataFields.duration}
-                    onChange={(e) => updateFormField("metadata", "duration", e.target.value)}
-                    placeholder="3:45"
-                  />
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="genre">Genre</Label>
-                <Select
-                  value={formState.metadataFields.genre || ""}
-                  onValueChange={(value) => updateFormField("metadata", "genre", value)}
-                >
-                  <SelectTrigger id="genre">
-                    <SelectValue placeholder="Select genre" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="electronic">Electronic</SelectItem>
-                    <SelectItem value="rock">Rock</SelectItem>
-                    <SelectItem value="pop">Pop</SelectItem>
-                    <SelectItem value="jazz">Jazz</SelectItem>
-                    <SelectItem value="classical">Classical</SelectItem>
-                    <SelectItem value="hip-hop">Hip-Hop</SelectItem>
-                    <SelectItem value="ambient">Ambient</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bpm">BPM</Label>
-                <Input
-                  id="bpm"
-                  type="number"
-                  value={formState.metadataFields.bpm}
-                  onChange={(e) => updateFormField("metadata", "bpm", e.target.value)}
-                  placeholder="120"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="key">Musical Key</Label>
-                <Select
-                  value={formState.metadataFields.key || ""}
-                  onValueChange={(value) => updateFormField("metadata", "key", value)}
-                >
-                  <SelectTrigger id="key">
-                    <SelectValue placeholder="Select key" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="c-major">C Major</SelectItem>
-                    <SelectItem value="c-minor">C Minor</SelectItem>
-                    <SelectItem value="d-major">D Major</SelectItem>
-                    <SelectItem value="d-minor">D Minor</SelectItem>
-                    <SelectItem value="e-major">E Major</SelectItem>
-                    <SelectItem value="e-minor">E Minor</SelectItem>
-                    <SelectItem value="f-major">F Major</SelectItem>
-                    <SelectItem value="f-minor">F Minor</SelectItem>
-                    <SelectItem value="g-major">G Major</SelectItem>
-                    <SelectItem value="g-minor">G Minor</SelectItem>
-                    <SelectItem value="a-major">A Major</SelectItem>
-                    <SelectItem value="a-minor">A Minor</SelectItem>
-                    <SelectItem value="b-major">B Major</SelectItem>
-                    <SelectItem value="b-minor">B Minor</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="audioFormat">Audio Format</Label>
-                  <Select
-                    value={formState.metadataFields.audioFormat || "WAV"}
-                    onValueChange={(value) => updateFormField("metadata", "audioFormat", value)}
-                  >
-                    <SelectTrigger id="audioFormat">
-                      <SelectValue placeholder="Select format" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="WAV">WAV</SelectItem>
-                      <SelectItem value="MP3">MP3</SelectItem>
-                      <SelectItem value="FLAC">FLAC</SelectItem>
-                      <SelectItem value="AAC">AAC</SelectItem>
-                      <SelectItem value="OGG">OGG</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="sampleRate">Sample Rate</Label>
-                  <Select
-                    value={formState.metadataFields.sampleRate || "48kHz"}
-                    onValueChange={(value) => updateFormField("metadata", "sampleRate", value)}
-                  >
-                    <SelectTrigger id="sampleRate">
-                      <SelectValue placeholder="Select sample rate" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="44.1kHz">44.1kHz</SelectItem>
-                      <SelectItem value="48kHz">48kHz</SelectItem>
-                      <SelectItem value="96kHz">96kHz</SelectItem>
-                      <SelectItem value="192kHz">192kHz</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="composer">Composer</Label>
-                  <Input
-                    id="composer"
-                    value={formState.metadataFields.composer}
-                    onChange={(e) => updateFormField("metadata", "composer", e.target.value)}
-                    placeholder="John Doe"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="publisher">Publisher</Label>
-                  <Input
-                    id="publisher"
-                    value={formState.metadataFields.publisher}
-                    onChange={(e) => updateFormField("metadata", "publisher", e.target.value)}
-                    placeholder="Music Publishing Co."
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-
+        return [
+          { key: "duration", label: "Duration", type: "text", placeholder: "e.g., 3:45" },
+          {
+            key: "genre",
+            label: "Genre",
+            type: "select",
+            options: ["Pop", "Rock", "Jazz", "Classical", "Electronic", "Hip Hop", "Country", "Other"],
+          },
+          { key: "bpm", label: "BPM", type: "number", placeholder: "e.g., 120" },
+          { key: "key", label: "Musical Key", type: "text", placeholder: "e.g., C Major" },
+          { key: "instruments", label: "Instruments", type: "text", placeholder: "e.g., Guitar, Piano, Drums" },
+          { key: "recordingDate", label: "Recording Date", type: "date" },
+        ]
       case "art":
-        return (
-          <div className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="medium">Medium</Label>
-                <Select
-                  value={formState.metadataFields.medium || "Digital"}
-                  onValueChange={(value) => updateFormField("metadata", "medium", value)}
-                >
-                  <SelectTrigger id="medium">
-                    <SelectValue placeholder="Select medium" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Digital">Digital</SelectItem>
-                    <SelectItem value="Oil">Oil</SelectItem>
-                    <SelectItem value="Acrylic">Acrylic</SelectItem>
-                    <SelectItem value="Watercolor">Watercolor</SelectItem>
-                    <SelectItem value="Mixed Media">Mixed Media</SelectItem>
-                    <SelectItem value="Photography">Photography</SelectItem>
-                    <SelectItem value="Sculpture">Sculpture</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="dimensions">Dimensions</Label>
-                <Input
-                  id="dimensions"
-                  value={formState.metadataFields.dimensions}
-                  onChange={(e) => updateFormField("metadata", "dimensions", e.target.value)}
-                  placeholder="3000x2000 px or 24x36 inches"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="style">Style</Label>
-                <Select
-                  value={formState.metadataFields.style || ""}
-                  onValueChange={(value) => updateFormField("metadata", "style", value)}
-                >
-                  <SelectTrigger id="style">
-                    <SelectValue placeholder="Select style" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Abstract">Abstract</SelectItem>
-                    <SelectItem value="Realistic">Realistic</SelectItem>
-                    <SelectItem value="Impressionist">Impressionist</SelectItem>
-                    <SelectItem value="Expressionist">Expressionist</SelectItem>
-                    <SelectItem value="Minimalist">Minimalist</SelectItem>
-                    <SelectItem value="Surrealist">Surrealist</SelectItem>
-                    <SelectItem value="Pop Art">Pop Art</SelectItem>
-                    <SelectItem value="Digital Art">Digital Art</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="creationDate">Creation Date</Label>
-                <Input
-                  id="creationDate"
-                  type="date"
-                  value={formState.metadataFields.creationDate}
-                  onChange={(e) => updateFormField("metadata", "creationDate", e.target.value)}
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="technique">Technique</Label>
-                <Input
-                  id="technique"
-                  value={formState.metadataFields.technique}
-                  onChange={(e) => updateFormField("metadata", "technique", e.target.value)}
-                  placeholder="Digital Painting, Oil on Canvas, etc."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="software">Software Used (if digital)</Label>
-                <Input
-                  id="software"
-                  value={formState.metadataFields.software}
-                  onChange={(e) => updateFormField("metadata", "software", e.target.value)}
-                  placeholder="Adobe Photoshop, Procreate, etc."
-                />
-              </div>
-            </div>
-          </div>
-        )
-
-      case "nft":
-        return (
-          <div className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="blockchain">Blockchain</Label>
-                <Select
-                  value={formState.metadataFields.blockchain || "Ethereum"}
-                  onValueChange={(value) => updateFormField("metadata", "blockchain", value)}
-                >
-                  <SelectTrigger id="blockchain">
-                    <SelectValue placeholder="Select blockchain" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Ethereum">Ethereum</SelectItem>
-                    <SelectItem value="Polygon">Polygon</SelectItem>
-                    <SelectItem value="Solana">Solana</SelectItem>
-                    <SelectItem value="Binance">Binance Smart Chain</SelectItem>
-                    <SelectItem value="Flow">Flow</SelectItem>
-                    <SelectItem value="Tezos">Tezos</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="tokenStandard">Token Standard</Label>
-                <Select
-                  value={formState.metadataFields.tokenStandard || "ERC-721"}
-                  onValueChange={(value) => updateFormField("metadata", "tokenStandard", value)}
-                >
-                  <SelectTrigger id="tokenStandard">
-                    <SelectValue placeholder="Select token standard" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ERC-721">ERC-721</SelectItem>
-                    <SelectItem value="ERC-1155">ERC-1155</SelectItem>
-                    <SelectItem value="SPL">SPL (Solana)</SelectItem>
-                    <SelectItem value="BEP-721">BEP-721</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="contractAddress">Contract Address (optional)</Label>
-                <Input
-                  id="contractAddress"
-                  value={formState.metadataFields.contractAddress}
-                  onChange={(e) => updateFormField("metadata", "contractAddress", e.target.value)}
-                  placeholder="0x..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="tokenId">Token ID (optional)</Label>
-                <Input
-                  id="tokenId"
-                  value={formState.metadataFields.tokenId}
-                  onChange={(e) => updateFormField("metadata", "tokenId", e.target.value)}
-                  placeholder="Token ID if known"
-                />
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="rarity">Rarity</Label>
-                  <Select
-                    value={formState.metadataFields.rarity || "Common"}
-                    onValueChange={(value) => updateFormField("metadata", "rarity", value)}
-                  >
-                    <SelectTrigger id="rarity">
-                      <SelectValue placeholder="Select rarity" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Common">Common</SelectItem>
-                      <SelectItem value="Uncommon">Uncommon</SelectItem>
-                      <SelectItem value="Rare">Rare</SelectItem>
-                      <SelectItem value="Epic">Epic</SelectItem>
-                      <SelectItem value="Legendary">Legendary</SelectItem>
-                      <SelectItem value="Unique">Unique (1 of 1)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="editions">Editions</Label>
-                  <Input
-                    id="editions"
-                    type="number"
-                    value={formState.metadataFields.editions}
-                    onChange={(e) => updateFormField("metadata", "editions", e.target.value)}
-                    placeholder="Number of editions"
-                    min="1"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="mintDate">Mint Date (optional)</Label>
-                <Input
-                  id="mintDate"
-                  type="date"
-                  value={formState.metadataFields.mintDate}
-                  onChange={(e) => updateFormField("metadata", "mintDate", e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        )
-
+        return [
+          {
+            key: "medium",
+            label: "Medium",
+            type: "select",
+            options: ["Digital", "Oil Paint", "Watercolor", "Acrylic", "Pencil", "Mixed Media", "Photography", "Other"],
+          },
+          { key: "dimensions", label: "Dimensions", type: "text", placeholder: "e.g., 1920x1080 or 24x36 inches" },
+          {
+            key: "style",
+            label: "Art Style",
+            type: "select",
+            options: [
+              "Abstract",
+              "Realistic",
+              "Impressionist",
+              "Modern",
+              "Contemporary",
+              "Pop Art",
+              "Minimalist",
+              "Other",
+            ],
+          },
+          { key: "colorPalette", label: "Color Palette", type: "text", placeholder: "e.g., Warm tones, Monochrome" },
+          { key: "technique", label: "Technique", type: "text", placeholder: "e.g., Digital painting, Oil on canvas" },
+          { key: "inspiration", label: "Inspiration", type: "textarea", placeholder: "What inspired this artwork?" },
+        ]
       case "video":
-        return (
-          <div className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="duration">Duration</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="duration"
-                    value={formState.metadataFields.duration}
-                    onChange={(e) => updateFormField("metadata", "duration", e.target.value)}
-                    placeholder="12:34"
-                  />
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="resolution">Resolution</Label>
-                <Select
-                  value={formState.metadataFields.resolution || "1080p"}
-                  onValueChange={(value) => updateFormField("metadata", "resolution", value)}
-                >
-                  <SelectTrigger id="resolution">
-                    <SelectValue placeholder="Select resolution" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="720p">720p (HD)</SelectItem>
-                    <SelectItem value="1080p">1080p (Full HD)</SelectItem>
-                    <SelectItem value="1440p">1440p (QHD)</SelectItem>
-                    <SelectItem value="4K">4K (Ultra HD)</SelectItem>
-                    <SelectItem value="8K">8K</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="frameRate">Frame Rate</Label>
-                <Select
-                  value={formState.metadataFields.frameRate || "30 fps"}
-                  onValueChange={(value) => updateFormField("metadata", "frameRate", value)}
-                >
-                  <SelectTrigger id="frameRate">
-                    <SelectValue placeholder="Select frame rate" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="24 fps">24 fps (Film)</SelectItem>
-                    <SelectItem value="25 fps">25 fps (PAL)</SelectItem>
-                    <SelectItem value="30 fps">30 fps</SelectItem>
-                    <SelectItem value="60 fps">60 fps</SelectItem>
-                    <SelectItem value="120 fps">120 fps</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="codec">Codec</Label>
-                <Select
-                  value={formState.metadataFields.codec || "H.264"}
-                  onValueChange={(value) => updateFormField("metadata", "codec", value)}
-                >
-                  <SelectTrigger id="codec">
-                    <SelectValue placeholder="Select codec" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="H.264">H.264/AVC</SelectItem>
-                    <SelectItem value="H.265">H.265/HEVC</SelectItem>
-                    <SelectItem value="ProRes">ProRes</SelectItem>
-                    <SelectItem value="VP9">VP9</SelectItem>
-                    <SelectItem value="AV1">AV1</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="director">Director</Label>
-                  <Input
-                    id="director"
-                    value={formState.metadataFields.director}
-                    onChange={(e) => updateFormField("metadata", "director", e.target.value)}
-                    placeholder="Director name"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="releaseDate">Release Date</Label>
-                  <Input
-                    id="releaseDate"
-                    type="date"
-                    value={formState.metadataFields.releaseDate}
-                    onChange={(e) => updateFormField("metadata", "releaseDate", e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="language">Language</Label>
-                  <Input
-                    id="language"
-                    value={formState.metadataFields.language}
-                    onChange={(e) => updateFormField("metadata", "language", e.target.value)}
-                    placeholder="English"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-
+        return [
+          { key: "duration", label: "Duration", type: "text", placeholder: "e.g., 10:30" },
+          { key: "resolution", label: "Resolution", type: "select", options: ["720p", "1080p", "4K", "8K", "Other"] },
+          {
+            key: "frameRate",
+            label: "Frame Rate",
+            type: "select",
+            options: ["24fps", "30fps", "60fps", "120fps", "Other"],
+          },
+          {
+            key: "genre",
+            label: "Genre",
+            type: "select",
+            options: ["Documentary", "Animation", "Short Film", "Music Video", "Tutorial", "Commercial", "Other"],
+          },
+          { key: "language", label: "Language", type: "text", placeholder: "e.g., English, Spanish" },
+          { key: "subtitles", label: "Subtitles Available", type: "checkbox" },
+        ]
+      case "software":
+        return [
+          { key: "version", label: "Version", type: "text", placeholder: "e.g., 1.0.0" },
+          {
+            key: "programmingLanguage",
+            label: "Programming Language",
+            type: "select",
+            options: ["JavaScript", "Python", "Java", "C++", "C#", "Go", "Rust", "Swift", "Other"],
+          },
+          {
+            key: "platform",
+            label: "Platform",
+            type: "select",
+            options: ["Web", "Mobile", "Desktop", "Cross-platform", "Other"],
+          },
+          { key: "dependencies", label: "Dependencies", type: "textarea", placeholder: "List main dependencies" },
+          {
+            key: "minRequirements",
+            label: "Minimum Requirements",
+            type: "textarea",
+            placeholder: "System requirements",
+          },
+          { key: "openSource", label: "Open Source", type: "checkbox" },
+        ]
+      case "documents":
+        return [
+          {
+            key: "documentType",
+            label: "Document Type",
+            type: "select",
+            options: ["Contract", "Agreement", "Manual", "Report", "Research Paper", "Legal Document", "Other"],
+          },
+          { key: "pageCount", label: "Page Count", type: "number", placeholder: "Number of pages" },
+          { key: "language", label: "Language", type: "text", placeholder: "e.g., English" },
+          { key: "format", label: "Format", type: "select", options: ["PDF", "DOC", "DOCX", "TXT", "HTML", "Other"] },
+          { key: "wordCount", label: "Word Count", type: "number", placeholder: "Approximate word count" },
+          { key: "confidential", label: "Confidential", type: "checkbox" },
+        ]
+      case "nft":
+        return [
+          {
+            key: "blockchain",
+            label: "Blockchain",
+            type: "select",
+            options: ["Ethereum", "Polygon", "Solana", "Binance Smart Chain", "Avalanche", "Other"],
+          },
+          {
+            key: "tokenStandard",
+            label: "Token Standard",
+            type: "select",
+            options: ["ERC-721", "ERC-1155", "SPL", "Other"],
+          },
+          { key: "mintDate", label: "Mint Date", type: "date" },
+          { key: "totalSupply", label: "Total Supply", type: "number", placeholder: "e.g., 1 for unique NFT" },
+          { key: "royaltyPercentage", label: "Royalty %", type: "number", placeholder: "e.g., 5" },
+          {
+            key: "rarity",
+            label: "Rarity",
+            type: "select",
+            options: ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Unique"],
+          },
+        ]
       default:
+        return []
+    }
+  }
+
+  const templateFields = getTemplateFields()
+
+  // General metadata fields that apply to all asset types
+  const generalFields = [
+    { key: "creator", label: "Creator/Author", type: "text", placeholder: "Creator or author name" },
+    { key: "creationDate", label: "Creation Date", type: "date", placeholder: "" },
+    { key: "location", label: "Location", type: "text", placeholder: "Where was this created?" },
+    {
+      key: "category",
+      label: "Category",
+      type: "select",
+      options: [
+        "Art & Design",
+        "Music & Audio",
+        "Video & Film",
+        "Writing & Literature",
+        "Software & Code",
+        "Photography",
+        "Other",
+      ],
+    },
+    { key: "keywords", label: "Keywords", type: "text", placeholder: "Enter keywords separated by commas" },
+    {
+      key: "additionalNotes",
+      label: "Additional Notes",
+      type: "textarea",
+      placeholder: "Any additional information about this asset...",
+    },
+  ]
+
+  // Render a field based on its type
+  const renderField = (field: any) => {
+    const fieldValue = formState.metadataFields[field.key] || ""
+
+    switch (field.type) {
+      case "text":
         return (
-          <div className="space-y-4">
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Standard Metadata</AlertTitle>
-              <AlertDescription>
-                Enter basic metadata for your {template.name} asset. Add additional custom fields below as needed.
-              </AlertDescription>
-            </Alert>
-
-            <div className="space-y-2">
-              <Label htmlFor="format">Format</Label>
-              <Input
-                id="format"
-                value={formState.metadataFields.format}
-                onChange={(e) => updateFormField("metadata", "format", e.target.value)}
-                placeholder="File format (PDF, JPG, etc.)"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="creationDate">Creation Date</Label>
-              <Input
-                id="creationDate"
-                type="date"
-                value={formState.metadataFields.creationDate}
-                onChange={(e) => updateFormField("metadata", "creationDate", e.target.value)}
-              />
-            </div>
+          <Input
+            id={field.key}
+            placeholder={field.placeholder}
+            value={fieldValue}
+            onChange={(e) => updateFormField("metadata", `metadataFields.${field.key}`, e.target.value)}
+            className="h-12 text-base"
+          />
+        )
+      case "number":
+        return (
+          <Input
+            id={field.key}
+            type="number"
+            placeholder={field.placeholder}
+            value={fieldValue}
+            onChange={(e) => updateFormField("metadata", `metadataFields.${field.key}`, e.target.value)}
+            className="h-12 text-base"
+          />
+        )
+      case "date":
+        return (
+          <Input
+            id={field.key}
+            type="date"
+            value={fieldValue}
+            onChange={(e) => updateFormField("metadata", `metadataFields.${field.key}`, e.target.value)}
+            className="h-12 text-base"
+          />
+        )
+      case "textarea":
+        return (
+          <Textarea
+            id={field.key}
+            placeholder={field.placeholder}
+            value={fieldValue}
+            onChange={(e) => updateFormField("metadata", `metadataFields.${field.key}`, e.target.value)}
+            rows={3}
+            className="resize-none text-base"
+          />
+        )
+      case "select":
+        return (
+          <Select
+            value={fieldValue}
+            onValueChange={(value) => updateFormField("metadata", `metadataFields.${field.key}`, value)}
+          >
+            <SelectTrigger className="h-12 text-base">
+              <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+            </SelectTrigger>
+            <SelectContent>
+              {field.options.map((option: string) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )
+      case "checkbox":
+        return (
+          <div className="flex items-center space-x-3 p-3 border rounded-lg">
+            <Checkbox
+              id={field.key}
+              checked={fieldValue || false}
+              onCheckedChange={(checked) => updateFormField("metadata", `metadataFields.${field.key}`, checked)}
+            />
+            <Label htmlFor={field.key} className="text-base cursor-pointer">
+              {field.label}
+            </Label>
           </div>
         )
+      default:
+        return <Input placeholder={field.placeholder} className="h-12 text-base" />
     }
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Database className="h-5 w-5" />
-          Template Details
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="standard">Standard Fields</TabsTrigger>
-            <TabsTrigger value="custom">Custom Fields</TabsTrigger>
-          </TabsList>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="text-center md:text-left">
+        <h2 className="text-2xl md:text-3xl font-bold mb-2">Asset Details</h2>
+        <p className="text-muted-foreground">
+          {template
+            ? `Add ${template.name.toLowerCase()}-specific metadata to enhance your asset's discoverability and protection.`
+            : "Add detailed metadata to enhance your asset's discoverability and protection."}
+        </p>
+      </div>
 
-          <TabsContent value="standard" className="mt-4">
-            {renderTemplateFields()}
-          </TabsContent>
+      {/* Template-Specific Fields */}
+      {templateFields.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Database className="h-5 w-5" />
+              {template?.name} Metadata
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              {templateFields.map((field) => (
+                <div key={field.key} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor={field.key} className="text-base font-medium">
+                      {field.label}
+                    </Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="w-[200px] text-xs">
+                            {field.type === "select"
+                              ? `Choose from available ${field.label.toLowerCase()} options`
+                              : field.placeholder || `Enter ${field.label.toLowerCase()}`}
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  {renderField(field)}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-          <TabsContent value="custom" className="mt-4">
-            <div className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+      {/* General Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Info className="h-5 w-5" />
+            General Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 gap-6">
+            {generalFields.map((field) => (
+              <div key={field.key} className="space-y-2">
+                <Label htmlFor={field.key} className="text-base font-medium">
+                  {field.label}
+                </Label>
+                {renderField(field)}
+                {field.key === "keywords" && (
+                  <p className="text-sm text-muted-foreground">Add relevant keywords to improve discoverability</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Custom Fields */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between text-lg">
+            <div className="flex items-center gap-2">
+              <Plus className="h-5 w-5" />
+              Custom Fields
+            </div>
+            <Button variant="outline" size="sm" onClick={() => setShowCustomFields(!showCustomFields)}>
+              {showCustomFields ? "Hide" : "Add Custom"}
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Existing custom fields */}
+          {customFields.length > 0 && (
+            <div className="space-y-3">
+              {customFields.map((field, index) => (
+                <div key={index} className="flex items-center gap-3 p-4 border rounded-lg bg-muted/30">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="outline" className="text-xs">
+                        {field.type}
+                      </Badge>
+                      <span className="font-medium">{field.key}</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{field.value}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" onClick={() => removeCustomField(index)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Separator />
+            </div>
+          )}
+
+          {/* Add new custom field */}
+          {showCustomFields && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/20">
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="custom-field-name">Field Name</Label>
+                  <Label htmlFor="fieldKey" className="text-base font-medium">
+                    Field Name
+                  </Label>
                   <Input
-                    id="custom-field-name"
-                    value={customField.name}
-                    onChange={(e) => setCustomField({ ...customField, name: e.target.value })}
-                    placeholder="Field name"
+                    id="fieldKey"
+                    placeholder="e.g., Edition Number"
+                    value={newFieldKey}
+                    onChange={(e) => setNewFieldKey(e.target.value)}
+                    className="h-12 text-base"
                   />
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="custom-field-value">Field Value</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="custom-field-value"
-                      value={customField.value}
-                      onChange={(e) => setCustomField({ ...customField, value: e.target.value })}
-                      placeholder="Field value"
-                    />
-                    <Button onClick={addCustomField} className="shrink-0">
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {customFields.length > 0 ? (
-                <div className="border rounded-md p-4 space-y-2">
-                  <h4 className="text-sm font-medium">Added Custom Fields</h4>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    {customFields.map((field, index) => (
-                      <div key={index} className="flex justify-between items-center border-b pb-2">
-                        <div>
-                          <p className="font-medium">{field.name}</p>
-                          <p className="text-sm text-muted-foreground">{field.value}</p>
-                        </div>
-                        <Button variant="ghost" size="sm" onClick={() => removeCustomField(field.name)}>
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
+                    <Label htmlFor="fieldType" className="text-base font-medium">
+                      Type
+                    </Label>
+                    <Select value={newFieldType} onValueChange={setNewFieldType}>
+                      <SelectTrigger className="h-12 text-base">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="text">Text</SelectItem>
+                        <SelectItem value="number">Number</SelectItem>
+                        <SelectItem value="date">Date</SelectItem>
+                        <SelectItem value="url">URL</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fieldValue" className="text-base font-medium">
+                      Value
+                    </Label>
+                    <Input
+                      id="fieldValue"
+                      placeholder="Enter value"
+                      value={newFieldValue}
+                      onChange={(e) => setNewFieldValue(e.target.value)}
+                      className="h-12 text-base"
+                    />
                   </div>
                 </div>
-              ) : (
-                <div className="text-center p-6 border border-dashed rounded-md">
-                  <Layers className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <h4 className="font-medium">No Custom Fields Added</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Add custom fields to include additional metadata for your asset
-                  </p>
-                </div>
-              )}
+                <Button onClick={addCustomField} disabled={!newFieldKey || !newFieldValue} className="w-full" size="lg">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Custom Field
+                </Button>
+              </div>
             </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+          )}
+
+          {customFields.length === 0 && !showCustomFields && (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertDescription>
+                Add custom fields to include additional metadata specific to your asset. This can help with
+                categorization, search, and providing more context about your intellectual property.
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   )
 }
