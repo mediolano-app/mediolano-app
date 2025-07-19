@@ -47,7 +47,7 @@ export default function TemplatesPage() {
   const selectedTemplateObject = templates.find((template) => template.id === selectedTemplate)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen">
      
       <main className="container mx-auto p-4 py-8">
         <div className="mb-8 space-y-6">
@@ -56,7 +56,7 @@ export default function TemplatesPage() {
             <AlertTitle>Optimized IP Registration</AlertTitle>
             <AlertDescription>
               Our templates are designed for different types of intellectual property, providing specialized fields and
-              blockchain registration optimized for maximum legal protection.
+              blockchain registration using Starknet and Ethereum security.
             </AlertDescription>
           </Alert>
 

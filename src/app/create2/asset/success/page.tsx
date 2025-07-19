@@ -58,7 +58,7 @@ export default function AssetCreatedSuccessPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <main className="container mx-auto p-4 py-12 max-w-4xl">
         {/* Success Header */}
         <div className="text-center mb-8">

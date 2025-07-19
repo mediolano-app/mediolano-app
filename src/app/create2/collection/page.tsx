@@ -226,7 +226,7 @@ export default function CreateCollectionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen">
     
 
       <main className="container mx-auto px-4 py-6 md:py-8">
