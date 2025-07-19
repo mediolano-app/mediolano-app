@@ -38,8 +38,8 @@ const creationOptions = [
     trending: true,
     popular: true,
     estimatedTime: "1-5 min",
-    successRate: 98,
-    userCount: "15.2k",
+    successRate: 99,
+    userCount: "55",
     benefits: [
       "Comprehensive IP protection",
       "Decentralized Authorship",
@@ -57,9 +57,12 @@ const creationOptions = [
     gradient: "from-blue-500 to-blue-700",
     iconColor: "text-blue-500",
     requirements: ["Original work", "Metadata"],
-    timeEstimate: "5-10 min",
+    timeEstimate: "1-5 min",
     tags: ["IP", "Asset", "Protection"],
     featured: true,
+    complexity: "Medium",
+    useCases: ["Custom IP registration", "Metadata management"],
+    completionRate: 95,
   },
   {
     id: "templates",
@@ -70,9 +73,9 @@ const creationOptions = [
     category: "core",
     trending: true,
     popular: true,
-    estimatedTime: "3-7 min",
+    estimatedTime: "1-5 min",
     successRate: 99,
-    userCount: "28.7k",
+    userCount: "28",
     benefits: [
       "Pre-configured for your asset type",
       "Industry-specific metadata fields",
@@ -90,9 +93,12 @@ const creationOptions = [
     gradient: "from-purple-500 to-purple-700",
     iconColor: "text-purple-500",
     requirements: ["Template selection"],
-    timeEstimate: "3-7 min",
-    tags: ["Template", "IP", "Fast"],
+    timeEstimate: "2-5 min",
+    tags: ["Template", "IP", "Creator"],
     featured: false,
+    complexity: "Low",
+    useCases: ["Quick IP registration", "Industry templates"],
+    completionRate: 99,
   },
   {
     id: "collection",
@@ -103,9 +109,9 @@ const creationOptions = [
     category: "organization",
     trending: false,
     popular: false,
-    estimatedTime: "2-5 min",
+    estimatedTime: "1-2 min",
     successRate: 97,
-    userCount: "8.9k",
+    userCount: "89",
     benefits: ["Organize related assets", "Batch licensing options", "Unified branding", "Easier portfolio management"],
     process: [
       "Define collection details and theme",
@@ -118,9 +124,12 @@ const creationOptions = [
     gradient: "from-green-500 to-green-700",
     iconColor: "text-green-500",
     requirements: ["Multiple assets"],
-    timeEstimate: "2-5 min",
+    timeEstimate: "1-2 min",
     tags: ["Collection", "Batch", "Organization"],
     featured: false,
+    complexity: "Low",
+    useCases: ["Showcase assets", "Portfolio organization"],
+    completionRate: 92,
   },
 ]
 
@@ -132,7 +141,7 @@ const templates = [
     description: "Music, podcasts, sound effects, and audio content",
     color: "blue",
     category: "media",
-    count: "4.2k",
+    count: "42",
   },
   {
     id: "art",
@@ -141,7 +150,7 @@ const templates = [
     description: "Digital art, illustrations, paintings, and visual creations",
     color: "purple",
     category: "media",
-    count: "12.8k",
+    count: "12",
   },
   {
     id: "video",
@@ -150,7 +159,7 @@ const templates = [
     description: "Films, animations, tutorials, and video content",
     color: "red",
     category: "media",
-    count: "6.1k",
+    count: "61",
   },
   {
     id: "software",
@@ -159,7 +168,7 @@ const templates = [
     description: "Applications, code, algorithms, and digital tools",
     color: "violet",
     category: "tech",
-    count: "3.7k",
+    count: "37",
   },
   {
     id: "documents",
@@ -168,7 +177,7 @@ const templates = [
     description: "Contracts, agreements, manuals, and written content",
     color: "gray",
     category: "legal",
-    count: "2.9k",
+    count: "29",
   },
   {
     id: "nft",
@@ -177,7 +186,7 @@ const templates = [
     description: "Non-fungible tokens and blockchain assets",
     color: "teal",
     category: "blockchain",
-    count: "8.4k",
+    count: "84",
   },
 ]
 
@@ -233,7 +242,7 @@ export default function CreatePage() {
         <div className="text-center py-8 md:py-12">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
             <Sparkles className="h-4 w-4" />
-            Onramp your intellectual property onchain
+            Onramp your intellectual property
           </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
             Protect Your{" "}

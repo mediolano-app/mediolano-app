@@ -25,7 +25,7 @@ export function AssetConfirmation({ formState, template }: AssetConfirmationProp
             <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold mb-2">Asset Created Successfully!</h1>
+            <h1 className="text-3xl font-bold mb-2">Programmable IP</h1>
             <p className="text-muted-foreground">
               Your {template.name.toLowerCase()} has been registered and protected on the blockchain
             </p>
@@ -117,7 +117,7 @@ export function AssetConfirmation({ formState, template }: AssetConfirmationProp
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Network:</span>
-                  <span className="font-medium">Ethereum Mainnet</span>
+                  <span className="font-medium">Starknet</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Status:</span>
