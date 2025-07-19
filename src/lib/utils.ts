@@ -64,3 +64,8 @@ export function toHexString(value: string | number | bigint): string {
     throw new Error(`Invalid input for hex conversion: ${value}`);
   }
 }
+
+export function toEpochTime(date: string | Date): number {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return Math.floor(d.getTime() / 1000);
+}
