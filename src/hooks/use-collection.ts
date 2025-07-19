@@ -142,8 +142,8 @@ export function useCollection(): UseCollectionReturn {
         };
 
         // Upload metadata to IPFS
-        // const ipfsHash = await uploadMetadataToIPFS(metadata);
-        const baseUri = `ipfs://12345`;
+        const ipfsHash = await uploadMetadataToIPFS(metadata);
+        const baseUri = `ipfs://${ipfsHash}`;
 
         // Create collection symbol from name (first 6 chars, uppercase)
         const symbol =
