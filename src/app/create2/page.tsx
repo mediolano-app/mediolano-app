@@ -30,30 +30,30 @@ import { CreationOptionDetails } from "@/components/create/creation-option-detai
 const creationOptions = [
   {
     id: "asset",
-    title: "Create IP Asset",
+    title: "Create Your Programmable IP",
     description: "Register and protect your intellectual property with comprehensive metadata and licensing options.",
     icon: "Shield",
     color: "blue",
     category: "core",
     trending: true,
     popular: true,
-    estimatedTime: "5-10 min",
+    estimatedTime: "1-5 min",
     successRate: 98,
     userCount: "15.2k",
     benefits: [
       "Comprehensive IP protection",
-      "Flexible licensing options",
-      "Automated royalty tracking",
-      "Global recognition",
+      "Decentralized Authorship",
+      "Proof of Ownership",
+      "Global Reach and Recognition",
     ],
     process: [
       "Upload your asset and add basic information",
       "Configure metadata and licensing terms",
       "Review and confirm registration",
-      "Receive your IP certificate",
+      "Self custody your IP onchain",
     ],
     href: "/create2/asset",
-    useCase: "Perfect for creators who want to protect their original work with full legal backing.",
+    useCase: "Perfect for creators who want to customize their Programmable IP.",
     gradient: "from-blue-500 to-blue-700",
     iconColor: "text-blue-500",
     requirements: ["Original work", "Metadata"],
@@ -64,7 +64,7 @@ const creationOptions = [
   {
     id: "templates",
     title: "Use Template",
-    description: "Choose from optimized templates designed for specific types of intellectual property.",
+    description: "Choose from optimized templates designed for specific types of content.",
     icon: "Grid3X3",
     color: "purple",
     category: "core",
@@ -233,7 +233,7 @@ export default function CreatePage() {
         <div className="text-center py-8 md:py-12">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
             <Sparkles className="h-4 w-4" />
-            Trusted by 50,000+ creators worldwide
+            Onramp your intellectual property onchain
           </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
             Protect Your{" "}
@@ -249,19 +249,19 @@ export default function CreatePage() {
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">50k+</div>
-              <div className="text-sm text-muted-foreground">Assets Protected</div>
+              <div className="text-2xl font-bold text-primary">Zero</div>
+              <div className="text-sm text-muted-foreground">Fees</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">$2.5M+</div>
-              <div className="text-sm text-muted-foreground">Royalties Earned</div>
+              <div className="text-2xl font-bold text-primary">Self</div>
+              <div className="text-sm text-muted-foreground"> Custody</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">99.8%</div>
-              <div className="text-sm text-muted-foreground">Success Rate</div>
+              <div className="text-2xl font-bold text-primary">Onchain</div>
+              <div className="text-sm text-muted-foreground">Authorship</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">24/7</div>
+              <div className="text-2xl font-bold text-primary">Global</div>
               <div className="text-sm text-muted-foreground">Protection</div>
             </div>
           </div>
@@ -428,7 +428,7 @@ export default function CreatePage() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="font-medium text-sm">{template.name}</div>
-                                <div className="text-xs text-muted-foreground">{template.count} created</div>
+                                {/*<div className="text-xs text-muted-foreground">{template.count} created</div>*/}
                               </div>
                               <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
                             </div>
@@ -462,23 +462,23 @@ export default function CreatePage() {
                   {/* Benefits */}
                   <Card>
                     <CardContent className="p-4">
-                      <h4 className="font-medium mb-3">Why Choose Our Platform?</h4>
+                      <h4 className="font-medium mb-3">Why register with Mediolano?</h4>
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span>Zero platform fees</span>
+                          <span>Zero fees protocol and dapp</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span>Full ownership rights</span>
+                          <span>Full ownership onchain</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span>Instant protection</span>
+                          <span>Instant tokenization</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span>Global recognition</span>
+                          <span>Powered on Starknet Blockchain</span>
                         </div>
                       </div>
                     </CardContent>
