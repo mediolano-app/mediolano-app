@@ -95,6 +95,8 @@ export default function SettingsPage() {
     }));
   };
 
+
+
   useEffect(() => {
     if (!walletAddress) return;
 
@@ -105,6 +107,8 @@ export default function SettingsPage() {
       setLoadingSettings(true);
 
       try {
+        console.log("Fetching settings for:", walletAddress);
+
         const [
           accountSettingRes,
           ipSettingRes,
@@ -239,6 +243,7 @@ export default function SettingsPage() {
           <div className="flex justify-end p-5">
             <Button
               onClick={async (e) => {
+                console.log(user);
                 await executeSettingsCall({
                   method: "store_account_details",
                   args: [
@@ -300,6 +305,7 @@ export default function SettingsPage() {
           <div className="flex justify-end p-5">
             <Button
               onClick={async (e) => {
+                console.log(user);
                 await executeSettingsCall({
                   method: "store_ip_management_settings",
                   args: [
@@ -387,6 +393,7 @@ export default function SettingsPage() {
           <div className="flex justify-end p-5">
             <Button
               onClick={async (e) => {
+                console.log(user);
                 await executeSettingsCall({
                   method: "store_notification_settings",
                   args: [
@@ -446,6 +453,7 @@ export default function SettingsPage() {
           <div className="flex justify-end p-5">
             <Button
               onClick={async (e) => {
+                console.log(user);
                 await executeSettingsCall({
                   method: "store_security_settings",
                   args: [user.password, toEpochTime(new Date().toISOString())],
@@ -504,6 +512,7 @@ export default function SettingsPage() {
           <div className="flex justify-end p-5">
             <Button
               onClick={async (e) => {
+                console.log(user);
                 await executeSettingsCall({
                   method: "store_network_settings",
                   args: [
@@ -563,6 +572,7 @@ export default function SettingsPage() {
                 variant="destructive"
                 className="w-full"
                 onClick={async () => {
+                  console.log(user);
                   await executeSettingsCall({
                     method: "delete_account",
                     args: [toEpochTime(new Date().toISOString())],
@@ -576,6 +586,7 @@ export default function SettingsPage() {
           <div className="flex justify-end p-5">
             <Button
               onClick={async (e) => {
+                console.log(user);
                 await executeSettingsCall({
                   method: "store_advanced_settings",
                   args: [user.apiKey, toEpochTime(new Date().toISOString())],
