@@ -19,6 +19,7 @@ import {
   Users,
   Shield,
   ChevronRight,
+  Coins,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -40,8 +41,8 @@ interface CreationOption {
   timeEstimate: string
   complexity: "Beginner" | "Intermediate" | "Advanced"
   useCases: string[]
-  completionRate: number
-  userCount: string
+  ownershipRate: number
+  popularity: string
 }
 
 interface CreationOptionCardProps {
@@ -118,12 +119,12 @@ export function CreationOptionCard({ option, isSelected, onSelect }: CreationOpt
             <span>{option.timeEstimate}</span>
           </div>
           <div className="flex items-center gap-1.5 text-muted-foreground">
-            <Users className="h-3.5 w-3.5" />
-            <span>{option.userCount} users</span>
+            <Coins className="h-3.5 w-3.5" />
+            <span>Zero Fee</span>
           </div>
           <div className="flex items-center gap-1.5 text-muted-foreground">
             <Shield className="h-3.5 w-3.5" />
-            <span>{option.completionRate}% success</span>
+            <span>100% Ownership</span>
           </div>
           <Badge variant="outline" className="text-xs justify-self-end">
             {option.complexity}

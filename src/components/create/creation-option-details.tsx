@@ -12,8 +12,8 @@ interface CreationOptionDetailsProps {
     title: string
     description: string
     estimatedTime: string
-    successRate: number
-    userCount: string
+    estimatedFee: number
+    popularity: string
     benefits?: string[]
     process?: string[]
     useCase?: string
@@ -58,18 +58,18 @@ export function CreationOptionDetails({ option }: CreationOptionDetailsProps) {
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/50">
               <Users className="h-4 w-4 mx-auto mb-1 text-primary" />
-              <div className="text-sm font-medium">{option.userCount}</div>
-              <div className="text-xs text-muted-foreground">Users</div>
+              <div className="text-sm font-medium">{option.popularity}</div>
+              <div className="text-xs text-muted-foreground">Popularity</div>
             </div>
           </div>
 
           <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium">Success Rate</span>
+              <span className="text-sm font-medium">Network Fee</span>
             </div>
             <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-              {option.successRate}%
+              {option.estimatedFee}
             </Badge>
           </div>
 

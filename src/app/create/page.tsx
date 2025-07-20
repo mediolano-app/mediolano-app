@@ -30,7 +30,7 @@ import { CreationOptionDetails } from "@/components/create/creation-option-detai
 const creationOptions = [
   {
     id: "asset",
-    title: "Create Your Programmable IP",
+    title: "Create Asset: Programmable IP",
     description: "Register and protect your intellectual property with comprehensive metadata and licensing options.",
     icon: "Shield",
     color: "blue",
@@ -38,7 +38,7 @@ const creationOptions = [
     trending: true,
     popular: true,
     estimatedTime: "1-5 min",
-    successRate: 99,
+    estimatedFee: 0.001,
     userCount: "55",
     benefits: [
       "Comprehensive IP protection",
@@ -60,13 +60,13 @@ const creationOptions = [
     timeEstimate: "1-5 min",
     tags: ["IP", "Asset", "Protection"],
     featured: true,
-    complexity: "Medium",
+    complexity: "Intermediate",
     useCases: ["Custom IP registration", "Metadata management"],
-    completionRate: 95,
+    popularity: 99,
   },
   {
     id: "templates",
-    title: "Creat with IP Template",
+    title: "Create With IP Template",
     description: "Choose from optimized templates designed for specific types of content.",
     icon: "Grid3X3",
     color: "purple",
@@ -74,7 +74,7 @@ const creationOptions = [
     trending: true,
     popular: true,
     estimatedTime: "1-5 min",
-    successRate: 99,
+    estimatedFee: 0.001,
     userCount: "28",
     benefits: [
       "Pre-configured for your asset type",
@@ -96,9 +96,9 @@ const creationOptions = [
     timeEstimate: "2-5 min",
     tags: ["Template", "IP", "Creator"],
     featured: false,
-    complexity: "Low",
+    complexity: "Beginner",
     useCases: ["Quick IP registration", "Industry templates"],
-    completionRate: 99,
+    popularity: 75,
   },
   {
     id: "collection",
@@ -110,7 +110,7 @@ const creationOptions = [
     trending: false,
     popular: false,
     estimatedTime: "1-2 min",
-    successRate: 97,
+    estimatedFee: 0.001,
     userCount: "89",
     benefits: ["Organize related assets", "Batch licensing options", "Unified branding", "Easier portfolio management"],
     process: [
@@ -127,9 +127,9 @@ const creationOptions = [
     timeEstimate: "1-2 min",
     tags: ["Collection", "Batch", "Organization"],
     featured: false,
-    complexity: "Low",
+    complexity: "Beginner",
     useCases: ["Showcase assets", "Portfolio organization"],
-    completionRate: 92,
+    popularity: 92,
   },
 ]
 
@@ -222,7 +222,7 @@ export default function CreatePage() {
       case "time":
         return Number.parseInt(a.estimatedTime.split("-")[0]) - Number.parseInt(b.estimatedTime.split("-")[0])
       case "success":
-        return b.successRate - a.successRate
+        return b.estimatedFee - a.estimatedFee
       case "name":
         return a.title.localeCompare(b.title)
       default:
@@ -240,13 +240,13 @@ export default function CreatePage() {
       <main className="container mx-auto p-4 max-w-7xl">
         {/* Hero Section */}
         <div className="text-center py-8 md:py-12">
-          <div className="inline-flex items-center gap-2 bg-blue/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
-            
-            Programmable IP for the Integrity Web
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
+            <Sparkles className="h-4 w-4" />
+            Programmable IP
           </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-4">
             Protect Your{" "}
-            <span className="text-blue-600">
+            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Creative Work
             </span>
           </h1>
