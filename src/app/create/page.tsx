@@ -97,7 +97,7 @@ const creationOptions = [
     tags: ["Template", "IP", "Creator"],
     featured: false,
     complexity: "Beginner",
-    useCases: ["Quick IP registration", "Industry templates"],
+    useCases: ["Music", "Publications", "Videos", "Software"],
     popularity: 75,
   },
   {
@@ -112,11 +112,11 @@ const creationOptions = [
     estimatedTime: "1-2 min",
     estimatedFee: 0.001,
     userCount: "89",
-    benefits: ["Organize related assets", "Batch licensing options", "Unified branding", "Easier portfolio management"],
+    benefits: ["Manage assets", "Showcase IP", "Unified branding", "Powerful features"],
     process: [
       "Define collection details and theme",
       "Set collection-wide licensing terms",
-      "Add assets to your collection",
+      "Open and collaborative collections",
       "Publish and manage your collection",
     ],
     href: "/create/collection",

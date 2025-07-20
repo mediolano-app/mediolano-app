@@ -3,7 +3,7 @@ export const templates = [
     id: "general",
     name: "General Asset",
     icon: "FileText",
-    description: "Create a general intellectual property asset with flexible metadata",
+    description: "Create a custom intellectual property asset with flexible metadata",
     color: "slate",
     category: "other",
     features: ["Flexible schema", "Custom validation", "Adaptive forms"],
