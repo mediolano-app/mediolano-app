@@ -127,14 +127,14 @@ export default function TemplatesPage() {
                   <TemplateDetails template={selectedTemplateObject} />
 
                   <div className="space-y-3">
-                    <Link href={`/create2/templates/${selectedTemplateObject.id}`}>
+                    <Link href={`/create/templates/${selectedTemplateObject.id}`}>
                       <Button className="w-full" size="lg">
                         Use {selectedTemplateObject.name} Template
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
 
-                    <Link href="/create2/asset">
+                    <Link href="/create/asset">
                       <Button variant="outline" className="w-full bg-transparent" size="lg">
                         Create Custom Asset
                       </Button>

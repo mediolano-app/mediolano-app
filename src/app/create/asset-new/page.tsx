@@ -1,50 +1,34 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Eye } from "lucide-react"
-import Link from "next/link"
-
+import { ArrowLeft, Eye, FileText } from "lucide-react"
+import Link from "next/link"  
 import { AssetPreview } from "@/components/asset-creation/asset-preview"
-import { AssetConfirmation } from "@/components/asset-creation/asset-confirmation"
 import { AssetFormCore } from "@/components/asset-creation/asset-form-core"
 import { LicensingOptions } from "@/components/asset-creation/licensing-options"
-import { TemplateInfoCard } from "@/components/asset-creation/template-info-card"
 import { TemplateSpecificFields } from "@/components/asset-creation/template-specific-fields"
+import { TemplateInfoCard } from "@/components/asset-creation/template-info-card"
+import { Card, CardContent } from "@/components/ui/card"
 import { useAssetForm } from "@/hooks/use-asset-form"
 import { templates, getTemplateById } from "@/lib/templates"
 
-export default function CreateAssetFromTemplate() {
-  const params = useParams()
+export default function CreateAssetPage() {
   const router = useRouter()
-  const templateId = params.templateId as string
-
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showMobilePreview, setShowMobilePreview] = useState(false)
-  const [isComplete, setIsComplete] = useState(false)
 
-  // Find the template
-  const template = getTemplateById(templateId)
+  // Initialize form
+  const { formState, updateFormField, handleFileChange, canSubmit } = useAssetForm()
 
-  // Initialize form with template-specific defaults
-  const { formState, updateFormField, handleFileChange, canSubmit } = useAssetForm({
-    assetType: templateId,
-  })
+  // Get selected template
+  const selectedTemplate = getTemplateById(formState.assetType)
 
-  // Redirect if template not found
-  useEffect(() => {
-    if (!template) {
-      router.push("/create2/templates")
-    }
-  }, [template, router])
-
-  if (!template) {
-    return null
-  }
-
-  const handleTemplateChange = (newTemplateId: string) => {
-    router.push(`/create2/templates/${newTemplateId}`)
+  const handleTemplateChange = (templateId: string) => {
+    updateFormField("assetType", templateId)
+    // Clear metadata fields when changing template
+    updateFormField("metadataFields", {})
   }
 
   const handleSubmit = async () => {
@@ -53,17 +37,14 @@ export default function CreateAssetFromTemplate() {
     setIsSubmitting(true)
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsSubmitting(false)
-    setIsComplete(true)
-  }
 
-  if (isComplete) {
-    return <AssetConfirmation formState={formState} template={template} />
+    // Redirect to success page
+    router.push("/create/asset/success")
   }
 
   return (
     <div className="min-h-screen">
-      
+
 
       {/* Mobile Preview Modal */}
       {showMobilePreview && (
@@ -76,7 +57,7 @@ export default function CreateAssetFromTemplate() {
               </Button>
             </div>
             <div className="p-4">
-              <AssetPreview formState={formState} template={template} />
+              <AssetPreview formState={formState} template={selectedTemplate} />
             </div>
           </div>
         </div>
@@ -92,13 +73,19 @@ export default function CreateAssetFromTemplate() {
               updateFormField={updateFormField}
               handleFileChange={handleFileChange}
               templates={templates}
-              selectedTemplate={template}
+              selectedTemplate={selectedTemplate}
               onTemplateChange={handleTemplateChange}
-              showTemplateSelector={false}
+              showTemplateSelector={true}
             />
 
             {/* Template-Specific Fields */}
-            <TemplateSpecificFields template={template} formState={formState} updateFormField={updateFormField} />
+            {selectedTemplate && (
+              <TemplateSpecificFields
+                template={selectedTemplate}
+                formState={formState}
+                updateFormField={updateFormField}
+              />
+            )}
 
             {/* Licensing Options */}
             <LicensingOptions formState={formState} updateFormField={updateFormField} />
@@ -115,10 +102,26 @@ export default function CreateAssetFromTemplate() {
           <div className="hidden lg:block lg:col-span-1">
             <div className="sticky top-24 space-y-6">
               {/* Template Info */}
-              <TemplateInfoCard template={template} />
+              {selectedTemplate && <TemplateInfoCard template={selectedTemplate} />}
 
               {/* Live Preview */}
-              <AssetPreview formState={formState} template={template} />
+              <AssetPreview formState={formState} template={selectedTemplate} />
+
+              {/* Help Card */}
+              <Card>
+                <CardContent className="p-4">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Need Help?
+                  </h4>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Learn more about creating and protecting your intellectual property assets.
+                  </p>
+                  <Button variant="outline" size="sm" className="w-full bg-transparent">
+                    View Documentation
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

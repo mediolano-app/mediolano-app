@@ -82,10 +82,10 @@ export function MainNav() {
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <Box className="mr-2 h-4 w-4  text-blue-600" />
-                      Create Asset
+                      Create
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Create a new Programmable IP or Collection.
+                      Register a new Programmable IP or Collection.
                     </p>
                   </Link>
                 </NavigationMenuLink>

@@ -46,12 +46,12 @@ export function QuickActions() {
                 </Button>
               </Link>
 
-              <Link href="/licensing/create" className="w-full">
+              <Link href="/create" className="w-full">
                 <Button variant="outline" className="h-full w-full justify-start gap-3 px-4 py-6">
                   <Plus className="h-5 w-5" />
                   <div className="flex flex-col items-start">
-                    <span className="font-medium">Create Asset</span>
-                    <span className="text-xs text-muted-foreground">Generate Programmable IP</span>
+                    <span className="font-medium">Create</span>
+                    <span className="text-xs text-muted-foreground">Register Programmable IP</span>
                   </div>
                 </Button>
               </Link>
