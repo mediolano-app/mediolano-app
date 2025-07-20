@@ -96,10 +96,6 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    console.log(user);
-  }, [user]);
-
-  useEffect(() => {
     if (!walletAddress) return;
 
     const decode = (val: any) =>
@@ -109,8 +105,6 @@ export default function SettingsPage() {
       setLoadingSettings(true);
 
       try {
-        console.log("Fetching settings for:", walletAddress);
-
         const [
           accountSettingRes,
           ipSettingRes,
