@@ -267,8 +267,11 @@ export function WalletConnect() {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
+          
+          
           {isConnected ? (
             <div className="grid gap-4">
+              
               <Link href="/discover">
                 <Button variant="outline" className="justify-start w-full">
                   <Rocket className="mr-2 h-4 w-4" />
@@ -346,8 +349,7 @@ export function WalletConnect() {
 
               <div className="alert alert-warning">
                 <p className="text-sm">
-                  * Mediolano Dapp is under development and connected to the
-                  testnet. Please make sure your wallet is connect on{" "}
+                  * Mediolano Dapp is under development and connected to the testnet. Please make sure your wallet is connect on{" "}
                   <strong>Starknet Sepolia</strong> to interact.
                 </p>
               </div>

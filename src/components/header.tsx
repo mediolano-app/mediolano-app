@@ -1,8 +1,8 @@
-import { MobileSidebar } from "@/components/header/MobileSidebar"
-import { MainNav } from "@/components/header/MainNav"
-import { WalletConnect } from "@/components/header/WalletConnect"
-import { ThemeToggle } from "@/components/header/ThemeToggle"
-import { Logo } from "@/components/header/Logo"
+import { MobileSidebar } from "@/components/header/sidebar"
+import { MainNav } from "@/components/header/nav"
+import { WalletConnect } from "@/components/header/wallet-connect"
+import { ThemeToggle } from "@/components/header/theme-toggle"
+import { Logo } from "@/components/header/logo"
 
 export function Header() {
   return (

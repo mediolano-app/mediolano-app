@@ -19,10 +19,10 @@ import {
 } from "@/components/ui/accordion"
 import dynamic from 'next/dynamic';
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { ThemeToggle } from "@/components/header/ThemeToggle"
+import { ThemeToggle } from "@/components/header/theme-toggle"
+import { WalletConnect } from "@/components/header/wallet-connect"
 
-
-const WalletBarM = dynamic(() => import('@/components/header/WalletBarM'), { ssr: false })
+const WalletBarM = dynamic(() => import('@/components/header/walletbar-mobile'), { ssr: false })
 
 const navigationItems = [
   {
@@ -96,16 +96,15 @@ export function MobileSidebar() {
       <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
       <VisuallyHidden.Root>
         <SheetTitle>
-          Dapp Menu
+          Mediolano Dapp
         </SheetTitle>
       </VisuallyHidden.Root>
         <nav className="flex flex-col space-y-4 mt-4">
 
 
         <div className='mt-2'>
-            <WalletBarM />
+          <WalletConnect />
         </div>
-
 
 
           <Accordion type="single" collapsible className="w-full">
