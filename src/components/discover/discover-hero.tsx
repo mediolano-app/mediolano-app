@@ -88,7 +88,7 @@ export default function HeroSection() {
               className="inline-flex items-center space-x-2 bg-blue/10 text-primary px-4 py-2 rounded-full mb-6"
             >
               <Shield className="h-4 w-4" color="blue" />
-              <span className="text-sm font-medium">Powered by Starknet</span>
+              <span className="text-sm font-medium">Powered on Starknet</span>
             </motion.div>
 
             <motion.h1 variants={itemVariants} className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">

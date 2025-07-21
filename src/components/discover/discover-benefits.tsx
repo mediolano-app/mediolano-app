@@ -130,7 +130,7 @@ export default function DiscoverBenefitsCreators() {
           animate={isMounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
           transition={{ duration: 0.7 }}
           viewport={{ once: true, margin: "-100px" }}
-          className="mt-20 p-8 rounded-2xl"
+          className="mt-40 p-8 rounded-2xl"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>

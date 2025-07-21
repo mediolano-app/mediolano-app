@@ -1,11 +1,9 @@
 import type { Metadata } from "next"
-import Resources from "@/components/discover/DiscoverResources"
-import DiscoverBenefitsCreators from "@/components/discover/DiscoverBenefitsCreators"
-import DiscoverHero from "@/components/discover/DiscoverHero"
-import StartFeatures from "@/components/discover/StartFeatures"
-import DiscoverServicesCTA from "@/components/discover/DiscoverServicesCTA"
-import DiscoverFeatures from "@/components/discover/DiscoverFeatures"
-import DiscoverFAQ from "@/components/discover/DiscoverFAQ"
+import DiscoverResources from "@/components/discover/discover-resources"
+import DiscoverBenefitsCreators from "@/components/discover/discover-benefits"
+import DiscoverHero from "@/components/discover/discover-hero"
+import DiscoverFeatures from "@/components/discover/discover-features"
+import DiscoverFAQ from "@/components/discover/discover-faq"
 
 export default function AboutPage() {
   return (
@@ -13,9 +11,8 @@ export default function AboutPage() {
       <DiscoverHero />
       <DiscoverBenefitsCreators />
       <DiscoverFeatures />      
-      <DiscoverServicesCTA />
       <DiscoverFAQ />
-      <Resources />
+      <DiscoverResources />
     </div>
   )
 }

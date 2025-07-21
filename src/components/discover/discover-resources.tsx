@@ -23,10 +23,10 @@ const resources = [
   },
 ]
 
-export default function Resources() {
+export default function DiscoverResources() {
   return (
-    <section className="space-y-6 mb-20">
-      <h2 className="text-2xl text-center tracking-tighter sm:text-3xl md:text-4xl">Resources (Upcoming)</h2>
+    <section className="space-y-6 mb-40">
+      <h2 className="text-xl text-center tracking-tighter sm:text-3xl md:text-4xl">Resources (Upcoming)</h2>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {resources.map((resource, index) => (
           <Card key={index} className="bg-background/40">

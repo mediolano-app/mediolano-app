@@ -33,14 +33,14 @@ export default function DiscoverFeatures() {
     },
     {
       icon: <Clock className="h-10 w-10 text-blue-600" />,
-      title: "Timestamped Ownership",
+      title: "Proof of Ownership",
       description:
         "Your copyright will be timestamped for proof of ownership, valid for 50-70 years depending on legal jurisdiction.",
     },
     {
       icon: <Lock className="h-10 w-10 text-blue-600" />,
       title: "Permissionless Registration",
-      description: "Anyone can register their Intellectual Property assets without barriers or gatekeepers.",
+      description: "Anyone can create Programmable Intellectual Property assets without barriers or gatekeepers.",
     },
   ]
 
