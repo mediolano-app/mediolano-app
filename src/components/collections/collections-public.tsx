@@ -100,7 +100,7 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
     <div className="space-y-8">
       {featuredCollection && (
         <div className="mb-10">
-          <h2 className="text-2xl font-bold mb-4">Featured Collection</h2>
+          
           <FeaturedCollectionCard
             collection={featuredCollection}
             nftCount={getCollectionNFTCount(featuredCollection.id)}

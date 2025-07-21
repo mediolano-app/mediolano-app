@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid, Gem, ArrowRightLeft, FileBadge, FileCheck, DollarSign } from 'lucide-react'
+import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid, Gem, ArrowRightLeft, FileBadge, FileCheck, DollarSign, Grid2X2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -29,17 +29,19 @@ const navigationItems = [
     title: 'Start',
     items: [
       { title: 'Discover', href: '/discover', icon: BookOpen },
-      { title: 'Create IP', href: '/create', icon: Box },
-      { title: 'Explore Assets', href: '/assets', icon: Grid },
+      { title: 'Create', href: '/create', icon: Box },
+      { title: 'Create IP Collection', href: '/create/collection', icon: Grid2X2 },
+      { title: 'Create IP Asset', href: '/create/asset', icon: DollarSign },
+      { title: 'Create with IP Templates', href: '/create/templates', icon: Grid },
     ],
   },
   {
     title: 'Manage',
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: FileText },
-      { title: 'Assets Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
-      { title: 'Transfer Asset', href: '/transfer', icon: ArrowRightLeft },
-      { title: 'Licensing', href: '/licensing', icon: FileText },
+      { title: 'Collections', href: '/portfolio/collections', icon: Gem },
+      { title: 'Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
+      { title: 'Account', href: '/account', icon: User },
     ],
   },
   {
@@ -48,6 +50,8 @@ const navigationItems = [
 
       { title: 'Proof of Ownership', href: '/services/proof-of-ownership', icon: FileBadge },
       { title: 'Proof of Licensing', href: '/services/proof-of-licensing', icon: FileCheck },
+      { title: 'Transfer', href: '/transfer', icon: ArrowRightLeft },
+      { title: 'Licensing', href: '/licensing', icon: FileText },
       { title: 'Listings', href: '/listing', icon: Banknote },
     ],
   },
@@ -55,7 +59,6 @@ const navigationItems = [
 
 const userMenuItems = [
   { title: 'My Account', href: '/account', icon: User },
-  { title: 'Rewards', href: '/rewards', icon: Award },
   { title: 'Settings', href: '/settings', icon: Settings },
 ]
 
@@ -171,15 +174,15 @@ export function MobileSidebar() {
               className="w-full"
               onClick={() => handleNavigation('/create')}
             >
-              Create Programmable IP
+              Create
             </Button>
             <Button
               variant="default"
               size="lg"
               className="w-full"
-              onClick={() => handleNavigation('/portfolio')}
+              onClick={() => handleNavigation('/assets')}
             >
-              Open Portfolio
+              Explore
             </Button>
           </div>
 

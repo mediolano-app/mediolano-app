@@ -42,6 +42,7 @@ import {
   ArrowRightLeft,
   Building,
   FileBadge,
+  Grid2X2,
 } from "lucide-react"
 import { Logo } from "@/components/header/Logo"
 
@@ -147,6 +148,20 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/portfolio"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Grid2X2 className="mr-2 h-4 w-4  text-blue-600" />
+                      Collections
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Manage your IP Collections.
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     href="/portfolio/dashboard"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
@@ -168,38 +183,11 @@ export function MainNav() {
                       Transfer
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Transfer your Programmable IP to another account.
+                      Transfer your assets.
                     </p>
                   </Link>
                 </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/licensing"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <FileCode2 className="mr-2 h-4 w-4  text-blue-600" />
-                      Licensing
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Create new licensing agreements.
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/listing"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <Bookmark className="mr-2 h-4 w-4  text-blue-600" />
-                      Listings
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Sell, trade and tokenize your IP for marketplaces.
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+                
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
@@ -239,7 +227,7 @@ export function MainNav() {
                       Proof of Ownership
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Verifiable ownership of a digital asset (Preview)
+                      Verifiable ownership of a digital asset
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -257,7 +245,34 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
-
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/licensing"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <FileCode2 className="mr-2 h-4 w-4  text-blue-600" />
+                      Licensing
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Create new licensing agreements.
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/listing"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Bookmark className="mr-2 h-4 w-4  text-blue-600" />
+                      Listings
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Sell, trade and tokenize your IP for marketplaces.
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
                 
                 
               </div>

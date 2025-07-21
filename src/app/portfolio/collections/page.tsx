@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 import { getCollections } from "@/lib/mockupPortfolioData" // import real data from MIP
-import { CollectionsGrid } from "@/components/collections/collections-public"
+import { CollectionsPortfolioGrid } from "@/components/collections/collections-portfolio"
+import { CollectionStats } from "@/components/collections/collections-stats" // import real components
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function CollectionsPage() {
@@ -11,13 +12,15 @@ export default function CollectionsPage() {
       <div className="container py-10 space-y-8">
         <div className="space-y-2">
           <h1 className="text-4xl font-bold tracking-tight">Collections</h1>
-          <p className="text-muted-foreground">Discover IP Collections</p>
+          <p className="text-muted-foreground">Browse and manage your IP Collections</p>
         </div>
 
-
+        <Suspense fallback={<StatsSkeleton />}>
+          <CollectionStats />
+        </Suspense>
 
         <Suspense fallback={<CollectionsSkeleton />}>
-          <CollectionsGrid collections={collections} />
+          <CollectionsPortfolioGrid collections={collections} />
         </Suspense>
       </div>
     </div>
