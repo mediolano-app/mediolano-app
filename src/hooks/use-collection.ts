@@ -7,7 +7,7 @@ import {
 import { Abi } from "starknet";
 import { ipCollectionAbi } from "@/abis/ip_collection";
 import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
-import { fetchInBatches, withRetry } from "@/lib/utils";
+import { fetchOneByOne, withRetry } from "@/lib/utils";
 
 export interface ICreateCollection {
   name: string;
@@ -136,40 +136,57 @@ export function useGetCollections(walletAddress?: `0x${string}`) {
 
   const { fetchCollection } = useGetCollection();
 
-  useEffect(() => {
-    const loadCollections = async () => {
-      if (!contract || !walletAddress) return;
-      setLoading(true);
-      setError(null);
+  const loadCollections = useCallback(async () => {
+    if (!contract || !walletAddress) return;
+    setLoading(true);
+    setError(null);
 
-      try {
-        const ids: string[] = await contract.call(
-          "list_user_collections",
-          [walletAddress],
-          {
-            parseRequest: true,
-            parseResponse: true,
-          }
-        );
+    try {
+      const ids: string[] = await contract.call(
+        "list_user_collections",
+        [walletAddress],
+        {
+          parseRequest: true,
+          parseResponse: true,
+        }
+      );
 
-        const results = await fetchInBatches(
-          ids.map((id) => () => fetchCollection(id)),
-          5,
-          300
-        );
+      const results = await fetchOneByOne(
+        ids.map((id) => () => fetchCollection(id)),
+        700
+      );
 
-        setCollections(results);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch collections"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCollections();
+      setCollections(results);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch collections"
+      );
+    } finally {
+      setLoading(false);
+    }
   }, [contract, walletAddress, fetchCollection]);
 
-  return { collections, loading, error };
+  useEffect(() => {
+    loadCollections();
+  }, [loadCollections]);
+
+  return { collections, loading, error, reload: loadCollections };
+}
+
+export function useIsCollectionOwner() {
+  const { contract } = useContract({
+    abi: COLLECTION_CONTRACT_ABI as Abi,
+    address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
+  });
+
+  const checkOwnership = useCallback(
+    async (collectionId: string, owner: string): Promise<boolean> => {
+      if (!contract) throw new Error("Contract not available");
+
+      return await contract.call("is_collection_owner", [collectionId, owner]);
+    },
+    [contract]
+  );
+
+  return { checkOwnership };
 }

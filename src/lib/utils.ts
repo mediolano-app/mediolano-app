@@ -117,4 +117,25 @@ export async function fetchInBatches<T>(
   return results;
 }
 
+export async function fetchOneByOne<T>(
+  tasks: (() => Promise<T>)[],
+  delayMs = 500
+): Promise<T[]> {
+  const results: T[] = [];
+
+  for (const task of tasks) {
+    try {
+      const result = await task();
+      results.push(result);
+    } catch (err) {
+      console.warn("Fetch failed:", err);
+    }
+
+    if (delayMs > 0) {
+      await new Promise((res) => setTimeout(res, delayMs));
+    }
+  }
+
+  return results;
+}
 

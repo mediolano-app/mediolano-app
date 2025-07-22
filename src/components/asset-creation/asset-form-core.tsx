@@ -24,6 +24,7 @@ import {
   FileText,
   Code,
   Palette,
+  RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +37,10 @@ interface AssetFormCoreProps {
   onTemplateChange?: (templateId: string) => void;
   showTemplateSelector?: boolean;
   collections: any;
+  isLoadingCollections?: boolean;
+  collectionError: any;
   openCollectionModal?: () => void;
+  refetchCollections?: () => void;
 }
 
 const getIconForTemplate = (templateId: string) => {
@@ -61,6 +65,9 @@ export function AssetFormCore({
   onTemplateChange,
   collections,
   openCollectionModal,
+  isLoadingCollections,
+  collectionError,
+  refetchCollections,
   showTemplateSelector = true,
 }: AssetFormCoreProps) {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -124,10 +131,10 @@ export function AssetFormCore({
       }
     }
   };
-  const selectedCollection = collections.find(
-    (c: { name: string; id: string }) =>
-      String(c.id) === String(formState.collection)
-  );
+  const selectedCollection = (collectionId: string) =>
+    collections.find(
+      (c: { id: string }) => String(c.id) === String(collectionId)
+    );
 
   return (
     <div className="space-y-6">
@@ -321,19 +328,36 @@ export function AssetFormCore({
               Collections
             </Label>
 
-            {collections?.length > 0 ? (
-              <Select
-                value={formState.collection}
-                onValueChange={(e) => [
-                  updateFormField("collection", e),
-                  updateFormField("collectionName", selectedCollection),
-                ]}
-              >
-                <SelectTrigger className="h-12">
-                  <SelectValue placeholder="Select Collection" />
-                </SelectTrigger>
-                <SelectContent>
-                  {collections.map(
+            <Select
+              value={formState.collection}
+              onValueChange={(e) => [
+                updateFormField("collection", e),
+                updateFormField("collectionName", selectedCollection(e).name),
+              ]}
+              disabled={isLoadingCollections && !collections?.length}
+            >
+              <SelectTrigger className="h-12">
+                <SelectValue placeholder="Select Collection" />
+              </SelectTrigger>
+              <SelectContent>
+                {isLoadingCollections ? (
+                  <div className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground">
+                    <RotateCcw className="h-4 w-4 animate-spin" />
+                    <span>Loading collections...</span>
+                  </div>
+                ) : collectionError ? (
+                  <div className="flex flex-col gap-2 px-4 py-2 text-sm text-red-500">
+                    <p>Failed to load collections.</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={refetchCollections}
+                    >
+                      Retry
+                    </Button>
+                  </div>
+                ) : collections?.length > 0 ? (
+                  collections.map(
                     (collection: { id: string; name: string }) => (
                       <SelectItem
                         key={collection.id}
@@ -344,19 +368,19 @@ export function AssetFormCore({
                         </div>
                       </SelectItem>
                     )
-                  )}
-                </SelectContent>
-              </Select>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <p className="text-sm text-muted-foreground">
-                  No collections found.
-                </p>
-                <Button variant="outline" onClick={openCollectionModal}>
-                  + Add Collection
-                </Button>
-              </div>
-            )}
+                  )
+                ) : (
+                  <div className="flex p-3 flex-col gap-2">
+                    <p className="text-sm text-muted-foreground">
+                      No collections found.
+                    </p>
+                    <Button variant="outline" onClick={openCollectionModal}>
+                      + Add Collection
+                    </Button>
+                  </div>
+                )}
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
