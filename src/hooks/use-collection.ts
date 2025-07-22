@@ -1,13 +1,13 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   useAccount,
   useContract,
   useSendTransaction,
 } from "@starknet-react/core";
 import { Abi } from "starknet";
-import { IPFSMetadata } from "@/utils/ipfs";
 import { ipCollectionAbi } from "@/abis/ip_collection";
 import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
+import { fetchInBatches, withRetry } from "@/lib/utils";
 
 export interface ICreateCollection {
   name: string;
@@ -27,17 +27,9 @@ export interface CollectionFormData {
   requireApproval: boolean;
 }
 
-export interface CollectionMetadata extends IPFSMetadata {
-  name: string;
-  description: string;
-  type: string;
-  visibility: string;
-  coverImage?: string;
-  enableVersioning: boolean;
-  allowComments: boolean;
-  requireApproval: boolean;
-  creator: string;
-  createdAt: string;
+interface CollectionMetadata {
+  id: string;
+  [key: string]: any;
 }
 
 export interface UseCollectionReturn {
@@ -110,4 +102,74 @@ export function useCollection(): UseCollectionReturn {
     isCreating,
     error,
   };
+}
+
+export function useGetCollection() {
+  const { contract } = useContract({
+    abi: COLLECTION_CONTRACT_ABI as Abi,
+    address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
+  });
+
+  const fetchCollection = useCallback(
+    async (id: string) => {
+      if (!contract) throw new Error("Contract not ready");
+      const data = (await withRetry(() =>
+        contract.call("get_collection", [String(id)])
+      )) as any;
+      return { id, ...data };
+    },
+    [contract]
+  );
+
+  return { fetchCollection };
+}
+
+export function useGetCollections(walletAddress?: `0x${string}`) {
+  const [collections, setCollections] = useState<CollectionMetadata[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { contract } = useContract({
+    abi: COLLECTION_CONTRACT_ABI as Abi,
+    address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
+  });
+
+  const { fetchCollection } = useGetCollection();
+
+  useEffect(() => {
+    const loadCollections = async () => {
+      if (!contract || !walletAddress) return;
+      setLoading(true);
+      setError(null);
+
+      try {
+        const ids: string[] = await contract.call(
+          "list_user_collections",
+          [walletAddress],
+          {
+            parseRequest: true,
+            parseResponse: true,
+          }
+        );
+
+        const results = await fetchInBatches(
+          ids.map((id) => () => fetchCollection(id)),
+          5,
+          300
+        );
+
+        setCollections(results);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Failed to fetch collections"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCollections();
+  }, [contract, walletAddress, fetchCollection]);
+
+  return { collections, loading, error };
 }

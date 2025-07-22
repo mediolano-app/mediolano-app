@@ -1,25 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, X, ImageIcon, Music, Video, FileText, Code, Palette } from "lucide-react"
-import { cn } from "@/lib/utils"
+import type React from "react";
+import { useState, useRef } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Upload,
+  X,
+  ImageIcon,
+  Music,
+  Video,
+  FileText,
+  Code,
+  Palette,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AssetFormCoreProps {
-  formState: any
-  updateFormField: (field: string, value: any) => void
-  handleFileChange: (file: File | null) => void
-  templates?: any[]
-  selectedTemplate?: any
-  onTemplateChange?: (templateId: string) => void
-  showTemplateSelector?: boolean
+  formState: any;
+  updateFormField: (field: string, value: any) => void;
+  handleFileChange: (file: File | null) => void;
+  templates?: any[];
+  selectedTemplate?: any;
+  onTemplateChange?: (templateId: string) => void;
+  showTemplateSelector?: boolean;
+  collections: any;
+  openCollectionModal?: () => void;
 }
 
 const getIconForTemplate = (templateId: string) => {
@@ -31,9 +48,9 @@ const getIconForTemplate = (templateId: string) => {
     software: Code,
     nft: ImageIcon,
     general: FileText,
-  }
-  return icons[templateId] || FileText
-}
+  };
+  return icons[templateId] || FileText;
+};
 
 export function AssetFormCore({
   formState,
@@ -42,68 +59,75 @@ export function AssetFormCore({
   templates = [],
   selectedTemplate,
   onTemplateChange,
+  collections,
+  openCollectionModal,
   showTemplateSelector = true,
 }: AssetFormCoreProps) {
-  const [isDragOver, setIsDragOver] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  //Fetch collection
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(true)
-  }
+    e.preventDefault();
+    setIsDragOver(true);
+  };
 
   const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-  }
+    e.preventDefault();
+    setIsDragOver(false);
+  };
 
   const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-    const files = e.dataTransfer.files
+    e.preventDefault();
+    setIsDragOver(false);
+    const files = e.dataTransfer.files;
     if (files.length > 0) {
-      handleFileChange(files[0])
+      handleFileChange(files[0]);
     }
-  }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
+    const files = e.target.files;
     if (files && files.length > 0) {
-      handleFileChange(files[0])
+      handleFileChange(files[0]);
     }
-  }
+  };
 
   const removeFile = () => {
-    handleFileChange(null)
+    handleFileChange(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
   const addTag = (tag: string) => {
     if (tag && !formState.tags.includes(tag)) {
-      updateFormField("tags", [...formState.tags, tag])
+      updateFormField("tags", [...formState.tags, tag]);
     }
-  }
+  };
 
   const removeTag = (tagToRemove: string) => {
     updateFormField(
       "tags",
-      formState.tags.filter((tag: string) => tag !== tagToRemove),
-    )
-  }
+      formState.tags.filter((tag: string) => tag !== tagToRemove)
+    );
+  };
 
   const handleTagKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault()
-      const input = e.target as HTMLInputElement
-      const tag = input.value.trim()
+      e.preventDefault();
+      const input = e.target as HTMLInputElement;
+      const tag = input.value.trim();
       if (tag) {
-        addTag(tag)
-        input.value = ""
+        addTag(tag);
+        input.value = "";
       }
     }
-  }
+  };
+  const selectedCollection = collections.find(
+    (c: { name: string; id: string }) =>
+      String(c.id) === String(formState.collection)
+  );
 
   return (
     <div className="space-y-6">
@@ -114,15 +138,20 @@ export function AssetFormCore({
             <div className="space-y-4">
               <div>
                 <Label className="text-base font-medium">Asset Type</Label>
-                <p className="text-sm text-muted-foreground">Choose the type that best describes your asset</p>
+                <p className="text-sm text-muted-foreground">
+                  Choose the type that best describes your asset
+                </p>
               </div>
-              <Select value={selectedTemplate?.id} onValueChange={onTemplateChange}>
+              <Select
+                value={selectedTemplate?.id}
+                onValueChange={onTemplateChange}
+              >
                 <SelectTrigger className="h-12">
                   <SelectValue placeholder="Select asset type" />
                 </SelectTrigger>
                 <SelectContent>
                   {templates.map((template) => {
-                    const Icon = getIconForTemplate(template.id)
+                    const Icon = getIconForTemplate(template.id);
                     return (
                       <SelectItem key={template.id} value={template.id}>
                         <div className="flex items-center gap-2">
@@ -130,7 +159,7 @@ export function AssetFormCore({
                           <span>{template.name}</span>
                         </div>
                       </SelectItem>
-                    )
+                    );
                   })}
                 </SelectContent>
               </Select>
@@ -145,9 +174,12 @@ export function AssetFormCore({
           {/* Media Upload */}
           <div className="space-y-4">
             <div>
-              <Label className="text-base font-medium">Upload Your {selectedTemplate?.name || "Asset"}</Label>
+              <Label className="text-base font-medium">
+                Upload Your {selectedTemplate?.name || "Asset"}
+              </Label>
               <p className="text-sm text-muted-foreground">
-                Add the main file for your {selectedTemplate?.name.toLowerCase() || "asset"}
+                Add the main file for your{" "}
+                {selectedTemplate?.name.toLowerCase() || "asset"}
               </p>
             </div>
 
@@ -156,7 +188,8 @@ export function AssetFormCore({
                 <div className="flex items-center gap-4 p-4 border rounded-lg bg-muted/30">
                   <div className="flex-shrink-0">
                     {formState.mediaPreviewUrl &&
-                    formState.mediaPreviewUrl !== "/placeholder.svg?height=600&width=600" ? (
+                    formState.mediaPreviewUrl !==
+                      "/placeholder.svg?height=600&width=600" ? (
                       <img
                         src={formState.mediaPreviewUrl || "/placeholder.svg"}
                         alt="Preview"
@@ -169,7 +202,9 @@ export function AssetFormCore({
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{formState.mediaFile.name}</p>
+                    <p className="font-medium truncate">
+                      {formState.mediaFile.name}
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       {(formState.mediaFile.size / 1024 / 1024).toFixed(2)} MB
                     </p>
@@ -183,7 +218,9 @@ export function AssetFormCore({
               <div
                 className={cn(
                   "border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer",
-                  isDragOver ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50",
+                  isDragOver
+                    ? "border-primary bg-primary/5"
+                    : "border-muted-foreground/25 hover:border-primary/50"
                 )}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -192,11 +229,20 @@ export function AssetFormCore({
               >
                 <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-medium mb-2">
-                  Drop your {selectedTemplate?.name.toLowerCase() || "file"} here
+                  Drop your {selectedTemplate?.name.toLowerCase() || "file"}{" "}
+                  here
                 </h3>
-                <p className="text-muted-foreground mb-4">or click to browse from your device</p>
+                <p className="text-muted-foreground mb-4">
+                  or click to browse from your device
+                </p>
                 <Button variant="outline">Choose File</Button>
-                <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelect} accept="*/*" />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileSelect}
+                  accept="*/*"
+                />
               </div>
             )}
           </div>
@@ -208,7 +254,9 @@ export function AssetFormCore({
             </Label>
             <Input
               id="title"
-              placeholder={`Give your ${selectedTemplate?.name.toLowerCase() || "asset"} a compelling title`}
+              placeholder={`Give your ${
+                selectedTemplate?.name.toLowerCase() || "asset"
+              } a compelling title`}
               value={formState.title}
               onChange={(e) => updateFormField("title", e.target.value)}
               className="h-12 text-base"
@@ -223,7 +271,9 @@ export function AssetFormCore({
             </Label>
             <Textarea
               id="description"
-              placeholder={`Describe your ${selectedTemplate?.name.toLowerCase() || "asset"} and what makes it unique...`}
+              placeholder={`Describe your ${
+                selectedTemplate?.name.toLowerCase() || "asset"
+              } and what makes it unique...`}
               value={formState.description}
               onChange={(e) => updateFormField("description", e.target.value)}
               rows={4}
@@ -239,9 +289,16 @@ export function AssetFormCore({
               {formState.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {formState.tags.map((tag: string) => (
-                    <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                    <Badge
+                      key={tag}
+                      variant="secondary"
+                      className="flex items-center gap-1"
+                    >
                       {tag}
-                      <X className="h-3 w-3 cursor-pointer" onClick={() => removeTag(tag)} />
+                      <X
+                        className="h-3 w-3 cursor-pointer"
+                        onClick={() => removeTag(tag)}
+                      />
                     </Badge>
                   ))}
                 </div>
@@ -252,7 +309,8 @@ export function AssetFormCore({
                 className="h-12 text-base"
               />
               <p className="text-sm text-muted-foreground">
-                Add relevant tags to help others discover your {selectedTemplate?.name.toLowerCase() || "asset"}
+                Add relevant tags to help others discover your{" "}
+                {selectedTemplate?.name.toLowerCase() || "asset"}
               </p>
             </div>
           </div>
@@ -260,18 +318,48 @@ export function AssetFormCore({
           {/* Collection */}
           <div className="space-y-2">
             <Label htmlFor="collection" className="text-base font-medium">
-              Collection (Optional)
+              Collections
             </Label>
-            <Input
-              id="collection"
-              placeholder="Add to a collection or create a new one"
-              value={formState.collection}
-              onChange={(e) => updateFormField("collection", e.target.value)}
-              className="h-12 text-base"
-            />
+
+            {collections?.length > 0 ? (
+              <Select
+                value={formState.collection}
+                onValueChange={(e) => [
+                  updateFormField("collection", e),
+                  updateFormField("collectionName", selectedCollection),
+                ]}
+              >
+                <SelectTrigger className="h-12">
+                  <SelectValue placeholder="Select Collection" />
+                </SelectTrigger>
+                <SelectContent>
+                  {collections.map(
+                    (collection: { id: string; name: string }) => (
+                      <SelectItem
+                        key={collection.id}
+                        value={String(collection.id)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{collection.name}</span>
+                        </div>
+                      </SelectItem>
+                    )
+                  )}
+                </SelectContent>
+              </Select>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-muted-foreground">
+                  No collections found.
+                </p>
+                <Button variant="outline" onClick={openCollectionModal}>
+                  + Add Collection
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
