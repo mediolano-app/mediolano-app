@@ -62,12 +62,9 @@ export function useCreateAsset(): IMintReturnType {
           formData.token_uri,
         ]);
 
-        console.log(contractCall, "call");
-
         // Execute the transaction
         const tx = await mintAsset([contractCall]);
 
-        console.log(tx, "tx");
         toast({
           title: "Transaction Submitted!",
           description: (

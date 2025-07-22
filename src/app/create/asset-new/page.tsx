@@ -65,7 +65,7 @@ export default function CreateAssetPage() {
     try {
       //Extra Check for collection ownership
       const isOwner = await checkOwnership(
-        formState?.collection,
+        formState.collection,
         walletAddress as string
       );
       if (!isOwner) {
