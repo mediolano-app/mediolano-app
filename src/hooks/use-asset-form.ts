@@ -11,8 +11,8 @@ interface AssetFormState {
   assetType: string
 
   // Media
-  mediaFile: File | null
-  mediaPreviewUrl: string | null
+  mediaFile?: File | null
+  mediaPreviewUrl?: string | null
 
   // Licensing
   licenseType: string

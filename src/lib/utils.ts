@@ -69,3 +69,52 @@ export function toEpochTime(date: string | Date): number {
   const d = typeof date === "string" ? new Date(date) : date;
   return Math.floor(d.getTime() / 1000);
 }
+
+export function delay(ms: number) {
+  return new Promise((res) => setTimeout(res, ms));
+}
+
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  retries = 3,
+  delay = 300
+): Promise<T> {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (attempt === retries) throw e;
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw new Error("Max retry attempts reached");
+}
+
+export async function fetchInBatches<T>(
+  tasks: (() => Promise<T>)[],
+  batchSize = 5,
+  delayMs = 300
+): Promise<T[]> {
+  const results: T[] = [];
+
+  for (let i = 0; i < tasks.length; i += batchSize) {
+    const batch = tasks.slice(i, i + batchSize);
+    const batchResults = await Promise.allSettled(batch.map((t) => t()));
+
+    for (const res of batchResults) {
+      if (res.status === "fulfilled") {
+        results.push(res.value);
+      } else {
+        console.warn("Data fetch failed:", res.reason);
+      }
+    }
+
+    if (i + batchSize < tasks.length) {
+      await delay(delayMs);
+    }
+  }
+
+  return results;
+}
+
+
