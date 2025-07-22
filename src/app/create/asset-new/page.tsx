@@ -102,7 +102,7 @@ export default function CreateAssetPage() {
       {openCollection && (
         <Dialog open={openCollection} onOpenChange={setOpenCollection}>
           <DialogContent className="max-w-none overflow-y-auto w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-h-none p-0 gap-0 border-0 shadow-2xl">
-            <CreateCollectionView />
+            <CreateCollectionView isModalMode={true} />
           </DialogContent>
         </Dialog>
       )}
