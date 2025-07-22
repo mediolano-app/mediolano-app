@@ -15,7 +15,10 @@ import { useIpfsUpload } from "@/hooks/useIpfs";
 import { useCreateAsset } from "@/hooks/use-create-asset";
 import { useAccount } from "@starknet-react/core";
 import { useToast } from "@/hooks/use-toast";
-import { useGetCollections } from "@/hooks/use-collection";
+import {
+  useGetCollections,
+  useIsCollectionOwner,
+} from "@/hooks/use-collection";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import CreateCollectionView from "@/components/collections/create-collection";
 
@@ -26,11 +29,16 @@ export default function CreateAssetPage() {
   const { address: walletAddress } = useAccount();
   const { uploadToIpfs, loading: upload_loading } = useIpfsUpload();
   const { createAsset, isCreating } = useCreateAsset();
-
+  const { checkOwnership } = useIsCollectionOwner();
   // Initialize form
   const { formState, updateFormField, handleFileChange, canSubmit } =
     useAssetForm({});
-  const { collections } = useGetCollections(walletAddress);
+  const {
+    collections,
+    loading: collection_loading,
+    error: collection_error,
+    reload,
+  } = useGetCollections(walletAddress);
 
   // Get selected template
   const selectedTemplate = getTemplateById(formState.assetType);
@@ -55,6 +63,14 @@ export default function CreateAssetPage() {
     delete metaData.mediaFile;
 
     try {
+      //Extra Check for collection ownership
+      const isOwner = await checkOwnership(
+        formState?.collection,
+        walletAddress as string
+      );
+      if (!isOwner) {
+        throw new Error("You are not the owner of this collection");
+      }
       //Upload media and metadata.
       const result = await uploadToIpfs(
         formState?.mediaFile as File,
@@ -63,7 +79,7 @@ export default function CreateAssetPage() {
       );
       //Then make contract call.
       await createAsset({
-        collection_id: formState.collection,
+        collection_id: formState?.collection,
         recipient: walletAddress as string,
         token_uri: result?.metadataUrl,
       });
@@ -121,6 +137,9 @@ export default function CreateAssetPage() {
             <div className="lg:col-span-3 space-y-6">
               {/* Core Asset Form */}
               <AssetFormCore
+                refetchCollections={reload}
+                collectionError={collection_error}
+                isLoadingCollections={collection_loading}
                 collections={collections || []}
                 openCollectionModal={() => setOpenCollection(true)}
                 formState={formState}

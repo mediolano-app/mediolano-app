@@ -62,8 +62,12 @@ export function useCreateAsset(): IMintReturnType {
           formData.token_uri,
         ]);
 
+        console.log(contractCall, "call");
+
         // Execute the transaction
         const tx = await mintAsset([contractCall]);
+
+        console.log(tx, "tx");
         toast({
           title: "Transaction Submitted!",
           description: (
@@ -83,6 +87,9 @@ export function useCreateAsset(): IMintReturnType {
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to mint asset";
+
+        console.error("Mint Error:", err);
+
         setError(errorMessage);
         throw err;
       } finally {
