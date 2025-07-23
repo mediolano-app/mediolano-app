@@ -34,7 +34,12 @@ export function useIpfsUpload() {
   };
 
   const uploadToIpfs = useCallback(
-    async (file: File, metadata: any, imageKey?: string) => {
+    async (
+      file: File,
+      metadata: any,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      _imageKey?: string
+    ) => {
       setLoading(true);
       setError(null);
       setProgress(0);
@@ -55,7 +60,9 @@ export function useIpfsUpload() {
         // Upload metadata
         const metadataWithImage = {
           ...metadata,
-          [imageKey || "image"]: uploadedFileUrl,
+          image: uploadedFileUrl,
+          description: metadata?.description,
+          name: metadata?.title || metadata?.name,
         };
 
         const metadataSignedUrl = await getSignedUrl();

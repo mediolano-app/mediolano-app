@@ -32,7 +32,7 @@ export default function CreateAssetPage() {
   const { checkOwnership } = useIsCollectionOwner();
   // Initialize form
   const { formState, updateFormField, handleFileChange, canSubmit } =
-    useAssetForm({});
+    useAssetForm();
   const {
     collections,
     loading: collection_loading,
@@ -72,11 +72,7 @@ export default function CreateAssetPage() {
         throw new Error("You are not the owner of this collection");
       }
       //Upload media and metadata.
-      const result = await uploadToIpfs(
-        formState?.mediaFile as File,
-        metaData,
-        "mediaUrl"
-      );
+      const result = await uploadToIpfs(formState?.mediaFile as File, metaData);
       //Then make contract call.
       await createAsset({
         collection_id: formState?.collection,
