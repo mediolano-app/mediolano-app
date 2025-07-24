@@ -105,7 +105,7 @@ export default function TermsOfUsePage() {
                 {/* Introduction */}
                 <div className="mb-12">
                   <Badge variant="secondary" className="mb-4">
-                    Legal Document
+                    Mediolano
                   </Badge>
                   <h1 className="text-4xl font-bold mb-4">Terms of Use</h1>
                   <p className="text-lg text-muted-foreground leading-relaxed">

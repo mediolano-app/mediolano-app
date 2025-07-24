@@ -37,6 +37,8 @@ import {
   Brain,
   Box,
   Scroll,
+  Lock,
+  Shield,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -146,6 +148,9 @@ export function Footer() {
                   <li><Link href="/create/asset" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
                   <li><Link href="/create/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
                   <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
+                  <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Portfolio</Link></li>
+                  <li><Link href="/portfolio/collections" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> My Collections</Link></li>
+                  <li><Link href="/portfolio/dashboard" className="flex items-center hover:underline"><LayoutDashboard className="w-4 h-4 mr-2 ml-blue" /> Assets Dashboard</Link></li>
                   <li><Link href="/licensing" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Licensing</Link></li>
                   <li><Link href="/transfer" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" /> Transfer</Link></li>
                 </ul>
@@ -170,11 +175,13 @@ export function Footer() {
                 <div>
                 <h3 className="mb-6 text-sm font-semibold uppercase">Manage</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> Portfolio</Link></li>
-                    <li><Link href="/portfolio/collections" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> My Collections</Link></li>
-                    <li><Link href="/portfolio/dashboard" className="flex items-center hover:underline"><LayoutDashboard className="w-4 h-4 mr-2 ml-blue" /> Assets Dashboard</Link></li>
                     <li><Link href="/account" className="flex items-center hover:underline"><User className="w-4 h-4 mr-2 ml-blue" /> My Account</Link></li>
                     <li><Link href="/settings" className="flex items-center hover:underline"><Cog className="w-4 h-4 mr-2 ml-blue" /> Settings</Link></li>
+                </ul>
+                <h3 className="mb-6 mt-6 text-sm font-semibold uppercase">Platform</h3>
+                <ul className="space-y-4">
+                    <li><Link href="/faq" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> FAQ</Link></li>
+                    <li><Link href="/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
                 </ul>
                 </div>
                 
@@ -305,18 +312,18 @@ export function Footer() {
                   <div className="flex items-center space-x-4">
                     <Github className="h-8 w-8 ml-blue" />
                     <div>
-                      <h4 className="text-sm font-semibold">mediolano-app</h4>
+                      <h4 className="text-sm font-semibold">Mediolano</h4>
                       <p className="text-xs text-muted-foreground">Core smart contracts, APIs, dApps</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Badge variant="secondary" className="flex items-center space-x-1">
                       <Star className="h-3 w-3" />
-                      <span>43</span>
+                      <span>Open-Source</span>
                     </Badge>
                     <Badge variant="secondary" className="flex items-center space-x-1">
-                      <GitFork className="h-3 w-3" />
-                      <span>27</span>
+                      <Lock className="h-3 w-3" />
+                      <span>Permissionless</span>
                     </Badge>
                   </div>
                 </div>
@@ -345,19 +352,9 @@ export function Footer() {
             &copy; 2025 Mediolano. All rights reserved.
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-            <Link href="/faq" className="hover:underline">
-              FAQ
+            <Link href="https://mediolano.xyz/" className="hover:underline">
+              Mediolano.xyz
             </Link>
-            <Link href="#" className="hover:underline">
-              Terms of Privacy
-            </Link>
-            <Link href="/terms-of-use" className="hover:underline">
-              Terms of Use
-            </Link>
-            <Link href="#" className="hover:underline">
-              Community Guidelines
-            </Link>
-            
           </div>
         </div>
       </div>
