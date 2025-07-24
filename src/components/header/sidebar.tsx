@@ -22,8 +22,6 @@ import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { ThemeToggle } from "@/components/header/theme-toggle"
 import { WalletConnect } from "@/components/header/wallet-connect"
 
-const WalletBarM = dynamic(() => import('@/components/header/walletbar-mobile'), { ssr: false })
-
 const navigationItems = [
   {
     title: 'Start',

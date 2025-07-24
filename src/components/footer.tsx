@@ -351,7 +351,7 @@ export function Footer() {
             <Link href="#" className="hover:underline">
               Terms of Privacy
             </Link>
-            <Link href="#" className="hover:underline">
+            <Link href="/terms-of-use" className="hover:underline">
               Terms of Use
             </Link>
             <Link href="#" className="hover:underline">
