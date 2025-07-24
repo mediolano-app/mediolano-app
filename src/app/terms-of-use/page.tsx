@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { ChevronRight, FileText, Shield, Users, Gavel, AlertCircle, ArrowUp } from "lucide-react"
+import { ChevronRight, FileText, Shield, Users, Gavel, AlertCircle, ArrowUp, WholeWord, Landmark, BookOpenCheck, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -11,14 +11,14 @@ const tableOfContents = [
   { id: "acceptance", title: "Acceptance of Terms", icon: FileText },
   { id: "description", title: "Platform Description", icon: Shield },
   { id: "responsibilities", title: "Eligibility & Access", icon: Users },
-  { id: "ip-rights", title: "Intellectual Property Rights", icon: Gavel },
-  { id: "prohibited", title: "Licensing & Monetization", icon: AlertCircle },
-  { id: "availability", title: "Usage Guidelines", icon: Shield },
-  { id: "liability", title: "DAO Governance", icon: Gavel },
-  { id: "changes", title: "Privacy & Data Sovereignty", icon: FileText },
-  { id: "contact", title: "Security & Risk Disclosure", icon: Users },
-  { id: "security_risk", title: "Legal Recognition & Jurisdiction", icon: Gavel },
-  { id: "amendments", title: "Amendments & Versioning", icon: Users },
+  { id: "ip-rights", title: "Intellectual Property Rights", icon: BookOpenCheck },
+  { id: "prohibited", title: "Licensing & Monetization", icon: BookOpenCheck },
+  { id: "availability", title: "Usage Guidelines", icon: WholeWord },
+  { id: "liability", title: "DAO Governance", icon: Landmark },
+  { id: "changes", title: "Privacy & Data Sovereignty", icon: Lock },
+  { id: "contact", title: "Security & Risk Disclosure", icon: Shield },
+  { id: "security_risk", title: "Legal Recognition & Jurisdiction", icon: Shield },
+  { id: "amendments", title: "Amendments & Versioning", icon: FileText },
 ]
 
 export default function TermsOfUsePage() {
