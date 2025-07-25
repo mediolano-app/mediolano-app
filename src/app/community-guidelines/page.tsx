@@ -103,10 +103,9 @@ export default function PrivacyPolicyPage() {
                   <Badge variant="secondary" className="mb-4">
                     Mediolano
                   </Badge>
-                  <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
+                  <h1 className="text-4xl font-bold mb-4">Community Guidelines</h1>
                   <p className="text-lg text-muted-foreground leading-relaxed">
-                    Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your
-                    personal information when you use NFT Manager.
+                    Welcome to Mediolano, a decentralized protocol for creators and communities. These guidelines are designed to foster a respectful, inclusive, and collaborative environment for all participants.
                   </p>
                 </div>
 
