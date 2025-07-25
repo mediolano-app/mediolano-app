@@ -72,7 +72,7 @@ const creationOptions = [
     color: "purple",
     category: "core",
     trending: true,
-    popular: true,
+    popular: false,
     estimatedTime: "1-5 min",
     estimatedFee: 0.001,
     userCount: "28",
@@ -108,7 +108,7 @@ const creationOptions = [
     color: "green",
     category: "organization",
     trending: false,
-    popular: false,
+    popular: true,
     estimatedTime: "1-2 min",
     estimatedFee: 0.001,
     userCount: "89",
@@ -230,14 +230,13 @@ export default function CreatePage() {
     }
   })
 
-  // ✨ NEW – always search in the full list to guarantee a match
   const selectedOptionData = creationOptions.find((opt) => opt.id === selectedOption)
 
   return (
     <div className="min-h-screen">
     
 
-      <main className="container mx-auto p-4 max-w-7xl">
+      <main className="container mx-auto p-4 max-w-10xl">
         {/* Hero Section */}
         <div className="text-center py-8 md:py-12">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
@@ -348,7 +347,6 @@ export default function CreatePage() {
             </div>
           </div>
 
-          {/* Category Pills */}
           <div className="flex flex-wrap gap-2 mb-6">
             {categories.map((category) => (
               <Button

@@ -13,7 +13,7 @@ interface CreationOptionDetailsProps {
     description: string
     estimatedTime: string
     estimatedFee: number
-    popularity: string
+    complexity: string
     benefits?: string[]
     process?: string[]
     useCase?: string
@@ -58,23 +58,23 @@ export function CreationOptionDetails({ option }: CreationOptionDetailsProps) {
             </div>
             <div className="text-center p-3 rounded-lg bg-muted/50">
               <Users className="h-4 w-4 mx-auto mb-1 text-primary" />
-              <div className="text-sm font-medium">{option.popularity}</div>
-              <div className="text-xs text-muted-foreground">Popularity</div>
+              <div className="text-sm font-medium">{option.complexity}</div>
+              <div className="text-xs text-muted-foreground">Complexity</div>
             </div>
           </div>
 
           <div className="flex items-center justify-between p-3 rounded-lg bg-green-50 dark:bg-green-950/20">
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium">Network Fee</span>
+              <span className="text-sm font-medium">Etimated Fee</span>
             </div>
             <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
-              {option.estimatedFee}
+              {option.estimatedFee} STRK
             </Badge>
           </div>
 
           <Link href={option.href}>
-            <Button className="w-full" size="lg">
+            <Button className="w-full mt-4 bg-blue-600" size="lg">
               Get Started
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
