@@ -180,7 +180,7 @@ export function Footer() {
                 </ul>
                 <h3 className="mb-6 mt-6 text-sm font-semibold uppercase">Platform</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/faq" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> FAQ</Link></li>
+                    <li><Link href="/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
                     <li><Link href="/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
                 </ul>
                 </div>
@@ -211,8 +211,7 @@ export function Footer() {
             </Link>
             <p className="text-muted-foreground mr-5">
             Seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost (fraction of a cent) and smart contract intelligence for digital assets.
-            Mediolano empower creators, collectors and organizations with permissionless Programmable IP services using blockchain and zero-knowledge.
-                proofs.
+            Mediolano empower creators, collectors and organizations with permissionless Programmable IP services using blockchain and zero knowledge proofs.
             </p><br></br>
             <div className="flex space-x-4">
             <div className="flex items-center space-x-2">
@@ -281,19 +280,19 @@ export function Footer() {
             <Card>
               <CardHeader>
                 <CardTitle>Join our community on X</CardTitle>
-                <CardDescription>Interact and stay updated with the latest news and announcements from Mediolano.</CardDescription>
+                <CardDescription>Interact and stay updated with the latest news and announcements.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-4 mb-4">
                   <Twitter className="h-8 w-8 ml-blue" />
                   <div>
                     <h4 className="text-sm font-semibold">@MediolanoApp</h4>
-                    <p className="text-xs text-muted-foreground">Official Mediolano Twitter</p>
+                    <p className="text-xs text-muted-foreground">Official Mediolano X Account</p>
                   </div>
                 </div>
                 <Button variant="outline" asChild className="w-full">
                   <Link href="https://twitter.com/MediolanoApp" target="_blank" rel="noopener noreferrer">
-                    <Twitter className="mr-2 h-4 w-4" /> Follow on X/Twitter
+                    <Twitter className="mr-2 h-4 w-4" /> Join on X/Twitter
                   </Link>
                 </Button>
               </CardContent>
@@ -319,7 +318,7 @@ export function Footer() {
                   <div className="flex items-center space-x-2">
                     <Badge variant="secondary" className="flex items-center space-x-1">
                       <Star className="h-3 w-3" />
-                      <span>Open-Source</span>
+                      <span>Auditable</span>
                     </Badge>
                     <Badge variant="secondary" className="flex items-center space-x-1">
                       <Lock className="h-3 w-3" />
