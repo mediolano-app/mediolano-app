@@ -314,9 +314,103 @@ export default function UserAccount() {
     setIsDrawerOpen(true);
   }, []);
 
+
   const handleTransactionSign = useCallback(async (): Promise<void> => {
+    if (!isConnected || !address) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to save settings.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!contract) {
+      toast({
+        title: "Contract Error",
+        description: "Contract not available. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsTransacting(true);
     
-  }, []);
+    try {
+      console.log("User data to save:", user);
+      
+      // Upload images to IPFS first if any are selected
+      if (avatarFile || coverFile) {
+        console.log("Uploading images to IPFS...");
+        const uploadedImages = await uploadImagesToIpfs();
+        
+        setUser((prevUser: UserProfile) => ({
+          ...prevUser,
+          avatarUrl: uploadedImages.avatarUrl || prevUser.avatarUrl,
+          coverUrl: uploadedImages.coverUrl || prevUser.coverUrl
+        }));
+        
+        console.log("Images uploaded successfully:", uploadedImages);
+      }
+
+      console.log("Preparing Starknet transaction...");
+
+      const currentTimestamp = Math.floor(Date.now() / 1000);
+      const username = user.name.toLowerCase().replace(/\s+/g, "_") || "user";
+
+      console.log("Account details to store:", {
+        name: user.name,
+        email: user.email,
+        username: username,
+        timestamp: currentTimestamp,
+      });
+
+      // Prepare contract call using the consistent pattern
+      const contractCall = contract.populate("store_account_details", [
+        user.name,
+        user.email,
+        username,
+        currentTimestamp,
+      ]);
+
+      // Execute the transaction
+      const tx = await executeTransaction([contractCall]);
+
+      console.log("Transaction submitted:", tx.transaction_hash);
+
+      // Show success toast with transaction link
+      toast({
+        title: "Settings Saved!",
+        description: (
+          <div className="text-sm space-y-1">
+            <p>Your account settings have been saved to the blockchain.</p>
+            <a
+              href={`${EXPLORER_URL}/tx/${tx.transaction_hash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-blue-600"
+            >
+              View on StarkScan ↗
+            </a>
+          </div>
+        ),
+      });
+
+      setIsDrawerOpen(false);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to save settings";
+      
+      console.error("Transaction failed:", err);
+      
+      toast({
+        title: "Transaction Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsTransacting(false);
+    }
+  }, [isConnected, address, contract, user, avatarFile, coverFile, uploadImagesToIpfs, executeTransaction, toast]);
 
 
 
