@@ -183,6 +183,7 @@ export function Footer() {
                     <li><Link href="/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
                     <li><Link href="/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
                     <li><Link href="/community-guidelines" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> Community Guidelines</Link></li>
+                    <li><Link href="/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance Guidelines</Link></li>
                 </ul>
                 </div>
                 
