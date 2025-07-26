@@ -1,111 +1,331 @@
-'use client'
+"use client";
 
-import { useState, ChangeEvent } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
-import { Upload, RefreshCw, Award, User, Globe, Twitter, Linkedin, Github, Shield, Bell, Eye, Key, Save } from 'lucide-react'
+import { useState, ChangeEvent, useEffect, useCallback } from "react";
+import { useAccount, useContract, useSendTransaction } from "@starknet-react/core";
+import { useUsersSettings } from "@/hooks/useUsersSettings";
+import { useIpfsUpload } from "@/hooks/useIpfs";
+import { useToast } from "@/hooks/use-toast";
+import { userSettingsAbi } from "@/abis/user_settings";
+import { Abi } from "starknet";
+import { EXPLORER_URL } from "@/services/constants";
 
-// Mock user data
-const mockUser = {
-  address: "0x1a2b...3c4d",
-  name: "Author Name",
-  website: "https://mediolano.app",
-  email: "mediolanoapp@gmail.com",
+// UI Components
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
+// Icons
+import {
+  Upload,
+  RefreshCw,
+  Award,
+  User,
+  Globe,
+  Twitter,
+  Linkedin,
+  Github,
+  Shield,
+  Bell,
+  Eye,
+  Key,
+  Save,
+} from "lucide-react";
+
+// Types
+interface SocialMediaLinks {
+  twitter: string;
+  linkedin: string;
+  github: string;
+}
+
+interface UserPreferences {
+  marketProfile: boolean;
+  emailNotifications: boolean;
+  publicProfile: boolean;
+  dataSharing: string;
+}
+
+interface Transaction {
+  id: string;
+  type: string;
+  asset: string;
+  date: string;
+  status: string;
+}
+
+interface UserStats {
+  nftAssets: number;
+  transactions: number;
+  listingItems: number;
+  nftCollections: number;
+  rewards: number;
+  badges: number;
+}
+
+interface UserProfile {
+  address: string;
+  name: string;
+  website: string;
+  email: string;
+  socialMedia: SocialMediaLinks;
+  avatarUrl: string;
+  coverUrl: string;
+  bio: string;
+  preferences: UserPreferences;
+  transactions: Transaction[];
+  stats: UserStats;
+}
+
+interface UploadedImages {
+  avatarUrl?: string;
+  coverUrl?: string;
+}
+
+type ImageType = "avatar" | "cover";
+type PreferenceKey = keyof UserPreferences;
+type SocialPlatform = keyof SocialMediaLinks;
+type ProfileField = keyof Pick<UserProfile, "name" | "email" | "website" | "bio">;
+
+// Constants
+const INITIAL_USER_PROFILE: UserProfile = {
+  address: "",
+  name: "",
+  website: "",
+  email: "",
   socialMedia: {
-    twitter: "@mediolanoapp",
-    linkedin: "mediolano-app",
-    github: "mediolano-app"
+    twitter: "",
+    linkedin: "",
+    github: "",
   },
   avatarUrl: "/background.jpg?height=100&width=100",
   coverUrl: "/background.jpg?height=300&width=1000",
-  bio: "Decentralized IP enthusiast and blockchain innovator.",
+  bio: "",
   preferences: {
     marketProfile: false,
     emailNotifications: false,
     publicProfile: true,
-    dataSharing: "anonymous"
+    dataSharing: "anonymous",
   },
-  transactions: [
-    { id: "0xtx1", type: "Registration", asset: "Novel Manuscript", date: "2023-05-15", status: "Confirmed" },
-    { id: "0xtx2", type: "License", asset: "Logo Design", date: "2023-06-02", status: "Pending" },
-    { id: "0xtx3", type: "Royalty", asset: "AI Algorithm", date: "2023-06-10", status: "Confirmed" },
-  ],
+  transactions: [],
   stats: {
-    nftAssets: 15,
-    transactions: 47,
-    listingItems: 3,
-    nftCollections: 2,
-    rewards: 500,
-    badges: 7
-  }
-}
+    nftAssets: 0,
+    transactions: 0,
+    listingItems: 0,
+    nftCollections: 0,
+    rewards: 0,
+    badges: 0,
+  },
+};
+
+// Constants
+const USER_SETTINGS_CONTRACT_ADDRESS = process.env
+  .NEXT_PUBLIC_USER_SETTINGS_CONTRACT_ADDRESS as `0x${string}`;
 
 export default function UserAccount() {
-  const [user, setUser] = useState(mockUser)
-  const [theme, setTheme] = useState('light')
-  const [avatarPreview, setAvatarPreview] = useState(user.avatarUrl)
-  const [coverPreview, setCoverPreview] = useState(user.coverUrl)
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  // Hooks
+  const { address, isConnected } = useAccount();
+  const { toast } = useToast();
+  const { getAccountSettings } = useUsersSettings();
+  const { uploadToIpfs, loading: ipfsLoading, progress } = useIpfsUpload();
+  
+  // Contract setup
+  const { contract } = useContract({
+    abi: userSettingsAbi as Abi,
+    address: USER_SETTINGS_CONTRACT_ADDRESS,
+  });
+  
+  const { sendAsync: executeTransaction } = useSendTransaction({
+    calls: [],
+  });
 
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light')
-  }
+  // State
+  const [user, setUser] = useState<UserProfile>(INITIAL_USER_PROFILE);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [avatarPreview, setAvatarPreview] = useState(INITIAL_USER_PROFILE.avatarUrl);
+  const [coverPreview, setCoverPreview] = useState(INITIAL_USER_PROFILE.coverUrl);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isTransacting, setIsTransacting] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
 
-  const handlePreferenceChange = (preference: keyof typeof user.preferences, value: any) => {
-    setUser(prevUser => ({
-      ...prevUser,
-      preferences: {
-        ...prevUser.preferences,
-        [preference]: value
-      }
-    }))
-  }
+  // Event Handlers
+  const toggleTheme = useCallback(() => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  }, []);
 
-  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
-    const file = event.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          if (type === 'avatar') {
-            setAvatarPreview(reader.result)
-          } else {
-            setCoverPreview(reader.result)
-          }
+  const handlePreferenceChange = useCallback(
+    (preference: PreferenceKey, value: boolean | string) => {
+      setUser((prevUser: UserProfile) => ({
+        ...prevUser,
+        preferences: {
+          ...prevUser.preferences,
+          [preference]: value,
+        },
+      }));
+    },
+    []
+  );
+
+  const handleInputChange = useCallback(
+    (field: ProfileField, value: string) => {
+      setUser((prevUser: UserProfile) => ({
+        ...prevUser,
+        [field]: value,
+      }));
+    },
+    []
+  );
+
+  const handleSocialMediaChange = useCallback(
+    (platform: SocialPlatform, value: string) => {
+      setUser((prevUser: UserProfile) => ({
+        ...prevUser,
+        socialMedia: {
+          ...prevUser.socialMedia,
+          [platform]: value,
+        },
+      }));
+    },
+    []
+  );
+
+  // Effects
+  useEffect(() => {
+    const loadUserSettings = async (): Promise<void> => {
+      if (!isConnected || !address) return;
+
+      setIsLoading(true);
+      try {
+        console.log(
+          "Loading user settings from contract for address:",
+          address
+        );
+        const accountSettings = await getAccountSettings(address);
+
+        if (accountSettings) {
+          console.log("Loaded account settings:", accountSettings);
+          setUser((prevUser: UserProfile) => ({
+            ...prevUser,
+            address: address,
+            // TODO: Map contract data to user state based on actual contract response structure
+          }));
+        } else {
+          console.log("No existing settings found, using defaults");
+          setUser((prevUser: UserProfile) => ({
+            ...prevUser,
+            address: address,
+          }));
         }
+      } catch (err) {
+        console.error("Failed to load user settings:", err);
+      } finally {
+        setIsLoading(false);
       }
-      reader.readAsDataURL(file)
+    };
+
+    loadUserSettings();
+  }, [isConnected, address, getAccountSettings]);
+
+  // Image Upload Handlers
+  const handleImageUpload = useCallback(
+    (event: ChangeEvent<HTMLInputElement>, type: ImageType): void => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e): void => {
+        const result = e.target?.result as string;
+        if (type === "avatar") {
+          setAvatarPreview(result);
+          setAvatarFile(file);
+        } else {
+          setCoverPreview(result);
+          setCoverFile(file);
+        }
+      };
+      reader.readAsDataURL(file);
+    },
+    []
+  );
+
+  const uploadImagesToIpfs = useCallback(async (): Promise<UploadedImages> => {
+    const files = [
+      { file: avatarFile, type: 'avatar' as const, name: 'Avatar' },
+      { file: coverFile, type: 'cover' as const, name: 'Cover' }
+    ].filter(({ file }) => file);
+
+    if (!files.length) return {};
+
+    try {
+      console.log(`Uploading ${files.length} image(s) to IPFS...`);
+      
+      const results = await Promise.all(
+        files.map(({ file, type, name }) =>
+          uploadToIpfs(file!, {
+            name: `${user.name || 'User'} ${name}`,
+            description: `Profile ${name.toLowerCase()} image`,
+          }).then(result => ({ type, url: result.fileUrl }))
+        )
+      );
+
+      return results.reduce((acc, { type, url }) => {
+        acc[type === 'avatar' ? 'avatarUrl' : 'coverUrl'] = url;
+        console.log(`${type} uploaded:`, url);
+        return acc;
+      }, {} as UploadedImages);
+    } catch (error) {
+      console.error("IPFS upload failed:", error);
+      throw new Error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }
+  }, [avatarFile, coverFile, uploadToIpfs, user.name]);
 
-  const handleSave = async () => {
-    // Simulate saving to IPFS and blockchain
-    console.log("Saving user data to IPFS and blockchain...")
-    // Here you would typically make API calls to save the data
-    setIsDrawerOpen(true)
-  }
 
-  const handleTransactionSign = async () => {
-    // Simulate transaction signing
-    console.log("Signing transaction...")
-    // Here you would typically interact with the user's wallet
-    setIsDrawerOpen(false)
-  }
+
+
+  // Transaction Handlers
+  const handleSave = useCallback(async (): Promise<void> => {
+    setIsDrawerOpen(true);
+  }, []);
+
+  const handleTransactionSign = useCallback(async (): Promise<void> => {
+    
+  }, []);
+
+
+
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
-      
+    <div className={`min-h-screen ${theme === "dark" ? "dark" : ""}`}>
       <div className="container mx-auto py-10">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">My Account (Preview)</h1>
-          
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -118,9 +338,22 @@ export default function UserAccount() {
               {/* Profile Section */}
               <div className="space-y-4">
                 <div className="relative h-40 rounded-lg overflow-hidden mb-8">
-                  <img src={coverPreview || "/background.jpg"} alt="Profile cover" className="w-full h-full object-cover" />
-                  <Label htmlFor="cover-upload" className="absolute bottom-2 right-2 cursor-pointer">
-                    <Input id="cover-upload" type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'cover')} accept="image/*" />
+                  <img
+                    src={coverPreview || "/background.jpg"}
+                    alt="Profile cover"
+                    className="w-full h-full object-cover"
+                  />
+                  <Label
+                    htmlFor="cover-upload"
+                    className="absolute bottom-2 right-2 cursor-pointer"
+                  >
+                    <Input
+                      id="cover-upload"
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => handleImageUpload(e, "cover")}
+                      accept="image/*"
+                    />
                     <div className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors">
                       <Upload className="w-4 h-4 mr-2" />
                       Change Cover
@@ -129,9 +362,22 @@ export default function UserAccount() {
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="relative">
-                    <img src={avatarPreview || "/background.jpg"} alt="Avatar" className="w-20 h-20 rounded-full" />
-                    <Label htmlFor="avatar-upload" className="absolute bottom-0 right-0 cursor-pointer">
-                      <Input id="avatar-upload" type="file" className="hidden" onChange={(e) => handleImageUpload(e, 'avatar')} accept="image/*" />
+                    <img
+                      src={avatarPreview || "/background.jpg"}
+                      alt="Avatar"
+                      className="w-20 h-20 rounded-full"
+                    />
+                    <Label
+                      htmlFor="avatar-upload"
+                      className="absolute bottom-0 right-0 cursor-pointer"
+                    >
+                      <Input
+                        id="avatar-upload"
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => handleImageUpload(e, "avatar")}
+                        accept="image/*"
+                      />
                       <div className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 rounded-full flex items-center justify-center">
                         <Upload className="w-4 h-4" />
                       </div>
@@ -139,7 +385,9 @@ export default function UserAccount() {
                   </div>
                   <div className="space-y-1">
                     <h2 className="text-2xl font-bold">{user.name}</h2>
-                    <p className="text-sm text-muted-foreground">{user.address}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user.address}
+                    </p>
                   </div>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -147,48 +395,95 @@ export default function UserAccount() {
                     <Label htmlFor="name">Name</Label>
                     <div className="relative">
                       <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input id="name" defaultValue={user.name} className="pl-8" />
+                      <Input
+                        id="name"
+                        value={user.name}
+                        onChange={(e) =>
+                          handleInputChange("name", e.target.value)
+                        }
+                        className="pl-8"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email (not visible)</Label>
                     <div className="relative">
                       <Globe className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input id="email" defaultValue={user.email} className="pl-8" />
+                      <Input
+                        id="email"
+                        value={user.email}
+                        onChange={(e) =>
+                          handleInputChange("email", e.target.value)
+                        }
+                        className="pl-8"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="website">Website</Label>
                     <div className="relative">
                       <Globe className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input id="website" defaultValue={user.website} className="pl-8" />
+                      <Input
+                        id="website"
+                        value={user.website}
+                        onChange={(e) =>
+                          handleInputChange("website", e.target.value)
+                        }
+                        className="pl-8"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="twitter">X</Label>
                     <div className="relative">
                       <Twitter className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input id="twitter" defaultValue={user.socialMedia.twitter} className="pl-8" />
+                      <Input
+                        id="twitter"
+                        value={user.socialMedia.twitter}
+                        onChange={(e) =>
+                          handleSocialMediaChange("twitter", e.target.value)
+                        }
+                        className="pl-8"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="linkedin">LinkedIn</Label>
                     <div className="relative">
                       <Linkedin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input id="linkedin" defaultValue={user.socialMedia.linkedin} className="pl-8" />
+                      <Input
+                        id="linkedin"
+                        value={user.socialMedia.linkedin}
+                        onChange={(e) =>
+                          handleSocialMediaChange("linkedin", e.target.value)
+                        }
+                        className="pl-8"
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="github">GitHub</Label>
                     <div className="relative">
                       <Github className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input id="github" defaultValue={user.socialMedia.github} className="pl-8" />
+                      <Input
+                        id="github"
+                        value={user.socialMedia.github}
+                        onChange={(e) =>
+                          handleSocialMediaChange("github", e.target.value)
+                        }
+                        className="pl-8"
+                      />
                     </div>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio</Label>
-                  <Textarea id="bio" defaultValue={user.bio} className="resize-none" />
+                  <Textarea
+                    id="bio"
+                    value={user.bio}
+                    onChange={(e) => handleInputChange("bio", e.target.value)}
+                    className="resize-none"
+                  />
                 </div>
               </div>
 
@@ -201,12 +496,17 @@ export default function UserAccount() {
                       <Shield className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <Label>Display Public Profile</Label>
-                        <p className="text-sm text-muted-foreground">You can make your profile private by disabling this option.</p>
+                        <p className="text-sm text-muted-foreground">
+                          You can make your profile private by disabling this
+                          option.
+                        </p>
                       </div>
                     </div>
                     <Switch
                       checked={user.preferences.publicProfile}
-                      onCheckedChange={(checked) => handlePreferenceChange('publicProfile', checked)}
+                      onCheckedChange={(checked) =>
+                        handlePreferenceChange("publicProfile", checked)
+                      }
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -214,12 +514,16 @@ export default function UserAccount() {
                       <Bell className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <Label>Email Notifications</Label>
-                        <p className="text-sm text-muted-foreground">Receive updates about your IP assets and account</p>
+                        <p className="text-sm text-muted-foreground">
+                          Receive updates about your IP assets and account
+                        </p>
                       </div>
                     </div>
                     <Switch
                       checked={user.preferences.emailNotifications}
-                      onCheckedChange={(checked) => handlePreferenceChange('emailNotifications', checked)}
+                      onCheckedChange={(checked) =>
+                        handlePreferenceChange("emailNotifications", checked)
+                      }
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -227,25 +531,32 @@ export default function UserAccount() {
                       <Eye className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <Label>Marketplace Profile</Label>
-                        <p className="text-sm text-muted-foreground">Allow others to see your profile and IP portfolio at the Marketplace</p>
+                        <p className="text-sm text-muted-foreground">
+                          Allow others to see your profile and IP portfolio at
+                          the Marketplace
+                        </p>
                       </div>
                     </div>
                     <Switch
                       checked={user.preferences.marketProfile}
-                      onCheckedChange={(checked) => handlePreferenceChange('marketProfile', checked)}
+                      onCheckedChange={(checked) =>
+                        handlePreferenceChange("marketProfile", checked)
+                      }
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>Data Sharing</Label>
-                    <Select 
-                      defaultValue={user.preferences.dataSharing}
-                      onValueChange={(value) => handlePreferenceChange('dataSharing', value)}
+                    <Select
+                      value={user.preferences.dataSharing}
+                      onValueChange={(value) =>
+                        handlePreferenceChange("dataSharing", value)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select data sharing level" />
                       </SelectTrigger>
                       <SelectContent>
-                      <SelectItem value="anonymous">Anonymous</SelectItem>
+                        <SelectItem value="anonymous">Anonymous</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -254,16 +565,33 @@ export default function UserAccount() {
 
               <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                 <DrawerTrigger asChild>
-                  <Button className="w-full" onClick={handleSave}>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Profile & Preferences
+                  <Button
+                    className="w-full"
+                    onClick={handleSave}
+                    disabled={!isConnected || isLoading || ipfsLoading || isTransacting}
+                  >
+                    {isLoading || ipfsLoading || isTransacting ? (
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4 mr-2" />
+                    )}
+                    {!isConnected
+                      ? "Connect Wallet to Save"
+                      : isLoading
+                      ? "Loading Settings..."
+                      : ipfsLoading
+                      ? `Uploading to IPFS... ${progress}%`
+                      : isTransacting
+                      ? "Processing Transaction..."
+                      : "Save Profile & Preferences"}
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent>
                   <DrawerHeader>
                     <DrawerTitle>Confirm Transaction</DrawerTitle>
                     <DrawerDescription>
-                      Please review and sign the transaction to save your profile and preferences to the blockchain.
+                      Please review and sign the transaction to save your
+                      profile and preferences to the blockchain.
                     </DrawerDescription>
                   </DrawerHeader>
                   <div className="p-4 space-y-4">
@@ -271,11 +599,22 @@ export default function UserAccount() {
                     <ul className="list-disc list-inside">
                       <li>Update profile information</li>
                       <li>Update account preferences</li>
-                      <li>Upload new images to IPFS</li>
+                      <li>Store data on Starknet blockchain</li>
                     </ul>
-                    <Button onClick={handleTransactionSign} className="w-full">
-                      <Key className="w-4 h-4 mr-2" />
-                      Sign and Submit
+
+                    <Button
+                      onClick={handleTransactionSign}
+                      className="w-full"
+                      disabled={isTransacting}
+                    >
+                      {isTransacting ? (
+                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Key className="w-4 h-4 mr-2" />
+                      )}
+                      {isTransacting
+                        ? "Processing Transaction..."
+                        : "Sign and Submit"}
                     </Button>
                   </div>
                 </DrawerContent>
@@ -290,7 +629,9 @@ export default function UserAccount() {
                 <CardTitle className="text-sm font-medium">
                   {key.split(/(?=[A-Z])/).join(" ")}
                 </CardTitle>
-                {key === 'rewards' && <Award className="h-4 w-4 text-muted-foreground" />}
+                {key === "rewards" && (
+                  <Award className="h-4 w-4 text-muted-foreground" />
+                )}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{value}</div>
@@ -329,5 +670,5 @@ export default function UserAccount() {
         </div>
       </div>
     </div>
-  )
+  );
 }
