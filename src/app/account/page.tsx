@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, ChangeEvent, useEffect, useCallback } from "react";
-import { useAccount, useContract, useSendTransaction } from "@starknet-react/core";
+import { useAccount } from "@starknet-react/core";
 import { useUsersSettings } from "@/hooks/useUsersSettings";
 import { useIpfsUpload } from "@/hooks/useIpfs";
 import { useToast } from "@/hooks/use-toast";
-import { userSettingsAbi } from "@/abis/user_settings";
-import { Abi } from "starknet";
-import { EXPLORER_URL } from "@/services/constants";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -110,7 +107,10 @@ interface UploadedImages {
 type ImageType = "avatar" | "cover";
 type PreferenceKey = keyof UserPreferences;
 type SocialPlatform = keyof SocialMediaLinks;
-type ProfileField = keyof Pick<UserProfile, "name" | "email" | "website" | "bio">;
+type ProfileField = keyof Pick<
+  UserProfile,
+  "name" | "email" | "website" | "bio"
+>;
 
 // Constants
 const INITIAL_USER_PROFILE: UserProfile = {
@@ -143,35 +143,25 @@ const INITIAL_USER_PROFILE: UserProfile = {
   },
 };
 
-// Constants
-const USER_SETTINGS_CONTRACT_ADDRESS = process.env
-  .NEXT_PUBLIC_USER_SETTINGS_CONTRACT_ADDRESS as `0x${string}`;
-
 export default function UserAccount() {
   // Hooks
   const { address, isConnected } = useAccount();
   const { toast } = useToast();
-  const { getAccountSettings } = useUsersSettings();
+  const { getAccountSettings, executeSettingsCall, isUpdating } =
+    useUsersSettings();
   const { uploadToIpfs, loading: ipfsLoading, progress } = useIpfsUpload();
-  
-  // Contract setup
-  const { contract } = useContract({
-    abi: userSettingsAbi as Abi,
-    address: USER_SETTINGS_CONTRACT_ADDRESS,
-  });
-  
-  const { sendAsync: executeTransaction } = useSendTransaction({
-    calls: [],
-  });
 
   // State
   const [user, setUser] = useState<UserProfile>(INITIAL_USER_PROFILE);
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [avatarPreview, setAvatarPreview] = useState(INITIAL_USER_PROFILE.avatarUrl);
-  const [coverPreview, setCoverPreview] = useState(INITIAL_USER_PROFILE.coverUrl);
+  const [avatarPreview, setAvatarPreview] = useState(
+    INITIAL_USER_PROFILE.avatarUrl
+  );
+  const [coverPreview, setCoverPreview] = useState(
+    INITIAL_USER_PROFILE.coverUrl
+  );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isTransacting, setIsTransacting] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
 
@@ -277,42 +267,47 @@ export default function UserAccount() {
 
   const uploadImagesToIpfs = useCallback(async (): Promise<UploadedImages> => {
     const files = [
-      { file: avatarFile, type: 'avatar' as const, name: 'Avatar' },
-      { file: coverFile, type: 'cover' as const, name: 'Cover' }
+      { file: avatarFile, type: "avatar" as const, name: "Avatar" },
+      { file: coverFile, type: "cover" as const, name: "Cover" },
     ].filter(({ file }) => file);
 
     if (!files.length) return {};
 
     try {
       console.log(`Uploading ${files.length} image(s) to IPFS...`);
-      
+
       const results = await Promise.all(
         files.map(({ file, type, name }) =>
           uploadToIpfs(file!, {
-            name: `${user.name || 'User'} ${name}`,
+            name: `${user.name || "User"} ${name}`,
             description: `Profile ${name.toLowerCase()} image`,
-          }).then(result => ({ type, url: result.fileUrl }))
+          }).then((result) => ({ type, url: result.fileUrl }))
         )
       );
 
       return results.reduce((acc, { type, url }) => {
-        acc[type === 'avatar' ? 'avatarUrl' : 'coverUrl'] = url;
+        acc[type === "avatar" ? "avatarUrl" : "coverUrl"] = url;
         console.log(`${type} uploaded:`, url);
         return acc;
       }, {} as UploadedImages);
     } catch (error) {
       console.error("IPFS upload failed:", error);
-      throw new Error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Upload failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     }
   }, [avatarFile, coverFile, uploadToIpfs, user.name]);
 
-
-
+  
 
   // Transaction Handlers
   const handleSave = useCallback(async (): Promise<void> => {
     setIsDrawerOpen(true);
   }, []);
+
+
 
 
   const handleTransactionSign = useCallback(async (): Promise<void> => {
@@ -325,92 +320,48 @@ export default function UserAccount() {
       return;
     }
 
-    if (!contract) {
-      toast({
-        title: "Contract Error",
-        description: "Contract not available. Please try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsTransacting(true);
-    
     try {
-      console.log("User data to save:", user);
-      
-      // Upload images to IPFS first if any are selected
+      // Upload images first if any are selected
       if (avatarFile || coverFile) {
-        console.log("Uploading images to IPFS...");
         const uploadedImages = await uploadImagesToIpfs();
-        
-        setUser((prevUser: UserProfile) => ({
-          ...prevUser,
-          avatarUrl: uploadedImages.avatarUrl || prevUser.avatarUrl,
-          coverUrl: uploadedImages.coverUrl || prevUser.coverUrl
+        setUser((prev) => ({
+          ...prev,
+          avatarUrl: uploadedImages.avatarUrl || prev.avatarUrl,
+          coverUrl: uploadedImages.coverUrl || prev.coverUrl,
         }));
-        
-        console.log("Images uploaded successfully:", uploadedImages);
       }
 
-      console.log("Preparing Starknet transaction...");
-
-      const currentTimestamp = Math.floor(Date.now() / 1000);
+      // Execute transaction
+      const timestamp = Math.floor(Date.now() / 1000);
       const username = user.name.toLowerCase().replace(/\s+/g, "_") || "user";
 
-      console.log("Account details to store:", {
-        name: user.name,
-        email: user.email,
-        username: username,
-        timestamp: currentTimestamp,
+      await executeSettingsCall({
+        method: "store_account_details",
+        args: [user.name, user.email, username, timestamp],
       });
 
-      // Prepare contract call using the consistent pattern
-      const contractCall = contract.populate("store_account_details", [
-        user.name,
-        user.email,
-        username,
-        currentTimestamp,
-      ]);
-
-      // Execute the transaction
-      const tx = await executeTransaction([contractCall]);
-
-      console.log("Transaction submitted:", tx.transaction_hash);
-
-      // Show success toast with transaction link
       toast({
         title: "Settings Saved!",
-        description: (
-          <div className="text-sm space-y-1">
-            <p>Your account settings have been saved to the blockchain.</p>
-            <a
-              href={`${EXPLORER_URL}/tx/${tx.transaction_hash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline text-blue-600"
-            >
-              View on StarkScan ↗
-            </a>
-          </div>
-        ),
+        description: "Your account settings have been saved to the blockchain.",
       });
 
       setIsDrawerOpen(false);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to save settings";
-      
-      console.error("Transaction failed:", err);
-      
       toast({
         title: "Transaction Failed",
-        description: errorMessage,
+        description:
+          err instanceof Error ? err.message : "Failed to save settings",
         variant: "destructive",
       });
-    } finally {
-      setIsTransacting(false);
     }
-  }, [isConnected, address, contract, user, avatarFile, coverFile, uploadImagesToIpfs, executeTransaction, toast]);
+  }, [
+    isConnected,
+    address,
+    user,
+    avatarFile,
+    coverFile,
+  ]);
+
 
 
 
@@ -662,9 +613,11 @@ export default function UserAccount() {
                   <Button
                     className="w-full"
                     onClick={handleSave}
-                    disabled={!isConnected || isLoading || ipfsLoading || isTransacting}
+                    disabled={
+                      !isConnected || isLoading || ipfsLoading || isUpdating
+                    }
                   >
-                    {isLoading || ipfsLoading || isTransacting ? (
+                    {isLoading || ipfsLoading || isUpdating ? (
                       <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                     ) : (
                       <Save className="w-4 h-4 mr-2" />
@@ -675,7 +628,7 @@ export default function UserAccount() {
                       ? "Loading Settings..."
                       : ipfsLoading
                       ? `Uploading to IPFS... ${progress}%`
-                      : isTransacting
+                      : isUpdating
                       ? "Processing Transaction..."
                       : "Save Profile & Preferences"}
                   </Button>
@@ -699,14 +652,14 @@ export default function UserAccount() {
                     <Button
                       onClick={handleTransactionSign}
                       className="w-full"
-                      disabled={isTransacting}
+                      disabled={isUpdating}
                     >
-                      {isTransacting ? (
+                      {isUpdating ? (
                         <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
                       ) : (
                         <Key className="w-4 h-4 mr-2" />
                       )}
-                      {isTransacting
+                      {isUpdating
                         ? "Processing Transaction..."
                         : "Sign and Submit"}
                     </Button>
