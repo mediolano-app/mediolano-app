@@ -3,6 +3,7 @@ import {
   useContract,
   useSendTransaction,
   useAccount,
+  useProvider,
 } from "@starknet-react/core";
 import { useCallback, useState } from "react";
 import { Abi } from "starknet";
@@ -12,7 +13,8 @@ const USER_SETTINGS_CONTRACT_ADDRESS = process.env
 const USER_SETTINGS_CONTRACT_ABI = userSettingsAbi as Abi;
 
 export const useUsersSettings = () => {
-  const { address } = useAccount();
+  const { address, account } = useAccount();
+  const { provider } = useProvider();
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { contract } = useContract({
@@ -100,25 +102,45 @@ export const useUsersSettings = () => {
     }
   };
 
+  const executeMultipleSettingsCalls = async (calls: Array<{
+    method: string;
+    args: any[];
+  }>) => {
+    if (!address) throw new Error("Wallet not connected");
+    if (!account) throw new Error("Account not connected");
+    if (!contract) throw new Error("Contract not initialized");
+
+    setIsUpdating(true);
+    setError(null);
+
+    try {
+      const contractCalls = calls.map(({ method, args }) => 
+        contract.populate(method, args)
+      );
+      
+      const multiCall = await account.execute(contractCalls);
+      await provider.waitForTransaction(multiCall.transaction_hash);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to execute multicall";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return {
-    // Query functions
     getAccountSettings,
     getNetworkSettings,
     getIpSettings,
     getNotificationSettings,
     getSecuritySettings,
     getAdvancedSettings,
-
-    // Mutation functions
     executeSettingsCall,
-
-    // Contract instance
+    executeMultipleSettingsCalls,
     contract,
-
-    // Loading State
     isUpdating,
-
-    // Error
     error,
   };
 };
