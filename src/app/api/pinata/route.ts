@@ -10,9 +10,12 @@ export async function GET() {
     });
     return NextResponse.json({ url: url }, { status: 200 });
   } catch (error) {
-    console.log(error);
+    console.error("Pinata API Error:", error);
     return NextResponse.json(
-      { text: "Error creating API Key:" },
+      { 
+        text: "Error creating signed URL", 
+        error: error instanceof Error ? error.message : String(error) 
+      },
       { status: 500 }
     );
   }
