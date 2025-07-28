@@ -1,462 +1,265 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAccount } from '@starknet-react/core';
-import { Contract, Abi } from 'starknet';
-import { abi } from '@/abis/abi';
+import { useState, useEffect, useMemo } from 'react';
 import {
-	CreatedAsset,
-	AssetType,
-} from '@/components/created-assets/created-assets';
-import {
-	mockCreatedAssets,
-	mockCreatedAssetsStats,
-} from '@/lib/mockCreatedAssets';
+	useMIP,
+	useCreatorNFTPortfolio,
+	type IP,
+} from '@/hooks/contracts/use-mip';
 
-const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP || '';
+export type AssetType =
+	| 'IP Token'
+	| 'IP Coin'
+	| 'Story Chapter'
+	| 'Artwork'
+	| 'Music'
+	| 'Video'
+	| 'Document'
+	| 'Software'
+	| 'Patent'
+	| 'AI Model'
+	| 'NFT'
+	| 'Publication'
+	| 'RWA'
+	| 'Other';
 
-// Development mode flag - can be toggled for testing
-const DEVELOPMENT_MODE =
-	process.env.NODE_ENV === 'development' &&
-	process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
+export interface CreatedAsset {
+	id: string;
+	tokenId: string;
+	name: string;
+	description: string;
+	image: string;
+	assetType: AssetType;
+	createdAt: string;
+	contractAddress: string;
+	blockchain: string;
+	tokenStandard: string;
+	isActive: boolean;
+	external_url?: string;
+	attributes?: Array<{
+		trait_type: string;
+		value: string | number;
+	}>;
+}
 
 export interface CreatedAssetsStats {
 	totalAssets: number;
 	uniqueTypes: number;
-	mostRecentAsset: string | null;
+	mostRecentAsset: CreatedAsset | null;
 	activeAssets: number;
 	assetsByType: Record<AssetType, number>;
 }
 
-export function useCreatedAssets(walletAddress?: string) {
-	const { account } = useAccount();
-
+export function useCreatedAssets() {
 	const [assets, setAssets] = useState<CreatedAsset[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [stats, setStats] = useState<CreatedAssetsStats | null>(null);
-	const [userTokens, setUserTokens] = useState<string[]>([]);
-	const [contract, setContract] = useState<Contract | null>(null);
 
-	// Determine asset type from metadata with enhanced detection
-	const determineAssetType = useCallback(
-		(metadata: Record<string, unknown>): AssetType => {
-			if (!metadata) return 'Other';
+	// Use the real blockchain hooks
+	const { balanceError, tokenIdsError, isLoading: mipLoading } = useMIP();
 
-			const name = (metadata.name as string)?.toLowerCase() || '';
-			const type = (metadata.type as string)?.toLowerCase() || '';
-			const assetType = (metadata.asset_type as string)?.toLowerCase() || '';
-			const category = (metadata.category as string)?.toLowerCase() || '';
-			const tags = Array.isArray(metadata.tags)
-				? metadata.tags.map((tag: unknown) => String(tag).toLowerCase())
-				: [];
-			const allText = `${name} ${type} ${assetType} ${category} ${tags.join(
-				' '
-			)}`;
+	const {
+		metadata,
+		loading: metadataLoading,
+		error: metadataError,
+	} = useCreatorNFTPortfolio();
 
-			// Enhanced asset type detection with priority order
+	const isLoading = mipLoading || metadataLoading;
 
-			// AI Models (high priority)
-			if (
-				allText.includes('ai model') ||
-				allText.includes('machine learning') ||
-				allText.includes('neural network') ||
-				allText.includes('artificial intelligence') ||
-				category === 'ai' ||
-				type === 'ai_model'
-			) {
-				return 'AI Model';
+	// Determine asset type based on metadata
+	const determineAssetType = (ipMetadata: IP): AssetType => {
+		const name = ipMetadata.name?.toLowerCase() || '';
+		const description = ipMetadata.description?.toLowerCase() || '';
+		const attributes = ipMetadata.attributes || [];
+
+		// Check attributes first for more specific classification
+		for (const attr of attributes) {
+			const traitType = attr.trait_type?.toLowerCase() || '';
+			const value = attr.value?.toLowerCase() || '';
+
+			if (traitType.includes('type') || traitType.includes('category')) {
+				if (value.includes('ip') && value.includes('token')) return 'IP Token';
+				if (value.includes('ip') && value.includes('coin')) return 'IP Coin';
+				if (value.includes('story') || value.includes('chapter'))
+					return 'Story Chapter';
+				if (value.includes('artwork') || value.includes('art'))
+					return 'Artwork';
+				if (value.includes('music') || value.includes('audio')) return 'Music';
+				if (value.includes('video') || value.includes('film')) return 'Video';
+				if (value.includes('document') || value.includes('pdf'))
+					return 'Document';
+				if (value.includes('software') || value.includes('code'))
+					return 'Software';
+				if (value.includes('patent')) return 'Patent';
+				if (value.includes('ai') || value.includes('model')) return 'AI Model';
+				if (value.includes('nft')) return 'NFT';
+				if (value.includes('publication') || value.includes('book'))
+					return 'Publication';
+				if (value.includes('rwa') || value.includes('real world')) return 'RWA';
 			}
+		}
 
-			// IP Tokens and Coins
-			if (
-				allText.includes('ip token') ||
-				metadata.token_standard === 'ERC20' ||
-				metadata.is_fungible === true
-			) {
-				if (allText.includes('coin')) return 'IP Coin';
-				return 'IP Token';
-			}
+		// Fallback to name/description analysis
+		if (
+			name.includes('ip') &&
+			(name.includes('token') || description.includes('token'))
+		)
+			return 'IP Token';
+		if (name.includes('coin') || name.includes('currency')) return 'IP Coin';
+		if (
+			name.includes('story') ||
+			name.includes('chapter') ||
+			description.includes('narrative')
+		)
+			return 'Story Chapter';
+		if (
+			name.includes('art') ||
+			name.includes('artwork') ||
+			name.includes('painting')
+		)
+			return 'Artwork';
+		if (
+			name.includes('music') ||
+			name.includes('song') ||
+			name.includes('audio')
+		)
+			return 'Music';
+		if (
+			name.includes('video') ||
+			name.includes('film') ||
+			name.includes('movie')
+		)
+			return 'Video';
+		if (
+			name.includes('document') ||
+			name.includes('pdf') ||
+			name.includes('paper')
+		)
+			return 'Document';
+		if (
+			name.includes('software') ||
+			name.includes('app') ||
+			name.includes('code')
+		)
+			return 'Software';
+		if (name.includes('patent') || description.includes('invention'))
+			return 'Patent';
+		if (
+			name.includes('ai') ||
+			name.includes('model') ||
+			name.includes('algorithm')
+		)
+			return 'AI Model';
+		if (name.includes('nft') || name.includes('collectible')) return 'NFT';
+		if (
+			name.includes('publication') ||
+			name.includes('book') ||
+			name.includes('article')
+		)
+			return 'Publication';
+		if (
+			name.includes('rwa') ||
+			name.includes('real world') ||
+			name.includes('physical')
+		)
+			return 'RWA';
 
-			// Story Chapters and Publications
-			if (
-				allText.includes('story') ||
-				allText.includes('chapter') ||
-				allText.includes('narrative') ||
-				category === 'story'
-			) {
-				return 'Story Chapter';
-			}
+		return 'Other';
+	};
 
-			if (
-				allText.includes('publication') ||
-				allText.includes('book') ||
-				allText.includes('paper') ||
-				allText.includes('article') ||
-				category === 'publication'
-			) {
-				return 'Publication';
-			}
-
-			// Creative Assets
-			if (
-				allText.includes('artwork') ||
-				allText.includes('painting') ||
-				allText.includes('drawing') ||
-				allText.includes('visual art') ||
-				category === 'art' ||
-				category === 'artwork'
-			) {
-				return 'Artwork';
-			}
-
-			if (
-				allText.includes('music') ||
-				allText.includes('audio') ||
-				allText.includes('song') ||
-				allText.includes('sound') ||
-				category === 'music' ||
-				category === 'audio'
-			) {
-				return 'Music';
-			}
-
-			if (
-				allText.includes('video') ||
-				allText.includes('film') ||
-				allText.includes('movie') ||
-				allText.includes('animation') ||
-				category === 'video' ||
-				category === 'film'
-			) {
-				return 'Video';
-			}
-
-			// Technical Assets
-			if (
-				allText.includes('software') ||
-				allText.includes('code') ||
-				allText.includes('application') ||
-				allText.includes('program') ||
-				category === 'software' ||
-				type === 'software'
-			) {
-				return 'Software';
-			}
-
-			if (
-				allText.includes('patent') ||
-				allText.includes('invention') ||
-				category === 'patent' ||
-				type === 'patent'
-			) {
-				return 'Patent';
-			}
-
-			// Real World Assets
-			if (
-				allText.includes('rwa') ||
-				allText.includes('real world asset') ||
-				allText.includes('physical asset') ||
-				category === 'rwa' ||
-				type === 'rwa'
-			) {
-				return 'RWA';
-			}
-
-			// Documents
-			if (
-				allText.includes('document') ||
-				allText.includes('pdf') ||
-				allText.includes('text') ||
-				allText.includes('contract') ||
-				category === 'document'
-			) {
-				return 'Document';
-			}
-
-			// NFTs (general)
-			if (
-				allText.includes('nft') ||
-				allText.includes('non-fungible') ||
-				metadata.token_standard === 'ERC721' ||
-				metadata.token_standard === 'ERC1155'
-			) {
-				return 'NFT';
-			}
-
-			return 'Other';
-		},
-		[]
-	);
-
-	// Determine token standard from metadata
-	const determineTokenStandard = useCallback(
-		(metadata: Record<string, unknown>): 'ERC721' | 'ERC1155' | 'ERC20' => {
-			if (metadata?.token_standard) {
-				return metadata.token_standard as 'ERC721' | 'ERC1155' | 'ERC20';
-			}
-
-			// Default based on asset type
-			if (
-				metadata?.asset_type?.toString().includes('coin') ||
-				metadata?.symbol
-			) {
-				return 'ERC20';
-			}
-
-			return 'ERC721';
-		},
-		[]
-	);
-
-	// Calculate comprehensive stats from assets
-	const calculateStats = useCallback(
-		(assets: CreatedAsset[]): CreatedAssetsStats => {
-			const assetsByType: Record<AssetType, number> = {
-				'IP Token': 0,
-				'IP Coin': 0,
-				'Story Chapter': 0,
-				Artwork: 0,
-				Music: 0,
-				Video: 0,
-				Document: 0,
-				Software: 0,
-				Patent: 0,
-				'AI Model': 0,
-				NFT: 0,
-				Publication: 0,
-				RWA: 0,
-				Other: 0,
-			};
-
-			assets.forEach((asset) => {
-				assetsByType[asset.assetType]++;
-			});
-
-			const uniqueTypes = Object.values(assetsByType).filter(
-				(count) => count > 0
-			).length;
-			const activeAssets = assets.filter((asset) => asset.isActive).length;
-
-			// Find most recent asset
-			const sortedByDate = [...assets].sort(
-				(a, b) =>
-					new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+	// Convert blockchain data to CreatedAsset format
+	useEffect(() => {
+		if (metadataError || balanceError || tokenIdsError) {
+			setError(
+				metadataError ||
+					balanceError?.message ||
+					tokenIdsError?.message ||
+					'Failed to fetch assets'
 			);
-			const mostRecentAsset =
-				sortedByDate.length > 0 ? sortedByDate[0].name : null;
-
-			return {
-				totalAssets: assets.length,
-				uniqueTypes,
-				mostRecentAsset,
-				activeAssets,
-				assetsByType,
-			};
-		},
-		[]
-	);
-
-	// Fetch token metadata from IPFS with proper error handling
-	const fetchTokenMetadata = useCallback(
-		async (tokenId: string): Promise<Record<string, unknown> | null> => {
-			if (!contract) return null;
-
-			try {
-				// Get tokenURI from contract
-				const tokenUri = await contract.call('tokenURI', [tokenId]);
-				if (!tokenUri || typeof tokenUri !== 'string') return null;
-
-				// Handle IPFS URLs
-				let metadataUrl = tokenUri.toString();
-				if (metadataUrl.startsWith('ipfs://')) {
-					metadataUrl = metadataUrl.replace(
-						'ipfs://',
-						'https://gateway.pinata.cloud/ipfs/'
-					);
-				}
-
-				// Fetch metadata with timeout
-				const controller = new AbortController();
-				const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-
-				const response = await fetch(metadataUrl, {
-					signal: controller.signal,
-				});
-				clearTimeout(timeoutId);
-
-				if (!response.ok) return null;
-
-				const metadata = await response.json();
-				return metadata;
-			} catch (err) {
-				console.error(`Error fetching metadata for token ${tokenId}:`, err);
-				return null;
-			}
-		},
-		[contract]
-	);
-
-	// Handle development mode with mock data
-	useEffect(() => {
-		if (DEVELOPMENT_MODE) {
-			setIsLoading(true);
-			// Simulate loading delay
-			setTimeout(() => {
-				setAssets(mockCreatedAssets);
-				setStats(mockCreatedAssetsStats);
-				setIsLoading(false);
-				setError(null);
-			}, 1000);
 			return;
 		}
-	}, []);
 
-	// Initialize contract for production mode
-	useEffect(() => {
-		if (DEVELOPMENT_MODE) return;
-
-		if (account && contractAddress) {
-			try {
-				const newContract = new Contract(
-					abi as unknown as Abi,
-					contractAddress,
-					account
-				);
-				setContract(newContract);
-			} catch (err) {
-				console.error('Error initializing contract:', err);
-				setError('Failed to initialize contract');
-				setIsLoading(false);
-			}
-		}
-	}, [account]);
-
-	// Fetch user tokens when contract or wallet changes
-	useEffect(() => {
-		if (DEVELOPMENT_MODE) return;
-
-		if (account && contract && walletAddress) {
-			setIsLoading(true);
-			setError(null);
-
-			contract
-				.call('list_user_tokens', [walletAddress])
-				.then((result: unknown) => {
-					const tokens = Array.isArray(result)
-						? result.map((token: unknown) => String(token))
-						: [];
-					setUserTokens(tokens);
-				})
-				.catch((err: Error) => {
-					console.error('Error fetching user tokens:', err);
-					setError('Failed to fetch assets from blockchain');
-					setIsLoading(false);
-				});
-		}
-	}, [account, contract, walletAddress]);
-
-	// Process tokens into assets
-	useEffect(() => {
-		if (DEVELOPMENT_MODE) return;
-
-		if (userTokens.length > 0 && contract && walletAddress) {
-			const processTokens = async () => {
-				try {
-					const assetPromises = userTokens.map(async (tokenId) => {
-						try {
-							const metadata = await fetchTokenMetadata(tokenId);
-							if (!metadata) return null;
-
-							const asset: CreatedAsset = {
-								id: tokenId,
-								tokenId,
-								name: (metadata.name as string) || `Asset #${tokenId}`,
-								description:
-									(metadata.description as string) ||
-									'No description available',
-								image: (metadata.image as string) || '',
-								assetType: determineAssetType(metadata),
-								tokenStandard: determineTokenStandard(metadata),
-								contractAddress,
-								createdAt: new Date().toISOString(), // In real implementation, this would come from blockchain events
-								blockchain: 'Starknet' as const,
-								isActive: true,
-								metadata,
-							};
-
-							return asset;
-						} catch (error) {
-							console.error(`Error processing token ${tokenId}:`, error);
-							return null;
-						}
-					});
-
-					const processedAssets = await Promise.all(assetPromises);
-					const validAssets = processedAssets.filter(
-						(asset): asset is CreatedAsset => asset !== null
-					);
-
-					setAssets(validAssets);
-					setStats(calculateStats(validAssets));
-					setIsLoading(false);
-				} catch (err) {
-					console.error('Error processing tokens:', err);
-					setError('Failed to process assets');
-					setIsLoading(false);
-				}
-			};
-
-			processTokens();
-		} else if (userTokens.length === 0 && contract && walletAddress) {
+		if (!metadata || metadata.length === 0) {
 			setAssets([]);
-			setStats(calculateStats([]));
-			setIsLoading(false);
-		}
-	}, [
-		userTokens,
-		contract,
-		walletAddress,
-		fetchTokenMetadata,
-		determineAssetType,
-		determineTokenStandard,
-		calculateStats,
-		isLoading,
-	]);
-
-	// Refetch function for manual refresh
-	const refetch = useCallback(() => {
-		if (DEVELOPMENT_MODE) {
-			setIsLoading(true);
-			setTimeout(() => {
-				setAssets(mockCreatedAssets);
-				setStats(mockCreatedAssetsStats);
-				setIsLoading(false);
-			}, 500);
 			return;
 		}
 
-		if (account && contract && walletAddress) {
-			setIsLoading(true);
-			setError(null);
+		try {
+			const convertedAssets: CreatedAsset[] = metadata.map((ipData) => ({
+				id: `asset-${ipData.tokenId}`,
+				tokenId: ipData.tokenId.toString(),
+				name: ipData.name || `Programmable IP #${ipData.tokenId}`,
+				description: ipData.description || 'No description available',
+				image: ipData.image || '/placeholder.svg',
+				assetType: determineAssetType(ipData),
+				createdAt: new Date().toISOString(), // Real creation date would come from blockchain events
+				contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP || '',
+				blockchain: 'Starknet',
+				tokenStandard: 'ERC721', // Based on the MIP contract structure
+				isActive: true, // Assume all fetched assets are active
+				external_url: ipData.external_url,
+				attributes: ipData.attributes,
+			}));
 
-			// Refetch user tokens
-			contract
-				.call('list_user_tokens', [walletAddress])
-				.then((result: unknown) => {
-					const tokens = Array.isArray(result)
-						? result.map((token: unknown) => String(token))
-						: [];
-					setUserTokens(tokens);
-				})
-				.catch((err: Error) => {
-					console.error('Error refetching user tokens:', err);
-					setError('Failed to refetch assets');
-					setIsLoading(false);
-				});
+			setAssets(convertedAssets);
+			setError(null);
+		} catch (err) {
+			console.error('Error converting blockchain data to assets:', err);
+			setError('Failed to process asset data');
 		}
-	}, [account, contract, walletAddress]);
+	}, [metadata, metadataError, balanceError, tokenIdsError]);
+
+	// Calculate statistics
+	const stats: CreatedAssetsStats = useMemo(() => {
+		if (assets.length === 0) {
+			return {
+				totalAssets: 0,
+				uniqueTypes: 0,
+				mostRecentAsset: null,
+				activeAssets: 0,
+				assetsByType: {} as Record<AssetType, number>,
+			};
+		}
+
+		const assetsByType: Record<AssetType, number> = {
+			'IP Token': 0,
+			'IP Coin': 0,
+			'Story Chapter': 0,
+			Artwork: 0,
+			Music: 0,
+			Video: 0,
+			Document: 0,
+			Software: 0,
+			Patent: 0,
+			'AI Model': 0,
+			NFT: 0,
+			Publication: 0,
+			RWA: 0,
+			Other: 0,
+		};
+
+		assets.forEach((asset) => {
+			assetsByType[asset.assetType]++;
+		});
+
+		const uniqueTypes = Object.values(assetsByType).filter(
+			(count) => count > 0
+		).length;
+		const activeAssets = assets.filter((asset) => asset.isActive).length;
+		const mostRecentAsset = assets.length > 0 ? assets[0] : null; // Assuming first is most recent
+
+		return {
+			totalAssets: assets.length,
+			uniqueTypes,
+			mostRecentAsset,
+			activeAssets,
+			assetsByType,
+		};
+	}, [assets]);
+
+	const refetch = () => {
+		// The underlying hooks will handle refetching
+		window.location.reload();
+	};
 
 	return {
 		assets,
