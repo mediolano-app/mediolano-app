@@ -5,6 +5,12 @@ import { useAccount } from "@starknet-react/core";
 import { useUsersSettings } from "@/hooks/useUsersSettings";
 import { useIpfsUpload } from "@/hooks/useIpfs";
 import { useToast } from "@/hooks/use-toast";
+import { toEpochTime } from "@/lib/utils";
+import type {
+  UserProfile,
+  SocialMediaLinks,
+  UserPreferences,
+} from "@/lib/types";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -54,50 +60,7 @@ import {
   Save,
 } from "lucide-react";
 
-// Types
-interface SocialMediaLinks {
-  twitter: string;
-  linkedin: string;
-  github: string;
-}
 
-interface UserPreferences {
-  marketProfile: boolean;
-  emailNotifications: boolean;
-  publicProfile: boolean;
-  dataSharing: string;
-}
-
-interface Transaction {
-  id: string;
-  type: string;
-  asset: string;
-  date: string;
-  status: string;
-}
-
-interface UserStats {
-  nftAssets: number;
-  transactions: number;
-  listingItems: number;
-  nftCollections: number;
-  rewards: number;
-  badges: number;
-}
-
-interface UserProfile {
-  address: string;
-  name: string;
-  website: string;
-  email: string;
-  socialMedia: SocialMediaLinks;
-  avatarUrl: string;
-  coverUrl: string;
-  bio: string;
-  preferences: UserPreferences;
-  transactions: Transaction[];
-  stats: UserStats;
-}
 
 interface UploadedImages {
   avatarUrl?: string;
@@ -107,15 +70,13 @@ interface UploadedImages {
 type ImageType = "avatar" | "cover";
 type PreferenceKey = keyof UserPreferences;
 type SocialPlatform = keyof SocialMediaLinks;
-type ProfileField = keyof Pick<
-  UserProfile,
-  "name" | "email" | "website" | "bio"
->;
+type ProfileField = "name" | "username" | "email" | "website" | "bio";
 
 // Constants
 const INITIAL_USER_PROFILE: UserProfile = {
   address: "",
   name: "",
+  username: "",
   website: "",
   email: "",
   socialMedia: {
@@ -123,14 +84,14 @@ const INITIAL_USER_PROFILE: UserProfile = {
     linkedin: "",
     github: "",
   },
-  avatarUrl: "/background.jpg?height=100&width=100",
-  coverUrl: "/background.jpg?height=300&width=1000",
+  avatarUrl: "/avatar.jpg",
+  coverUrl: "/background.jpg",
   bio: "",
   preferences: {
     marketProfile: false,
-    emailNotifications: false,
+    emailNotifications: true,
     publicProfile: true,
-    dataSharing: "anonymous",
+    dataSharing: "limited",
   },
   transactions: [],
   stats: {
@@ -147,8 +108,12 @@ export default function UserAccount() {
   // Hooks
   const { address, isConnected } = useAccount();
   const { toast } = useToast();
-  const { getAccountSettings, executeSettingsCall, isUpdating } =
-    useUsersSettings();
+  const {
+    getAccountSettings,
+    executeSettingsCall,
+    executeMultipleSettingsCalls,
+    isUpdating,
+  } = useUsersSettings();
   const { uploadToIpfs, loading: ipfsLoading, progress } = useIpfsUpload();
 
   // State
@@ -300,15 +265,10 @@ export default function UserAccount() {
     }
   }, [avatarFile, coverFile, uploadToIpfs, user.name]);
 
-  
-
   // Transaction Handlers
   const handleSave = useCallback(async (): Promise<void> => {
     setIsDrawerOpen(true);
   }, []);
-
-
-
 
   const handleTransactionSign = useCallback(async (): Promise<void> => {
     if (!isConnected || !address) {
@@ -331,22 +291,63 @@ export default function UserAccount() {
         }));
       }
 
-      // Execute transaction
-      const timestamp = Math.floor(Date.now() / 1000);
-      const username = user.name.toLowerCase().replace(/\s+/g, "_") || "user";
+      const timestamp = toEpochTime(new Date().toISOString());
 
-      await executeSettingsCall({
-        method: "store_account_details",
-        args: [user.name, user.email, username, timestamp],
-      });
+      if (!user.name.trim()) {
+        toast({
+          title: "Validation Error",
+          description: "Name is required to save account settings.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!user.username.trim()) {
+        toast({
+          title: "Validation Error",
+          description: "Username is required to save account settings.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { emailNotifications, publicProfile, marketProfile } =
+        user.preferences;
+
+      await executeMultipleSettingsCalls([
+        {
+          method: "store_account_details",
+          args: [user.name, user.email, user.username, timestamp],
+        },
+        {
+          method: "store_ip_management_settings",
+          args: ["0", marketProfile ? 1 : 0, timestamp],
+        },
+        {
+          method: "store_notification_settings",
+          args: [
+            emailNotifications,
+            publicProfile,
+            false,
+            marketProfile,
+            timestamp,
+          ],
+        },
+        {
+          method: "store_X_verification",
+          args: [false, timestamp, user.socialMedia.twitter],
+        },
+      ]);
 
       toast({
         title: "Settings Saved!",
-        description: "Your account settings have been saved to the blockchain.",
+        description:
+          "Your account settings have been saved!.",
       });
 
       setIsDrawerOpen(false);
     } catch (err) {
+      console.error("Multicall transaction failed:", err);
       toast({
         title: "Transaction Failed",
         description:
@@ -360,11 +361,10 @@ export default function UserAccount() {
     user,
     avatarFile,
     coverFile,
+    executeSettingsCall,
+    uploadImagesToIpfs,
+    toast,
   ]);
-
-
-
-
 
   return (
     <div className={`min-h-screen ${theme === "dark" ? "dark" : ""}`}>
@@ -447,6 +447,21 @@ export default function UserAccount() {
                           handleInputChange("name", e.target.value)
                         }
                         className="pl-8"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Username</Label>
+                    <div className="relative">
+                      <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="username"
+                        value={user.username}
+                        onChange={(e) =>
+                          handleInputChange("username", e.target.value)
+                        }
+                        className="pl-8"
+                        placeholder="Enter your username"
                       />
                     </div>
                   </div>
