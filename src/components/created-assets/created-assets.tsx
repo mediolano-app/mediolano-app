@@ -48,24 +48,12 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import {
+	useCreatedAssets,
+	type CreatedAsset,
+	type AssetType,
+} from '@/hooks/useCreatedAssets';
 import { cn } from '@/lib/utils';
-import { useCreatedAssets } from '@/hooks/useCreatedAssets';
-
-export type AssetType =
-	| 'IP Token'
-	| 'IP Coin'
-	| 'Story Chapter'
-	| 'Artwork'
-	| 'Music'
-	| 'Video'
-	| 'Document'
-	| 'Software'
-	| 'Patent'
-	| 'AI Model'
-	| 'NFT'
-	| 'Publication'
-	| 'RWA'
-	| 'Other';
 
 export type SortOption =
 	| 'date-desc'
@@ -74,34 +62,6 @@ export type SortOption =
 	| 'name-desc'
 	| 'type-asc'
 	| 'type-desc';
-
-export interface CreatedAsset {
-	id: string;
-	tokenId: string;
-	name: string;
-	description: string;
-	image: string;
-	assetType: AssetType;
-	symbol?: string; // For ERC20 tokens
-	preview?: string; // Text/image preview
-	createdAt: string;
-	contractAddress: string;
-	tokenURI?: string;
-	attributes?: {
-		trait_type: string;
-		value: string;
-	}[];
-	metadata?: {
-		author?: string;
-		version?: string;
-		license?: string;
-		[key: string]: unknown;
-	};
-	blockchain: 'Starknet';
-	tokenStandard: 'ERC721' | 'ERC1155' | 'ERC20';
-	isActive: boolean;
-	lastUpdated?: string;
-}
 
 interface CreatedAssetsProps {
 	className?: string;
@@ -158,15 +118,14 @@ export function CreatedAssets({
 	itemsPerPage = 12,
 	showStats = true,
 }: CreatedAssetsProps) {
-	const { address, isConnected } = useAccount();
+	const { isConnected } = useAccount();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedType, setSelectedType] = useState<AssetType | 'all'>('all');
 	const [sortOption, setSortOption] = useState<SortOption>('date-desc');
 	const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 	const [currentPage, setCurrentPage] = useState(1);
 
-	const { assets, isLoading, error, stats, refetch } =
-		useCreatedAssets(address);
+	const { assets, isLoading, error, stats, refetch } = useCreatedAssets();
 
 	// Filter and sort assets
 	const filteredAndSortedAssets = useMemo(() => {
@@ -176,21 +135,23 @@ export function CreatedAssets({
 		if (searchQuery.trim()) {
 			const query = searchQuery.toLowerCase();
 			filtered = filtered.filter(
-				(asset) =>
+				(asset: CreatedAsset) =>
 					asset.name.toLowerCase().includes(query) ||
 					asset.description.toLowerCase().includes(query) ||
 					asset.assetType.toLowerCase().includes(query) ||
-					asset.symbol?.toLowerCase().includes(query)
+					asset.tokenId.toLowerCase().includes(query)
 			);
 		}
 
 		// Apply type filter
 		if (selectedType !== 'all') {
-			filtered = filtered.filter((asset) => asset.assetType === selectedType);
+			filtered = filtered.filter(
+				(asset: CreatedAsset) => asset.assetType === selectedType
+			);
 		}
 
 		// Apply sorting
-		filtered.sort((a, b) => {
+		filtered.sort((a: CreatedAsset, b: CreatedAsset) => {
 			switch (sortOption) {
 				case 'date-desc':
 					return (
@@ -226,7 +187,7 @@ export function CreatedAssets({
 
 	// Get unique asset types for filter
 	const availableTypes = useMemo(() => {
-		const types = new Set(assets.map((asset) => asset.assetType));
+		const types = new Set(assets.map((asset: CreatedAsset) => asset.assetType));
 		return Array.from(types).sort();
 	}, [assets]);
 
@@ -297,7 +258,7 @@ export function CreatedAssets({
 						<CardContent>
 							<div className="text-sm font-medium">
 								{stats.mostRecentAsset ? (
-									<span>{stats.mostRecentAsset}</span>
+									<span>{stats.mostRecentAsset?.name || 'None'}</span>
 								) : (
 									<span className="text-muted-foreground">None</span>
 								)}
@@ -373,7 +334,7 @@ export function CreatedAssets({
 								</SelectTrigger>
 								<SelectContent>
 									<SelectItem value="all">All Types</SelectItem>
-									{availableTypes.map((type) => (
+									{availableTypes.map((type: string) => (
 										<SelectItem key={type} value={type}>
 											{type}
 										</SelectItem>
@@ -450,14 +411,14 @@ export function CreatedAssets({
 					>
 						<TabsContent value="grid" className="mt-0">
 							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-								{paginatedAssets.map((asset) => (
+								{paginatedAssets.map((asset: CreatedAsset) => (
 									<AssetCard key={asset.id} asset={asset} />
 								))}
 							</div>
 						</TabsContent>
 						<TabsContent value="list" className="mt-0">
 							<div className="space-y-4">
-								{paginatedAssets.map((asset) => (
+								{paginatedAssets.map((asset: CreatedAsset) => (
 									<AssetListItem key={asset.id} asset={asset} />
 								))}
 							</div>
@@ -558,16 +519,6 @@ function AssetCard({ asset }: { asset: CreatedAsset }) {
 						</Badge>
 					</div>
 				)}
-				{asset.symbol && (
-					<div className="absolute bottom-2 left-2">
-						<Badge
-							variant="outline"
-							className="text-xs bg-background/80 backdrop-blur-sm"
-						>
-							{asset.symbol}
-						</Badge>
-					</div>
-				)}
 			</div>
 			<CardContent className="p-4">
 				<div className="space-y-3">
@@ -642,23 +593,6 @@ function AssetCard({ asset }: { asset: CreatedAsset }) {
 							<span>Created</span>
 							<span>{formatDate(asset.createdAt)}</span>
 						</div>
-						{asset.metadata?.author && (
-							<div className="flex items-center justify-between">
-								<span>Author</span>
-								<span
-									className="truncate max-w-[120px]"
-									title={asset.metadata.author}
-								>
-									{asset.metadata.author}
-								</span>
-							</div>
-						)}
-						{asset.metadata?.version && (
-							<div className="flex items-center justify-between">
-								<span>Version</span>
-								<span>{asset.metadata.version}</span>
-							</div>
-						)}
 					</div>
 
 					{/* Action buttons */}
@@ -750,11 +684,6 @@ function AssetListItem({ asset }: { asset: CreatedAsset }) {
 									Inactive
 								</Badge>
 							)}
-							{asset.symbol && (
-								<Badge variant="outline" className="text-xs">
-									{asset.symbol}
-								</Badge>
-							)}
 						</div>
 						<p className="text-sm text-muted-foreground line-clamp-2 mb-2">
 							{asset.description}
@@ -771,17 +700,6 @@ function AssetListItem({ asset }: { asset: CreatedAsset }) {
 								<span className="font-medium">Standard:</span>
 								{asset.tokenStandard}
 							</span>
-							{asset.metadata?.author && (
-								<span className="flex items-center gap-1 truncate">
-									<span className="font-medium">Author:</span>
-									<span
-										className="truncate max-w-[100px]"
-										title={asset.metadata.author}
-									>
-										{asset.metadata.author}
-									</span>
-								</span>
-							)}
 						</div>
 					</div>
 					<div className="flex items-center gap-2 flex-shrink-0">
