@@ -140,3 +140,49 @@ export interface Asset {
   protectionDuration: string;
   version: string;
 }
+
+// User Profile Types
+export interface SocialMediaLinks {
+  twitter: string;
+  linkedin: string;
+  github: string;
+}
+
+export interface UserPreferences {
+  marketProfile: boolean;
+  emailNotifications: boolean;
+  publicProfile: boolean;
+  dataSharing: string;
+}
+
+export interface Transaction {
+  id: string;
+  type: string;
+  asset: string;
+  date: string;
+  status: string;
+}
+
+export interface UserStats {
+  nftAssets: number;
+  transactions: number;
+  listingItems: number;
+  nftCollections: number;
+  rewards: number;
+  badges: number;
+}
+
+export interface UserProfile {
+  address: string;
+  name: string;
+  username: string;
+  website: string;
+  email: string;
+  socialMedia: SocialMediaLinks;
+  avatarUrl: string;
+  coverUrl: string;
+  bio: string;
+  preferences: UserPreferences;
+  transactions: Transaction[];
+  stats: UserStats;
+}
