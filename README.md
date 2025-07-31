@@ -10,12 +10,8 @@ Quick links:
 <a href="https://x.com/mediolanoapp">X / Twitter</a>
 <br>
 
----
-
-![Mediolano.app](https://mediolano.app/wp-content/uploads/2025/03/Mediolano-Dapp-20250310alpha.png)
-
 > [!IMPORTANT]
-> Mediolano dapp is in constant development and the current version runs on Starknet's Sepolia devnet. Use for testing purposes only. 
+> Mediolano dapp is in constant development. Use for testing purposes only. 
 
 ## Programmable IP for the Integrity Web
 
