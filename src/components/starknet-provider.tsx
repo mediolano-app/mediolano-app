@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import { sepolia, mainnet } from "@starknet-react/chains";
 import {
   StarknetConfig,
@@ -31,7 +31,7 @@ export const useNetwork = () => {
 };
 
 export function StarknetProvider({ children }: { children: React.ReactNode }) {
-  const [currentNetwork, setCurrentNetwork] = useState<'mainnet' | 'sepolia'>('mainnet');
+  const [currentNetwork, setCurrentNetwork] = useState<'mainnet' | 'sepolia'>('sepolia');
   const { connectors } = useInjectedConnectors({
     recommended: [argent(), braavos()],
     includeRecommended: "onlyIfNoConnectors",
@@ -75,8 +75,8 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
         provider={providerFactory}
         connectors={connectors}
         explorer={voyager}
-        defaultChainId={currentNetwork === 'mainnet' ? mainnet.id : sepolia.id} // default chain for testing
-        autoConnect={true} // Enable auto-connect
+        defaultChainId={currentNetwork === 'mainnet' ? mainnet.id : sepolia.id}
+        autoConnect={true}
       >
         {children}
       </StarknetConfig>
