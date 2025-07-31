@@ -19,6 +19,7 @@ import {
   LogOut,
   Rocket,
   Box,
+  Network
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
@@ -27,14 +28,15 @@ import type {
   ArgentWebWallet,
   SessionAccountInterface,
 } from "@argent/invisible-sdk";
+import { useNetwork } from "@/components/starknet-provider";
 
 export function WalletConnect() {
   const { connect, connectors } = useConnect();
   const { account, address } = useAccount();
   const { disconnect } = useDisconnect();
   const [open, setOpen] = React.useState(false);
-  const envName = process.env.NEXT_PUBLIC_ENV_NAME as "mainnet" | "sepolia";
-  const isMainnet = envName === "mainnet";
+  const { currentNetwork, switchNetwork, networkConfig } = useNetwork();
+  const isMainnet = currentNetwork === "mainnet";
   const chainId = isMainnet
     ? constants.StarknetChainId.SN_MAIN
     : constants.StarknetChainId.SN_SEPOLIA;
@@ -68,7 +70,7 @@ export function WalletConnect() {
       nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
       headers: JSON.parse(process.env.NEXT_PUBLIC_RPC_HEADERS || "{}"),
     });
-  }, []);
+  }, [chainId]);
 
   // Initialize Argent Web Wallet on client side only
   useEffect(() => {
@@ -80,7 +82,7 @@ export function WalletConnect() {
 
         const wallet = ArgentWebWallet.init({
           appName: "Mediolano Dapp",
-          environment: envName || "sepolia",
+          environment: currentNetwork,
           sessionParams: {
             allowedMethods: [
               {
@@ -101,7 +103,7 @@ export function WalletConnect() {
     };
 
     initializeArgentWallet();
-  }, []);
+  }, [currentNetwork]);
 
   // Auto-connect on component mount
   useEffect(() => {
@@ -139,6 +141,20 @@ export function WalletConnect() {
         console.error("Failed to connect to ArgentWebWallet", err);
       });
   }, [argentWebWallet, provider]);
+
+  // Handle network switch - disconnect user first
+  const handleNetworkSwitch = async (newNetwork: 'mainnet' | 'sepolia') => {
+    // Disconnect current connections before switching
+    if (invisibleAccount) {
+      setInvisibleAccount(undefined);
+    }
+    if (address) {
+      disconnect();
+    }
+    
+    // Switch network
+    switchNetwork(newNetwork);
+  };
 
   // Handle Argent Invisible Wallet connection
   const handleInvisibleWalletConnect = async () => {
@@ -262,13 +278,11 @@ export function WalletConnect() {
               ? `Connected: ${currentAddress?.slice(
                   0,
                   6
-                )}...${currentAddress?.slice(-4)}`
+                )}...${currentAddress?.slice(-4)} on ${networkConfig.name}`
               : "Please connect to Starknet Sepolia *"}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
-          
-          
           {isConnected ? (
             <div className="grid gap-4">
               

@@ -1,6 +1,7 @@
 import { MobileSidebar } from "@/components/header/sidebar"
 import { MainNav } from "@/components/header/nav"
 import { WalletConnect } from "@/components/header/wallet-connect"
+import { NetworkSwitcher } from '@/components/header/network-switcher';
 import { ThemeToggle } from "@/components/header/theme-toggle"
 import { Logo } from "@/components/header/logo"
 
@@ -17,10 +18,14 @@ export function Header() {
         <MainNav />
         
         <div className="flex items-center">
+
         
           <div className="">
             <WalletConnect />
-          </div>          
+          </div>      
+          <div>
+            <NetworkSwitcher />
+          </div>    
           <MobileSidebar />
 
           <div className="hidden md:block">
