@@ -14,18 +14,18 @@ export class ActivityFeedService {
   constructor() {
   
     this.provider = new Provider({ 
-      nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_6'
+      nodeUrl: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/iIgYbGyTort4ZYdxhT97aymG5j8_aYUk'
     });
 
     // Map activity types to their respective contract addresses
     this.contractAddresses = new Map([
-      [ActivityType.MINT, '0x...'], // Replace with actual Mediolano mint contract
-      [ActivityType.CREATE_OFFER, '0x...'], // Replace with marketplace contract
-      [ActivityType.BUY, '0x...'], // Replace with marketplace contract
-      [ActivityType.SELL, '0x...'], // Replace with marketplace contract
-      [ActivityType.CREATE_IP_COIN, '0x...'], // Replace with IP coin factory
-      [ActivityType.POOL_LIQUIDITY, '0x...'], // Replace with liquidity pool contract
-      [ActivityType.DAO_VOTE, '0x...'] // Replace with DAO contract
+      [ActivityType.MINT, '0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0'], 
+      [ActivityType.CREATE_OFFER, '0x025a178bc9ace058ab1518392780610665857dfde111e1bed4d69742451bc61c'], 
+      [ActivityType.BUY, '0x025a178bc9ace058ab1518392780610665857dfde111e1bed4d69742451bc61c'], 
+      [ActivityType.SELL, '0x025a178bc9ace058ab1518392780610665857dfde111e1bed4d69742451bc61c'], 
+      [ActivityType.CREATE_IP_COIN, '0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0'], 
+      [ActivityType.POOL_LIQUIDITY, '0x055f444b1ace8bec6d79ceb815a8733958e9ceaa598160af291a7429e0146a74'], 
+      [ActivityType.DAO_VOTE, '0x06398e87b9bae77238d75a3ff6c5a247de26d931d6ca66467b85087cf4f57bdf'] 
     ]);
   }
 
