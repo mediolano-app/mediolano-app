@@ -373,16 +373,21 @@ function FeaturedCollectionCard({ collection, nftCount, totalValue, onClick }: C
           <div className="hidden md:block">
             <p className="text-sm font-medium mb-2">Preview</p>
             <div className="flex gap-2">
-              {nfts.map((nft, index) => (
-                <div key={nft.id} className="relative h-12 w-12 rounded-md overflow-hidden">
-                  <Image
-                    src={nft.image || "/background.jpg"}
-                    alt={`${collection.name} NFT ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ))}
+              {/* Show up to 4 preview images - use collection image as fallback */}
+              {Array.from({ length: 4 }, (_, index) => {
+                const nft = nfts[index];
+                return (
+                  <div key={index} className="relative h-12 w-12 rounded-md overflow-hidden">
+                    <Image
+                      src={nft?.image || collection.image || "/background.jpg"}
+                      alt={`${collection.name} preview ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

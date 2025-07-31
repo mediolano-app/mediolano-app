@@ -1,22 +1,80 @@
-import { Suspense } from "react"
+"use client"
+
+import { Suspense, useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { getCollections, getNFTs } from "@/lib/mockupPortfolioData"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Grid3X3, BarChart3, TrendingUp, Clock, Star, Plus, Edit } from "lucide-react"
-import IPPortfolio from "@/components/IPPortfolio"
+import { ArrowLeft, Grid3X3, BarChart3, TrendingUp, Star, Plus, Edit } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useGetCollection, Collection } from "@/hooks/use-collection"
+import { useParams } from "next/navigation"
+import { shortenAddress } from "@/lib/utils"
 
-export default function CollectionDetailPage({ params }: { params: { id: string } }) {
-  const collections = getCollections()
-  const collection = collections.find((c) => c.id === params.id)
+export default function CollectionDetailPage() {
+  const params = useParams()
+  const id = params.id as string
+  const { fetchCollection } = useGetCollection()
+  const [collection, setCollection] = useState<Collection | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadCollection = async () => {
+      try {
+        setLoading(true)
+        const collectionData = await fetchCollection(id)
+        setCollection(collectionData)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to fetch collection")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (id) {
+      loadCollection()
+    }
+  }, [id, fetchCollection])
+
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-10 xl:px-4">
+        <div className="flex items-center gap-2 mb-6">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/collections">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold">Loading Collection...</h1>
+        </div>
+        <Skeleton className="h-96 w-full" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-10 px-4">
+        <div className="flex items-center gap-2 mb-6">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/collections">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Button>
+          <h1 className="text-2xl font-bold">Error Loading Collection</h1>
+        </div>
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    )
+  }
 
   if (!collection) {
     return (
-      <div className="container py-10">
+      <div className="container mx-auto py-10 px-4">
         <div className="flex items-center gap-2 mb-6">
           <Button variant="ghost" size="icon" asChild>
             <Link href="/collections">
@@ -25,23 +83,21 @@ export default function CollectionDetailPage({ params }: { params: { id: string 
           </Button>
           <h1 className="text-2xl font-bold">Collection Not Found</h1>
         </div>
-        <p>The collection you're looking for doesn't exist or has been removed.</p>
+        <p>The collection you&apos;re looking for doesn&apos;t exist or has been removed.</p>
       </div>
     )
   }
 
-  const nfts = getNFTs().filter((nft) => nft.collection.id === collection.id)
-  const totalValue = nfts.reduce((sum, nft) => sum + nft.price, 0)
-  const averagePrice = nfts.length > 0 ? totalValue / nfts.length : 0
+  // Use collection image as cover - validate before displaying
+  const coverImage = collection.image && collection.image !== '/placeholder.svg' 
+    ? collection.image 
+    : "/placeholder.svg?height=400&width=600"
 
-  // Get a random image from the collection to display as cover
-  const coverImage = nfts.length > 0 ? nfts[0].image : "/placeholder.svg?height=400&width=600"
-
-  // Check if this is a featured collection (mock data)
-  const isFeatured = collection.id === "bored-ape" || collection.id === "cryptopunks"
+  // Check if this is a featured collection (collection with id "5")
+  const isFeatured = collection.id.toString() === "5"
 
   return (
-    <main className="container py-10">
+    <main className="container py-10 mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild>
@@ -78,9 +134,15 @@ export default function CollectionDetailPage({ params }: { params: { id: string 
             <Image src={coverImage || "/placeholder.svg"} alt={collection.name} fill className="object-cover" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
-            {nfts.slice(0, 4).map((nft) => (
-              <div key={nft.id} className="relative aspect-square rounded-md overflow-hidden">
-                <Image src={nft.image || "/placeholder.svg"} alt={nft.name} fill className="object-cover" />
+            {/* Show collection image in preview spots */}
+            {Array.from({ length: 4 }, (_, index) => (
+              <div key={index} className="relative aspect-square rounded-md overflow-hidden">
+                <Image 
+                  src={collection.image || "/placeholder.svg"} 
+                  alt={`${collection.name} preview ${index + 1}`} 
+                  fill 
+                  className="object-cover" 
+                />
               </div>
             ))}
           </div>
@@ -96,31 +158,32 @@ export default function CollectionDetailPage({ params }: { params: { id: string 
                   <Grid3X3 className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Total NFTs</span>
                 </div>
-                <span className="font-medium">{nfts.length}</span>
+                <span className="font-medium">{collection.itemCount}</span>
               </div>
-              <div className="flex justify-between">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Total Value</span>
-                </div>
-                <span className="font-medium">{totalValue.toFixed(2)} ETH</span>
-              </div>
+                             <div className="flex justify-between">
+                 <div className="flex items-center gap-2">
+                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                   <span className="text-sm text-muted-foreground">Total Supply</span>
+                 </div>
+                 <span className="font-medium">{collection.totalSupply || 0}</span>
+               </div>
               <div className="flex justify-between">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Average Price</span>
+                  <span className="text-sm text-muted-foreground">Total Minted</span>
                 </div>
-                <span className="font-medium">{averagePrice.toFixed(2)} ETH</span>
+                <span className="font-medium">{collection.totalMinted || 0}</span>
               </div>
-              {collection.floorPrice && (
-                <div className="flex justify-between">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">Floor Price</span>
-                  </div>
-                  <span className="font-medium">{collection.floorPrice} ETH</span>
-                </div>
-              )}
+              
+                             <div className="flex justify-between">
+                 <div className="flex items-center gap-2">
+                   <Star className="h-4 w-4 text-muted-foreground" />
+                   <span className="text-sm text-muted-foreground">Owner</span>
+                 </div>
+                 <span className="font-medium text-xs font-mono" title={collection.owner || "N/A"}>
+                   {shortenAddress(collection.owner || "N/A")}
+                 </span>
+               </div>
             </CardContent>
           </Card>
           <Card>
@@ -209,15 +272,15 @@ export default function CollectionDetailPage({ params }: { params: { id: string 
                     <p className="text-sm text-muted-foreground">Total volume</p>
                   </CardContent>
                 </Card>
-                <Card className="sm:col-span-2 md:col-span-1">
-                  <CardContent className="pt-6">
-                    <h3 className="font-medium mb-2">Unique Owners</h3>
-                    <p className="text-2xl font-bold">{Math.ceil(nfts.length * 0.7)}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {Math.round(nfts.length > 0 ? (Math.ceil(nfts.length * 0.7) / nfts.length) * 100 : 0)}% of items
-                    </p>
-                  </CardContent>
-                </Card>
+                  <Card className="sm:col-span-2 md:col-span-1">
+                   <CardContent className="pt-6">
+                     <h3 className="font-medium mb-2">Unique Owners</h3>
+                     <p className="text-2xl font-bold font-mono" title={collection?.owner || "N/A"}>
+                       {shortenAddress(collection?.owner || "N/A")}
+                     </p>
+                     <p className="text-sm text-muted-foreground">Collection owner</p>
+                   </CardContent>
+                 </Card>
               </div>
             </CardContent>
           </Card>
@@ -228,17 +291,12 @@ export default function CollectionDetailPage({ params }: { params: { id: string 
 }
 
 function CollectionNFTs({ collectionId }: { collectionId: string }) {
-  // This is a simplified version of NFTPortfolio that only shows NFTs from a specific collection
-  const nfts = getNFTs().filter((nft) => nft.collection.id === collectionId)
-
-  if (nfts.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">No NFTs found in this collection</p>
-      </div>
-    )
-  }
-
-  return <IPPortfolio initialCollectionId={collectionId} />
+  // For now, show a placeholder since we don't have individual NFT data
+  return (
+    <div className="text-center py-12">
+      <p className="text-muted-foreground">NFTs from this collection will be displayed here</p>
+      <p className="text-sm text-muted-foreground mt-2">Collection ID: {collectionId}</p>
+    </div>
+  )
 }
 

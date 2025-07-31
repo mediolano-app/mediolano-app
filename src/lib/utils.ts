@@ -7,6 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 // Helper function to shorten address
 export const shortenAddress = (address: string) => {
+  if (!address || address === "N/A" || address.length < 10) return address || "N/A";
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
