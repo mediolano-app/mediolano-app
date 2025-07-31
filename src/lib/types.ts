@@ -22,8 +22,12 @@ export interface Item {
 export interface Collection {
   id: string
   name: string
+  description?: string
   image: string
   itemCount: number
+  floorPrice?: number
+  owner?: string
+  assets?: string[]
 }
 
 export interface Offer {
@@ -57,12 +61,6 @@ export interface SocialLink {
   url: string
 }
 
-export interface Collection {
-  id: string
-  name: string
-  description?: string
-  floorPrice?: number
-}
 
 export interface NFT {
   id: string

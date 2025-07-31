@@ -5,12 +5,16 @@ const collections: Collection[] = [
   {
     id: "bored-ape",
     name: "Bored Ape Yacht Club",
+    image: "/background.jpg",
+    itemCount: 10000,
     description: "The Bored Ape Yacht Club is a collection of 10,000 unique Bored Ape NFTs.",
     floorPrice: 30.5,
   },
   {
     id: "cryptopunks",
     name: "CryptoPunks",
+    image: "/background.jpg",
+    itemCount: 10000,
     description:
       "CryptoPunks launched as a fixed set of 10,000 items in mid-2017 and became one of the inspirations for the ERC-721 standard.",
     floorPrice: 50.2,
@@ -18,18 +22,24 @@ const collections: Collection[] = [
   {
     id: "doodles",
     name: "Doodles",
+    image: "/background.jpg",
+    itemCount: 10000,
     description: "A community-driven collectibles project featuring art by Burnt Toast.",
     floorPrice: 5.8,
   },
   {
     id: "azuki",
     name: "Azuki",
+    image: "/background.jpg",
+    itemCount: 10000,
     description: "Azuki starts with a collection of 10,000 avatars that give you membership access to The Garden.",
     floorPrice: 10.2,
   },
   {
     id: "moonbirds",
     name: "Moonbirds",
+    image: "/background.jpg",
+    itemCount: 10000,
     description:
       "A collection of 10,000 utility-enabled PFPs that feature a richly diverse and unique pool of rarity-powered traits.",
     floorPrice: 8.5,
