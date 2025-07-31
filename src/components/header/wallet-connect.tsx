@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect } from "react";
 import { useConnect, useAccount, useDisconnect } from "@starknet-react/core";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,20 +13,15 @@ import {
 } from "@/components/ui/dialog";
 import {
   Wallet,
-  User,
-  Gift,
-  Settings,
   LogOut,
   Rocket,
   Box,
-  Network
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { RpcProvider, constants } from "starknet";
 import type {
   ArgentWebWallet,
-  SessionAccountInterface,
 } from "@argent/invisible-sdk";
 import { useNetwork } from "@/components/starknet-provider";
 
@@ -73,7 +68,7 @@ export function WalletConnect() {
   }, [chainId]);
 
   // Initialize Argent Web Wallet on client side only
-  useEffect(() => {
+  React.useEffect(() => {
     if (typeof window === "undefined") return;
 
     const initializeArgentWallet = async () => {
@@ -300,20 +295,6 @@ export function WalletConnect() {
                 </Button>
               </Link>
 
-              {/* Account Menu
-              <Button variant="outline" className="justify-start">
-                <User className="mr-2 h-4 w-4" />
-                My Account
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Gift className="mr-2 h-4 w-4" />
-                Rewards
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-               */}
               <Button
                 variant="destructive"
                 onClick={handleDisconnect}

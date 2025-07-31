@@ -6,20 +6,6 @@ import { Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { constants } from "starknet";
 
-/**
- * The main issue is that the UI's network state (`currentNetwork` from useNetwork)
- * is not updated when the user switches network via the wallet UI.
- * 
- * The `useNetwork` context is only updated by calling its `switchNetwork` function,
- * but this is not called anywhere in this component, nor is it called after a successful
- * wallet network switch. As a result, the UI always shows the old network.
- * 
- * Solution:
- * - Call `switchNetwork` from the context after a successful switchChainAsync.
- * - Also, listen for changes in the account's chainId and update the context accordingly.
- *   (This is optional, but helps if the user switches network from the wallet UI directly.)
- */
-
 export function NetworkSwitcher() {
   const { currentNetwork, networkConfig, switchNetwork } = useNetwork();
   const { address, chainId } = useAccount();
