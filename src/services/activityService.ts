@@ -1,60 +1,54 @@
-import { Provider, num } from 'starknet';
+import { Contract, RpcProvider, num } from 'starknet';
 import { 
   ActivityEvent, 
+  ActivityFilter, 
   ActivityType, 
-  ActivityFilter,
   STARKNET_EVENT_SIGNATURES,
   STARKNET_EXPLORER_URL 
 } from '@/types/activity';
 
+export interface ActivityFetchResult {
+  activities: ActivityEvent[];
+  total: number;
+  hasMore: boolean;
+}
+
 export class ActivityFeedService {
-  private provider: Provider;
-  private contractAddresses: Map<ActivityType, string>;
+  private provider: RpcProvider;
+  private contracts: Map<string, Contract> = new Map();
 
-  constructor() {
-  
-    this.provider = new Provider({ 
-      nodeUrl: 'https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/iIgYbGyTort4ZYdxhT97aymG5j8_aYUk'
+  constructor(providerUrl?: string) {
+    this.provider = new RpcProvider({
+      nodeUrl: providerUrl || process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 'https://starknet-sepolia.public.blastapi.io'
     });
-
-    // Map activity types to their respective contract addresses
-    this.contractAddresses = new Map([
-      [ActivityType.MINT, '0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0'], 
-      [ActivityType.CREATE_OFFER, '0x025a178bc9ace058ab1518392780610665857dfde111e1bed4d69742451bc61c'], 
-      [ActivityType.BUY, '0x025a178bc9ace058ab1518392780610665857dfde111e1bed4d69742451bc61c'], 
-      [ActivityType.SELL, '0x025a178bc9ace058ab1518392780610665857dfde111e1bed4d69742451bc61c'], 
-      [ActivityType.CREATE_IP_COIN, '0x03c7b6d007691c8c5c2b76c6277197dc17257491f1d82df5609ed1163a2690d0'], 
-      [ActivityType.POOL_LIQUIDITY, '0x055f444b1ace8bec6d79ceb815a8733958e9ceaa598160af291a7429e0146a74'], 
-      [ActivityType.DAO_VOTE, '0x06398e87b9bae77238d75a3ff6c5a247de26d931d6ca66467b85087cf4f57bdf'] 
-    ]);
   }
 
+  /**
+   * Fetch user activities from Starknet
+   */
   async fetchUserActivity(
     walletAddress: string,
     filter: ActivityFilter,
     page: number = 1,
     limit: number = 20
-  ): Promise<{ activities: ActivityEvent[]; hasMore: boolean; total: number }> {
+  ): Promise<ActivityFetchResult> {
     try {
-      const allActivities: ActivityEvent[] = [];
+      const activities: ActivityEvent[] = [];
       
-      // Fetch events for each activity type
+      // Get events for each activity type in the filter
       for (const activityType of filter.activityTypes) {
-        const contractAddress = this.contractAddresses.get(activityType);
-        if (!contractAddress) continue;
-
-        const events = await this.fetchEventsForActivityType(
-          contractAddress,
-          activityType,
+        const typeActivities = await this.fetchActivityByType(
           walletAddress,
-          filter
+          activityType,
+          filter,
+          page,
+          limit
         );
-        
-        allActivities.push(...events);
+        activities.push(...typeActivities);
       }
 
       // Sort activities
-      const sortedActivities = this.sortActivities(allActivities, filter);
+      const sortedActivities = this.sortActivities(activities, filter);
       
       // Apply pagination
       const startIndex = (page - 1) * limit;
@@ -63,191 +57,290 @@ export class ActivityFeedService {
       
       return {
         activities: paginatedActivities,
-        hasMore: endIndex < sortedActivities.length,
-        total: sortedActivities.length
+        total: sortedActivities.length,
+        hasMore: endIndex < sortedActivities.length
       };
     } catch (error) {
-      console.error('Error fetching user activity:', error);
-      throw new Error('Failed to fetch activity data');
+      console.error('Error fetching user activities:', error);
+      throw new Error('Failed to fetch activities from Starknet');
     }
   }
 
-  private async fetchEventsForActivityType(
-    contractAddress: string,
+  /**
+   * Fetch activities by specific type
+   */
+  private async fetchActivityByType(
+    walletAddress: string,
     activityType: ActivityType,
-    userAddress: string,
-    filter: ActivityFilter
+    filter: ActivityFilter,
+    page: number,
+    limit: number
   ): Promise<ActivityEvent[]> {
     try {
       const eventSignature = STARKNET_EVENT_SIGNATURES[activityType];
+      if (!eventSignature) {
+        console.warn(`No event signature found for activity type: ${activityType}`);
+        return [];
+      }
+
+      // Get recent blocks to search (last 1000 blocks as example)
+      const latestBlock = await this.provider.getBlockNumber();
+      const fromBlock = Math.max(0, latestBlock - 1000);
+
+      // Fetch events from Starknet
+      const eventFilter = {
+        from_block: { block_number: fromBlock },
+        to_block: { block_number: latestBlock },
+        address: undefined, // We'll filter by all relevant contracts
+        keys: [[eventSignature]], // Event signature as array of arrays
+        chunk_size: limit // Add required chunk_size property
+      };
+
+      const events = await this.provider.getEvents(eventFilter);
       
-      // Fetch events from the contract
-      const events = await this.provider.getEvents({
-        address: contractAddress,
-        keys: [[eventSignature]],
-        from_block: { block_number: 0 },
-        to_block: 'latest',
-        chunk_size: 100
-      });
-
+      // Process and filter events
       const activities: ActivityEvent[] = [];
-
+      
       for (const event of events.events) {
-        // Filter events by user address
-        if (!this.isUserEvent(event, userAddress)) continue;
-        
-        // Parse event into ActivityEvent
-        const activity = await this.parseEvent(event, activityType);
-        if (activity && this.matchesDateFilter(activity, filter)) {
-          activities.push(activity);
+        try {
+          const activity = await this.parseEventToActivity(event, activityType, walletAddress);
+          if (activity && this.matchesDateFilter(activity, filter)) {
+            activities.push(activity);
+          }
+        } catch (parseError) {
+          console.warn('Error parsing event:', parseError);
+          // Continue processing other events
         }
       }
 
       return activities;
     } catch (error) {
-      console.error(`Error fetching ${activityType} events:`, error);
+      console.error(`Error fetching ${activityType} activities:`, error);
       return [];
     }
   }
 
-  private isUserEvent(event: any, userAddress: string): boolean {
-    // Check if the event involves the user (as sender, receiver, or participant)
-    const normalizedUserAddress = num.toHex(userAddress);
-    
-    return event.data.some((data: string) => {
-      const normalizedData = num.toHex(data);
-      return normalizedData === normalizedUserAddress;
-    });
-  }
-
-  private async parseEvent(event: any, activityType: ActivityType): Promise<ActivityEvent | null> {
+  /**
+   * Parse a Starknet event into an ActivityEvent
+   */
+  private async parseEventToActivity(
+    event: any,
+    activityType: ActivityType,
+    userAddress: string
+  ): Promise<ActivityEvent | null> {
     try {
-      const block = await this.provider.getBlock(event.block_number);
-      const timestamp = block.timestamp * 1000; // Convert to milliseconds
-
-      const baseActivity: Partial<ActivityEvent> = {
-        id: `${event.transaction_hash}_${event.event_index}`,
+      // Basic event data
+      const activity: ActivityEvent = {
+        id: `${event.transaction_hash}_${event.event_index || 0}`,
         txHash: event.transaction_hash,
         blockNumber: event.block_number,
-        timestamp,
+        timestamp: Date.now(), 
         activityType,
-        userAddress: num.toHex(event.data[0]) // Assuming first data field is user address
+        userAddress,
+        metadata: {}
       };
 
-      // Parse activity-specific data
+      // Get block details for timestamp
+      try {
+        const block = await this.provider.getBlockWithTxHashes(event.block_number);
+        activity.timestamp = block.timestamp * 1000; // Convert to milliseconds
+      } catch (blockError) {
+        console.warn('Could not fetch block timestamp:', blockError);
+        // Use current time as fallback
+        activity.timestamp = Date.now();
+      }
+
+      // Parse event data based on activity type
       switch (activityType) {
         case ActivityType.MINT:
-          return this.parseMintEvent(event, baseActivity);
+          return this.parseMintEvent(activity, event);
         case ActivityType.CREATE_OFFER:
-          return this.parseCreateOfferEvent(event, baseActivity);
+          return this.parseCreateOfferEvent(activity, event);
         case ActivityType.BUY:
+          return this.parseBuyEvent(activity, event);
         case ActivityType.SELL:
-          return this.parseTradeEvent(event, baseActivity);
+          return this.parseSellEvent(activity, event);
         case ActivityType.CREATE_IP_COIN:
-          return this.parseCreateIPCoinEvent(event, baseActivity);
+          return this.parseCreateIPCoinEvent(activity, event);
         case ActivityType.POOL_LIQUIDITY:
-          return this.parsePoolLiquidityEvent(event, baseActivity);
+          return this.parsePoolLiquidityEvent(activity, event);
         case ActivityType.DAO_VOTE:
-          return this.parseDAOVoteEvent(event, baseActivity);
+          return this.parseDAOVoteEvent(activity, event);
         default:
-          return null;
+          return activity;
       }
     } catch (error) {
-      console.error('Error parsing event:', error);
+      console.error('Error parsing event to activity:', error);
       return null;
     }
   }
 
-  private parseMintEvent(event: any, base: Partial<ActivityEvent>): ActivityEvent {
-    return {
-      ...base,
-      assetId: num.toHex(event.data[1]),
-      assetName: this.decodeString(event.data[2]),
-      metadata: {
-        ipType: this.decodeString(event.data[3]),
-        royalty: num.toBigInt(event.data[4]).toString()
-      }
-    } as ActivityEvent;
-  }
-
-  private parseCreateOfferEvent(event: any, base: Partial<ActivityEvent>): ActivityEvent {
-    return {
-      ...base,
-      assetId: num.toHex(event.data[1]),
-      price: num.toBigInt(event.data[2]).toString(),
-      currency: 'ETH',
-      metadata: {
-        offerId: num.toHex(event.data[3]),
-        duration: num.toBigInt(event.data[4]).toString()
-      }
-    } as ActivityEvent;
-  }
-
-  private parseTradeEvent(event: any, base: Partial<ActivityEvent>): ActivityEvent {
-    return {
-      ...base,
-      assetId: num.toHex(event.data[1]),
-      amount: '1', // NFTs are typically quantity 1
-      price: num.toBigInt(event.data[2]).toString(),
-      currency: 'ETH',
-      metadata: {
-        buyer: num.toHex(event.data[3]),
-        seller: num.toHex(event.data[4])
-      }
-    } as ActivityEvent;
-  }
-
-  private parseCreateIPCoinEvent(event: any, base: Partial<ActivityEvent>): ActivityEvent {
-    return {
-      ...base,
-      assetId: num.toHex(event.data[1]),
-      assetName: this.decodeString(event.data[2]),
-      amount: num.toBigInt(event.data[3]).toString(),
-      metadata: {
-        symbol: this.decodeString(event.data[4]),
-        totalSupply: num.toBigInt(event.data[5]).toString()
-      }
-    } as ActivityEvent;
-  }
-
-  private parsePoolLiquidityEvent(event: any, base: Partial<ActivityEvent>): ActivityEvent {
-    return {
-      ...base,
-      assetId: num.toHex(event.data[1]),
-      amount: num.toBigInt(event.data[2]).toString(),
-      price: num.toBigInt(event.data[3]).toString(),
-      currency: 'ETH',
-      metadata: {
-        poolAddress: num.toHex(event.data[4]),
-        liquidityType: event.data[5] === '1' ? 'add' : 'remove'
-      }
-    } as ActivityEvent;
-  }
-
-  private parseDAOVoteEvent(event: any, base: Partial<ActivityEvent>): ActivityEvent {
-    const voteChoices = ['against', 'for', 'abstain'];
-    const voteChoice = voteChoices[Number(event.data[2])] as 'for' | 'against' | 'abstain';
-    
-    return {
-      ...base,
-      proposalId: num.toHex(event.data[1]),
-      voteChoice,
-      amount: num.toBigInt(event.data[3]).toString(), // Voting power
-      metadata: {
-        proposalTitle: this.decodeString(event.data[4])
-      }
-    } as ActivityEvent;
-  }
-
-  private decodeString(data: string): string {
+  /**
+   * Parse mint event
+   */
+  private parseMintEvent(activity: ActivityEvent, event: any): ActivityEvent {
     try {
-      // Decode Cairo string (simplified implementation)
-      return Buffer.from(data.slice(2), 'hex').toString('utf8').replace(/\0/g, '');
-    } catch {
-      return 'Unknown';
+      // Typical mint event: [to_address, token_id, ...]
+      if (event.data && event.data.length >= 2) {
+        const tokenId = num.toHex(event.data[1]);
+        activity.assetId = tokenId;
+        activity.assetName = `IP Asset #${tokenId}`;
+        activity.metadata = {
+          tokenId,
+          contractAddress: event.from_address
+        };
+      }
+      return activity;
+    } catch (error) {
+      console.warn('Error parsing mint event:', error);
+      return activity;
     }
   }
 
+  /**
+   * Parse create offer event
+   */
+  private parseCreateOfferEvent(activity: ActivityEvent, event: any): ActivityEvent {
+    try {
+      // Typical offer event: [offerer, asset_id, price, ...]
+      if (event.data && event.data.length >= 3) {
+        activity.assetId = num.toHex(event.data[1]);
+        activity.price = num.toHex(event.data[2]);
+        activity.currency = 'ETH';
+        activity.metadata = {
+          offerer: num.toHex(event.data[0]),
+          assetId: activity.assetId
+        };
+      }
+      return activity;
+    } catch (error) {
+      console.warn('Error parsing create offer event:', error);
+      return activity;
+    }
+  }
+
+  /**
+   * Parse buy event
+   */
+  private parseBuyEvent(activity: ActivityEvent, event: any): ActivityEvent {
+    try {
+      // Typical buy event: [buyer, seller, asset_id, price, ...]
+      if (event.data && event.data.length >= 4) {
+        activity.assetId = num.toHex(event.data[2]);
+        activity.price = num.toHex(event.data[3]);
+        activity.currency = 'ETH';
+        activity.metadata = {
+          buyer: num.toHex(event.data[0]),
+          seller: num.toHex(event.data[1]),
+          assetId: activity.assetId
+        };
+      }
+      return activity;
+    } catch (error) {
+      console.warn('Error parsing buy event:', error);
+      return activity;
+    }
+  }
+
+  /**
+   * Parse sell event
+   */
+  private parseSellEvent(activity: ActivityEvent, event: any): ActivityEvent {
+    try {
+      // Similar to buy event but from seller perspective
+      if (event.data && event.data.length >= 4) {
+        activity.assetId = num.toHex(event.data[2]);
+        activity.price = num.toHex(event.data[3]);
+        activity.currency = 'ETH';
+        activity.metadata = {
+          seller: num.toHex(event.data[0]),
+          buyer: num.toHex(event.data[1]),
+          assetId: activity.assetId
+        };
+      }
+      return activity;
+    } catch (error) {
+      console.warn('Error parsing sell event:', error);
+      return activity;
+    }
+  }
+
+  /**
+   * Parse create IP coin event
+   */
+  private parseCreateIPCoinEvent(activity: ActivityEvent, event: any): ActivityEvent {
+    try {
+      if (event.data && event.data.length >= 2) {
+        activity.assetId = num.toHex(event.data[0]);
+        activity.assetName = `IP Coin for Asset #${activity.assetId}`;
+        activity.metadata = {
+          ipAssetId: activity.assetId,
+          coinAddress: num.toHex(event.data[1])
+        };
+      }
+      return activity;
+    } catch (error) {
+      console.warn('Error parsing create IP coin event:', error);
+      return activity;
+    }
+  }
+
+  /**
+   * Parse pool liquidity event
+   */
+  private parsePoolLiquidityEvent(activity: ActivityEvent, event: any): ActivityEvent {
+    try {
+      if (event.data && event.data.length >= 3) {
+        activity.amount = num.toHex(event.data[1]);
+        activity.price = num.toHex(event.data[2]);
+        activity.currency = 'ETH';
+        activity.metadata = {
+          poolAddress: event.from_address,
+          liquidityProvider: num.toHex(event.data[0])
+        };
+      }
+      return activity;
+    } catch (error) {
+      console.warn('Error parsing pool liquidity event:', error);
+      return activity;
+    }
+  }
+
+  /**
+   * Parse DAO vote event
+   */
+  private parseDAOVoteEvent(activity: ActivityEvent, event: any): ActivityEvent {
+    try {
+      if (event.data && event.data.length >= 3) {
+        activity.proposalId = num.toHex(event.data[0]);
+        const voteValue = num.toBigInt(event.data[2]);
+        activity.voteChoice = voteValue === 1n ? 'for' : voteValue === 2n ? 'against' : 'abstain';
+        activity.metadata = {
+          proposalId: activity.proposalId,
+          voter: num.toHex(event.data[1]),
+          voteChoice: activity.voteChoice
+        };
+      }
+      return activity;
+    } catch (error) {
+      console.warn('Error parsing DAO vote event:', error);
+      return activity;
+    }
+  }
+
+  /**
+   * Check if activity matches date filter
+   */
+  private matchesDateFilter(activity: ActivityEvent, filter: ActivityFilter): boolean {
+    if (!filter.dateRange) return true;
+    
+    const activityDate = new Date(activity.timestamp);
+    return activityDate >= filter.dateRange.start && activityDate <= filter.dateRange.end;
+  }
+
+  /**
+   * Sort activities based on filter
+   */
   private sortActivities(activities: ActivityEvent[], filter: ActivityFilter): ActivityEvent[] {
     return activities.sort((a, b) => {
       let comparison = 0;
@@ -264,34 +357,55 @@ export class ActivityFeedService {
         case 'activityType':
           comparison = a.activityType.localeCompare(b.activityType);
           break;
+        default:
+          comparison = a.timestamp - b.timestamp;
       }
       
       return filter.sortOrder === 'desc' ? -comparison : comparison;
     });
   }
 
-  private matchesDateFilter(activity: ActivityEvent, filter: ActivityFilter): boolean {
-    if (!filter.dateRange) return true;
-    
-    const activityDate = new Date(activity.timestamp);
-    return activityDate >= filter.dateRange.start && activityDate <= filter.dateRange.end;
-  }
-
+  /**
+   * Get Starknet explorer URL for transaction
+   */
   getExplorerUrl(txHash: string): string {
     return `${STARKNET_EXPLORER_URL}/tx/${txHash}`;
   }
 
-  async getAssetMetadata(assetId: string): Promise<{ name: string; image?: string } | null> {
+  /**
+   * Get asset metadata (placeholder - implement based on your metadata service)
+   */
+  async getAssetMetadata(assetId: string): Promise<any> {
     try {
-      // This would typically call a metadata service or IPFS
-      // For now, return a placeholder implementation
+      // This would typically call your metadata service or IPFS
+      // For now, return a placeholder
       return {
-        name: `Asset #${assetId.slice(-6)}`,
-        image: `https://api.dicebear.com/7.x/shapes/svg?seed=${assetId}`
+        name: `Asset #${assetId}`,
+        image: '/placeholder.svg',
+        description: `Blockchain asset with ID ${assetId}`
       };
     } catch (error) {
       console.error('Error fetching asset metadata:', error);
       return null;
     }
+  }
+
+  /**
+   * Add contract for specific interactions
+   */
+  addContract(address: string, abi: any): void {
+    try {
+      const contract = new Contract(abi, address, this.provider);
+      this.contracts.set(address, contract);
+    } catch (error) {
+      console.error('Error adding contract:', error);
+    }
+  }
+
+  /**
+   * Get contract by address
+   */
+  getContract(address: string): Contract | undefined {
+    return this.contracts.get(address);
   }
 }

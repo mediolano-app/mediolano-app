@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useAccount } from '@starknet-react/core';
 import { ActivityFeedService } from '@/services/activityService';
 import {
   ActivityType,
   ActivityFilter,
   ActivityFeedState,
-  PaginationState
+  PaginationState,
+  ActivityEvent
 } from '@/types/activity';
 
 const initialFilter: ActivityFilter = {
@@ -28,21 +30,45 @@ const initialState: ActivityFeedState = {
   pagination: initialPagination
 };
 
-export function useActivityFeed(walletAddress: string) {
+export function useActivityFeed(walletAddress?: string) {
+  const { account } = useAccount();
   const [state, setState] = useState<ActivityFeedState>(initialState);
-  const activityService = useMemo(() => new ActivityFeedService(), []);
+  
+  // Use the connected wallet address if no specific address is provided
+  const targetAddress = walletAddress || account?.address;
+  
+  // Create service instance with memoization
+  const activityService = useMemo(() => {
+    const service = new ActivityFeedService();
+    
+    // Add any contracts that might be relevant for your dapp
+    // You can add specific contract addresses and ABIs here
+    if (process.env.NEXT_PUBLIC_IP_COLLECTION_ADDRESS) {
+      // Add your IP collection contract if you have the ABI
+      // service.addContract(process.env.NEXT_PUBLIC_IP_COLLECTION_ADDRESS, ipCollectionAbi);
+    }
+    
+    return service;
+  }, []);
 
   const fetchActivities = useCallback(async (
     page: number = 1,
     append: boolean = false
   ) => {
-    if (!walletAddress) return;
+    if (!targetAddress) {
+      setState(prev => ({ 
+        ...prev, 
+        error: 'No wallet address available',
+        loading: false 
+      }));
+      return;
+    }
 
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
       const result = await activityService.fetchUserActivity(
-        walletAddress,
+        targetAddress,
         state.filter,
         page,
         state.pagination.limit
@@ -60,13 +86,14 @@ export function useActivityFeed(walletAddress: string) {
         }
       }));
     } catch (error) {
+      console.error('Error fetching activities:', error);
       setState(prev => ({
         ...prev,
         loading: false,
         error: error instanceof Error ? error.message : 'Failed to fetch activities'
       }));
     }
-  }, [walletAddress, state.filter, state.pagination.limit, activityService]);
+  }, [targetAddress, state.filter, state.pagination.limit, activityService]);
 
   const loadMore = useCallback(() => {
     if (state.loading || !state.pagination.hasMore) return;
@@ -126,13 +153,22 @@ export function useActivityFeed(walletAddress: string) {
     setState(prev => ({ ...prev, error: null }));
   }, []);
 
-  
+  // Auto-fetch when wallet address or filter changes
   useEffect(() => {
-    if (walletAddress) {
+    if (targetAddress) {
       fetchActivities(1, false);
+    } else {
+      // Clear activities if no wallet is connected
+      setState(prev => ({
+        ...prev,
+        activities: [],
+        error: null,
+        loading: false
+      }));
     }
-  }, [walletAddress, state.filter]);
+  }, [targetAddress, state.filter]);
 
+  // Enhanced activities with computed properties
   const enhancedActivities = useMemo(() => 
     state.activities.map(activity => ({
       ...activity,
@@ -143,7 +179,7 @@ export function useActivityFeed(walletAddress: string) {
     }))
   , [state.activities, activityService]);
 
-
+  // Group activities by date
   const groupedActivities = useMemo(() => {
     const groups: { [date: string]: typeof enhancedActivities } = {};
     
@@ -156,7 +192,7 @@ export function useActivityFeed(walletAddress: string) {
     return groups;
   }, [enhancedActivities]);
 
-  
+  // Calculate statistics
   const statistics = useMemo(() => {
     const stats = {
       totalActivities: state.activities.length,
@@ -166,16 +202,16 @@ export function useActivityFeed(walletAddress: string) {
     };
 
     state.activities.forEach(activity => {
-      
+      // Count activities by type
       stats.activityCounts[activity.activityType] = 
         (stats.activityCounts[activity.activityType] || 0) + 1;
       
-      
+      // Sum total value
       if (activity.price) {
         stats.totalValue += parseFloat(activity.price);
       }
       
-    
+      // Track unique assets
       if (activity.assetId) {
         stats.uniqueAssets.add(activity.assetId);
       }
@@ -188,6 +224,7 @@ export function useActivityFeed(walletAddress: string) {
   }, [state.activities]);
 
   return {
+    // Data
     activities: enhancedActivities,
     groupedActivities,
     statistics,
@@ -195,8 +232,10 @@ export function useActivityFeed(walletAddress: string) {
     error: state.error,
     filter: state.filter,
     pagination: state.pagination,
-    
+    walletAddress: targetAddress,
+    isConnected: !!account,
 
+    // Actions
     fetchActivities,
     loadMore,
     updateFilter,
@@ -206,7 +245,7 @@ export function useActivityFeed(walletAddress: string) {
     refresh,
     clearError,
     
-    
+    // Utility functions
     getExplorerUrl: activityService.getExplorerUrl,
     getAssetMetadata: activityService.getAssetMetadata
   };
