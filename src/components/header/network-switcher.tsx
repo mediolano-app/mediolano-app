@@ -96,7 +96,7 @@ export function NetworkSwitcher() {
     <div className="network-switcher relative" ref={switcherRef}>
       <div className="flex items-center gap-3 mx-4">
         <div
-          className="flex items-center gap-2 px-3 py-2 border border-blue-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer select-none"
+          className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 cursor-pointer select-none"
           onClick={() => setOpen((prev) => !prev)}
           tabIndex={0}
           aria-haspopup="true"
@@ -107,7 +107,7 @@ export function NetworkSwitcher() {
               currentNetwork === 'mainnet' ? 'bg-green-500' : 'bg-yellow-500'
             }`}
           />
-          <span className="text-xs text-blue-600">
+          <span className="text-xs text-white">
             {networkConfig.name}
           </span>
         </div>
@@ -123,7 +123,7 @@ export function NetworkSwitcher() {
             <div className={`px-2 py-1 rounded text-xs ${
               currentNetwork === 'mainnet' 
                 ? 'bg-blue-600 text-white' 
-                : 'bg-purple-600 text-shite'
+                : 'bg-blue-900 text-shite'
             }`}>
               {networkConfig.name}
             </div>
