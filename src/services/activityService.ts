@@ -1,9 +1,8 @@
-import { Contract, RpcProvider, num } from 'starknet';
+import { Contract, RpcProvider, num, hash } from 'starknet';
 import { 
   ActivityEvent, 
   ActivityFilter, 
   ActivityType, 
-  STARKNET_EVENT_SIGNATURES,
   STARKNET_EXPLORER_URL 
 } from '@/types/activity';
 
@@ -67,6 +66,24 @@ export class ActivityFeedService {
   }
 
   /**
+   * Get proper Starknet event selector for activity type
+   */
+  private getEventSelector(activityType: ActivityType): string {
+    // These should be actual Starknet event selectors (use starknet_keccak)
+    const eventSelectors: Record<ActivityType, string> = {
+      [ActivityType.MINT]: hash.getSelectorFromName("Transfer"), // Common NFT transfer event
+      [ActivityType.CREATE_OFFER]: hash.getSelectorFromName("OfferCreated"),
+      [ActivityType.BUY]: hash.getSelectorFromName("Purchase"),
+      [ActivityType.SELL]: hash.getSelectorFromName("Sale"),
+      [ActivityType.CREATE_IP_COIN]: hash.getSelectorFromName("IPCoinCreated"),
+      [ActivityType.POOL_LIQUIDITY]: hash.getSelectorFromName("LiquidityAdded"),
+      [ActivityType.DAO_VOTE]: hash.getSelectorFromName("VoteCast"),
+    };
+
+    return eventSelectors[activityType];
+  }
+
+  /**
    * Fetch activities by specific type
    */
   private async fetchActivityByType(
@@ -77,9 +94,9 @@ export class ActivityFeedService {
     limit: number
   ): Promise<ActivityEvent[]> {
     try {
-      const eventSignature = STARKNET_EVENT_SIGNATURES[activityType];
-      if (!eventSignature) {
-        console.warn(`No event signature found for activity type: ${activityType}`);
+      const eventSelector = this.getEventSelector(activityType);
+      if (!eventSelector) {
+        console.warn(`No event selector found for activity type: ${activityType}`);
         return [];
       }
 
@@ -87,13 +104,15 @@ export class ActivityFeedService {
       const latestBlock = await this.provider.getBlockNumber();
       const fromBlock = Math.max(0, latestBlock - 1000);
 
-      // Fetch events from Starknet
+      // Fetch events from Starknet with proper event filter
       const eventFilter = {
         from_block: { block_number: fromBlock },
         to_block: { block_number: latestBlock },
-        address: undefined, // We'll filter by all relevant contracts
-        keys: [[eventSignature]], // Event signature as array of arrays
-        chunk_size: limit // Add required chunk_size property
+        address: undefined, // Filter by all contracts
+        keys: [
+          [eventSelector] // First key is the event selector
+        ],
+        chunk_size: limit
       };
 
       const events = await this.provider.getEvents(eventFilter);
@@ -104,7 +123,7 @@ export class ActivityFeedService {
       for (const event of events.events) {
         try {
           const activity = await this.parseEventToActivity(event, activityType, walletAddress);
-          if (activity && this.matchesDateFilter(activity, filter)) {
+          if (activity && this.matchesDateFilter(activity, filter) && this.isUserRelated(activity, walletAddress)) {
             activities.push(activity);
           }
         } catch (parseError) {
@@ -118,6 +137,28 @@ export class ActivityFeedService {
       console.error(`Error fetching ${activityType} activities:`, error);
       return [];
     }
+  }
+
+  /**
+   * Check if activity is related to the user
+   */
+  private isUserRelated(activity: ActivityEvent, userAddress: string): boolean {
+    const normalizedUserAddress = userAddress.toLowerCase();
+    
+    // Check if user is involved in the activity
+    if (activity.userAddress?.toLowerCase() === normalizedUserAddress) {
+      return true;
+    }
+
+    // Check metadata for user involvement
+    if (activity.metadata) {
+      const metadataValues = Object.values(activity.metadata);
+      return metadataValues.some(value => 
+        typeof value === 'string' && value.toLowerCase() === normalizedUserAddress
+      );
+    }
+
+    return false;
   }
 
   /**
@@ -176,19 +217,34 @@ export class ActivityFeedService {
   }
 
   /**
-   * Parse mint event
+   * Parse mint event (Transfer with from_address = 0)
    */
   private parseMintEvent(activity: ActivityEvent, event: any): ActivityEvent {
     try {
-      // Typical mint event: [to_address, token_id, ...]
-      if (event.data && event.data.length >= 2) {
-        const tokenId = num.toHex(event.data[1]);
-        activity.assetId = tokenId;
-        activity.assetName = `IP Asset #${tokenId}`;
-        activity.metadata = {
-          tokenId,
-          contractAddress: event.from_address
-        };
+      // Transfer event structure: keys=[selector, from, to], data=[token_id_low, token_id_high]
+      if (event.keys && event.keys.length >= 3) {
+        const from = event.keys[1];
+        const to = event.keys[2];
+        
+        // Check if it's a mint (from address is 0)
+        if (from === '0x0' || from === '0') {
+          activity.userAddress = to;
+          
+          if (event.data && event.data.length >= 1) {
+            // Handle U256 token ID (low, high parts)
+            const tokenIdLow = event.data[0];
+            const tokenIdHigh = event.data.length > 1 ? event.data[1] : '0x0';
+            
+            activity.assetId = tokenIdLow; // Use low part for simplicity
+            activity.assetName = `NFT #${num.toHex(tokenIdLow)}`;
+            activity.metadata = {
+              tokenId: tokenIdLow,
+              tokenIdHigh: tokenIdHigh,
+              contractAddress: event.from_address,
+              recipient: to
+            };
+          }
+        }
       }
       return activity;
     } catch (error) {
@@ -202,14 +258,22 @@ export class ActivityFeedService {
    */
   private parseCreateOfferEvent(activity: ActivityEvent, event: any): ActivityEvent {
     try {
-      // Typical offer event: [offerer, asset_id, price, ...]
+      // Custom event structure depends on your contract implementation
       if (event.data && event.data.length >= 3) {
-        activity.assetId = num.toHex(event.data[1]);
-        activity.price = num.toHex(event.data[2]);
+        const offerer = event.data[0];
+        const assetId = event.data[1];
+        const priceLow = event.data[2];
+        const priceHigh = event.data.length > 3 ? event.data[3] : '0x0';
+        
+        activity.userAddress = offerer;
+        activity.assetId = num.toHex(assetId);
+        activity.price = num.toHex(priceLow); // Use low part
         activity.currency = 'ETH';
         activity.metadata = {
-          offerer: num.toHex(event.data[0]),
-          assetId: activity.assetId
+          offerer,
+          assetId: activity.assetId,
+          priceLow,
+          priceHigh
         };
       }
       return activity;
@@ -224,15 +288,23 @@ export class ActivityFeedService {
    */
   private parseBuyEvent(activity: ActivityEvent, event: any): ActivityEvent {
     try {
-      // Typical buy event: [buyer, seller, asset_id, price, ...]
       if (event.data && event.data.length >= 4) {
-        activity.assetId = num.toHex(event.data[2]);
-        activity.price = num.toHex(event.data[3]);
+        const buyer = event.data[0];
+        const seller = event.data[1];
+        const assetId = event.data[2];
+        const priceLow = event.data[3];
+        const priceHigh = event.data.length > 4 ? event.data[4] : '0x0';
+        
+        activity.userAddress = buyer;
+        activity.assetId = num.toHex(assetId);
+        activity.price = num.toHex(priceLow);
         activity.currency = 'ETH';
         activity.metadata = {
-          buyer: num.toHex(event.data[0]),
-          seller: num.toHex(event.data[1]),
-          assetId: activity.assetId
+          buyer,
+          seller,
+          assetId: activity.assetId,
+          priceLow,
+          priceHigh
         };
       }
       return activity;
@@ -247,15 +319,23 @@ export class ActivityFeedService {
    */
   private parseSellEvent(activity: ActivityEvent, event: any): ActivityEvent {
     try {
-      // Similar to buy event but from seller perspective
       if (event.data && event.data.length >= 4) {
-        activity.assetId = num.toHex(event.data[2]);
-        activity.price = num.toHex(event.data[3]);
+        const seller = event.data[0];
+        const buyer = event.data[1];
+        const assetId = event.data[2];
+        const priceLow = event.data[3];
+        const priceHigh = event.data.length > 4 ? event.data[4] : '0x0';
+        
+        activity.userAddress = seller;
+        activity.assetId = num.toHex(assetId);
+        activity.price = num.toHex(priceLow);
         activity.currency = 'ETH';
         activity.metadata = {
-          seller: num.toHex(event.data[0]),
-          buyer: num.toHex(event.data[1]),
-          assetId: activity.assetId
+          seller,
+          buyer,
+          assetId: activity.assetId,
+          priceLow,
+          priceHigh
         };
       }
       return activity;
@@ -271,11 +351,17 @@ export class ActivityFeedService {
   private parseCreateIPCoinEvent(activity: ActivityEvent, event: any): ActivityEvent {
     try {
       if (event.data && event.data.length >= 2) {
-        activity.assetId = num.toHex(event.data[0]);
+        const creator = event.data[0];
+        const ipAssetId = event.data[1];
+        const coinAddress = event.data.length > 2 ? event.data[2] : event.from_address;
+        
+        activity.userAddress = creator;
+        activity.assetId = num.toHex(ipAssetId);
         activity.assetName = `IP Coin for Asset #${activity.assetId}`;
         activity.metadata = {
+          creator,
           ipAssetId: activity.assetId,
-          coinAddress: num.toHex(event.data[1])
+          coinAddress
         };
       }
       return activity;
@@ -291,12 +377,18 @@ export class ActivityFeedService {
   private parsePoolLiquidityEvent(activity: ActivityEvent, event: any): ActivityEvent {
     try {
       if (event.data && event.data.length >= 3) {
-        activity.amount = num.toHex(event.data[1]);
-        activity.price = num.toHex(event.data[2]);
+        const provider = event.data[0];
+        const amountLow = event.data[1];
+        const amountHigh = event.data.length > 2 ? event.data[2] : '0x0';
+        
+        activity.userAddress = provider;
+        activity.amount = num.toHex(amountLow);
         activity.currency = 'ETH';
         activity.metadata = {
           poolAddress: event.from_address,
-          liquidityProvider: num.toHex(event.data[0])
+          liquidityProvider: provider,
+          amountLow,
+          amountHigh
         };
       }
       return activity;
@@ -312,12 +404,16 @@ export class ActivityFeedService {
   private parseDAOVoteEvent(activity: ActivityEvent, event: any): ActivityEvent {
     try {
       if (event.data && event.data.length >= 3) {
-        activity.proposalId = num.toHex(event.data[0]);
+        const voter = event.data[0];
+        const proposalId = event.data[1];
         const voteValue = num.toBigInt(event.data[2]);
+        
+        activity.userAddress = voter;
+        activity.proposalId = num.toHex(proposalId);
         activity.voteChoice = voteValue === 1n ? 'for' : voteValue === 2n ? 'against' : 'abstain';
         activity.metadata = {
           proposalId: activity.proposalId,
-          voter: num.toHex(event.data[1]),
+          voter,
           voteChoice: activity.voteChoice
         };
       }
@@ -373,12 +469,11 @@ export class ActivityFeedService {
   }
 
   /**
-   * Get asset metadata (placeholder - implement based on your metadata service)
+   * Get asset metadata
    */
   async getAssetMetadata(assetId: string): Promise<any> {
     try {
       // This would typically call your metadata service or IPFS
-      // For now, return a placeholder
       return {
         name: `Asset #${assetId}`,
         image: '/placeholder.svg',
@@ -407,5 +502,84 @@ export class ActivityFeedService {
    */
   getContract(address: string): Contract | undefined {
     return this.contracts.get(address);
+  }
+
+  /**
+   * Alternative method: Fetch events by contract address
+   */
+  async fetchEventsByContract(
+    contractAddress: string,
+    eventName: string,
+    walletAddress: string,
+    limit: number = 20
+  ): Promise<ActivityEvent[]> {
+    try {
+      const eventSelector = hash.getSelectorFromName(eventName);
+      const latestBlock = await this.provider.getBlockNumber();
+      const fromBlock = Math.max(0, latestBlock - 1000);
+
+      const eventFilter = {
+        from_block: { block_number: fromBlock },
+        to_block: { block_number: latestBlock },
+        address: contractAddress, // Specific contract
+        keys: [[eventSelector]],
+        chunk_size: limit
+      };
+
+      const events = await this.provider.getEvents(eventFilter);
+      const activities: ActivityEvent[] = [];
+
+      for (const event of events.events) {
+        
+        const activity = await this.parseGenericEvent(event, eventName, walletAddress);
+        if (activity) {
+          activities.push(activity);
+        }
+      }
+
+      return activities;
+    } catch (error) {
+      console.error('Error fetching events by contract:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Generic event parser
+   */
+  private async parseGenericEvent(
+    event: any,
+    eventName: string,
+    userAddress: string
+  ): Promise<ActivityEvent | null> {
+    try {
+      const activity: ActivityEvent = {
+        id: `${event.transaction_hash}_${event.event_index || 0}`,
+        txHash: event.transaction_hash,
+        blockNumber: event.block_number,
+        timestamp: Date.now(),
+        activityType: ActivityType.MINT, // Default, should be determined by eventName
+        userAddress,
+        metadata: {
+          eventName,
+          contractAddress: event.from_address,
+          keys: event.keys,
+          data: event.data
+        }
+      };
+
+      // Get timestamp from block
+      try {
+        const block = await this.provider.getBlockWithTxHashes(event.block_number);
+        activity.timestamp = block.timestamp * 1000;
+      } catch (error) {
+        console.warn('Could not fetch block timestamp:', error);
+      }
+
+      return activity;
+    } catch (error) {
+      console.error('Error parsing generic event:', error);
+      return null;
+    }
   }
 }
