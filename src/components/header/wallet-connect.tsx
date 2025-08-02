@@ -24,6 +24,7 @@ import type {
   ArgentWebWallet,
 } from "@argent/invisible-sdk";
 import { useNetwork } from "@/components/starknet-provider";
+import { NetworkSwitcher } from "./network-switcher";
 
 export function WalletConnect() {
   const { connect, connectors } = useConnect();
@@ -281,19 +282,7 @@ export function WalletConnect() {
           {isConnected ? (
             <div className="grid gap-4">
               
-              <Link href="/discover">
-                <Button variant="outline" className="justify-start w-full">
-                  <Rocket className="mr-2 h-4 w-4" />
-                  Discover
-                </Button>
-              </Link>
-
-              <Link href="/create">
-                <Button variant="outline" className="justify-start w-full">
-                  <Box className="mr-2 h-4 w-4" />
-                  Create
-                </Button>
-              </Link>
+              <NetworkSwitcher/>
 
               <Button
                 variant="destructive"

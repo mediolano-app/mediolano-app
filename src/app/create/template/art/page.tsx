@@ -60,7 +60,7 @@ import { toast } from "@/hooks/use-toast"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { TagInput } from "@/components/TagInput"
+import { TagInput } from "@/components/tag-input"
 import {
   Drawer,
   DrawerClose,

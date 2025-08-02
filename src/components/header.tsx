@@ -19,13 +19,10 @@ export function Header() {
         
         <div className="flex items-center">
 
-        
-          <div className="">
+          <div>
             <WalletConnect />
           </div>      
-          <div>
-            <NetworkSwitcher />
-          </div>    
+
           <MobileSidebar />
 
           <div className="hidden md:block">
