@@ -41,14 +41,17 @@ export interface ProfileSettings {
   marketplace_profile: boolean;
 }
 
-export interface UserProfile extends PersonalInfo, SocialMediaLinks, ProfileSettings {}
+export interface UserProfile
+  extends PersonalInfo,
+    SocialMediaLinks,
+    ProfileSettings {}
 
 export const useAccountContract = () => {
   const { address, account } = useAccount();
   const { provider } = useProvider();
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { contract } = useContract({
     address: ACCOUNT_CONTRACT_ADDRESS,
     abi: ACCOUNT_CONTRACT_ABI,
@@ -124,18 +127,15 @@ export const useAccountContract = () => {
     [contract]
   );
 
-  const getProfileCount = useCallback(
-    async () => {
-      if (!contract) return 0;
-      try {
-        return await contract.get_profile_count();
-      } catch (err) {
-        console.error("Error getting profile count:", err);
-        return 0;
-      }
-    },
-    [contract]
-  );
+  const getProfileCount = useCallback(async () => {
+    if (!contract) return 0;
+    try {
+      return await contract.get_profile_count();
+    } catch (err) {
+      console.error("Error getting profile count:", err);
+      return 0;
+    }
+  }, [contract]);
 
   const getUsername = useCallback(
     async (user: `0x${string}`) => {
@@ -165,7 +165,11 @@ export const useAccountContract = () => {
 
   // Write Functions (External) - Direct contract function calls
   const registerProfile = useCallback(
-    async (personalInfo: PersonalInfo, socialLinks: SocialMediaLinks, settings: ProfileSettings) => {
+    async (
+      personalInfo: PersonalInfo,
+      socialLinks: SocialMediaLinks,
+      settings: ProfileSettings
+    ) => {
       if (!address) throw new Error("Wallet not connected");
       if (!contract) throw new Error("Contract not initialized");
 
@@ -173,14 +177,20 @@ export const useAccountContract = () => {
       setError(null);
 
       try {
-        const contractCall = contract.populate("register_profile", [personalInfo, socialLinks, settings]);
-        await accountSend([contractCall]);
+        const contractCall = contract.populate("register_profile", [
+          personalInfo,
+          socialLinks,
+          settings,
+        ]);
+        const result = await accountSend([contractCall]);
+        return result;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to register profile";
         setError(errorMessage);
         throw err;
       } finally {
+        console.log("Updating state...");
         setIsUpdating(false);
       }
     },
@@ -196,8 +206,10 @@ export const useAccountContract = () => {
       setError(null);
 
       try {
-        const contractCall = contract.populate("update_personal_info", [personalInfo]);
-        await accountSend([contractCall]);
+        const contractCall = contract.populate("update_personal_info", [
+          personalInfo,
+        ]);
+        await account?.execute([contractCall]);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to update personal info";
@@ -208,10 +220,7 @@ export const useAccountContract = () => {
       }
     },
     [address, contract, accountSend]
-
   );
-
-  
 
   const updateSocialLinks = useCallback(
     async (socialLinks: SocialMediaLinks) => {
@@ -222,7 +231,9 @@ export const useAccountContract = () => {
       setError(null);
 
       try {
-        const contractCall = contract.populate("update_social_links", [socialLinks]);
+        const contractCall = contract.populate("update_social_links", [
+          socialLinks,
+        ]);
         await accountSend([contractCall]);
       } catch (err) {
         const errorMessage =
@@ -244,6 +255,8 @@ export const useAccountContract = () => {
       setIsUpdating(true);
       setError(null);
 
+      console.log(settings, "settings");
+
       try {
         const contractCall = contract.populate("update_settings", [settings]);
         await accountSend([contractCall]);
@@ -259,6 +272,77 @@ export const useAccountContract = () => {
     [address, contract, accountSend]
   );
 
+  // Generic multicall function to execute multiple contract calls at once
+  const executeMultipleProfileCalls = useCallback(
+    async (calls: Array<{ method: string; args: any[] }>) => {
+      if (!address) throw new Error("Wallet not connected");
+      if (!account) throw new Error("Account not connected");
+      if (!contract) throw new Error("Contract not initialized");
+
+      setIsUpdating(true);
+      setError(null);
+
+  
+      try {
+        const contractCalls = calls.map(({ method, args }) => {
+          const populatedCall = contract.populate(method, args);
+          return {
+            contractAddress: ACCOUNT_CONTRACT_ADDRESS,
+            entrypoint: method,
+            calldata: populatedCall.calldata
+          };
+        });
+
+        const result = await account.execute(contractCalls);
+        await provider.waitForTransaction(result.transaction_hash);
+
+        console.log("✅ [MULTICALL] Profile calls executed successfully!", {
+          transactionHash: result?.transaction_hash,
+          userAddress: address,
+          executedMethods: calls.map(call => call.method),
+          result,
+          timestamp: new Date().toISOString(),
+        });
+
+        return result;
+      } catch (err) {
+        console.error("❌ [MULTICALL] Profile calls failed:", {
+          error: err,
+          userAddress: address,
+          methods: calls.map(call => call.method),
+          message: err instanceof Error ? err.message : "Unknown error",
+          timestamp: new Date().toISOString(),
+        });
+
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to execute profile multicall";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsUpdating(false);
+      }
+    },
+    [address, account, contract, provider]
+  );
+
+  // Convenience function to update all profile sections at once
+  const updateProfileMulticall = useCallback(
+    async (
+      personalInfo: PersonalInfo,
+      socialLinks: SocialMediaLinks,
+      settings: ProfileSettings
+    ) => {
+      const calls = [
+        { method: "update_personal_info", args: [personalInfo] },
+        { method: "update_social_links", args: [socialLinks] },
+        { method: "update_settings", args: [settings] },
+      ];
+
+      return executeMultipleProfileCalls(calls);
+    },
+    [executeMultipleProfileCalls]
+  );
+
   return {
     // Read functions
     getProfile,
@@ -269,18 +353,19 @@ export const useAccountContract = () => {
     getProfileCount,
     getUsername,
     isProfilePublic,
-    
+
     // Write functions
     registerProfile,
     updatePersonalInfo,
     updateSocialLinks,
     updateSettings,
-    
+    updateProfileMulticall,
+
     // State
     contract,
     isUpdating,
     error,
-    
+
     // Account info
     address,
     account,

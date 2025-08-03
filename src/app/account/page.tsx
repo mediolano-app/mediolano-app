@@ -197,9 +197,8 @@ export default function UserAccount() {
     getSettings,
     isProfileRegistered,
     registerProfile,
-    updatePersonalInfo,
-    updateSocialLinks,
-    updateSettings,
+   
+    updateProfileMulticall,
     isUpdating: isContractUpdating,
     error: contractError,
   } = useAccountContract();
@@ -278,14 +277,6 @@ export default function UserAccount() {
     }
   };
 
-  const getAvatarSrc = () => {
-    return avatarPreview && avatarPreview !== "/avatar.jpg"
-      ? avatarPreview
-      : `https://api.dicebear.com/7.x/initials/svg?seed=${
-          user.name || user.username || address || "User"
-        }&backgroundColor=3b82f6&textColor=ffffff`;
-  };
-
   // Social Links Management
   const getActiveSocialLinks = () => {
     return SOCIAL_PLATFORMS.filter((platform) => {
@@ -296,8 +287,6 @@ export default function UserAccount() {
       return hasContent || isExplicitlyAdded;
     });
   };
-
-  console.log(getActiveSocialLinks());
 
   const getAvailableSocialPlatforms = () => {
     const activePlatforms = getActiveSocialLinks().map((p) => p.key);
@@ -381,8 +370,6 @@ export default function UserAccount() {
 
       setIsLoading(true);
       try {
-        console.log("Loading user profile from contract for address:", address);
-
         // Check if profile is registered first
         const profileRegistered = await isProfileRegistered(address);
 
@@ -395,13 +382,6 @@ export default function UserAccount() {
               getSocialLinks(address),
               getSettings(address),
             ]);
-
-          console.log("Loaded profile data:", {
-            profileData,
-            personalInfo,
-            socialLinks,
-            settings,
-          });
 
           if (personalInfo && socialLinks && settings) {
             setUser((prevUser: UserProfile) => ({
@@ -528,10 +508,20 @@ export default function UserAccount() {
       return;
     }
 
+    // Loading state is managed by the contract hook automatically
+
     try {
-      // Upload images first if any are selected
+      // Step 1: Upload images to IPFS if any are selected
       if (avatarFile || coverFile) {
+        // Show IPFS upload progress
+        toast({
+          title: "Uploading Images",
+          description: "Uploading images to IPFS...",
+        });
+
         const uploadedImages = await uploadImagesToIpfs();
+
+        // Update user state with new image URLs
         setUser((prev) => ({
           ...prev,
           avatarUrl: uploadedImages.avatarUrl || prev.avatarUrl,
@@ -539,7 +529,7 @@ export default function UserAccount() {
         }));
       }
 
-      // Validation
+      // Step 2: Validation
       const validationErrors = [
         {
           field: user.name.trim(),
@@ -560,12 +550,10 @@ export default function UserAccount() {
         return;
       }
 
-      const timestamp = toEpochTime(new Date().toISOString());
-
+      // Step 3: Prepare contract data
       const { emailNotifications, publicProfile, marketProfile } =
         user.preferences;
 
-      // Prepare data structures for Account contract
       const personalInfo: PersonalInfo = {
         username: user.username,
         name: user.name,
@@ -594,33 +582,76 @@ export default function UserAccount() {
         marketplace_profile: marketProfile,
       };
 
-      // Check if profile exists and register or update accordingly
+      toast({
+        title: "Checking Profile",
+        description: "Checking if profile exists on blockchain...",
+      });
+
       const profileExists = await isProfileRegistered(address);
 
+      toast({
+        title: "Processing Transaction",
+        description: profileExists
+          ? "Updating existing profile..."
+          : "Registering new profile...",
+      });
+
+      let transactionResult;
       if (!profileExists) {
-        // Register new profile
-        await registerProfile(personalInfo, socialLinks, profileSettings);
+        console.log("🆕 Registering new profile...");
+        transactionResult = await registerProfile(
+          personalInfo,
+          socialLinks,
+          profileSettings
+        );
+        console.log(transactionResult);
       } else {
-        // Update existing profile sections
-        await Promise.all([
-          updatePersonalInfo(personalInfo),
-          updateSocialLinks(socialLinks),
-          updateSettings(profileSettings),
-        ]);
+        transactionResult = await updateProfileMulticall(personalInfo, socialLinks, profileSettings);
+      }
+
+      console.log("✅ Transaction completed successfully:", transactionResult);
+
+      // Success handling
+      toast({
+        title: "Success! 🎉",
+        description: profileExists
+          ? "Your profile has been updated on the blockchain!"
+          : "Your profile has been registered on the blockchain!",
+      });
+
+      // Close drawer
+      setIsDrawerOpen(false);
+
+      // Optional: Refresh profile data from contract
+      console.log("🔄 Refreshing profile data from blockchain...");
+    } catch (err) {
+    
+      // Determine error type for better user feedback
+      let errorTitle = "Transaction Failed";
+      let errorDescription = "Failed to save settings";
+
+      if (err instanceof Error) {
+        if (
+          err.message.includes("User rejected") ||
+          err.message.includes("rejected")
+        ) {
+          errorTitle = "Transaction Cancelled";
+          errorDescription = "You cancelled the transaction.";
+        } else if (err.message.includes("insufficient")) {
+          errorTitle = "Insufficient Funds";
+          errorDescription =
+            "You don't have enough funds to complete this transaction.";
+        } else if (err.message.includes("network")) {
+          errorTitle = "Network Error";
+          errorDescription = "Network connection issue. Please try again.";
+        } else {
+          errorDescription = err.message;
+        }
       }
 
       toast({
-        title: "Settings Saved!",
-        description: "Your account settings have been saved!.",
-      });
-
-      setIsDrawerOpen(false);
-    } catch (err) {
-      console.error("Multicall transaction failed:", err);
-      toast({
-        title: "Transaction Failed",
-        description:
-          err instanceof Error ? err.message : "Failed to save settings",
+        title: errorTitle,
+        description: errorDescription,
         variant: "destructive",
       });
     }
@@ -631,6 +662,7 @@ export default function UserAccount() {
     avatarFile,
     coverFile,
     registerProfile,
+    updateProfileMulticall,
     uploadImagesToIpfs,
     toast,
   ]);
