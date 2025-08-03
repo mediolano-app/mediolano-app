@@ -799,7 +799,7 @@ export default function UserAccount() {
         </Drawer>
       </div>
 
-      {/* User Stats Widgets */}
+      {/* User Stats Widgets 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {Object.entries(user.stats).map(([key, value]) => (
           <Card key={key}>
@@ -816,9 +816,9 @@ export default function UserAccount() {
             </CardContent>
           </Card>
         ))}
-      </div>
+      </div>*/}
 
-      {/* Recent Transactions */}
+      {/* Recent Transactions 
       <Card className="col-span-full">
         <CardHeader>
           <CardTitle>Recent Transactions</CardTitle>
@@ -846,6 +846,9 @@ export default function UserAccount() {
           </Table>
         </CardContent>
       </Card>
+      */}
+
+
     </div>
   );
 }

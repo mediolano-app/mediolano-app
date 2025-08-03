@@ -57,6 +57,7 @@ export const useAccountContract = () => {
     abi: ACCOUNT_CONTRACT_ABI,
   });
 
+  
   const { sendAsync: accountSend } = useSendTransaction({
     calls: [],
   });
