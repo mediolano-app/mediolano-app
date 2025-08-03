@@ -130,6 +130,9 @@ export default function StartHero({
           </motion.div>
 
 
+
+          {/*
+
           <motion.div custom={2} variants={fadeUpVariants} initial="hidden" animate="visible">
             <p className="text-lg mb-0 leading-relaxed font-light tracking-wide">
             Powered on
@@ -163,7 +166,7 @@ export default function StartHero({
                           </div>
           
           </motion.div>
-
+            */}
 
 
 

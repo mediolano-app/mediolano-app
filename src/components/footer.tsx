@@ -201,6 +201,7 @@ export function Footer() {
 
             {/* Mediolano */}
             <div className="space-y-4 lg:col-span-1 bg-blue-600/10 p-4 rounded-lg">
+            
             <Link href="/" className="flex items-center space-x-2">
                 <motion.span
                 className="text-1xl font-bold"
@@ -211,10 +212,12 @@ export function Footer() {
                 Programmable IP for the Integrity Web
                 </motion.span>
             </Link>
+
             <p className="text-muted-foreground mr-5">
-            Seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost (fraction of a cent) and smart contract intelligence for digital assets.
-            Mediolano empower creators, collectors and organizations with permissionless Programmable IP services using blockchain and zero knowledge proofs.
-            </p><br></br>
+            Mediolano is a decentralized innovation hub to empower creators, developers, business, AI agents and communities to assert ownership, exchange value, and unlock new revenue streams. 
+            </p>
+            <p className="text-muted-foreground mr-5">
+            By seamlessly integrating smart contracts with zero knowledge-proofs, Mediolano bridges the gap between intelligence and real-world application — turning code, content, and culture into programmable, sovereign assets.            </p><br></br>
             <div className="flex space-x-4">
             <div className="flex items-center space-x-2">
           
