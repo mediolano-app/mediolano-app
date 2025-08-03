@@ -99,6 +99,7 @@ export function MobileSidebar() {
       </VisuallyHidden.Root>
         <nav className="flex flex-col space-y-4 mt-4">
 
+        <ThemeToggle />
 
         <div className='mt-2'>
           <WalletConnect />
@@ -183,24 +184,10 @@ export function MobileSidebar() {
             </Button>
           </div>
 
-
-
           <Separator className="my-4" />
 
-          <ThemeToggle />
-
-
-
-
-
-
+          
         </nav>
-
-
-
-
-
-
 
       </SheetContent>
     </Sheet>

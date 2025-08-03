@@ -96,7 +96,7 @@ export function NetworkSwitcher() {
     <div className="network-switcher relative" ref={switcherRef}>
       <div className="flex items-center gap-3 mx-4">
         <div
-          className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer select-none"
+          className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 cursor-pointer select-none"
           onClick={() => setOpen((prev) => !prev)}
           tabIndex={0}
           aria-haspopup="true"
@@ -107,14 +107,14 @@ export function NetworkSwitcher() {
               currentNetwork === 'mainnet' ? 'bg-green-500' : 'bg-yellow-500'
             }`}
           />
-          <span className="text-xs text-gray-600">
+          <span className="text-xs text-white">
             {networkConfig.name}
           </span>
         </div>
       </div>
 
       {open && (
-        <div className="absolute left-1/2 -translate-x-1/2 mt-2 z-50 min-w-[220px] bg-white border border-gray-200 rounded-lg shadow-lg p-3">
+        <div className="absolute left-1/2 -translate-x-1/2 mt-2 z-50 min-w-[220px] bg-background border border-blue-600 rounded-lg shadow-lg p-3">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Network className="h-4 w-4" />
@@ -122,8 +122,8 @@ export function NetworkSwitcher() {
             </div>
             <div className={`px-2 py-1 rounded text-xs ${
               currentNetwork === 'mainnet' 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-yellow-100 text-yellow-800'
+                ? 'bg-blue-600 text-white' 
+                : 'bg-blue-900 text-shite'
             }`}>
               {networkConfig.name}
             </div>

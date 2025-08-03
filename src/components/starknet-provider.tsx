@@ -5,6 +5,7 @@ import {
   StarknetConfig,
   argent,
   braavos,
+  publicProvider,
   useInjectedConnectors,
   voyager,
 } from "@starknet-react/core";

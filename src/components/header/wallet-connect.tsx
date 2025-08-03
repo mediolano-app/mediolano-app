@@ -24,6 +24,7 @@ import type {
   ArgentWebWallet,
 } from "@argent/invisible-sdk";
 import { useNetwork } from "@/components/starknet-provider";
+import { NetworkSwitcher } from "./network-switcher";
 
 export function WalletConnect() {
   const { connect, connectors } = useConnect();
@@ -279,29 +280,15 @@ export function WalletConnect() {
         </DialogHeader>
         <div className="grid gap-4">
           {isConnected ? (
-            <div className="grid gap-4">
-              
-              <Link href="/discover">
-                <Button variant="outline" className="justify-start w-full">
-                  <Rocket className="mr-2 h-4 w-4" />
-                  Discover
-                </Button>
-              </Link>
-
-              <Link href="/create">
-                <Button variant="outline" className="justify-start w-full">
-                  <Box className="mr-2 h-4 w-4" />
-                  Create
-                </Button>
-              </Link>
-
+            <div className="flex gap-4 items-center">
+              <NetworkSwitcher />
               <Button
-                variant="destructive"
-                onClick={handleDisconnect}
-                className="justify-start"
+              variant="destructive"
+              onClick={handleDisconnect}
+              className="flex items-center"
               >
-                <LogOut className="mr-2 h-4 w-4" />
-                Disconnect
+              <LogOut className="mr-2 h-4 w-4" />
+              Disconnect
               </Button>
             </div>
           ) : (
@@ -315,7 +302,7 @@ export function WalletConnect() {
                 </Button>
               ))}
               <div className="border-t pt-4">
-                <label className="flex items-center text-sm mb-3 cursor-pointer">
+                <label className="flex items-center text-sm text-muted mb-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={withApproval}
@@ -344,8 +331,7 @@ export function WalletConnect() {
 
               <div className="alert alert-warning">
                 <p className="text-sm">
-                  * Mediolano Dapp is under development and connected to the testnet. Please make sure your wallet is connect on{" "}
-                  <strong>Starknet Sepolia</strong> to interact.
+                  * Mediolano Dapp is under development, use for testing purposes only.
                 </p>
               </div>
             </div>

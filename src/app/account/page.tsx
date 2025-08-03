@@ -2,30 +2,30 @@
 
 import { useState, ChangeEvent, useEffect, useCallback } from "react";
 import { useAccount } from "@starknet-react/core";
-import { useUsersSettings } from "@/hooks/useUsersSettings";
+import {
+  useAccountContract,
+  type PersonalInfo,
+  type SocialMediaLinks as ContractSocialLinks,
+  type ProfileSettings,
+} from "@/hooks/useAccount";
 import { useIpfsUpload } from "@/hooks/useIpfs";
 import { useToast } from "@/hooks/use-toast";
+import {
+  PersonalInfoSection,
+  SocialLinksSection,
+  AdditionalInfoSection,
+  PreferencesSection,
+  ProfileHeader,
+} from "@/components/account";
 import { toEpochTime } from "@/lib/utils";
 import type {
   UserProfile,
-  SocialMediaLinks,
   UserPreferences,
+  SocialMediaLinks,
 } from "@/lib/types";
-
-// UI Components
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   Table,
   TableBody,
@@ -48,9 +48,21 @@ import {
   Upload,
   RefreshCw,
   Award,
+  Phone,
+  MapPin,
+  Building,
+  Instagram,
+  Video,
+  Facebook,
+  MessageCircle,
+  Youtube,
   User,
   Globe,
   Twitter,
+  Copy,
+  Check,
+  Plus,
+  X,
   Linkedin,
   Github,
   Shield,
@@ -60,8 +72,6 @@ import {
   Save,
 } from "lucide-react";
 
-
-
 interface UploadedImages {
   avatarUrl?: string;
   coverUrl?: string;
@@ -70,7 +80,69 @@ interface UploadedImages {
 type ImageType = "avatar" | "cover";
 type PreferenceKey = keyof UserPreferences;
 type SocialPlatform = keyof SocialMediaLinks;
-type ProfileField = "name" | "username" | "email" | "website" | "bio";
+type ProfileField =
+  | "name"
+  | "username"
+  | "email"
+  | "website"
+  | "bio"
+  | "phone"
+  | "location"
+  | "org";
+
+// Social Platform Configuration
+const SOCIAL_PLATFORMS = [
+  {
+    key: "twitter" as const,
+    label: "X (Twitter)",
+    icon: Twitter,
+    placeholder: "Enter username",
+  },
+  {
+    key: "linkedin" as const,
+    label: "LinkedIn",
+    icon: Linkedin,
+    placeholder: "Enter profile URL or username",
+  },
+  {
+    key: "github" as const,
+    label: "GitHub",
+    icon: Github,
+    placeholder: "Enter username",
+  },
+  {
+    key: "instagram" as const,
+    label: "Instagram",
+    icon: Instagram,
+    placeholder: "Enter username",
+  },
+  {
+    key: "tiktok" as const,
+    label: "TikTok",
+    icon: Video,
+    placeholder: "Enter username",
+  },
+  {
+    key: "facebook" as const,
+    label: "Facebook",
+    icon: Facebook,
+    placeholder: "Enter profile URL or username",
+  },
+  {
+    key: "discord" as const,
+    label: "Discord",
+    icon: MessageCircle,
+    placeholder: "Enter username#1234",
+  },
+  {
+    key: "youtube" as const,
+    label: "YouTube",
+    icon: Youtube,
+    placeholder: "Enter channel URL or handle",
+  },
+] as const;
+
+type SocialPlatformKey = (typeof SOCIAL_PLATFORMS)[number]["key"];
 
 // Constants
 const INITIAL_USER_PROFILE: UserProfile = {
@@ -79,10 +151,18 @@ const INITIAL_USER_PROFILE: UserProfile = {
   username: "",
   website: "",
   email: "",
+  phone: "",
+  location: "",
+  org: "",
   socialMedia: {
     twitter: "",
     linkedin: "",
     github: "",
+    instagram: "",
+    tiktok: "",
+    facebook: "",
+    discord: "",
+    youtube: "",
   },
   avatarUrl: "/avatar.jpg",
   coverUrl: "/background.jpg",
@@ -105,23 +185,35 @@ const INITIAL_USER_PROFILE: UserProfile = {
 };
 
 export default function UserAccount() {
-  // Hooks
+  // Wallet connection
   const { address, isConnected } = useAccount();
   const { toast } = useToast();
+
+  // Account contract operations
   const {
-    getAccountSettings,
-    executeSettingsCall,
-    executeMultipleSettingsCalls,
-    isUpdating,
-  } = useUsersSettings();
-  const { uploadToIpfs, loading: ipfsLoading, progress } = useIpfsUpload();
+    getProfile,
+    getPersonalInfo,
+    getSocialLinks,
+    getSettings,
+    isProfileRegistered,
+    registerProfile,
+   
+    updateProfileMulticall,
+    isUpdating: isContractUpdating,
+    error: contractError,
+  } = useAccountContract();
+
+  // IPFS upload functionality
+  const {
+    uploadToIpfs,
+    loading: isIpfsUploading,
+    progress: uploadProgress,
+  } = useIpfsUpload();
 
   // State
   const [user, setUser] = useState<UserProfile>(INITIAL_USER_PROFILE);
   const [theme, setTheme] = useState<"light" | "dark">("light");
-  const [avatarPreview, setAvatarPreview] = useState(
-    INITIAL_USER_PROFILE.avatarUrl
-  );
+  const [avatarPreview, setAvatarPreview] = useState("");
   const [coverPreview, setCoverPreview] = useState(
     INITIAL_USER_PROFILE.coverUrl
   );
@@ -129,6 +221,106 @@ export default function UserAccount() {
   const [isLoading, setIsLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
+  const [activeSocialLinks, setActiveSocialLinks] = useState<
+    SocialPlatformKey[]
+  >([]);
+  const [showSocialDropdown, setShowSocialDropdown] = useState(false);
+
+  // Initialize active social links based on existing data when component first loads
+  useEffect(() => {
+    const activePlatforms = SOCIAL_PLATFORMS.filter(
+      (platform) =>
+        user.socialMedia[platform.key] &&
+        user.socialMedia[platform.key].trim() !== ""
+    ).map((platform) => platform.key);
+    setActiveSocialLinks(activePlatforms);
+  }, []); // Only run once on mount, not on every user.socialMedia change
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showSocialDropdown && !target.closest("[data-social-dropdown]")) {
+        setShowSocialDropdown(false);
+      }
+    };
+
+    if (showSocialDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showSocialDropdown]);
+
+  // Utility functions
+  const sliceAddress = (address: string) => {
+    if (!address) return "";
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setIsCopied(true);
+      toast({
+        title: "Copied!",
+        description: "Address copied to clipboard",
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      toast({
+        title: "Copy failed",
+        description: "Could not copy address to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Social Links Management
+  const getActiveSocialLinks = () => {
+    return SOCIAL_PLATFORMS.filter((platform) => {
+      const hasContent =
+        user.socialMedia[platform.key] &&
+        user.socialMedia[platform.key].trim() !== "";
+      const isExplicitlyAdded = activeSocialLinks.includes(platform.key);
+      return hasContent || isExplicitlyAdded;
+    });
+  };
+
+  const getAvailableSocialPlatforms = () => {
+    const activePlatforms = getActiveSocialLinks().map((p) => p.key);
+    return SOCIAL_PLATFORMS.filter(
+      (platform) => !activePlatforms.includes(platform.key)
+    );
+  };
+
+  const addSocialLink = (platformKey: SocialPlatformKey) => {
+    // Add to activeSocialLinks to track explicitly added platforms
+    setActiveSocialLinks((prev) => [...prev, platformKey]);
+    // Initialize the social media field with empty string
+    setUser((prevUser) => ({
+      ...prevUser,
+      socialMedia: {
+        ...prevUser.socialMedia,
+        [platformKey]: "",
+      },
+    }));
+    setShowSocialDropdown(false);
+  };
+
+  const removeSocialLink = (platformKey: SocialPlatformKey) => {
+    // Remove from activeSocialLinks
+    setActiveSocialLinks((prev) => prev.filter((key) => key !== platformKey));
+    // Clear the social media field
+    setUser((prevUser) => ({
+      ...prevUser,
+      socialMedia: {
+        ...prevUser.socialMedia,
+        [platformKey]: "",
+      },
+    }));
+  };
 
   // Event Handlers
   const toggleTheme = useCallback(() => {
@@ -178,21 +370,51 @@ export default function UserAccount() {
 
       setIsLoading(true);
       try {
-        console.log(
-          "Loading user settings from contract for address:",
-          address
-        );
-        const accountSettings = await getAccountSettings(address);
+        // Check if profile is registered first
+        const profileRegistered = await isProfileRegistered(address);
 
-        if (accountSettings) {
-          console.log("Loaded account settings:", accountSettings);
-          setUser((prevUser: UserProfile) => ({
-            ...prevUser,
-            address: address,
-            // TODO: Map contract data to user state based on actual contract response structure
-          }));
+        if (profileRegistered) {
+          // Load complete profile data
+          const [profileData, personalInfo, socialLinks, settings] =
+            await Promise.all([
+              getProfile(address),
+              getPersonalInfo(address),
+              getSocialLinks(address),
+              getSettings(address),
+            ]);
+
+          if (personalInfo && socialLinks && settings) {
+            setUser((prevUser: UserProfile) => ({
+              ...prevUser,
+              address: address,
+              name: personalInfo.name || "",
+              username: personalInfo.username || "",
+              email: personalInfo.email || "",
+              bio: personalInfo.bio || "",
+              location: personalInfo.location || "",
+              phone: personalInfo.phone || "",
+              org: personalInfo.org || "",
+              website: personalInfo.website || "",
+              socialMedia: {
+                twitter: socialLinks.x_handle || "",
+                linkedin: socialLinks.linkedin || "",
+                instagram: socialLinks.instagram || "",
+                tiktok: socialLinks.tiktok || "",
+                facebook: socialLinks.facebook || "",
+                discord: socialLinks.discord || "",
+                youtube: socialLinks.youtube || "",
+                github: socialLinks.github || "",
+              },
+              preferences: {
+                ...prevUser.preferences,
+                publicProfile: settings.display_public_profile || false,
+                emailNotifications: settings.email_notifications || false,
+                marketProfile: settings.marketplace_profile || false,
+              },
+            }));
+          }
         } else {
-          console.log("No existing settings found, using defaults");
+          console.log("Profile not registered, using defaults");
           setUser((prevUser: UserProfile) => ({
             ...prevUser,
             address: address,
@@ -206,7 +428,15 @@ export default function UserAccount() {
     };
 
     loadUserSettings();
-  }, [isConnected, address, getAccountSettings]);
+  }, [
+    isConnected,
+    address,
+    isProfileRegistered,
+    getProfile,
+    getPersonalInfo,
+    getSocialLinks,
+    getSettings,
+  ]);
 
   // Image Upload Handlers
   const handleImageUpload = useCallback(
@@ -239,8 +469,6 @@ export default function UserAccount() {
     if (!files.length) return {};
 
     try {
-      console.log(`Uploading ${files.length} image(s) to IPFS...`);
-
       const results = await Promise.all(
         files.map(({ file, type, name }) =>
           uploadToIpfs(file!, {
@@ -280,10 +508,20 @@ export default function UserAccount() {
       return;
     }
 
+    // Loading state is managed by the contract hook automatically
+
     try {
-      // Upload images first if any are selected
+      // Step 1: Upload images to IPFS if any are selected
       if (avatarFile || coverFile) {
+        // Show IPFS upload progress
+        toast({
+          title: "Uploading Images",
+          description: "Uploading images to IPFS...",
+        });
+
         const uploadedImages = await uploadImagesToIpfs();
+
+        // Update user state with new image URLs
         setUser((prev) => ({
           ...prev,
           avatarUrl: uploadedImages.avatarUrl || prev.avatarUrl,
@@ -291,67 +529,129 @@ export default function UserAccount() {
         }));
       }
 
-      const timestamp = toEpochTime(new Date().toISOString());
+      // Step 2: Validation
+      const validationErrors = [
+        {
+          field: user.name.trim(),
+          message: "Name is required to save account settings.",
+        },
+        {
+          field: user.username.trim(),
+          message: "Username is required to save account settings.",
+        },
+      ].filter(({ field }) => !field);
 
-      if (!user.name.trim()) {
+      if (validationErrors.length > 0) {
         toast({
           title: "Validation Error",
-          description: "Name is required to save account settings.",
+          description: validationErrors[0].message,
           variant: "destructive",
         });
         return;
       }
 
-      if (!user.username.trim()) {
-        toast({
-          title: "Validation Error",
-          description: "Username is required to save account settings.",
-          variant: "destructive",
-        });
-        return;
-      }
-
+      // Step 3: Prepare contract data
       const { emailNotifications, publicProfile, marketProfile } =
         user.preferences;
 
-      await executeMultipleSettingsCalls([
-        {
-          method: "store_account_details",
-          args: [user.name, user.email, user.username, timestamp],
-        },
-        {
-          method: "store_ip_management_settings",
-          args: ["0", marketProfile ? 1 : 0, timestamp],
-        },
-        {
-          method: "store_notification_settings",
-          args: [
-            emailNotifications,
-            publicProfile,
-            false,
-            marketProfile,
-            timestamp,
-          ],
-        },
-        {
-          method: "store_X_verification",
-          args: [false, timestamp, user.socialMedia.twitter],
-        },
-      ]);
+      const personalInfo: PersonalInfo = {
+        username: user.username,
+        name: user.name,
+        bio: user.bio || "",
+        location: user.location || "",
+        email: user.email,
+        phone: user.phone || "",
+        org: user.org || "",
+        website: user.website || "",
+      };
+
+      const socialLinks: ContractSocialLinks = {
+        x_handle: user.socialMedia.twitter || "",
+        linkedin: user.socialMedia.linkedin || "",
+        instagram: user.socialMedia.instagram || "",
+        tiktok: user.socialMedia.tiktok || "",
+        facebook: user.socialMedia.facebook || "",
+        discord: user.socialMedia.discord || "",
+        youtube: user.socialMedia.youtube || "",
+        github: user.socialMedia.github || "",
+      };
+
+      const profileSettings: ProfileSettings = {
+        display_public_profile: publicProfile,
+        email_notifications: emailNotifications,
+        marketplace_profile: marketProfile,
+      };
 
       toast({
-        title: "Settings Saved!",
-        description:
-          "Your account settings have been saved!.",
+        title: "Checking Profile",
+        description: "Checking if profile exists on blockchain...",
       });
 
-      setIsDrawerOpen(false);
-    } catch (err) {
-      console.error("Multicall transaction failed:", err);
+      const profileExists = await isProfileRegistered(address);
+
       toast({
-        title: "Transaction Failed",
-        description:
-          err instanceof Error ? err.message : "Failed to save settings",
+        title: "Processing Transaction",
+        description: profileExists
+          ? "Updating existing profile..."
+          : "Registering new profile...",
+      });
+
+      let transactionResult;
+      if (!profileExists) {
+        console.log("🆕 Registering new profile...");
+        transactionResult = await registerProfile(
+          personalInfo,
+          socialLinks,
+          profileSettings
+        );
+        console.log(transactionResult);
+      } else {
+        transactionResult = await updateProfileMulticall(personalInfo, socialLinks, profileSettings);
+      }
+
+      console.log("✅ Transaction completed successfully:", transactionResult);
+
+      // Success handling
+      toast({
+        title: "Success! 🎉",
+        description: profileExists
+          ? "Your profile has been updated on the blockchain!"
+          : "Your profile has been registered on the blockchain!",
+      });
+
+      // Close drawer
+      setIsDrawerOpen(false);
+
+      // Optional: Refresh profile data from contract
+      console.log("🔄 Refreshing profile data from blockchain...");
+    } catch (err) {
+    
+      // Determine error type for better user feedback
+      let errorTitle = "Transaction Failed";
+      let errorDescription = "Failed to save settings";
+
+      if (err instanceof Error) {
+        if (
+          err.message.includes("User rejected") ||
+          err.message.includes("rejected")
+        ) {
+          errorTitle = "Transaction Cancelled";
+          errorDescription = "You cancelled the transaction.";
+        } else if (err.message.includes("insufficient")) {
+          errorTitle = "Insufficient Funds";
+          errorDescription =
+            "You don't have enough funds to complete this transaction.";
+        } else if (err.message.includes("network")) {
+          errorTitle = "Network Error";
+          errorDescription = "Network connection issue. Please try again.";
+        } else {
+          errorDescription = err.message;
+        }
+      }
+
+      toast({
+        title: errorTitle,
+        description: errorDescription,
         variant: "destructive",
       });
     }
@@ -361,13 +661,14 @@ export default function UserAccount() {
     user,
     avatarFile,
     coverFile,
-    executeSettingsCall,
+    registerProfile,
+    updateProfileMulticall,
     uploadImagesToIpfs,
     toast,
   ]);
 
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "dark" : ""}`}>
+    <div className="min-h-screen">
       <div className="container mx-auto py-10">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">My Account (Preview)</h1>
@@ -380,357 +681,171 @@ export default function UserAccount() {
               <CardTitle>Profile & Preferences</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Profile Section */}
-              <div className="space-y-4">
-                <div className="relative h-40 rounded-lg overflow-hidden mb-8">
-                  <img
-                    src={coverPreview || "/background.jpg"}
-                    alt="Profile cover"
-                    className="w-full h-full object-cover"
-                  />
-                  <Label
-                    htmlFor="cover-upload"
-                    className="absolute bottom-2 right-2 cursor-pointer"
-                  >
-                    <Input
-                      id="cover-upload"
-                      type="file"
-                      className="hidden"
-                      onChange={(e) => handleImageUpload(e, "cover")}
-                      accept="image/*"
-                    />
-                    <div className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors">
-                      <Upload className="w-4 h-4 mr-2" />
-                      Change Cover
-                    </div>
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <img
-                      src={avatarPreview || "/background.jpg"}
-                      alt="Avatar"
-                      className="w-20 h-20 rounded-full"
-                    />
-                    <Label
-                      htmlFor="avatar-upload"
-                      className="absolute bottom-0 right-0 cursor-pointer"
-                    >
-                      <Input
-                        id="avatar-upload"
-                        type="file"
-                        className="hidden"
-                        onChange={(e) => handleImageUpload(e, "avatar")}
-                        accept="image/*"
-                      />
-                      <div className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 w-8 rounded-full flex items-center justify-center">
-                        <Upload className="w-4 h-4" />
-                      </div>
-                    </Label>
-                  </div>
-                  <div className="space-y-1">
-                    <h2 className="text-2xl font-bold">{user.name}</h2>
-                    <p className="text-sm text-muted-foreground">
-                      {user.address}
-                    </p>
-                  </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="name"
-                        value={user.name}
-                        onChange={(e) =>
-                          handleInputChange("name", e.target.value)
-                        }
-                        className="pl-8"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="username">Username</Label>
-                    <div className="relative">
-                      <User className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="username"
-                        value={user.username}
-                        onChange={(e) =>
-                          handleInputChange("username", e.target.value)
-                        }
-                        className="pl-8"
-                        placeholder="Enter your username"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email (not visible)</Label>
-                    <div className="relative">
-                      <Globe className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        value={user.email}
-                        onChange={(e) =>
-                          handleInputChange("email", e.target.value)
-                        }
-                        className="pl-8"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
-                    <div className="relative">
-                      <Globe className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="website"
-                        value={user.website}
-                        onChange={(e) =>
-                          handleInputChange("website", e.target.value)
-                        }
-                        className="pl-8"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="twitter">X</Label>
-                    <div className="relative">
-                      <Twitter className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="twitter"
-                        value={user.socialMedia.twitter}
-                        onChange={(e) =>
-                          handleSocialMediaChange("twitter", e.target.value)
-                        }
-                        className="pl-8"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="linkedin">LinkedIn</Label>
-                    <div className="relative">
-                      <Linkedin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="linkedin"
-                        value={user.socialMedia.linkedin}
-                        onChange={(e) =>
-                          handleSocialMediaChange("linkedin", e.target.value)
-                        }
-                        className="pl-8"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="github">GitHub</Label>
-                    <div className="relative">
-                      <Github className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="github"
-                        value={user.socialMedia.github}
-                        onChange={(e) =>
-                          handleSocialMediaChange("github", e.target.value)
-                        }
-                        className="pl-8"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    value={user.bio}
-                    onChange={(e) => handleInputChange("bio", e.target.value)}
-                    className="resize-none"
-                  />
-                </div>
-              </div>
+              <ProfileHeader
+                user={user}
+                address={address}
+                coverPreview={coverPreview}
+                avatarPreview={avatarPreview}
+                isCopied={isCopied}
+                onImageUpload={handleImageUpload}
+                onCopyAddress={() => copyToClipboard(address!)}
+                sliceAddress={sliceAddress}
+              />
 
-              {/* Preferences Section */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Account Preferences</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Shield className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <Label>Display Public Profile</Label>
-                        <p className="text-sm text-muted-foreground">
-                          You can make your profile private by disabling this
-                          option.
-                        </p>
-                      </div>
-                    </div>
-                    <Switch
-                      checked={user.preferences.publicProfile}
-                      onCheckedChange={(checked) =>
-                        handlePreferenceChange("publicProfile", checked)
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Bell className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <Label>Email Notifications</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Receive updates about your IP assets and account
-                        </p>
-                      </div>
-                    </div>
-                    <Switch
-                      checked={user.preferences.emailNotifications}
-                      onCheckedChange={(checked) =>
-                        handlePreferenceChange("emailNotifications", checked)
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Eye className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <Label>Marketplace Profile</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Allow others to see your profile and IP portfolio at
-                          the Marketplace
-                        </p>
-                      </div>
-                    </div>
-                    <Switch
-                      checked={user.preferences.marketProfile}
-                      onCheckedChange={(checked) =>
-                        handlePreferenceChange("marketProfile", checked)
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Data Sharing</Label>
-                    <Select
-                      value={user.preferences.dataSharing}
-                      onValueChange={(value) =>
-                        handlePreferenceChange("dataSharing", value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select data sharing level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="anonymous">Anonymous</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
+              <PersonalInfoSection
+                user={user}
+                onUserChange={handleInputChange}
+              />
 
-              <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                <DrawerTrigger asChild>
-                  <Button
-                    className="w-full"
-                    onClick={handleSave}
-                    disabled={
-                      !isConnected || isLoading || ipfsLoading || isUpdating
-                    }
-                  >
-                    {isLoading || ipfsLoading || isUpdating ? (
-                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Save className="w-4 h-4 mr-2" />
-                    )}
-                    {!isConnected
-                      ? "Connect Wallet to Save"
-                      : isLoading
-                      ? "Loading Settings..."
-                      : ipfsLoading
-                      ? `Uploading to IPFS... ${progress}%`
-                      : isUpdating
-                      ? "Processing Transaction..."
-                      : "Save Profile & Preferences"}
-                  </Button>
-                </DrawerTrigger>
-                <DrawerContent>
-                  <DrawerHeader>
-                    <DrawerTitle>Confirm Transaction</DrawerTitle>
-                    <DrawerDescription>
-                      Please review and sign the transaction to save your
-                      profile and preferences to the blockchain.
-                    </DrawerDescription>
-                  </DrawerHeader>
-                  <div className="p-4 space-y-4">
-                    <p>Transaction details:</p>
-                    <ul className="list-disc list-inside">
-                      <li>Update profile information</li>
-                      <li>Update account preferences</li>
-                      <li>Store data on Starknet blockchain</li>
-                    </ul>
+              <SocialLinksSection
+                socialLinks={user.socialMedia}
+                onSocialLinksChange={(links) =>
+                  setUser((prev) => ({ ...prev, socialMedia: links }))
+                }
+              />
 
-                    <Button
-                      onClick={handleTransactionSign}
-                      className="w-full"
-                      disabled={isUpdating}
-                    >
-                      {isUpdating ? (
-                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                      ) : (
-                        <Key className="w-4 h-4 mr-2" />
-                      )}
-                      {isUpdating
-                        ? "Processing Transaction..."
-                        : "Sign and Submit"}
-                    </Button>
-                  </div>
-                </DrawerContent>
-              </Drawer>
-            </CardContent>
-          </Card>
+              <AdditionalInfoSection
+                user={{
+                  phone: user.phone,
+                  location: user.location,
+                  organization: user.org,
+                }}
+                onUserChange={handleInputChange}
+              />
 
-          {/* User Stats Widgets */}
-          {Object.entries(user.stats).map(([key, value]) => (
-            <Card key={key}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {key.split(/(?=[A-Z])/).join(" ")}
-                </CardTitle>
-                {key === "rewards" && (
-                  <Award className="h-4 w-4 text-muted-foreground" />
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{value}</div>
-              </CardContent>
-            </Card>
-          ))}
-
-          {/* Recent Transactions */}
-          <Card className="col-span-full">
-            <CardHeader>
-              <CardTitle>Recent Transactions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Asset</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {user.transactions.map((tx) => (
-                    <TableRow key={tx.id}>
-                      <TableCell>{tx.type}</TableCell>
-                      <TableCell>{tx.asset}</TableCell>
-                      <TableCell>{tx.date}</TableCell>
-                      <TableCell>{tx.status}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <PreferencesSection
+                settings={{
+                  isPrivate: !user.preferences.publicProfile,
+                  emailNotifications: user.preferences.emailNotifications,
+                  profileVisibility: user.preferences.dataSharing,
+                }}
+                onSettingsChange={(field, value) => {
+                  if (field === "isPrivate") {
+                    handlePreferenceChange("publicProfile", !value);
+                  } else if (field === "emailNotifications") {
+                    handlePreferenceChange(
+                      "emailNotifications",
+                      value as boolean
+                    );
+                  } else if (field === "profileVisibility") {
+                    handlePreferenceChange("dataSharing", value as string);
+                  }
+                }}
+              />
             </CardContent>
           </Card>
         </div>
+
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <DrawerTrigger asChild>
+            <Button
+              className="w-full"
+              onClick={handleSave}
+              disabled={
+                !isConnected ||
+                isLoading ||
+                isIpfsUploading ||
+                isContractUpdating
+              }
+            >
+              {isLoading || isIpfsUploading || isContractUpdating ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              {!isConnected
+                ? "Connect Wallet to Save"
+                : isLoading
+                ? "Loading Settings..."
+                : isIpfsUploading
+                ? `Uploading to IPFS... ${uploadProgress}%`
+                : isContractUpdating
+                ? "Processing Transaction..."
+                : "Save Profile & Preferences"}
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Confirm Transaction</DrawerTitle>
+              <DrawerDescription>
+                Please review and sign the transaction to save your profile and
+                preferences to the blockchain.
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="p-4 space-y-4">
+              <p>Transaction details:</p>
+              <ul className="list-disc list-inside">
+                <li>Update profile information</li>
+                <li>Update account preferences</li>
+                <li>Store data on Starknet blockchain</li>
+              </ul>
+
+              <Button
+                onClick={handleTransactionSign}
+                className="w-full"
+                disabled={isContractUpdating}
+              >
+                {isContractUpdating ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Key className="w-4 h-4 mr-2" />
+                )}
+                {isContractUpdating
+                  ? "Processing Transaction..."
+                  : "Sign and Submit"}
+              </Button>
+            </div>
+          </DrawerContent>
+        </Drawer>
       </div>
+
+      {/* User Stats Widgets */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {Object.entries(user.stats).map(([key, value]) => (
+          <Card key={key}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {key.split(/(?=[A-Z])/).join(" ")}
+              </CardTitle>
+              {key === "rewards" && (
+                <Award className="h-4 w-4 text-muted-foreground" />
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{value}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Recent Transactions */}
+      <Card className="col-span-full">
+        <CardHeader>
+          <CardTitle>Recent Transactions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Type</TableHead>
+                <TableHead>Asset</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {user.transactions.map((tx) => (
+                <TableRow key={tx.id}>
+                  <TableCell>{tx.type}</TableCell>
+                  <TableCell>{tx.asset}</TableCell>
+                  <TableCell>{tx.date}</TableCell>
+                  <TableCell>{tx.status}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
