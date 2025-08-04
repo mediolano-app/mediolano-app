@@ -56,14 +56,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Link from "next/link"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import type { IPType } from "@/types/asset"
+import type { IPType, LicenseType } from "@/types/asset"
 import { 
   getKnownCids, 
   loadIPFSMetadataInBackground 
 } from '@/utils/ipfs';
 
-// temporary data - would be mixed with IPFS data if is necessary
-import { assets as mockAssets, recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
+import { usePortfolio } from "@/hooks/usePortfolio"
+import { recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
 
 interface EnhancedAsset {
   id: string;
@@ -91,50 +91,30 @@ export default function AssetsPage() {
   const [filterCollection, setFilterCollection] = useState<string>("all")
   const [filterLicense, setFilterLicense] = useState<string>("all")
   const [filterTemplate, setFilterTemplate] = useState<string>("all")
+  const { userAssets, isLoading, error } = usePortfolio();
   const [assets, setAssets] = useState<EnhancedAsset[]>([])
 
-  console.log(assets);
-
   useEffect(() => {
-    // Cargar datos y enriquecerlos con información de IPFS
-    const loadAssetsWithIPFS = async () => {
-      setLoading(true);
-      try {
-        // Obtener los CIDs conocidos
-        const knownCids = getKnownCids();
-
-        // Enriquecer los assets mock con información de IPFS
-        const enhancedAssets = mockAssets.map((asset) => {
-          const ipfsCid = knownCids[asset.id] || null;
-          
-          // Retornar el asset enriquecido
-          return {
-            ...asset,
-            ...(ipfsCid && { ipfsCid })
-          } as EnhancedAsset;
-        });
-
-        // Actualizar el estado con los assets enriquecidos inmediatamente
-        setAssets(enhancedAssets);
-        setLoading(false);
-
-        // Cargar metadatos de IPFS en segundo plano
-        loadIPFSMetadataInBackground(
-          enhancedAssets,
-          (updatedAssets) => {
-            setAssets(updatedAssets);
-          }
-        );
-      } catch (error) {
-        console.error("Error loading assets with IPFS data:", error);
-        // En caso de error, usar los datos mock sin modificar
-        setAssets(mockAssets as EnhancedAsset[]);
-        setLoading(false);
-      }
-    };
-
-    loadAssetsWithIPFS();
-  }, []);
+    // Map userAssets to EnhancedAsset format if needed
+    const mapped = userAssets.map((asset) => ({
+      id: asset.id,
+      name: asset.name,
+      creator: "", // If available in asset
+      verified: false, // If available in asset
+      image: asset.image,
+      collection: asset.collection,
+      licenseType: "Creative Commons" as LicenseType,
+      description: "",
+      registrationDate: "",
+      type: "NFT" as IPType,
+      templateType: undefined,
+      protectionLevel: 0,
+      value: "0",
+      ipfsCid: undefined,
+      views: 0,
+    }))
+    setAssets(mapped)
+  }, [userAssets])
 
 
 
@@ -865,13 +845,17 @@ export default function AssetsPage() {
             </TabsList>
 
             <TabsContent value="all">
-              {loading ? (
+              {isLoading ? (
                 <div className="grid grid-cols-3 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {Array(8)
                     .fill(0)
                     .map((_, i) => (
                       <NFTSkeleton key={i} />
                     ))}
+                </div>
+              ) : error ? (
+                <div className="text-center py-12 border rounded-lg text-red-500">
+                  {error}
                 </div>
               ) : sortedAssets.length === 0 ? (
                 <div className="text-center py-12 border rounded-lg">
@@ -941,7 +925,7 @@ export default function AssetsPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
                         <div className="p-4 text-white">
                           <h3 className="text-xl font-bold">{collection.name}</h3>
-                          <p className="text-sm opacity-90">{collection.assetCount} assets</p>
+                          <p className="text-sm opacity-90">{collection.assets} assets</p>
                         </div>
                       </div>
                     </div>
@@ -949,7 +933,7 @@ export default function AssetsPage() {
                       <div className="flex justify-between items-center mb-4">
                         <div>
                           <p className="text-sm text-muted-foreground">Total Value</p>
-                          <p className="font-medium">{collection.totalValue}</p>
+                          <p className="font-medium">{collection.totalVolume}</p>
                         </div>
                         <Badge
                           variant="outline"

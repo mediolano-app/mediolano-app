@@ -72,8 +72,54 @@ export function usePortfolio() {
       
       try {
         setIsLoadingTokens(true);
-        const result = await contract.call("list_user_tokens", [account.address]);
-        setUserTokens(Array.isArray(result) ? result.map(token => token.toString()) : []);
+        // Step 1: Get all collection IDs for the user
+        const collectionIdsResult = await contract.call("list_user_collections", [account.address]);
+        // u256 to hex utility
+        function u256ToHex(u256) {
+          if (!u256 || typeof u256 !== 'object' || u256.low === undefined || u256.high === undefined) return null;
+          const low = BigInt(u256.low);
+          const high = BigInt(u256.high);
+          return '0x' + (high << 128n | low).toString(16);
+        }
+        const isValidHex = (v: string) => /^0x[0-9a-fA-F]+$/.test(v) && v !== "0x";
+        let collectionIds = Array.isArray(collectionIdsResult)
+          ? collectionIdsResult.map(cid => u256ToHex(cid)).filter(cid => isValidHex(cid))
+          : [];
+        // If the only value is "0x", treat as empty
+        if (collectionIds.length === 1 && collectionIds[0] === "0x") {
+          collectionIds = [];
+        }
+        if (collectionIds.length === 0) {
+          console.warn("No valid collection IDs found for user.");
+          setUserTokens([]);
+          setIsLoadingTokens(false);
+          return;
+        }
+        let allTokenIds: string[] = [];
+        // Step 2: For each collection, get user tokens
+        for (const collectionId of collectionIds) {
+          if (!isValidHex(collectionId)) {
+            console.warn(`Skipping invalid collectionId: ${collectionId}`);
+            continue;
+          }
+          try {
+            const tokenIdsResult = await contract.call("list_user_tokens_per_collection", [collectionId, account.address]);
+            let validTokenIds = Array.isArray(tokenIdsResult)
+              ? tokenIdsResult.map(tid => u256ToHex(tid)).filter(tid => isValidHex(tid))
+              : [];
+            // If the only value is "0x", treat as empty
+            if (validTokenIds.length === 1 && validTokenIds[0] === "0x") {
+              validTokenIds = [];
+            }
+            if (validTokenIds.length !== (Array.isArray(tokenIdsResult) ? tokenIdsResult.length : 0)) {
+              console.warn(`Some invalid tokenIds found in collection ${collectionId}:`, tokenIdsResult);
+            }
+            allTokenIds = allTokenIds.concat(validTokenIds.filter((tid): tid is string => tid !== null));
+          } catch (err) {
+            console.error(`Error fetching tokens for collection ${collectionId}:`, err);
+          }
+        }
+        setUserTokens(allTokenIds.filter((tid): tid is string => tid !== null));
         setIsLoadingTokens(false);
       } catch (err) {
         console.error("Error fetching user tokens:", err);
@@ -89,6 +135,10 @@ export function usePortfolio() {
   const fetchTokenMetadata = useCallback(async (tokenId: string): Promise<UserAsset | null> => {
     try {
       if (!contract) return null;
+      if (!/^0x[0-9a-fA-F]+$/.test(tokenId)) {
+        console.warn(`Skipping invalid tokenId for metadata fetch: ${tokenId}`);
+        return null;
+      }
       const tokenURI = await contract.call("token_uri", [num.toBigInt(tokenId)]);
       if (!tokenURI) return null;
       const tokenURIString = tokenURI.toString();
@@ -222,9 +272,25 @@ export function usePortfolio() {
       // This triggers a refetch of the contract data
       if (account && contract) {
         setIsLoadingTokens(true);
-        contract.call("list_user_tokens", [account.address])
-          .then(result => {
-            setUserTokens(Array.isArray(result) ? result.map(token => token.toString()) : []);
+        // Step 1: Get all collection IDs for the user
+        contract.call("list_user_collections", [account.address])
+          .then(async (collectionIdsResult) => {
+            const isValidHex = (v: string) => /^0x[0-9a-fA-F]+$/.test(v);
+            const collectionIds = Array.isArray(collectionIdsResult)
+              ? collectionIdsResult.map(cid => cid.toString()).filter(cid => isValidHex(cid))
+              : [];
+            let allTokenIds: string[] = [];
+            for (const collectionId of collectionIds) {
+              try {
+                const tokenIdsResult = await contract.call("list_user_tokens_per_collection", [collectionId, account.address]);
+                if (Array.isArray(tokenIdsResult)) {
+                  allTokenIds = allTokenIds.concat(tokenIdsResult.map(tid => tid.toString()).filter(tid => isValidHex(tid)));
+                }
+              } catch (err) {
+                console.error(`Error fetching tokens for collection ${collectionId}:`, err);
+              }
+            }
+            setUserTokens(allTokenIds.filter((tid): tid is string => tid !== null));
             setIsLoadingTokens(false);
           })
           .catch(err => {
