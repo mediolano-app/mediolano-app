@@ -1,28 +1,55 @@
 "use client"
 
 import { useState } from "react"
-import { getCollections, getNFTs } from "@/lib/mockupPortfolioData"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Grid3X3, Wallet, BarChart3 } from "lucide-react"
+import { Collection } from "@/hooks/use-collection"
 
-export function CollectionStats() {
+interface CollectionStatsProps {
+  totalCollections: number;
+  totalAssets: number;
+  totalValue: number;
+  topCollection: {
+    name: string;
+    value: number;
+    tokenCount: number;
+  };
+  collections?: Collection[]; // Add collections data
+}
+
+export function CollectionStats({
+  totalCollections,
+  totalAssets,
+  totalValue,
+  topCollection,
+  collections = []
+}: CollectionStatsProps) {
   const [timeframe, setTimeframe] = useState<"day" | "week" | "month" | "year">("month")
-  const collections = getCollections()
-  const nfts = getNFTs()
 
-  // Calculate collection stats
-  const totalCollections = collections.length
-  const totalNFTs = nfts.length
-  const totalValue = nfts.reduce((sum, nft) => sum + nft.price, 0)
-  const averageCollectionSize = totalCollections > 0 ? totalNFTs / totalCollections : 0
+  // Calculate average collection size based on actual collection data
+  const calculateAverageCollectionSize = () => {
+    if (!collections || collections.length === 0) {
+      return totalCollections > 0 ? totalAssets / totalCollections : 0;
+    }
+    
+    // Sum up all collection item counts
+    const totalItems = collections.reduce((sum, collection) => {
+      const itemCount = collection.totalMinted - collection.totalBurned;
+      return sum + itemCount;
+    }, 0);
+    
+    return totalItems / collections.length;
+  };
 
-  // Mock data for collection growth
+  const averageCollectionSize = calculateAverageCollectionSize();
+
+  // Mock data for collection growth 
   const growthData = {
-    day: 0.5,
-    week: 2.3,
-    month: 8.7,
-    year: 32.1,
+    day: 0.0,
+    week: 0.0,
+    month: 0.0,
+    year: 0.0,
   }
 
   return (
@@ -34,7 +61,7 @@ export function CollectionStats() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{totalCollections}</div>
-          <p className="text-xs text-muted-foreground">Across {totalNFTs} NFTs</p>
+          <p className="text-xs text-muted-foreground">Across {totalAssets} NFTs</p>
         </CardContent>
       </Card>
 
@@ -44,8 +71,8 @@ export function CollectionStats() {
           <Wallet className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalValue.toFixed(2)} ETH</div>
-          <p className="text-xs text-muted-foreground">≈ ${(totalValue * 3500).toLocaleString()}</p>
+          <div className="text-2xl font-bold">{totalValue.toFixed(2)} STRK</div>
+          <p className="text-xs text-muted-foreground">≈ ${(totalValue / 10 ** 18).toLocaleString()}</p>
         </CardContent>
       </Card>
 
@@ -53,7 +80,7 @@ export function CollectionStats() {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Collection Growth</CardTitle>
           <div>
-            <Tabs defaultValue={timeframe} onValueChange={(v) => setTimeframe(v as any)}>
+            <Tabs defaultValue={timeframe} onValueChange={(v) => setTimeframe(v as "day" | "week" | "month" | "year")}>
               <TabsList className="h-7 w-fit">
                 <TabsTrigger value="day" className="text-xs px-2">
                   1D
@@ -83,11 +110,10 @@ export function CollectionStats() {
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{averageCollectionSize.toFixed(1)}</div>
+          <div className="text-2xl font-bold">{Math.round(averageCollectionSize)}</div>
           <p className="text-xs text-muted-foreground">NFTs per collection</p>
         </CardContent>
       </Card>
     </div>
   )
 }
-

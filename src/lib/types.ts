@@ -20,14 +20,113 @@ export interface Item {
 }
 
 export interface Collection {
-  id: string
-  name: string
-  description?: string
-  image: string
-  itemCount: number
-  floorPrice?: number
-  owner?: string
-  assets?: string[]
+  id: string | bigint;
+  name: string;
+  description: string;
+  image: string;
+  nftAddress: string;
+  owner: string;
+  isActive: boolean;
+  totalMinted: number;
+  totalBurned: number;
+  totalTransfers: number;
+  lastMintTime: string;
+  lastBurnTime: string;
+  lastTransferTime: string;
+  itemCount: number;
+  nftBalance?: number;
+  totalSupply: number;
+  ownerBalance?: number;
+  baseUri: string;
+  floorPrice?: number;
+  symbol?: string;
+  type?: string;
+  visibility?: string;
+  enableVersioning?: boolean;
+  allowComments?: boolean;
+  requireApproval?: boolean;
+}
+
+/**
+ * Data validation utilities for Collection objects
+ */
+export class CollectionValidator {
+  /**
+   * Validates if an object is a valid Collection
+   */
+  static isValid(collection: any): collection is Collection {
+    if (!collection || typeof collection !== 'object') {
+      return false;
+    }
+
+    const requiredFields = [
+      'id', 'name', 'description', 'image', 'nftAddress', 
+      'owner', 'isActive', 'totalMinted', 'totalBurned', 
+      'totalTransfers', 'lastMintTime', 'lastBurnTime', 
+      'lastTransferTime', 'itemCount', 'totalSupply', 'baseUri'
+    ];
+
+    // Check required fields
+    if (!requiredFields.every(field => field in collection)) {
+      return false;
+    }
+
+    // Type and value validation rules
+    const validations = [
+      typeof collection.name === 'string' && collection.name.trim() !== '',
+      typeof collection.description === 'string',
+      typeof collection.image === 'string',
+      typeof collection.isActive === 'boolean',
+      typeof collection.totalMinted === 'number' && collection.totalMinted >= 0,
+      typeof collection.totalBurned === 'number' && collection.totalBurned >= 0,
+      typeof collection.itemCount === 'number' && collection.itemCount >= 0,
+    ];
+
+    return validations.every(Boolean);
+  }
+
+  /**
+   * Normalizes a Collection object to ensure consistent data types
+   */
+  static normalize(collection: any): Collection {
+    return {
+      id: collection.id,
+      name: String(collection.name || '').trim(),
+      description: String(collection.description || ''),
+      image: String(collection.image || '/placeholder.svg'),
+      nftAddress: String(collection.nftAddress || ''),
+      owner: String(collection.owner || ''),
+      isActive: Boolean(collection.isActive),
+      totalMinted: Number(collection.totalMinted) || 0,
+      totalBurned: Number(collection.totalBurned) || 0,
+      totalTransfers: Number(collection.totalTransfers) || 0,
+      lastMintTime: String(collection.lastMintTime || ''),
+      lastBurnTime: String(collection.lastBurnTime || ''),
+      lastTransferTime: String(collection.lastTransferTime || ''),
+      itemCount: Number(collection.itemCount) || 0,
+      nftBalance: collection.nftBalance !== undefined ? Number(collection.nftBalance) : undefined,
+      totalSupply: Number(collection.totalSupply) || 0,
+      ownerBalance: collection.ownerBalance !== undefined ? Number(collection.ownerBalance) : undefined,
+      baseUri: String(collection.baseUri || ''),
+      floorPrice: collection.floorPrice !== undefined ? Number(collection.floorPrice) : undefined,
+      symbol: collection.symbol ? String(collection.symbol) : undefined,
+      type: collection.type ? String(collection.type) : undefined,
+      visibility: collection.visibility ? String(collection.visibility) : undefined,
+      enableVersioning: collection.enableVersioning !== undefined ? Boolean(collection.enableVersioning) : undefined,
+      allowComments: collection.allowComments !== undefined ? Boolean(collection.allowComments) : undefined,
+      requireApproval: collection.requireApproval !== undefined ? Boolean(collection.requireApproval) : undefined,
+    };
+  }
+
+  /**
+   * Validates and normalizes a collection, returning null if invalid
+   */
+  static validateAndNormalize(collection: any): Collection | null {
+    if (!this.isValid(collection)) {
+      return null;
+    }
+    return this.normalize(collection);
+  }
 }
 
 export interface Offer {

@@ -43,6 +43,11 @@ export const GAS_SPONSORSHIP_CONFIG = {
   MAX_SPONSORED_AMOUNT: process.env.NEXT_PUBLIC_MAX_SPONSORED_AMOUNT || "1000000000000000", // 0.001 ETH in wei
 } as const;
 
+/** List of featured collection IDs (string) */
+export const FEATURED_COLLECTION_IDS = [
+  "20", 
+];
+
 
 // Contract addresses   
 //export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
