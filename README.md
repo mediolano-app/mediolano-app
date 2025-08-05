@@ -1,7 +1,7 @@
 
 Quick links:
 <br>
-<a href="https://ip.mediolano.app">Mediolano Dapp (Sepolia)</a>
+<a href="https://ip.mediolano.app">Mediolano Dapp</a>
 <br>
 <a href="https://mediolano.xyz">Website mediolano.xyz</a>
 <br>
@@ -12,6 +12,9 @@ Quick links:
 
 > [!IMPORTANT]
 > Mediolano dapp is in constant development. Use for testing purposes only. 
+
+<img width="1566" height="894" alt="Mediolano Dapp" src="https://github.com/user-attachments/assets/4fa365f6-51f6-4af9-9df1-2bff2eec13e3" />
+
 
 ## Programmable IP for the Integrity Web
 
