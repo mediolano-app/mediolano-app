@@ -145,7 +145,7 @@ async function processCollectionMetadata(
     description: ipfsMetadata?.description || "No description",
     image: image,
     nftAddress: nftAddress,
-    owner: metadata.owner ? `0x${BigInt(metadata.owner).toString(16)}` : "",
+    owner: metadata.owner && metadata.owner !== "0" && metadata.owner !== "0x0" ? `0x${BigInt(metadata.owner).toString(16)}` : "",
     isActive: metadata.is_active,
     totalMinted: parseInt(metadata.total_minted) || 0,
     totalBurned: parseInt(metadata.total_burned) || 0,

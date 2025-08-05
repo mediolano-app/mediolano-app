@@ -8,7 +8,7 @@ import {
   forwardRef,
 } from "react";
 
-import { Upload, X, CheckCircle, LinkIcon, Camera } from "lucide-react";
+import { Upload, X, CheckCircle, LinkIcon, Camera, AlertCircle } from "lucide-react";
 
 import Image from "next/image";
 
@@ -285,6 +285,7 @@ MediaUploader.displayName = "MediaUploader";
 
 export interface CoverImageUploaderRef {
   getFile: () => File | null;
+  getImageUrl: () => string;
   clear: () => void;
 }
 
@@ -300,16 +301,48 @@ const CoverImageUploader = forwardRef<
 >(({ label = "Cover Image", initialImage = "", onChange }, ref) => {
   const [coverImage, setCoverImage] = useState<string>(initialImage);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [imageUrlInput, setImageUrlInput] = useState("");
+  const [inputMethod, setInputMethod] = useState<"upload" | "url">("upload");
+  const [isUrlValid, setIsUrlValid] = useState(false);
+  const [isUrlValidating, setIsUrlValidating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Default fallback image for mobile wallet compatibility
+  const DEFAULT_IMAGE = "/placeholder.svg";
 
   useImperativeHandle(ref, () => ({
     getFile: () => coverFile,
+    getImageUrl: () => {
+      // Return the current image URL, or default if none provided
+      if (coverFile && coverImage) return coverImage;
+      if (imageUrlInput && isUrlValid) return imageUrlInput;
+      return DEFAULT_IMAGE;
+    },
     clear: () => {
       setCoverImage("");
       setCoverFile(null);
+      setImageUrlInput("");
+      setIsUrlValid(false);
       onChange("");
     },
   }));
+
+  const validateImageUrl = async (url: string): Promise<boolean> => {
+    if (!url) return false;
+    
+    try {
+      new URL(url);
+      
+      // Check if the URL is accessible
+      const response = await fetch(url, { method: 'HEAD' });
+      const contentType = response.headers.get('content-type');
+      
+      return contentType?.startsWith('image/') || false;
+    } catch (error) {
+      console.warn('Invalid image URL:', error);
+      return false;
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -320,70 +353,223 @@ const CoverImageUploader = forwardRef<
       const result = event.target?.result as string;
       setCoverImage(result);
       setCoverFile(file);
+      // Clear URL input when uploading file
+      setImageUrlInput("");
+      setIsUrlValid(false);
       onChange(result, file);
     };
     reader.readAsDataURL(file);
   };
 
+  const handleUrlChange = async (url: string) => {
+    setImageUrlInput(url);
+    
+    if (url) {
+      // Reset validation state while checking
+      setIsUrlValid(false);
+      setIsUrlValidating(true);
+      
+      const isValid = await validateImageUrl(url);
+      setIsUrlValid(isValid);
+      setIsUrlValidating(false);
+      
+      if (isValid) {
+        // Clear any uploaded file when using URL
+        setCoverFile(null);
+        setCoverImage("");
+        onChange(url);
+      } else {
+        onChange("");
+      }
+    } else {
+      setIsUrlValid(false);
+      setIsUrlValidating(false);
+      onChange("");
+    }
+  };
+
   const clearImage = () => {
     setCoverImage("");
     setCoverFile(null);
+    setImageUrlInput("");
+    setIsUrlValid(false);
     onChange("");
   };
 
+  const clearUrlInput = () => {
+    setImageUrlInput("");
+    setIsUrlValid(false);
+    onChange("");
+  };
+
+
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       <Label htmlFor="cover-image" className="font-medium">
         {label}
+        <Badge variant="secondary" className="ml-2 text-xs">
+          Optional
+        </Badge>
       </Label>
 
-      <div
-        className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer"
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <Input
-          id="cover-image"
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleImageUpload}
-        />
+             <Tabs
+         value={inputMethod}
+         onValueChange={(val) => {
+           const newMethod = val as "upload" | "url";
+           setInputMethod(newMethod);
+           
+           // Clear the other method when switching tabs
+           if (newMethod === "upload") {
+             // Switching to upload tab - clear URL input
+             setImageUrlInput("");
+             setIsUrlValid(false);
+             setIsUrlValidating(false);
+           } else {
+             // Switching to URL tab - clear uploaded file
+             setCoverFile(null);
+             setCoverImage("");
+           }
+           onChange("");
+         }}
+       >
+        <TabsList className="grid w-full grid-cols-2 bg-muted/50">
+          <TabsTrigger
+            value="upload"
+            className="data-[state=active]:bg-background"
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Upload File
+          </TabsTrigger>
+          <TabsTrigger
+            value="url"
+            className="data-[state=active]:bg-background"
+          >
+            <LinkIcon className="w-4 h-4 mr-2" />
+            Image URL
+          </TabsTrigger>
+        </TabsList>
 
-        {coverImage ? (
-          <div className="space-y-2">
-            <Image
-              src={coverImage}
-              alt="Cover preview"
-              width={400}
-              height={200}
-              className="mx-auto max-h-[200px] rounded-lg object-cover"
+        <TabsContent value="upload" className="mt-4">
+          <div
+            className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/20 transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Input
+              id="cover-image"
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageUpload}
             />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-2"
-              onClick={(e) => {
-                e.stopPropagation();
-                clearImage();
-              }}
-            >
-              Remove Image
-            </Button>
+
+            {coverImage ? (
+              <div className="space-y-2">
+                <Image
+                  src={coverImage}
+                  alt="Cover preview"
+                  width={400}
+                  height={200}
+                  className="mx-auto max-h-[200px] rounded-lg object-cover"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearImage();
+                  }}
+                >
+                  Remove Image
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center">
+                <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  Drag and drop or click to select an image
+                </p>
+                <Button type="button" variant="outline">
+                  Select Image
+                </Button>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center">
-            <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground mb-2">
-              Drag and drop or click to select an image
-            </p>
-            <Button type="button" variant="outline">
-              Select Image
-            </Button>
-          </div>
-        )}
-      </div>
+        </TabsContent>
+
+                 <TabsContent value="url" className="mt-4">
+           <div className="space-y-3">
+             <div className="flex space-x-2">
+               <Input
+                 placeholder="https://example.com/image.jpg"
+                 value={imageUrlInput}
+                 onChange={(e) => handleUrlChange(e.target.value)}
+                 className="bg-background/50 border-border/50 focus:border-primary flex-1"
+               />
+               {imageUrlInput && (
+                 <Button
+                   type="button"
+                   variant="outline"
+                   size="sm"
+                   onClick={clearUrlInput}
+                 >
+                   Clear
+                 </Button>
+               )}
+             </div>
+             
+                           {imageUrlInput && (
+                <div className="flex items-center space-x-2">
+                  {isUrlValidating ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-sm text-muted-foreground">
+                        Validating URL...
+                      </span>
+                    </>
+                  ) : isUrlValid ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm text-muted-foreground">
+                        Valid image URL
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      <span className="text-sm text-muted-foreground">
+                        Invalid or inaccessible image URL
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+             
+             {imageUrlInput && isUrlValid && (
+               <div className="border rounded-lg overflow-hidden bg-muted/20">
+                 <Image
+                   src={imageUrlInput}
+                   alt="URL Preview"
+                   width={400}
+                   height={200}
+                   className="w-full h-32 object-cover"
+                 />
+               </div>
+             )}
+           </div>
+         </TabsContent>
+      </Tabs>
+             
+       {!coverFile && !imageUrlInput && (
+         <div className="mt-4">
+           <p className="text-xs text-muted-foreground">
+             No image provided. A default placeholder will be used for your collection.
+           </p>
+         </div>
+       )}
     </div>
   );
 });
