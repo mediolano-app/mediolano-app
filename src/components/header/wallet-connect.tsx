@@ -302,7 +302,7 @@ export function WalletConnect() {
                 </Button>
               ))}
               <div className="border-t pt-4">
-                <label className="flex items-center text-sm text-muted mb-3 cursor-pointer">
+                <label className="flex items-center text-sm mb-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={withApproval}

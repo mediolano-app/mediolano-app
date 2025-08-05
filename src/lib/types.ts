@@ -243,6 +243,11 @@ export interface SocialMediaLinks {
   twitter: string;
   linkedin: string;
   github: string;
+  instagram: string;
+  tiktok: string;
+  facebook: string;
+  discord: string;
+  youtube: string;
 }
 
 export interface UserPreferences {
@@ -275,6 +280,9 @@ export interface UserProfile {
   username: string;
   website: string;
   email: string;
+  phone: string;
+  location: string;
+  org: string;
   socialMedia: SocialMediaLinks;
   avatarUrl: string;
   coverUrl: string;
