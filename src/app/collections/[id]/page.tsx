@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft, Grid3X3, BarChart3, TrendingUp, Star, Plus, Edit } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useGetCollection, Collection } from "@/hooks/use-collection"
-import { useParams } from "next/navigation"
+import { useGetCollection } from "@/hooks/use-collection"
+import { useParams, useRouter } from "next/navigation"
+import { Collection } from "@/lib/types"
 import { shortenAddress } from "@/lib/utils"
 
 export default function CollectionDetailPage() {
@@ -20,6 +21,7 @@ export default function CollectionDetailPage() {
   const [collection, setCollection] = useState<Collection | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
 
   useEffect(() => {
     const loadCollection = async () => {
@@ -44,10 +46,8 @@ export default function CollectionDetailPage() {
     return (
       <div className="container mx-auto py-10 xl:px-4">
         <div className="flex items-center gap-2 mb-6">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/collections">
+          <Button variant="ghost" onClick={()=> router.back()} size="icon" asChild>
               <ArrowLeft className="h-4 w-4" />
-            </Link>
           </Button>
           <h1 className="text-2xl font-bold">Loading Collection...</h1>
         </div>

@@ -10,6 +10,7 @@ import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
 import { fetchOneByOne } from "@/lib/utils";
 
 import { fetchIPFSMetadata, processIPFSHashToUrl } from "@/utils/ipfs";
+import { Collection, CollectionValidator } from "@/lib/types";
 
 export interface ICreateCollection {
   name: string;
@@ -46,29 +47,6 @@ export interface CollectionMetadata {
 }
 
 
-export interface Collection {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  nftAddress: string;
-  owner: string;
-  isActive: boolean;
-  totalMinted: number;
-  totalBurned: number;
-  totalTransfers: number;
-  lastMintTime: string;
-  lastBurnTime: string;
-  lastTransferTime: string;
-  itemCount: number;
-  nftBalance?: number;
-  totalSupply: number;
-  ownerBalance?: number;
-  baseUri: string;
-  floorPrice?: number;
-}
-
-
 
 export interface UseCollectionReturn {
   createCollection: (formData: ICreateCollection) => Promise<void>;
@@ -78,7 +56,7 @@ export interface UseCollectionReturn {
 
 const COLLECTION_CONTRACT_ABI = ipCollectionAbi as Abi;
 
-// function to process collection metadata
+// function to process collection metadata with validation
 async function processCollectionMetadata(
   id: string, 
   metadata: CollectionMetadata
@@ -90,7 +68,6 @@ async function processCollectionMetadata(
   if (typeof baseUri === 'string') {
     // Process baseUri
     const processedBaseUri = processIPFSHashToUrl(baseUri, '/placeholder.svg');
-    
     // Check if the processed URL is valid for IPFS metadata fetching
     if (processedBaseUri && processedBaseUri.includes('/ipfs/')) {
       baseUri = processedBaseUri;
@@ -134,18 +111,30 @@ async function processCollectionMetadata(
     image = baseUri;
   }
   
-  // Final validation for image URL
-  if (image && (image.startsWith('undefined/') || (!image.startsWith('http') && !image.startsWith('/')))) {
-    image = '/placeholder.svg';
+  // Additional check: if the IPFS metadata itself has "undefined/" prefix, handle it
+  if (ipfsMetadata && typeof ipfsMetadata === 'object') {
+    // Check if any field in the metadata has "undefined/" prefix
+    Object.keys(ipfsMetadata).forEach(key => {
+      const value = ipfsMetadata[key];
+      if (typeof value === 'string' && value.startsWith('undefined/')) {
+        const cid = value.replace('undefined/', '');
+        if (cid.match(/^[a-zA-Z0-9]{34,}$/)) {
+          ipfsMetadata[key] = `https://gateway.pinata.cloud/ipfs/${cid}`;
+        }
+      }
+    });
   }
-  
-  return {
-    id: metadata.id,
-    name: ipfsMetadata?.name || cleanName || `Collection ${id}`,
-    description: ipfsMetadata?.description || "No description",
+
+  // Create the collection object
+  const collection: Collection = {
+    id: id,
+    name: cleanName || 'Unnamed Collection',
+    description: ipfsMetadata?.description || 'No description available',
     image: image,
     nftAddress: nftAddress,
+
     owner: metadata.owner && metadata.owner !== "0" && metadata.owner !== "0x0" ? `0x${BigInt(metadata.owner).toString(16)}` : "",
+
     isActive: metadata.is_active,
     totalMinted: parseInt(metadata.total_minted) || 0,
     totalBurned: parseInt(metadata.total_burned) || 0,
@@ -153,11 +142,42 @@ async function processCollectionMetadata(
     lastMintTime: metadata.last_mint_time,
     lastBurnTime: metadata.last_burn_time,
     lastTransferTime: metadata.last_transfer_time,
-    itemCount: parseInt(metadata.total_minted) || 0,
+    itemCount: (parseInt(metadata.total_minted) || 0) - (parseInt(metadata.total_burned) || 0),
     totalSupply: totalSupply,
     baseUri: baseUri,
-    ...ipfsMetadata,
+    symbol: metadata.symbol,
+    type: typeof ipfsMetadata?.type === 'string' ? ipfsMetadata.type : undefined,
+    visibility: typeof ipfsMetadata?.visibility === 'string' ? ipfsMetadata.visibility : undefined,
+    enableVersioning: typeof ipfsMetadata?.enableVersioning === 'boolean' ? ipfsMetadata.enableVersioning : undefined,
+    allowComments: typeof ipfsMetadata?.allowComments === 'boolean' ? ipfsMetadata.allowComments : undefined,
+    requireApproval: typeof ipfsMetadata?.requireApproval === 'boolean' ? ipfsMetadata.requireApproval : undefined,
   };
+
+  // Validate and normalize the collection
+  const validatedCollection = CollectionValidator.validateAndNormalize(collection);
+  if (!validatedCollection) {
+    // Return a minimal valid collection as fallback
+    return {
+      id: id,
+      name: 'Invalid Collection',
+      description: 'This collection has invalid data',
+      image: '/placeholder.svg',
+      nftAddress: '',
+      owner: '',
+      isActive: false,
+      totalMinted: 0,
+      totalBurned: 0,
+      totalTransfers: 0,
+      lastMintTime: '',
+      lastBurnTime: '',
+      lastTransferTime: '',
+      itemCount: 0,
+      totalSupply: 0,
+      baseUri: '',
+    };
+  }
+
+  return validatedCollection;
 }
 
 export function useCollection(): UseCollectionReturn {
@@ -305,7 +325,7 @@ export function useGetCollection(): UseGetCollectionReturn {
         const collection = await contract.call("get_collection", [String(id)]);
         const collectionStat = await contract.call("get_collection_stats", [String(id)]);
         const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
-        
+                
         return await processCollectionMetadata(id, metadata);
         
       } catch (error) {

@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { FEATURED_COLLECTION_IDS } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -120,7 +121,7 @@ export async function fetchInBatches<T>(
 
 export async function fetchOneByOne<T>(
   tasks: (() => Promise<T>)[],
-  delayMs = 500
+  delayMs = 1000
 ): Promise<T[]> {
   const results: T[] = [];
 
@@ -130,6 +131,11 @@ export async function fetchOneByOne<T>(
       results.push(result);
     } catch (err) {
       console.warn("Fetch failed:", err);
+      // If it's a rate limit error, wait longer
+      if (err instanceof Error && err.message.includes('429')) {
+        console.log("Rate limit hit, waiting 5 seconds...");
+        await new Promise((res) => setTimeout(res, 5000));
+      }
     }
 
     if (delayMs > 0) {
@@ -138,5 +144,44 @@ export async function fetchOneByOne<T>(
   }
 
   return results;
+}
+
+// Enhanced rate limiting with exponential backoff
+export async function fetchWithRateLimit<T>(
+  tasks: (() => Promise<T>)[],
+  baseDelayMs = 1500,
+  maxDelayMs = 10000
+): Promise<T[]> {
+  const results: T[] = [];
+  let currentDelay = baseDelayMs;
+
+  for (const task of tasks) {
+    try {
+      const result = await task();
+      results.push(result);
+      // Reset delay on success
+      currentDelay = baseDelayMs;
+    } catch (err) {
+      console.warn("Fetch failed:", err);
+      
+      // If it's a rate limit error, use exponential backoff
+      if (err instanceof Error && (err.message.includes('429') || err.message.includes('Too Many Requests'))) {
+        console.log(`Rate limit hit, waiting ${currentDelay}ms...`);
+        await new Promise((res) => setTimeout(res, currentDelay));
+        // Exponential backoff: double the delay, but cap it
+        currentDelay = Math.min(currentDelay * 2, maxDelayMs);
+      }
+    }
+
+    // Always wait between requests
+    await new Promise((res) => setTimeout(res, baseDelayMs));
+  }
+
+  return results;
+}
+
+export function isCollectionFeatured(collectionId: string | bigint): boolean {
+  const idString = String(collectionId);
+  return FEATURED_COLLECTION_IDS.includes(idString);
 }
 

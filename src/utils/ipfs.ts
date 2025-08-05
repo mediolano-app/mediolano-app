@@ -298,24 +298,28 @@ export function processIPFSHashToUrl(input: string, fallbackUrl: string): string
   let processedUrl = input.replace(/\0/g, '').trim();
   console.log(`Processing IPFS input:`, processedUrl);
   
+  // Handle undefined prefix first - this is the most common case
+  if (processedUrl.startsWith('undefined/')) {
+    const cid = processedUrl.replace('undefined/', '');
+    console.log(`Extracted CID from undefined/ prefix:`, cid, `(length: ${cid.length})`);
+    // Validate CID length and format - must be at least 34 characters (IPFS v0) or 46+ (IPFS v1)
+    if (cid.match(/^[a-zA-Z0-9]{34,}$/)) {
+      const gatewayUrl = `${IPFS_GATEWAYS[0]}${cid}`;
+      console.log(`Converted undefined/ prefix to gateway URL:`, gatewayUrl);
+      return gatewayUrl;
+    } else {
+      console.log(`Invalid CID length or format (${cid.length} chars):`, cid);
+      return fallbackUrl;
+    }
+  }
+  
   // reject any input that's too short to be a valid CID
   if (processedUrl.length < 46 && !processedUrl.startsWith('http') && !processedUrl.startsWith('/')) {
     console.log(`Input too short to be valid IPFS CID (${processedUrl.length} chars):`, processedUrl);
     return fallbackUrl;
   }
   
-  // Handle undefined prefix
-  if (processedUrl.startsWith('undefined/')) {
-    const cid = processedUrl.replace('undefined/', '');
-    // Validate CID length and format - must be at least 46 characters
-    if (cid.match(/^[a-zA-Z0-9]{46,}$/)) {
-      processedUrl = `${IPFS_GATEWAYS[0]}${cid}`;
-      return processedUrl;
-    } else {
-      console.log(`Invalid CID length or format (${cid.length} chars):`, cid);
-      return fallbackUrl;
-    }
-  }
+
   
   // Handle raw IPFS CIDs (must be at least 46 characters)
   if (processedUrl.match(/^[a-zA-Z0-9]{46,}$/)) {
@@ -344,6 +348,7 @@ export function processIPFSHashToUrl(input: string, fallbackUrl: string): string
         return fallbackUrl;
       }
     }
+    console.log("processedUrl", processedUrl);
     return processedUrl;
   }
   

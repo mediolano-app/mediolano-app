@@ -39,7 +39,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 // import { ConnectWallet } from "@/components/ConnectWallet"
-import { usePortfolio } from "@/hooks/usePortfolio";
+// import { usePortfolio } from "@/hooks/use-portfolio";
 import { useMIP } from "@/hooks/contracts/use-mip";
 import { useRouter } from "next/navigation";
 import NFTCard from "@/components/asset-card";
@@ -106,7 +106,7 @@ export default function DashboardPage() {
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1</div>
+              <div className="text-2xl font-bold">12</div>
               <p className="text-xs text-muted-foreground">
                 IP Collection
               </p>
