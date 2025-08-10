@@ -35,12 +35,12 @@ export function SelectedAssetDetails({ asset }: SelectedAssetDetailsProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link href={`/assets/${asset.id}`} className="text-muted-foreground hover:text-primary">
+                <Link href={`/asset/${asset.id}`} className="text-muted-foreground hover:text-primary">
                   <ExternalLink className="h-4 w-4" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>
-                <p>View asset details</p>
+                <p>View details</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

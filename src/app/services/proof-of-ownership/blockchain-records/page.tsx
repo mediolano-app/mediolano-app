@@ -87,7 +87,7 @@ export default function BlockchainRecordsPage() {
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button variant="outline" size="sm" asChild>
-                          <a href={`/assets/${asset.id}`}>View</a>
+                          <a href={`/asset/${asset.id}`}>View</a>
                         </Button>
                         <Button variant="outline" size="sm" asChild>
                           <a

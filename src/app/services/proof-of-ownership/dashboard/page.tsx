@@ -112,7 +112,7 @@ export default function DashboardPage() {
               </CardContent>
               <CardFooter className="flex justify-between pt-2">
                 <Button variant="outline" size="sm" asChild>
-                  <Link href={`/assets/${asset.id}`}>
+                  <Link href={`/asset/${asset.id}`}>
                     <Shield className="mr-1 h-3 w-3" /> View Proof
                   </Link>
                 </Button>

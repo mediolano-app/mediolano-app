@@ -92,7 +92,7 @@ export default function AssetGrid({ assets, showVerificationStatus = false }: As
             </CardHeader>
             <CardFooter className="p-4 pt-0 flex justify-between gap-2">
               <Button asChild variant="outline" size="sm">
-                <Link href={`/assets/${asset.id}`}>
+                <Link href={`/asset/${asset.id}`}>
                   <Eye className="h-4 w-4 mr-1" /> View Proof
                 </Link>
               </Button>

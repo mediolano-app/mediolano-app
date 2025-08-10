@@ -126,7 +126,7 @@ export default function AssetCreatedSuccessPage() {
               <h3 className="font-semibold mb-2">View Asset</h3>
               <p className="text-sm text-muted-foreground mb-4">See how your asset appears to others</p>
               <Button variant="outline" className="w-full" asChild>
-                <Link href={`/assets/${asset.id}`}>
+                <Link href={`/asset/${asset.id}`}>
                   View Details
                   <ExternalLink className="ml-2 h-4 w-4" />
                 </Link>

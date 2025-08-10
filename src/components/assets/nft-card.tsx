@@ -177,9 +177,9 @@ export default function NFTCard({
       </CardContent>
 
       <CardFooter className="p-4 pt-0 flex justify-between gap-2">
-        <Link href={`/assets/${id}`} className="flex-1">
+        <Link href={`/asset/${id}`} className="flex-1">
           <Button size="sm" className="w-full">
-            View IP
+            View details
             <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
           </Button>
         </Link>
