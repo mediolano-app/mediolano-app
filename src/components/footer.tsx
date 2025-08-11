@@ -179,11 +179,11 @@ export function Footer() {
                 </ul>
                 <h3 className="mb-6 mt-6 text-sm font-semibold uppercase">Guidelines</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
-                    <li><Link href="/community-guidelines" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> Community</Link></li>
-                     <li><Link href="/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
-                    <li><Link href="/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance</Link></li>
-                    <li><Link href="/governance-charter" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Governance</Link></li>
+                    <li><Link href="/docs/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
+                    <li><Link href="/docs/community-guidelines" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> Community</Link></li>
+                     <li><Link href="/docs/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
+                    <li><Link href="/docs/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance</Link></li>
+                    <li><Link href="/docs/governance-charter" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Governance</Link></li>
                 </ul>
                 </div>
                 
