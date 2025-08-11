@@ -131,8 +131,11 @@ export function useCreatorNFTPortfolio() {
   const [error, setError] = useState<string | null>(null);
   const [metadata, setMetadata] = useState<IP[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("price-high");
-
-  const { contract } = useContract({ abi, address: CONTRACT_ADDRESS });
+  
+  const { contract } = useContract({ 
+    abi: abi as Abi, 
+    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}` 
+  });
   const { tokenIds } = useMIP();
 
   useEffect(() => {
@@ -149,18 +152,34 @@ export function useCreatorNFTPortfolio() {
         const allMeta = await Promise.allSettled(
           tokenIds.map(async (id) => {
             try {
-              const tokenURI = await contract.call("get_token", [String(id)], {
+              const tokenData = await contract.call("get_token", [String(id)], {
                 parseRequest: true,
                 parseResponse: true,
               });
 
-              if (!tokenURI) {
-                throw new Error(`No URI found for token ${id}`);
+              if (!tokenData || !tokenData.metadata_uri) {
+                throw new Error(`No metadata URI found for token ${id}`);
               }
 
-              const response = await pinataClient.gateways.get(
-                tokenURI.token_id.toString()
-              );
+              const metadataUri = tokenData.metadata_uri;
+              let ipfsHash = metadataUri;
+              
+                // Handle different URI formats
+                if (metadataUri.startsWith('ipfs://')) {
+                  ipfsHash = metadataUri.replace('ipfs://', '');
+                } else if (metadataUri.startsWith('https://')) {
+                  // Extract hash from URL if it's a gateway URL
+                  const urlParts = metadataUri.split('/');
+                  ipfsHash = urlParts[urlParts.length - 1];
+                }
+              
+
+              // Fetch metadata from IPFS
+              const response = await pinataClient.gateways.get(ipfsHash);
+
+              if (!response || !response.data) {
+                throw new Error(`No data received for token ${id}`);
+              }
 
               const parsed =
                 typeof response.data === "string"
@@ -180,7 +199,8 @@ export function useCreatorNFTPortfolio() {
 
         const successfulResults = allMeta
           .filter((result) => result.status === "fulfilled")
-          .map((result) => result.value);
+          .map((result) => result.value)
+          .filter((result) => !result.error); // Filter out results with errors
 
         const failedResults = allMeta
           .filter((result) => result.status === "rejected")
@@ -206,6 +226,7 @@ export function useCreatorNFTPortfolio() {
 
     fetchAllMetadata();
   }, [tokenIds, contract, address]);
+  
   return {
     metadata,
     setMetadata,

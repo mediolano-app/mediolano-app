@@ -34,7 +34,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
   const tokenId = id || 0; // Default to 0 if id is not provided // need improve
 
   const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
-  const { account, address } = useAccount();
+  const { address } = useAccount();
 
   //Add new consts to recognize the Cids
   const [assetType, setAssetType] = useState<string>("NFT"); // use NFT for default
@@ -73,7 +73,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
     args: [tokenId],
   });
 
-  const tokenOwnerAddress = account ? address?.slice(0, 66) : "Unknown";
+  const tokenOwnerAddress = typeof address === "string" ? address.slice(0, 66) : "Unknown";
 
   // Fetch metadata when tokenURI changes
   useEffect(() => {
