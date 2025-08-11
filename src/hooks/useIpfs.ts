@@ -39,7 +39,7 @@ export function useIpfsUpload() {
       const metadataUpload = await pinata.upload.public
         .json(metadata)
         .url(metadataSignedUrl);
-      const uploadedMetadataUrl = `${IPFS_URL}/${metadataUpload.cid}`;
+      const uploadedMetadataUrl = `${IPFS_URL}/ipfs/${metadataUpload.cid}`;
       setMetadataUrl(uploadedMetadataUrl);
 
       return {
@@ -74,7 +74,7 @@ export function useIpfsUpload() {
         const fileUpload = await pinata.upload.public
           .file(file)
           .url(fileSignedUrl);
-        const uploadedFileUrl = `${IPFS_URL}/${fileUpload.cid}`;
+        const uploadedFileUrl = `${IPFS_URL}/ipfs/${fileUpload.cid}`;
         setFileUrl(uploadedFileUrl);
 
         // Upload metadata

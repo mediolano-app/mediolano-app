@@ -90,7 +90,7 @@ export function useNFTDetails(tokenId: number) {
     blockchain: "Starknet",
     contractAddress: CONTRACT_ADDRESS || "",
     ipfsUrl: tokenURI || "",
-    externalUrl: metadata?.external_url || ""
+    externalUrl: metadata?.externalUrl || ""
   };
 
   return {

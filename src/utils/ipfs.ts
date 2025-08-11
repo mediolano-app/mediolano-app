@@ -38,6 +38,7 @@ export interface AssetType {
   description?: string;
   image?: string;
   ipfsCid?: string;
+  metadataUrl?: string;
   type?: string;
   creator: string | { name: string; address: string }; 
   owner: string | { name: string; address: string }; 
@@ -131,8 +132,20 @@ export async function fetchIPFSMetadata(cid: string, bypassCache = false): Promi
 export function determineIPType(metadata: IPFSMetadata | null): string {
   if (!metadata) return 'Generic';
   
-  if (metadata.type) {
-    return metadata.type;
+
+  if (metadata.type && typeof metadata.type === 'string') {
+    const t = metadata.type.trim().toLowerCase();
+    // Map common aliases/synonyms to the expected IPType labels
+    if (/(^|\b)(art|digital art|painting|illustration)($|\b)/.test(t)) return 'Art';
+    if (/(^|\b)(audio|music|sound)($|\b)/.test(t)) return 'Audio';
+    if (/(^|\b)(video|film|movie)($|\b)/.test(t)) return 'Video';
+    if (/(^|\b)(software|code|app|application)($|\b)/.test(t)) return 'Software';
+    if (/(^|\b)(document|documents|pdf)($|\b)/.test(t)) return 'Documents';
+    if (/(^|\b)(publication|publications|book|journal)($|\b)/.test(t)) return 'Publications';
+    if (/(^|\b)(patent|patents)($|\b)/.test(t)) return 'Patents';
+    if (/(^|\b)(post|blog|article)($|\b)/.test(t)) return 'Posts';
+    if (/(^|\b)(rwa|real world asset|real-world asset|real estate)($|\b)/.test(t)) return 'RWA';
+    if (/(^|\b)(nft|token)($|\b)/.test(t)) return 'NFT';
   }
   
   if (metadata.medium === 'Digital Art' || metadata.medium === 'Physical Art' || 
@@ -144,18 +157,19 @@ export function determineIPType(metadata: IPFSMetadata | null): string {
     if (metadata.fileType.startsWith('audio/')) return 'Audio';
     if (metadata.fileType.startsWith('video/')) return 'Video';
     if (metadata.fileType.includes('code') || metadata.fileType.includes('javascript')) return 'Software';
+    if (metadata.fileType === 'application/pdf') return 'Documents';
   }
   
   if (metadata.duration || metadata.genre || metadata.bpm) return 'Audio';
   if (metadata.resolution || metadata.framerate) return 'Video';
   if (metadata.yearCreated && metadata.artistName) return 'Art';
   if (metadata.version && (metadata.external_url || metadata.repository)) return 'Software';
-  if (metadata.patent_number || metadata.patent_date) return 'Patent';
-  if (metadata.trademark_number) return 'Trademark';
+  if (metadata.patent_number || metadata.patent_date) return 'Patents';
+  
   
   if (metadata.tokenId || metadata.tokenStandard || metadata.blockchain) return 'NFT';
+ 
   
-  if (metadata.pages || metadata.authors || metadata.publisher) return 'Document';
   
   return 'Generic';
 }

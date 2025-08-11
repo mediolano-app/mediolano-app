@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/select";
 // import { ConnectWallet } from "@/components/ConnectWallet"
 // import { usePortfolio } from "@/hooks/use-portfolio";
-import { useMIP } from "@/hooks/contracts/use-mip";
+import { useMIP, useCreatorNFTPortfolio } from "@/hooks/contracts/use-mip";
 import { useRouter } from "next/navigation";
 import NFTCard from "@/components/asset-card";
 
@@ -68,9 +68,17 @@ export default function DashboardPage() {
   const router = useRouter();
   const { address, balance, balanceError, tokenIds, tokenIdsError, isLoading } =
     useMIP();
+  const { metadata, loading: metadataLoading } = useCreatorNFTPortfolio();
+  
   console.log(address);
   console.log(balance);
   console.log(tokenIds);
+
+  // Calculate real stats from metadata
+  const totalCollections = metadata.length > 0 ? 1 : 0;
+  const totalAssets = Number(balance);
+  const topCollection = metadata.length > 0 ? "IP Collection" : "No collections";
+  const recentActivity = metadata.length > 0 ? `${metadata.length} assets minted` : "No recorded activity";
 
   return (
     <div className="container mx-auto px-4 py-8 mt-10 mb-20">
@@ -106,9 +114,13 @@ export default function DashboardPage() {
               <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
+              <div className="text-2xl font-bold">
+                {address && (isLoading || metadataLoading)
+                  ? "Loading..."
+                  : totalCollections}
+              </div>
               <p className="text-xs text-muted-foreground">
-                IP Collection
+                IP Collections
               </p>
             </CardContent>
           </Card>
@@ -121,11 +133,11 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {address && isLoading
+                {address && (isLoading || metadataLoading)
                   ? "Loading..."
                   : balanceError
                   ? "Error"
-                  : balance.toString()}
+                  : totalAssets}
               </div>
               <p className="text-xs text-muted-foreground">
                 Total IPs in your portfolio
@@ -141,10 +153,16 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-1xl font-bold">
-                IP Collection
+                {address && (isLoading || metadataLoading)
+                  ? "Loading..."
+                  : topCollection}
               </div>
               <p className="text-xs text-muted-foreground">
-                {address && isLoading ? "" : "(New collections soon)"}
+                {address && (isLoading || metadataLoading) 
+                  ? "" 
+                  : metadata.length > 0 
+                    ? `${metadata.length} assets` 
+                    : "No assets yet"}
               </p>
             </CardContent>
           </Card>
@@ -157,17 +175,16 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-1xl font-bold">
-                {address && isLoading
+                {address && (isLoading || metadataLoading)
                   ? "Loading..."
-                  : // : (portfolioStats.recentActivity.length > 0
-                    // ? portfolioStats.recentActivity[0].item
-                    "No recorded activity"}
+                  : recentActivity}
               </div>
               <p className="text-xs text-muted-foreground">
-                {address && isLoading ? "" 
-                  // : (portfolioStats.recentActivity.length > 0 
-                  // ? `${portfolioStats.recentActivity[0].type === "buy" ? "Bought" : "Sold"} for ${portfolioStats.recentActivity[0].price} STRK` 
-                  : "(Preview)"}
+                {address && (isLoading || metadataLoading) 
+                  ? "" 
+                  : metadata.length > 0 
+                    ? "Latest minted assets" 
+                    : "No activity yet"}
               </p>
             </CardContent>
           </Card>
