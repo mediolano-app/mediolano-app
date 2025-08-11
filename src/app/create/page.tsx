@@ -237,7 +237,11 @@ export default function CreatePage() {
     
 
       <main className="container mx-auto p-4 max-w-10xl">
-        {/* Hero Section */}
+        
+        
+        
+        
+        {/* Hero Section 
         <div className="text-center py-8 md:py-12">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
             <Sparkles className="h-4 w-4" />
@@ -254,7 +258,6 @@ export default function CreatePage() {
             ownership, instant protection.
           </p>
 
-          {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">Zero</div>
@@ -274,7 +277,6 @@ export default function CreatePage() {
             </div>
           </div>
 
-          {/* Quick Actions */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
             <Link href="/create/asset">
               <Button size="lg" className="w-full sm:w-auto">
@@ -290,6 +292,11 @@ export default function CreatePage() {
             </Link>
           </div>
         </div>
+          */}
+
+
+
+
 
         {/* Search and Filters */}
         <div className="mb-8">
