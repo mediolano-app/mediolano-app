@@ -5,8 +5,7 @@ import {
   ActivityType,
   ActivityFilter,
   ActivityFeedState,
-  PaginationState,
-  ActivityEvent
+  PaginationState 
 } from '@/types/activity';
 
 const initialFilter: ActivityFilter = {
@@ -33,22 +32,13 @@ const initialState: ActivityFeedState = {
 export function useActivityFeed(walletAddress?: string) {
   const { account } = useAccount();
   const [state, setState] = useState<ActivityFeedState>(initialState);
+  const [isInitialized, setIsInitialized] = useState(false);
   
-  // Use the connected wallet address if no specific address is provided
   const targetAddress = walletAddress || account?.address;
   
   // Create service instance with memoization
   const activityService = useMemo(() => {
-    const service = new ActivityFeedService();
-    
-    // Add any contracts that might be relevant for your dapp
-    // You can add specific contract addresses and ABIs here
-    if (process.env.NEXT_PUBLIC_IP_COLLECTION_ADDRESS) {
-      // Add your IP collection contract if you have the ABI
-      // service.addContract(process.env.NEXT_PUBLIC_IP_COLLECTION_ADDRESS, ipCollectionAbi);
-    }
-    
-    return service;
+    return new ActivityFeedService();
   }, []);
 
   const fetchActivities = useCallback(async (
@@ -58,8 +48,18 @@ export function useActivityFeed(walletAddress?: string) {
     if (!targetAddress) {
       setState(prev => ({ 
         ...prev, 
-        error: 'No wallet address available',
+        error: 'No wallet address available. Please connect your wallet.',
         loading: false 
+      }));
+      return;
+    }
+
+    // Validate address format
+    if (!targetAddress.match(/^0x[0-9a-fA-F]{1,64}$/)) {
+      setState(prev => ({
+        ...prev,
+        error: 'Invalid wallet address format',
+        loading: false
       }));
       return;
     }
@@ -85,18 +85,21 @@ export function useActivityFeed(walletAddress?: string) {
           hasMore: result.hasMore
         }
       }));
+      
+      setIsInitialized(true);
     } catch (error) {
-      console.error('Error fetching activities:', error);
       setState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'Failed to fetch activities'
+        error: error instanceof Error ? error.message : 'Failed to fetch activities. Please try again.'
       }));
     }
   }, [targetAddress, state.filter, state.pagination.limit, activityService]);
 
   const loadMore = useCallback(() => {
-    if (state.loading || !state.pagination.hasMore) return;
+    if (state.loading || !state.pagination.hasMore) {
+      return;
+    }
     fetchActivities(state.pagination.page + 1, true);
   }, [state.loading, state.pagination.hasMore, state.pagination.page, fetchActivities]);
 
@@ -158,26 +161,30 @@ export function useActivityFeed(walletAddress?: string) {
     if (targetAddress) {
       fetchActivities(1, false);
     } else {
-      // Clear activities if no wallet is connected
       setState(prev => ({
         ...prev,
         activities: [],
         error: null,
         loading: false
       }));
+      setIsInitialized(false);
     }
   }, [targetAddress, state.filter]);
 
   // Enhanced activities with computed properties
-  const enhancedActivities = useMemo(() => 
-    state.activities.map(activity => ({
+  const enhancedActivities = useMemo(() => {
+    return state.activities.map(activity => ({
       ...activity,
       explorerUrl: activityService.getExplorerUrl(activity.txHash),
       formattedTimestamp: new Date(activity.timestamp).toLocaleString(),
-      formattedAmount: activity.amount ? parseFloat(activity.amount).toLocaleString() : undefined,
-      formattedPrice: activity.price ? `${parseFloat(activity.price).toLocaleString()} ${activity.currency || 'ETH'}` : undefined
-    }))
-  , [state.activities, activityService]);
+      formattedAmount: activity.amount 
+        ? parseFloat(activity.amount).toLocaleString() 
+        : undefined,
+      formattedPrice: activity.price 
+        ? `${parseFloat(activity.price).toLocaleString(undefined, { maximumFractionDigits: 6 })} ${activity.currency || 'ETH'}` 
+        : undefined
+    }));
+  }, [state.activities, activityService]);
 
   // Group activities by date
   const groupedActivities = useMemo(() => {
@@ -234,6 +241,7 @@ export function useActivityFeed(walletAddress?: string) {
     pagination: state.pagination,
     walletAddress: targetAddress,
     isConnected: !!account,
+    isInitialized,
 
     // Actions
     fetchActivities,
