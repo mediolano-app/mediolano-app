@@ -220,17 +220,17 @@ export class ActivityFeedService {
   constructor(config: ActivityServiceConfig = {}) {
     this.startTime = Date.now();
     
-    // Set default configuration
+    // Set default configuration with performance optimizations
     this.config = {
       providerUrl: config.providerUrl || process.env.NEXT_PUBLIC_STARKNET_RPC_URL || 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
-      maxRetries: config.maxRetries ?? 3,
-      retryDelay: config.retryDelay ?? 1000,
-      requestTimeout: config.requestTimeout ?? 30000,
+      maxRetries: config.maxRetries ?? 2, // Reduced retries for faster failures
+      retryDelay: config.retryDelay ?? 500, // Faster retry delay
+      requestTimeout: config.requestTimeout ?? 15000, // Reduced timeout for faster failures
       cacheEnabled: config.cacheEnabled ?? true,
-      cacheTtlMs: config.cacheTtlMs ?? 300000, // 5 minutes
-      maxBlockLookback: config.maxBlockLookback ?? 50000,
-      chunkSize: config.chunkSize ?? 100,
-      rateLimitPerSecond: config.rateLimitPerSecond ?? 10,
+      cacheTtlMs: config.cacheTtlMs ?? 180000, // 3 minutes - shorter for fresher data
+      maxBlockLookback: config.maxBlockLookback ?? 25000, // Reduced lookback for faster queries (~3.5 days)
+      chunkSize: config.chunkSize ?? 200, // Increased chunk size for fewer requests
+      rateLimitPerSecond: config.rateLimitPerSecond ?? 15, // Higher rate limit
       enableMetrics: config.enableMetrics ?? true,
       logLevel: config.logLevel ?? 'info'
     };
@@ -383,8 +383,9 @@ export class ActivityFeedService {
         responseTimeMs: responseTime
       });
 
-      
+      // Return graceful degradation instead of throwing
       if (this.config.cacheEnabled) {
+        // Try to return stale cache data
         const cacheKey = this.generateCacheKey(walletAddress, filter, page, limit);
         const staleData = this.cache.get<ActivityFetchResult>(cacheKey + '_stale');
         if (staleData) {
@@ -407,18 +408,33 @@ export class ActivityFeedService {
     return await this.withRetry(async () => {
       const activities: ActivityEvent[] = [];
       
-      // Get the latest block number with timeout
-      const latestBlock = await Promise.race([
-        this.provider.getBlockNumber(),
-        this.createTimeoutPromise('Failed to get latest block number')
-      ]);
+      // Get the latest block number with cached result
+      let latestBlock: number;
+      const blockCacheKey = 'latest_block_number';
+      const cachedBlock = this.config.cacheEnabled ? this.cache.get<{block: number, timestamp: number}>(blockCacheKey) : null;
+      
+      if (cachedBlock && Date.now() - cachedBlock.timestamp < 30000) { // 30 second cache for latest block
+        latestBlock = cachedBlock.block;
+        this.log('debug', 'Using cached latest block', { latestBlock });
+      } else {
+        latestBlock = await Promise.race([
+          this.provider.getBlockNumber(),
+          this.createTimeoutPromise('Failed to get latest block number')
+        ]);
+        
+        if (this.config.cacheEnabled) {
+          this.cache.set(blockCacheKey, { block: latestBlock, timestamp: Date.now() }, 30000);
+        }
+      }
       
       const fromBlock = Math.max(0, latestBlock - this.config.maxBlockLookback);
       
-      this.log('debug', 'Fetching activities', {
+      this.log('info', 'Fetching activities', {
         fromBlock,
         toBlock: latestBlock,
-        walletAddress: this.maskAddress(walletAddress)
+        blockRange: latestBlock - fromBlock,
+        walletAddress: this.maskAddress(walletAddress),
+        activityTypes: filter.activityTypes
       });
 
       // Fetch activities for each type with controlled concurrency
@@ -430,11 +446,16 @@ export class ActivityFeedService {
       
       // Process results and log any failures
       activityArrays.forEach((result, index) => {
+        const activityType = filter.activityTypes[index];
         if (result.status === 'fulfilled') {
+          this.log('info', 'Activity type fetch completed', {
+            activityType,
+            count: result.value.length
+          });
           activities.push(...result.value);
         } else {
           this.log('warn', 'Failed to fetch activity type', {
-            activityType: filter.activityTypes[index],
+            activityType,
             error: result.reason?.message
           });
         }
@@ -532,7 +553,7 @@ export class ActivityFeedService {
     });
   }
 
- 
+  // Enhanced activity fetching by type
   private async fetchActivitiesByType(
     walletAddress: string,
     activityType: ActivityType,
@@ -574,6 +595,16 @@ export class ActivityFeedService {
           activities.push(...voteActivities);
           break;
           
+        case ActivityType.ASSET_CREATED:
+          const assetCreatedActivities = await this.fetchAssetCreatedActivities(walletAddress, fromBlock, toBlock);
+          activities.push(...assetCreatedActivities);
+          break;
+          
+        case ActivityType.COLLECTION_CREATED:
+          const collectionCreatedActivities = await this.fetchCollectionCreatedActivities(walletAddress, fromBlock, toBlock);
+          activities.push(...collectionCreatedActivities);
+          break;
+          
         default:
           this.log('warn', 'Unknown activity type', { activityType });
       }
@@ -587,7 +618,7 @@ export class ActivityFeedService {
     return activities;
   }
 
-  
+  // Enhanced mint activities fetching
   private async fetchMintActivities(
     walletAddress: string,
     fromBlock: number,
@@ -612,6 +643,13 @@ export class ActivityFeedService {
         this.provider.getEvents(eventFilter),
         this.createTimeoutPromise('Mint activities fetch timeout')
       ]);
+
+      this.log('info', 'Mint events response', {
+        eventCount: response.events?.length || 0,
+        contractAddress: CONTRACT_ADDRESSES.MIP,
+        fromBlock,
+        toBlock
+      });
 
       const activities: ActivityEvent[] = [];
 
@@ -638,7 +676,7 @@ export class ActivityFeedService {
     }
   }
 
-
+  // Enhanced offer activities fetching
   private async fetchOfferActivities(
     walletAddress: string,
     fromBlock: number,
@@ -662,6 +700,13 @@ export class ActivityFeedService {
         this.provider.getEvents(eventFilter),
         this.createTimeoutPromise('Offer activities fetch timeout')
       ]);
+
+      this.log('info', 'Offer events response', {
+        eventCount: response.events?.length || 0,
+        contractAddress: CONTRACT_ADDRESSES.AGREEMENT_FACTORY,
+        fromBlock,
+        toBlock
+      });
 
       const activities: ActivityEvent[] = [];
 
@@ -688,7 +733,7 @@ export class ActivityFeedService {
     }
   }
 
- 
+  // Enhanced trade activities fetching
   private async fetchTradeActivities(
     walletAddress: string,
     activityType: ActivityType.BUY | ActivityType.SELL,
@@ -713,6 +758,14 @@ export class ActivityFeedService {
         this.provider.getEvents(eventFilter),
         this.createTimeoutPromise('Trade activities fetch timeout')
       ]);
+
+      this.log('info', 'Trade events response', {
+        eventCount: response.events?.length || 0,
+        contractAddress: CONTRACT_ADDRESSES.AGREEMENT_FACTORY,
+        eventName,
+        fromBlock,
+        toBlock
+      });
 
       const activities: ActivityEvent[] = [];
 
@@ -739,7 +792,7 @@ export class ActivityFeedService {
     }
   }
 
-  
+  // Enhanced IP coin activities fetching
   private async fetchIPCoinActivities(
     walletAddress: string,
     fromBlock: number,
@@ -789,7 +842,7 @@ export class ActivityFeedService {
     }
   }
 
-
+  // Enhanced liquidity activities fetching
   private async fetchLiquidityActivities(
     walletAddress: string,
     fromBlock: number,
@@ -839,7 +892,139 @@ export class ActivityFeedService {
     }
   }
 
-  
+  // Enhanced asset created activities fetching
+  private async fetchAssetCreatedActivities(
+    walletAddress: string,
+    fromBlock: number,
+    toBlock: number
+  ): Promise<ActivityEvent[]> {
+    try {
+      const assetCreatedSelector = hash.getSelectorFromName("AssetCreated");
+      
+      // Try both ASSET_REGISTRY and MIP contracts
+      const contractAddresses = [
+        CONTRACT_ADDRESSES.ASSET_REGISTRY,
+        CONTRACT_ADDRESSES.MIP
+      ].filter(Boolean);
+      
+      const activities: ActivityEvent[] = [];
+      
+      for (const contractAddress of contractAddresses) {
+        try {
+          const eventFilter = {
+            from_block: { block_number: fromBlock },
+            to_block: { block_number: toBlock },
+            address: contractAddress,
+            keys: [
+              [assetCreatedSelector],
+              [walletAddress] // creator address
+            ],
+            chunk_size: this.config.chunkSize
+          };
+
+          const response = await Promise.race([
+            this.provider.getEvents(eventFilter),
+            this.createTimeoutPromise('Asset creation activities fetch timeout')
+          ]);
+
+          this.log('info', 'Asset created events response', {
+            eventCount: response.events?.length || 0,
+            contractAddress,
+            fromBlock,
+            toBlock
+          });
+
+          for (const event of response.events || []) {
+            try {
+              const activity = await this.parseAssetCreatedEvent(event, walletAddress);
+              if (activity && this.validateActivity(activity)) {
+                activities.push(activity);
+              }
+            } catch (error) {
+              this.log('warn', 'Error parsing asset created event', {
+                eventHash: event.transaction_hash,
+                error: error instanceof Error ? error.message : 'Unknown error'
+              });
+            }
+          }
+        } catch (error) {
+          this.log('warn', 'Error fetching from contract', {
+            contractAddress,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      }
+
+      return activities;
+    } catch (error) {
+      this.log('error', 'Error fetching asset created activities', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  // Enhanced collection created activities fetching
+  private async fetchCollectionCreatedActivities(
+    walletAddress: string,
+    fromBlock: number,
+    toBlock: number
+  ): Promise<ActivityEvent[]> {
+    try {
+      const collectionCreatedSelector = hash.getSelectorFromName("CollectionCreated");
+      
+      if (!CONTRACT_ADDRESSES.COLLECTION_FACTORY) {
+        this.log('warn', 'Collection factory contract address not configured');
+        return [];
+      }
+      
+      const eventFilter = {
+        from_block: { block_number: fromBlock },
+        to_block: { block_number: toBlock },
+        address: CONTRACT_ADDRESSES.COLLECTION_FACTORY,
+        keys: [
+          [collectionCreatedSelector],
+          [walletAddress] // creator address
+        ],
+        chunk_size: this.config.chunkSize
+      };
+
+      const response = await Promise.race([
+        this.provider.getEvents(eventFilter),
+        this.createTimeoutPromise('Collection creation activities fetch timeout')
+      ]);
+
+      this.log('info', 'Collection created events response', {
+        eventCount: response.events?.length || 0,
+        contractAddress: CONTRACT_ADDRESSES.COLLECTION_FACTORY,
+        fromBlock,
+        toBlock
+      });
+
+      const activities: ActivityEvent[] = [];
+
+      for (const event of response.events || []) {
+        try {
+          const activity = await this.parseCollectionCreatedEvent(event, walletAddress);
+          if (activity && this.validateActivity(activity)) {
+            activities.push(activity);
+          }
+        } catch (error) {
+          this.log('warn', 'Error parsing collection created event', {
+            eventHash: event.transaction_hash,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      }
+
+      return activities;
+    } catch (error) {
+      this.log('error', 'Error fetching collection created activities', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
   private async fetchVoteActivities(
     walletAddress: string,
     fromBlock: number,
@@ -889,7 +1074,7 @@ export class ActivityFeedService {
     }
   }
 
-  
+  // Enhanced event parsing methods with validation
   private async parseMintEvent(event: any, walletAddress: string): Promise<ActivityEvent | null> {
     try {
       if (!event?.transaction_hash || !event?.block_number || !Array.isArray(event.data)) {
@@ -1149,7 +1334,117 @@ export class ActivityFeedService {
     }
   }
 
-  // Utility methods
+  private async parseAssetCreatedEvent(event: any, walletAddress: string): Promise<ActivityEvent | null> {
+    try {
+      if (!event?.transaction_hash || !event?.block_number || !Array.isArray(event.data)) {
+        this.log('warn', 'Invalid asset created event structure', { event });
+        return null;
+      }
+
+      const block = await Promise.race([
+        this.provider.getBlockWithTxHashes(event.block_number),
+        this.createTimeoutPromise('Block fetch timeout for asset created event')
+      ]);
+      
+      const assetId = event.data[0] || '0x0';
+      const assetNameData = event.data[1] || '0x0';
+      const metadataData = event.data[2] || '0x0';
+      
+      // Try to decode asset name if it's encoded
+      let assetName = `Asset #${num.toHex(assetId).slice(-6)}`;
+      try {
+        // If the name is a hex string, try to decode it
+        if (assetNameData !== '0x0') {
+          const nameHex = num.toHex(assetNameData);
+          if (nameHex.length > 2) {
+            // Simple hex to string conversion (this may need adjustment based on your encoding)
+            assetName = Buffer.from(nameHex.slice(2), 'hex').toString('utf8').replace(/\0/g, '') || assetName;
+          }
+        }
+      } catch {
+        // Keep default name if decoding fails
+      }
+      
+      return {
+        id: `${event.transaction_hash}_${event.event_index || 0}`,
+        txHash: event.transaction_hash,
+        blockNumber: event.block_number,
+        timestamp: block.timestamp * 1000,
+        activityType: ActivityType.ASSET_CREATED,
+        userAddress: walletAddress.toLowerCase(),
+        assetId: num.toHex(assetId),
+        assetName,
+        metadata: {
+          assetId,
+          assetNameData,
+          metadataData,
+          creator: walletAddress.toLowerCase(),
+          contractAddress: event.from_address
+        }
+      };
+    } catch (error) {
+      this.log('error', 'Error parsing asset created event', {
+        eventHash: event?.transaction_hash,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      return null;
+    }
+  }
+
+  private async parseCollectionCreatedEvent(event: any, walletAddress: string): Promise<ActivityEvent | null> {
+    try {
+      if (!event?.transaction_hash || !event?.block_number || !Array.isArray(event.data)) {
+        this.log('warn', 'Invalid collection created event structure', { event });
+        return null;
+      }
+
+      const block = await Promise.race([
+        this.provider.getBlockWithTxHashes(event.block_number),
+        this.createTimeoutPromise('Block fetch timeout for collection created event')
+      ]);
+      
+      const collectionId = event.data[0] || '0x0';
+      const collectionNameData = event.data[1] || '0x0';
+      const metadataData = event.data[2] || '0x0';
+      
+      // Try to decode collection name if it's encoded
+      let collectionName = `Collection #${num.toHex(collectionId).slice(-6)}`;
+      try {
+        if (collectionNameData !== '0x0') {
+          const nameHex = num.toHex(collectionNameData);
+          if (nameHex.length > 2) {
+            collectionName = Buffer.from(nameHex.slice(2), 'hex').toString('utf8').replace(/\0/g, '') || collectionName;
+          }
+        }
+      } catch {
+        // Keep default name if decoding fails
+      }
+      
+      return {
+        id: `${event.transaction_hash}_${event.event_index || 0}`,
+        txHash: event.transaction_hash,
+        blockNumber: event.block_number,
+        timestamp: block.timestamp * 1000,
+        activityType: ActivityType.COLLECTION_CREATED,
+        userAddress: walletAddress.toLowerCase(),
+        collectionId: num.toHex(collectionId),
+        collectionName,
+        metadata: {
+          collectionId,
+          collectionNameData,
+          metadataData,
+          creator: walletAddress.toLowerCase(),
+          contractAddress: event.from_address
+        }
+      };
+    } catch (error) {
+      this.log('error', 'Error parsing collection created event', {
+        eventHash: event?.transaction_hash,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      return null;
+    }
+  }
   private parseVoteChoice(voteValue: string): 'for' | 'against' | 'abstain' {
     try {
       const value = num.toBigInt(voteValue);

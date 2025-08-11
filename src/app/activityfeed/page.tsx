@@ -12,11 +12,13 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  Package,
   Wallet,
   AlertCircle,
   Activity,
   Coins,
   ShoppingCart,
+  Layers,
   Vote,
   Droplets,
   Zap
@@ -31,7 +33,9 @@ const ACTIVITY_TYPE_LABELS = {
   [ActivityType.SELL]: 'Sale',
   [ActivityType.CREATE_IP_COIN]: 'Create IP Coin',
   [ActivityType.POOL_LIQUIDITY]: 'Pool Liquidity',
-  [ActivityType.DAO_VOTE]: 'DAO Vote'
+  [ActivityType.DAO_VOTE]: 'DAO Vote',
+  [ActivityType.ASSET_CREATED]: 'Asset Created',
+  [ActivityType.COLLECTION_CREATED]: 'Collection Created'
 };
 
 const ACTIVITY_TYPE_COLORS = {
@@ -41,7 +45,9 @@ const ACTIVITY_TYPE_COLORS = {
   [ActivityType.SELL]: 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-800',
   [ActivityType.CREATE_IP_COIN]: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-800',
   [ActivityType.POOL_LIQUIDITY]: 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800',
-  [ActivityType.DAO_VOTE]: 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/20 dark:text-pink-300 dark:border-pink-800'
+  [ActivityType.DAO_VOTE]: 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/20 dark:text-pink-300 dark:border-pink-800',
+  [ActivityType.ASSET_CREATED]: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800',
+  [ActivityType.COLLECTION_CREATED]: 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/20 dark:text-violet-300 dark:border-violet-800'
 };
 
 const ACTIVITY_TYPE_ICONS = {
@@ -51,7 +57,9 @@ const ACTIVITY_TYPE_ICONS = {
   [ActivityType.SELL]: TrendingUp,
   [ActivityType.CREATE_IP_COIN]: Coins,
   [ActivityType.POOL_LIQUIDITY]: Droplets,
-  [ActivityType.DAO_VOTE]: Vote
+  [ActivityType.DAO_VOTE]: Vote,
+   [ActivityType.ASSET_CREATED]: Package,
+  [ActivityType.COLLECTION_CREATED]: Layers
 };
 
 interface ActivityFeedProps {
