@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-{/*}
+
 .gradient-background {
-    background: linear-gradient(300deg,rgba(0, 0, 145, 0.1),rgba(0, 0, 179, 0.25),rgba(0, 0, 111, 0.1));
+    background: linear-gradient(300deg,rgba(0, 0, 145, 0.144),rgba(0, 38, 206, 0.133),rgba(0, 35, 111, 0.144));
     background-size: 180% 180%;
     animation: gradient-animation 18s ease infinite;
 
@@ -20,7 +20,7 @@
       }
     }
   }
-*/}
+
 
 .background-image {
   background: './background.jpg';

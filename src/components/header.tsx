@@ -7,7 +7,7 @@ import { Logo } from "@/components/header/logo"
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full bg-background backdrop-blur supports-[backdrop-filter]:bg-background/30">
+    <header className="sticky top-0 z-50 w-full bg-background/50 backdrop-blur supports-[backdrop-filter]:bg-background/30">
       
       <div className="container mx-auto flex items-center justify-between h-16">
         

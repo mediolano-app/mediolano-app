@@ -66,12 +66,12 @@ export function MainNav() {
                   <NavigationMenuLink asChild>
                     <Link
                       className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                      href="/discover"
+                      href="/create"
                     >
-                      <Brain className="h-6 w-6 text-blue-600" />
-                      <div className="mb-2 mt-4 text-lg font-medium">Discover</div>
+                      <Box className="h-6 w-6 text-blue-600" />
+                      <div className="mb-2 mt-4 text-lg font-medium">Create</div>
                       <p className="text-sm leading-tight text-muted-foreground">
-                        Programmable IP for the Integrity Web.
+                        Tokenize your creative work and intellectual property
                       </p>
                     </Link>
                   </NavigationMenuLink>
@@ -79,14 +79,14 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/create"
+                    href="/discover"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Box className="mr-2 h-4 w-4  text-blue-600" />
-                      Create
+                      <Brain className="mr-2 h-4 w-4  text-blue-600" />
+                      Discover
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Register a new Programmable IP or Collection.
+                      Learn how to get started and protect your work.
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -111,10 +111,10 @@ export function MainNav() {
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <FileCode className="mr-2 h-4 w-4  text-blue-600" />
-                      Explore IP
+                      Explore
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Discover and explore all available assets.
+                      Discover and explore intellectual property onchain.
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -159,20 +159,7 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/portfolio/dashboard"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <LayoutDashboard className="mr-2 h-4 w-4  text-blue-600" />
-                      Dashboard
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Advanced assets management.
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
+
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
