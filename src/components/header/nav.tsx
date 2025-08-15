@@ -56,7 +56,7 @@ export function MainNav() {
         <NavigationMenuList>
           
           <NavigationMenuItem>
-            <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
+            <NavigationMenuTrigger className="bg-background/20 backdrop-blur">
               <Rocket className="mr-2 h-4 w-4" />
               Start
             </NavigationMenuTrigger>
