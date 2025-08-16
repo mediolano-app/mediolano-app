@@ -233,7 +233,7 @@ export default function CreatePage() {
   const selectedOptionData = creationOptions.find((opt) => opt.id === selectedOption)
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background/70 pb-20">
     
 
       <main className="container mx-auto p-4 max-w-10xl">

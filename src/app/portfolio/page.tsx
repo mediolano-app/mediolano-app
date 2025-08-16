@@ -49,7 +49,7 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="bg-background p-8">
+    <div className="bg-background/70 p-8">
       <main className="container mx-auto px-4 py-6">
       <div className="space-y-1 mb-5">
         <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>

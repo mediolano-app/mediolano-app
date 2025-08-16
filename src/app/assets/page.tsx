@@ -421,7 +421,7 @@ export default function AssetsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background/70 text-foreground pb-20">
      
       
       <main className="container mx-auto p-4 py-6">
