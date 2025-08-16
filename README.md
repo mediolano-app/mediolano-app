@@ -1,3 +1,7 @@
+<img width="1252" height="888" alt="image" src="https://github.com/user-attachments/assets/29a76a8b-9d05-489f-945b-eacca9b17996" />
+
+> [!IMPORTANT]
+> Mediolano dapp is in constant development. Use for testing purposes only. 
 
 Quick links:
 <br>
@@ -9,11 +13,6 @@ Quick links:
 <br>
 <a href="https://x.com/mediolanoapp">X / Twitter</a>
 <br>
-
-> [!IMPORTANT]
-> Mediolano dapp is in constant development. Use for testing purposes only. 
-
-<img width="1566" height="894" alt="Mediolano Dapp" src="https://github.com/user-attachments/assets/4fa365f6-51f6-4af9-9df1-2bff2eec13e3" />
 
 
 ## Programmable IP for the Integrity Web
