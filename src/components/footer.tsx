@@ -79,7 +79,7 @@ export function Footer() {
     <>
     {/*<DappInfo/>*/}
 
-    <footer className="bg-background/67 text-foreground">
+    <footer className="bg-background/80 text-foreground">
       <div className="container mx-auto px-4 py-6 md:py-8 lg:py-10">
         
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8 pt-6">

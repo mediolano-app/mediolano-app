@@ -57,13 +57,13 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 - [X] MIP Protocol @ Starknet Mainnet **25.07**
 
-- [ ] MIP Collections Protocol @ Starknet Sepolia **25.07**
+- [X] MIP Collections Protocol @ Starknet Sepolia **25.07**
 
-- [ ] MIP Dapp @ Starknet Mainnet **25.08**
+- [X] MIP Dapp @ Starknet Mainnet **25.08**
 
-- [ ] Mediolano Dapp @ Starknet Mainnet **25.08**
+- [X] MIP Collections Protocol @ Starknet Mainnet **25.08**
 
-- [ ] MIP Collections Protocol @ Starknet Mainnet **25.08**
+- [ ] Mediolano Dapp @ Starknet Mainnet **25.09**
 
 - [ ] Medialane Protocol @ Starknet Sepolia **25.08**
 
