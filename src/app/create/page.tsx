@@ -233,7 +233,7 @@ export default function CreatePage() {
   const selectedOptionData = creationOptions.find((opt) => opt.id === selectedOption)
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background pb-20">
     
 
       <main className="container mx-auto p-4 max-w-10xl">
@@ -476,7 +476,7 @@ export default function CreatePage() {
                   {/* Benefits */}
                   <Card>
                     <CardContent className="p-4">
-                      <h4 className="font-medium mb-3">Why register with Mediolano?</h4>
+                      <h4 className="font-medium mb-3">Why tokenize with Mediolano?</h4>
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm">
                           <CheckCircle className="h-4 w-4 text-green-500" />

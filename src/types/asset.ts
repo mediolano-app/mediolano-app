@@ -320,7 +320,7 @@ export interface trademarkIP  {
 
 
 
-export type IPType = "Basic" | "Art" | "Audio" | "Video" | "Document" | "Patent" | "RWA" | "Trademark" | "Software" | "NFT" | "Custom"
+export type IPType = "Art" | "Audio" | "Video" | "Document" | "Patent" | "RWA" | "Software" | "NFT" | "Custom"
 
 export type LicenseType = "Creative Commons" | "Commercial Use" | "Personal Use" | "Exclusive Rights" | "Open Source"
 

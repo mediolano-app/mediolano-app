@@ -145,20 +145,6 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/portfolio/collections"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <Grid2X2 className="mr-2 h-4 w-4  text-blue-600" />
-                      Collections
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Manage your IP Collections.
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
 
                 <NavigationMenuLink asChild>
                   <Link

@@ -37,8 +37,6 @@ const navigationItems = [
     title: 'Manage',
     items: [
       { title: 'Portfolio', href: '/portfolio', icon: FileText },
-      { title: 'Collections', href: '/portfolio/collections', icon: Gem },
-      { title: 'Dashboard', href: '/portfolio/dashboard', icon: LayoutDashboard },
       { title: 'Account', href: '/account', icon: User },
     ],
   },

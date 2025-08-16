@@ -49,14 +49,15 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-5 mb-20">
+    <div className="bg-background p-8">
+      <main className="container mx-auto px-4 py-6">
       <div className="space-y-1 mb-5">
         <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
         <p className="text-muted-foreground">
           Showcase and manage your digital assets
         </p>
       </div>
-      
+      </main>
       <Suspense fallback={<PortfolioSkeleton />}>
         <div className="space-y-8">
           {loading ? (
@@ -77,7 +78,7 @@ export default function PortfolioPage() {
             <div className="text-center py-8">
               <p className="text-muted-foreground mb-5">No collections found. Create your first collection to get started.</p>
               <Button variant="outline" asChild>
-                <Link href="/collections/create">Create Collection</Link>
+                <Link href="/create/collection">Create Collection</Link>
               </Button>
             </div>
           ) : (
