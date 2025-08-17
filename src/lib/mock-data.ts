@@ -1,989 +1,1326 @@
-import type { Asset, ActivityRecord, PortfolioStats, Collection, Template, IPType } from "@/types/asset"
+import type {
+  Asset,
+  Collection,
+  Creator,
+  Template,
+  ActivityRecord,
+  PortfolioStats,
+  OwnershipRecord,
+  User,
+} from "@/types/asset"
 
-// Enhanced mock assets with more comprehensive data
-export const assets: Asset[] = [
+// Enhanced mock creators data with more comprehensive profiles
+export const creators: Creator[] = [
   {
     id: "1",
-    name: "Abstract Dimension #312",
-    creator: "0xArtist",
+    slug: "alex-chen",
+    name: "Alex Chen",
+    address: "0x1a2b3c4d5e6f7g8h9i0j",
+    avatar: "/placeholder.svg?height=120&width=120&text=AC",
     verified: true,
-    image: "/placeholder.svg?height=500&width=400&text=Abstract+Art",
-    collection: "Dimensions",
-    licenseType: "Creative Commons",
-    description:
-      "An abstract digital artwork exploring dimensional concepts with vibrant colors and geometric patterns.",
-    registrationDate: "January 15, 2025",
-    value: "0.85 ETH",
-    type: "Art",
-    templateType: "Digital Artwork",
-    templateId: "template-art-1",
-    protectionLevel: 95,
-    metadata: {
-      dimensions: "3000x3000px",
-      medium: "Digital",
-      style: "Abstract",
-      colorPalette: "Vibrant",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2025-01-15T10:30:00Z",
-    numericValue: 850,
+    bio: "Digital artist and creative technologist specializing in abstract compositions and futuristic designs. Pioneer in programmable IP assets with over 5 years of experience in blockchain-based creative works.",
+    website: "https://alexchen.art",
+    twitter: "https://twitter.com/alexchen_art",
+    instagram: "https://instagram.com/alexchen.digital",
+    discord: "alexchen#1234",
+    joinDate: "January 2023",
+    totalAssets: 28,
+    totalValue: "156.8 ETH",
+    totalSales: 42,
+    followers: 12500,
+    following: 340,
+    collections: ["digital-horizons", "quantum-realms", "abstract-dimensions"],
+    specialties: ["Art", "NFT", "Digital Design"],
+    location: "San Francisco, CA",
+    isActive: true,
   },
   {
     id: "2",
-    name: "Cosmic Voyager #89",
-    creator: "CryptoCreator",
+    slug: "maya-rodriguez",
+    name: "Maya Rodriguez",
+    address: "0x2b3c4d5e6f7g8h9i0j1k",
+    avatar: "/placeholder.svg?height=120&width=120&text=MR",
     verified: true,
-    image: "/placeholder.svg?height=400&width=400&text=Cosmic+Space",
-    collection: "Cosmic Series",
-    licenseType: "Commercial Use",
-    description: "A journey through cosmic landscapes with ethereal elements and celestial bodies.",
-    registrationDate: "February 3, 2025",
-    value: "1.2 ETH",
-    type: "Art",
-    templateType: "Digital Artwork",
-    templateId: "template-art-1",
-    protectionLevel: 90,
-    metadata: {
-      dimensions: "4000x2500px",
-      medium: "Digital",
-      style: "Sci-Fi",
-      colorPalette: "Cosmic",
-    },
-    owner: "0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t",
-    createdAt: "2025-02-03T14:20:00Z",
-    numericValue: 1200,
+    bio: "Award-winning audio engineer and composer creating immersive soundscapes for the metaverse. Specializing in spatial audio and interactive music experiences.",
+    website: "https://mayamusic.io",
+    twitter: "https://twitter.com/maya_sounds",
+    instagram: "https://instagram.com/maya_audio",
+    joinDate: "February 2023",
+    totalAssets: 35,
+    totalValue: "89.3 ETH",
+    totalSales: 67,
+    followers: 8900,
+    following: 210,
+    collections: ["audio-landscapes", "sonic-journeys", "metaverse-sounds"],
+    specialties: ["Audio", "Music", "Sound Design"],
+    location: "Barcelona, Spain",
+    isActive: true,
   },
   {
     id: "3",
-    name: "Digital Dreams #567",
-    creator: "NFTMaster",
-    verified: false,
-    image: "/placeholder.svg?height=600&width=400&text=Digital+Dreams",
-    collection: "Dreamscape",
-    licenseType: "Personal Use",
-    description: "Surreal dreamscapes created through digital manipulation and AI enhancement.",
-    registrationDate: "February 18, 2025",
-    value: "0.5 ETH",
-    type: "Art",
-    templateType: "Digital Artwork",
-    templateId: "template-art-1",
-    protectionLevel: 85,
-    metadata: {
-      dimensions: "3500x3500px",
-      medium: "Digital/AI",
-      style: "Surrealism",
-      colorPalette: "Dreamy",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2025-02-18T09:15:00Z",
-    numericValue: 500,
+    slug: "dr-sarah-kim",
+    name: "Dr. Sarah Kim",
+    address: "0x3c4d5e6f7g8h9i0j1k2l",
+    avatar: "/placeholder.svg?height=120&width=120&text=SK",
+    verified: true,
+    bio: "AI researcher and patent attorney with PhD in Computer Science. Leading expert in machine learning innovations and intellectual property protection in the digital age.",
+    website: "https://sarahkim.research",
+    twitter: "https://twitter.com/dr_sarah_ai",
+    joinDate: "March 2023",
+    totalAssets: 18,
+    totalValue: "234.7 ETH",
+    totalSales: 15,
+    followers: 21000,
+    following: 150,
+    collections: ["ai-innovations", "ml-patents", "research-papers"],
+    specialties: ["Patent", "Software", "AI Research"],
+    location: "Seoul, South Korea",
+    isActive: true,
   },
   {
     id: "4",
-    name: "Pixel Paradise #42",
-    creator: "DigitalArtist",
+    slug: "techcorp-labs",
+    name: "TechCorp Labs",
+    address: "0x4d5e6f7g8h9i0j1k2l3m",
+    avatar: "/placeholder.svg?height=120&width=120&text=TC",
     verified: true,
-    image: "/placeholder.svg?height=450&width=400&text=Pixel+Art",
-    collection: "Pixel Art",
-    licenseType: "Creative Commons",
-    description: "Nostalgic pixel art scene depicting a tropical paradise with retro aesthetics.",
-    registrationDate: "December 12, 2024",
-    value: "0.3 ETH",
-    type: "Art",
-    templateType: "Digital Artwork",
-    templateId: "template-art-1",
-    protectionLevel: 92,
-    metadata: {
-      dimensions: "128x128px",
-      medium: "Pixel Art",
-      style: "Retro",
-      colorPalette: "Tropical",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2024-12-12T16:45:00Z",
-    numericValue: 300,
+    bio: "Enterprise software development and blockchain solutions company. Leading innovation in decentralized technologies and smart contract development.",
+    website: "https://techcorp.labs",
+    twitter: "https://twitter.com/techcorp_labs",
+    joinDate: "January 2023",
+    totalAssets: 45,
+    totalValue: "312.5 ETH",
+    totalSales: 28,
+    followers: 35000,
+    following: 80,
+    collections: ["blockchain-suite", "enterprise-solutions", "defi-protocols", "smart-contracts"],
+    specialties: ["Software", "Patent", "Blockchain"],
+    location: "Austin, TX",
+    isActive: true,
   },
   {
     id: "5",
-    name: "Neon Genesis #78",
-    creator: "0xArtist",
+    slug: "virtual-architects",
+    name: "Virtual Architects",
+    address: "0x5e6f7g8h9i0j1k2l3m4n",
+    avatar: "/placeholder.svg?height=120&width=120&text=VA",
     verified: true,
-    image: "/placeholder.svg?height=380&width=400&text=Neon+Cyberpunk",
-    collection: "Neon Collection",
-    licenseType: "Commercial Use",
-    description: "Cyberpunk-inspired artwork with neon elements and futuristic cityscapes.",
-    registrationDate: "March 5, 2025",
-    value: "1.5 ETH",
-    type: "Art",
-    templateType: "Digital Artwork",
-    templateId: "template-art-1",
-    protectionLevel: 98,
-    metadata: {
-      dimensions: "4500x2500px",
-      medium: "Digital",
-      style: "Cyberpunk",
-      colorPalette: "Neon",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2025-03-05T11:30:00Z",
-    numericValue: 1500,
+    bio: "Pioneering studio designing the future of virtual spaces. Specializing in metaverse architecture, 3D environments, and immersive digital experiences.",
+    website: "https://virtualarchitects.space",
+    twitter: "https://twitter.com/virtual_arch",
+    instagram: "https://instagram.com/virtual_architects",
+    joinDate: "April 2023",
+    totalAssets: 32,
+    totalValue: "178.9 ETH",
+    totalSales: 24,
+    followers: 18000,
+    following: 320,
+    collections: ["metaverse-spaces", "virtual-buildings", "3d-environments"],
+    specialties: ["Art", "Software", "3D Design"],
+    location: "London, UK",
+    isActive: true,
   },
   {
     id: "6",
-    name: "Quantum Realm #23",
-    creator: "QuantumCreator",
+    slug: "neon-collective",
+    name: "Neon Collective",
+    address: "0x6f7g8h9i0j1k2l3m4n5o",
+    avatar: "/placeholder.svg?height=120&width=120&text=NC",
     verified: false,
-    image: "/placeholder.svg?height=520&width=400&text=Quantum+Physics",
-    collection: "Quantum Series",
-    licenseType: "Personal Use",
-    description: "Visualization of quantum physics concepts through abstract digital art.",
-    registrationDate: "January 30, 2025",
-    value: "0.75 ETH",
-    type: "Art",
-    templateType: "Digital Artwork",
-    templateId: "template-art-1",
-    protectionLevel: 80,
-    metadata: {
-      dimensions: "3000x3000px",
-      medium: "Digital",
-      style: "Scientific",
-      colorPalette: "Quantum",
-    },
-    owner: "0x9876543210abcdef0123456789abcdef01234567",
-    createdAt: "2025-01-30T13:20:00Z",
-    numericValue: 750,
+    bio: "Cyberpunk art collective pushing the boundaries of digital expression. Creating dystopian visions and neon-soaked futures through collaborative digital art.",
+    website: "https://neoncollective.art",
+    instagram: "https://instagram.com/neon_collective",
+    discord: "neoncollective#5678",
+    joinDate: "May 2023",
+    totalAssets: 41,
+    totalValue: "124.6 ETH",
+    totalSales: 58,
+    followers: 28000,
+    following: 450,
+    collections: ["cyberpunk-dreams", "neon-nights", "digital-dystopia", "future-noir"],
+    specialties: ["Art", "NFT", "Digital Art"],
+    location: "Tokyo, Japan",
+    isActive: true,
   },
   {
     id: "7",
-    name: "Cyberpunk City #112",
-    creator: "CyberArtist",
+    slug: "quantum-labs",
+    name: "Quantum Labs",
+    address: "0x7g8h9i0j1k2l3m4n5o6p",
+    avatar: "/placeholder.svg?height=120&width=120&text=QL",
     verified: true,
-    image: "/placeholder.svg?height=480&width=400&text=Cyberpunk+City",
-    collection: "Cyberpunk",
-    licenseType: "Creative Commons",
-    description: "Dystopian urban landscape with high-tech elements and neon-lit streets.",
-    registrationDate: "February 25, 2025",
-    value: "0.95 ETH",
-    type: "Art",
-    templateType: "Digital Artwork",
-    templateId: "template-art-1",
-    protectionLevel: 94,
-    metadata: {
-      dimensions: "5000x3000px",
-      medium: "Digital",
-      style: "Cyberpunk",
-      colorPalette: "Neon/Dark",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2025-02-25T08:45:00Z",
-    numericValue: 950,
+    bio: "Quantum computing research and development laboratory. Pioneering the next generation of computational technologies and quantum algorithms.",
+    website: "https://quantumlabs.tech",
+    twitter: "https://twitter.com/quantum_labs",
+    joinDate: "February 2023",
+    totalAssets: 12,
+    totalValue: "287.3 ETH",
+    totalSales: 8,
+    followers: 15000,
+    following: 90,
+    collections: ["quantum-innovations", "computational-art"],
+    specialties: ["Patent", "Software", "Research"],
+    location: "Zurich, Switzerland",
+    isActive: true,
   },
   {
     id: "8",
-    name: "Ethereal Landscape #45",
-    creator: "LandscapeArtist",
+    slug: "digital-renaissance",
+    name: "Digital Renaissance",
+    address: "0x8h9i0j1k2l3m4n5o6p7q",
+    avatar: "/placeholder.svg?height=120&width=120&text=DR",
     verified: true,
-    image: "/placeholder.svg?height=420&width=400&text=Ethereal+Landscape",
-    collection: "Ethereal",
-    licenseType: "Commercial Use",
-    description: "Dreamlike natural landscapes with otherworldly lighting and atmospheric effects.",
-    registrationDate: "March 10, 2025",
-    value: "0.65 ETH",
-    type: "Art",
-    templateType: "Digital Artwork",
-    templateId: "template-art-1",
-    protectionLevel: 91,
-    metadata: {
-      dimensions: "4000x2250px",
-      medium: "Digital",
-      style: "Landscape",
-      colorPalette: "Ethereal",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2025-03-10T15:10:00Z",
-    numericValue: 650,
-  },
-  {
-    id: "9",
-    name: "Synthwave Beats Vol. 1",
-    creator: "AudioProducer",
-    verified: true,
-    image: "/placeholder.svg?height=400&width=400&text=Synthwave+Music",
-    collection: "Audio Collection",
-    licenseType: "Commercial Use",
-    description: "A collection of synthwave tracks with retro-futuristic vibes and electronic beats.",
-    registrationDate: "March 15, 2025",
-    value: "0.4 ETH",
-    type: "Audio",
-    templateType: "Music Track",
-    templateId: "template-audio-1",
-    protectionLevel: 88,
-    metadata: {
-      duration: "32:45",
-      bpm: "120",
-      key: "F Minor",
-      genre: "Synthwave",
-      instruments: "Synthesizers, Drum Machine",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2025-03-15T12:00:00Z",
-    numericValue: 400,
-  },
-  {
-    id: "10",
-    name: "Epic Orchestral Suite",
-    creator: "ComposerMaster",
-    verified: true,
-    image: "/placeholder.svg?height=400&width=400&text=Orchestral+Music",
-    collection: "Audio Collection",
-    licenseType: "Commercial Use",
-    description: "Cinematic orchestral composition perfect for film scores and dramatic presentations.",
-    registrationDate: "March 20, 2025",
-    value: "0.8 ETH",
-    type: "Audio",
-    templateType: "Music Track",
-    templateId: "template-audio-1",
-    protectionLevel: 96,
-    metadata: {
-      duration: "8:32",
-      bpm: "80",
-      key: "C Major",
-      genre: "Orchestral",
-      instruments: "Full Orchestra, Choir",
-    },
-    owner: "0x456789abcdef0123456789abcdef0123456789ab",
-    createdAt: "2025-03-20T10:30:00Z",
-    numericValue: 800,
-  },
-  {
-    id: "11",
-    name: "Documentary: Future Cities",
-    creator: "FilmmakerPro",
-    verified: true,
-    image: "/placeholder.svg?height=400&width=400&text=Documentary+Film",
-    collection: "Video Content",
-    licenseType: "Educational Use",
-    description: "Award-winning documentary exploring sustainable urban development and smart city technologies.",
-    registrationDate: "February 28, 2025",
-    value: "2.1 ETH",
-    type: "Video",
-    templateType: "Video Content",
-    templateId: "template-video-1",
-    protectionLevel: 99,
-    metadata: {
-      duration: "87:23",
-      resolution: "4K",
-      format: "MP4",
-      frameRate: "24fps",
-    },
-    owner: "0x789abcdef0123456789abcdef0123456789abcdef",
-    createdAt: "2025-02-28T14:15:00Z",
-    numericValue: 2100,
-  },
-  {
-    id: "12",
-    name: "Legal Contract Template",
-    creator: "LegalEagle",
-    verified: true,
-    image: "/placeholder.svg?height=400&width=400&text=Legal+Document",
-    collection: "Legal Documents",
-    licenseType: "Commercial Use",
-    description: "Professionally drafted legal contract template for business agreements and partnerships.",
-    registrationDate: "March 8, 2025",
-    value: "0.25 ETH",
-    type: "Document",
-    templateType: "Legal Document",
-    templateId: "template-document-1",
-    protectionLevel: 96,
-    metadata: {
-      documentType: "Contract Template",
-      jurisdiction: "International",
-      parties: "Multi-party",
-      effectiveDate: "Upon Execution",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2025-03-08T09:30:00Z",
-    numericValue: 250,
-  },
-  {
-    id: "13",
-    name: "Blockchain Patent #42",
-    creator: "TechInnovator",
-    verified: true,
-    image: "/placeholder.svg?height=400&width=400&text=Patent+Document",
-    collection: "Tech Patents",
-    licenseType: "Commercial Use",
-    description: "Patent for a novel blockchain consensus mechanism with improved scalability and energy efficiency.",
-    registrationDate: "February 28, 2025",
-    value: "2.5 ETH",
-    type: "Patent",
-    templateType: "Technical Patent",
-    templateId: "template-patent-1",
-    protectionLevel: 99,
-    metadata: {
-      claims: "17",
-      filingDate: "January 15, 2025",
-      patentClass: "G06F 21/64",
-      inventors: "Dr. Sarah Chen, Alex Rodriguez",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2025-02-28T11:45:00Z",
-    numericValue: 2500,
-  },
-  {
-    id: "14",
-    name: "Crypto Trading Algorithm",
-    creator: "FinTechDev",
-    verified: false,
-    image: "/placeholder.svg?height=400&width=400&text=Trading+Software",
-    collection: "Software Assets",
-    licenseType: "Commercial Use",
-    description: "Algorithmic trading system for cryptocurrency markets with machine learning optimization.",
-    registrationDate: "March 12, 2025",
-    value: "1.8 ETH",
-    type: "Software",
-    templateType: "Software Application",
-    templateId: "template-software-1",
-    protectionLevel: 93,
-    metadata: {
-      language: "Python",
-      platform: "Cross-platform",
-      dependencies: "TensorFlow, NumPy, Pandas",
-      version: "2.1.4",
-    },
-    owner: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-    createdAt: "2025-03-12T16:20:00Z",
-    numericValue: 1800,
-  },
-  {
-    id: "15",
-    name: "TechBrand™ Logo",
-    creator: "BrandDesigner",
-    verified: true,
-    image: "/placeholder.svg?height=400&width=400&text=Brand+Logo",
-    collection: "Brand Assets",
-    licenseType: "Trademark",
-    description: "Registered trademark for innovative technology brand with comprehensive usage guidelines.",
-    registrationDate: "January 20, 2025",
-    value: "1.2 ETH",
-    type: "Trademark",
-    templateType: "Brand Trademark",
-    templateId: "template-trademark-1",
-    protectionLevel: 98,
-    metadata: {
-      brandName: "TechBrand",
-      category: "Technology Services",
-      jurisdiction: "Global",
-      registrationNumber: "TM-2025-001",
-    },
-    owner: "0xabcdef0123456789abcdef0123456789abcdef01",
-    createdAt: "2025-01-20T13:30:00Z",
-    numericValue: 1200,
-  },
-  {
-    id: "16",
-    name: "Rare Genesis NFT #001",
-    creator: "NFTArtist",
-    verified: true,
-    image: "/placeholder.svg?height=400&width=400&text=Genesis+NFT",
-    collection: "Genesis Collection",
-    licenseType: "NFT License",
-    description: "First-ever minted NFT in the Genesis Collection with unique provenance and rarity attributes.",
-    registrationDate: "December 1, 2024",
-    value: "5.0 ETH",
-    type: "NFT",
-    templateType: "Collectible NFT",
-    templateId: "template-nft-1",
-    protectionLevel: 100,
-    metadata: {
-      blockchain: "Ethereum",
-      tokenId: "1",
-      edition: "1/1",
-      rarity: "Legendary",
-    },
-    owner: "0xdef0123456789abcdef0123456789abcdef012345",
-    createdAt: "2024-12-01T00:00:00Z",
-    numericValue: 5000,
+    bio: "Art movement bridging classical aesthetics with digital innovation. Creating timeless pieces that honor traditional art while embracing cutting-edge technology.",
+    website: "https://digitalrenaissance.gallery",
+    twitter: "https://twitter.com/digital_ren",
+    instagram: "https://instagram.com/digital_renaissance",
+    joinDate: "June 2023",
+    totalAssets: 29,
+    totalValue: "198.4 ETH",
+    totalSales: 36,
+    followers: 32000,
+    following: 180,
+    collections: ["classical-digital", "renaissance-nfts", "timeless-art"],
+    specialties: ["Art", "NFT", "Classical Art"],
+    location: "Florence, Italy",
+    isActive: true,
   },
 ]
 
-// Enhanced provenance data with comprehensive event tracking
-interface ProvenanceData {
-  assetId: string
-  events: Array<{
-    id: string
-    type: "creation" | "transfer" | "license" | "modification" | "verification" | "dispute"
-    title: string
-    description: string
-    from?: string
-    to?: string
-    date: string
-    timestamp: string
-    transactionHash?: string
-    blockNumber?: number
-    gasUsed?: number
-    memo?: string
-    verified: boolean
-    location?: string
-    ipAddress?: string
-    userAgent?: string
-    metadata?: Record<string, any>
-  }>
-}
-
-export const mockProvenanceData: ProvenanceData[] = [
+// Enhanced collections data with more variety
+export const collections: Collection[] = [
+  // Alex Chen's Collections
   {
-    assetId: "1",
-    events: [
-      {
-        id: "prov-1-1",
-        type: "creation",
-        title: "Asset Created",
-        description: "Abstract Dimension #312 was originally created and registered on the blockchain",
-        to: "0xArtist",
-        date: "January 15, 2025",
-        timestamp: "2025-01-15T10:30:00Z",
-        transactionHash: "0xabc123def456789abc123def456789abc123def456789abc123def456789abc123",
-        blockNumber: 19234567,
-        gasUsed: 125000,
-        verified: true,
-        location: "San Francisco, CA",
-        metadata: {
-          creationTool: "Adobe Creative Suite",
-          originalFormat: "PSD",
-          colorSpace: "sRGB",
-          dpi: 300,
-        },
-      },
-      {
-        id: "prov-1-2",
-        type: "verification",
-        title: "Community Verification",
-        description: "Asset authenticity verified by community validators",
-        date: "January 16, 2025",
-        timestamp: "2025-01-16T14:20:00Z",
-        verified: true,
-        metadata: {
-          validators: 15,
-          consensus: "unanimous",
-          verificationScore: 98.5,
-        },
-      },
-      {
-        id: "prov-1-3",
-        type: "license",
-        title: "License Agreement",
-        description: "Creative Commons license applied with commercial usage rights",
-        date: "January 18, 2025",
-        timestamp: "2025-01-18T09:15:00Z",
-        verified: true,
-        memo: "Commercial usage permitted with attribution",
-        metadata: {
-          licenseType: "CC BY-SA 4.0",
-          royaltyRate: "5%",
-          territory: "Worldwide",
-        },
-      },
-      {
-        id: "prov-1-4",
-        type: "transfer",
-        title: "Ownership Transfer",
-        description: "Asset transferred to new owner through marketplace transaction",
-        from: "0xArtist",
-        to: "CollectorDAO",
-        date: "February 10, 2025",
-        timestamp: "2025-02-10T16:45:00Z",
-        transactionHash: "0xdef456789abc123def456789abc123def456789abc123def456789abc123def456",
-        blockNumber: 19245678,
-        gasUsed: 85000,
-        verified: true,
-        memo: "Purchased through Mediolano marketplace",
-        metadata: {
-          salePrice: "0.85 ETH",
-          marketplace: "Mediolano",
-          paymentMethod: "ETH",
-        },
-      },
-    ],
+    id: "digital-horizons",
+    slug: "digital-horizons",
+    name: "Digital Horizons",
+    description:
+      "A curated collection of abstract digital artworks exploring the boundaries between reality and imagination, featuring stunning gradients and futuristic compositions.",
+    assetCount: 12,
+    totalValue: "45.8 ETH",
+    creator: "Alex Chen",
+    creationDate: "January 2024",
+    coverImage: "/digital-horizon-collection.png",
+    type: "Art",
+  },
+  {
+    id: "quantum-realms",
+    slug: "quantum-realms",
+    name: "Quantum Realms",
+    description:
+      "Exploring the intersection of quantum physics and digital art through mesmerizing visual representations of quantum phenomena.",
+    assetCount: 8,
+    totalValue: "32.4 ETH",
+    creator: "Alex Chen",
+    creationDate: "March 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Quantum+Realms",
+    type: "Art",
+  },
+  {
+    id: "abstract-dimensions",
+    slug: "abstract-dimensions",
+    name: "Abstract Dimensions",
+    description:
+      "Multi-dimensional abstract compositions that challenge perception and explore the concept of space in digital art.",
+    assetCount: 8,
+    totalValue: "28.6 ETH",
+    creator: "Alex Chen",
+    creationDate: "May 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Abstract+Dimensions",
+    type: "Art",
+  },
+
+  // Maya Rodriguez's Collections
+  {
+    id: "audio-landscapes",
+    slug: "audio-landscapes",
+    name: "Audio Landscapes",
+    description:
+      "Immersive soundscapes that paint vivid auditory pictures of imaginary worlds, from serene natural environments to bustling futuristic cities.",
+    assetCount: 15,
+    totalValue: "38.7 ETH",
+    creator: "Maya Rodriguez",
+    creationDate: "February 2024",
+    coverImage: "/audio-landscape-sound-waves.png",
+    type: "Audio",
+  },
+  {
+    id: "sonic-journeys",
+    slug: "sonic-journeys",
+    name: "Sonic Journeys",
+    description:
+      "Epic audio adventures that take listeners through emotional and physical landscapes using innovative sound design techniques.",
+    assetCount: 10,
+    totalValue: "29.1 ETH",
+    creator: "Maya Rodriguez",
+    creationDate: "April 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Sonic+Journeys",
+    type: "Audio",
+  },
+  {
+    id: "metaverse-sounds",
+    slug: "metaverse-sounds",
+    name: "Metaverse Sounds",
+    description: "Spatial audio compositions designed specifically for virtual reality and metaverse experiences.",
+    assetCount: 10,
+    totalValue: "21.5 ETH",
+    creator: "Maya Rodriguez",
+    creationDate: "June 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Metaverse+Sounds",
+    type: "Audio",
+  },
+
+  // Dr. Sarah Kim's Collections
+  {
+    id: "ai-innovations",
+    slug: "ai-innovations",
+    name: "AI Innovations",
+    description:
+      "Cutting-edge artificial intelligence patents and research papers covering breakthrough innovations in machine learning and neural networks.",
+    assetCount: 8,
+    totalValue: "156.3 ETH",
+    creator: "Dr. Sarah Kim",
+    creationDate: "January 2024",
+    coverImage: "/ai-innovation-neural-network.png",
+    type: "Patent",
+  },
+  {
+    id: "ml-patents",
+    slug: "ml-patents",
+    name: "Machine Learning Patents",
+    description:
+      "Comprehensive collection of machine learning patents covering algorithms, architectures, and applications.",
+    assetCount: 6,
+    totalValue: "78.4 ETH",
+    creator: "Dr. Sarah Kim",
+    creationDate: "March 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=ML+Patents",
+    type: "Patent",
+  },
+  {
+    id: "research-papers",
+    slug: "research-papers",
+    name: "Research Papers",
+    description: "Academic research papers and technical documentation on AI and machine learning innovations.",
+    assetCount: 4,
+    totalValue: "12.8 ETH",
+    creator: "Dr. Sarah Kim",
+    creationDate: "May 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Research+Papers",
+    type: "Document",
+  },
+
+  // TechCorp Labs Collections
+  {
+    id: "blockchain-suite",
+    slug: "blockchain-suite",
+    name: "Blockchain Suite",
+    description:
+      "Comprehensive blockchain software solutions for enterprise applications, including smart contracts and DeFi protocols.",
+    assetCount: 15,
+    totalValue: "89.7 ETH",
+    creator: "TechCorp Labs",
+    creationDate: "February 2024",
+    coverImage: "/blockchain-software-interface.png",
+    type: "Software",
+  },
+  {
+    id: "enterprise-solutions",
+    slug: "enterprise-solutions",
+    name: "Enterprise Solutions",
+    description: "Business-grade software solutions designed for large-scale enterprise deployment and integration.",
+    assetCount: 12,
+    totalValue: "67.2 ETH",
+    creator: "TechCorp Labs",
+    creationDate: "March 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Enterprise+Solutions",
+    type: "Software",
+  },
+  {
+    id: "defi-protocols",
+    slug: "defi-protocols",
+    name: "DeFi Protocols",
+    description: "Decentralized finance protocols and smart contracts for next-generation financial applications.",
+    assetCount: 10,
+    totalValue: "78.9 ETH",
+    creator: "TechCorp Labs",
+    creationDate: "April 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=DeFi+Protocols",
+    type: "Software",
+  },
+  {
+    id: "smart-contracts",
+    slug: "smart-contracts",
+    name: "Smart Contracts",
+    description: "Audited and optimized smart contracts for various blockchain applications and use cases.",
+    assetCount: 8,
+    totalValue: "76.7 ETH",
+    creator: "TechCorp Labs",
+    creationDate: "May 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Smart+Contracts",
+    type: "Software",
+  },
+
+  // Virtual Architects Collections
+  {
+    id: "metaverse-spaces",
+    slug: "metaverse-spaces",
+    name: "Metaverse Spaces",
+    description:
+      "Architectural designs and 3D environments for virtual worlds, featuring innovative spatial concepts and immersive experiences.",
+    assetCount: 14,
+    totalValue: "67.8 ETH",
+    creator: "Virtual Architects",
+    creationDate: "February 2024",
+    coverImage: "/metaverse-architecture-virtual-space.png",
+    type: "Art",
+  },
+  {
+    id: "virtual-buildings",
+    slug: "virtual-buildings",
+    name: "Virtual Buildings",
+    description: "Detailed architectural models of futuristic buildings designed for virtual reality environments.",
+    assetCount: 10,
+    totalValue: "54.3 ETH",
+    creator: "Virtual Architects",
+    creationDate: "April 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Virtual+Buildings",
+    type: "Art",
+  },
+  {
+    id: "3d-environments",
+    slug: "3d-environments",
+    name: "3D Environments",
+    description: "Complete 3D environmental designs for games, simulations, and virtual experiences.",
+    assetCount: 8,
+    totalValue: "56.8 ETH",
+    creator: "Virtual Architects",
+    creationDate: "June 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=3D+Environments",
+    type: "Art",
+  },
+
+  // Neon Collective Collections
+  {
+    id: "cyberpunk-dreams",
+    slug: "cyberpunk-dreams",
+    name: "Cyberpunk Dreams",
+    description:
+      "Neon-soaked visions of dystopian futures and cybernetic realities, featuring dark cityscapes and technological aesthetics.",
+    assetCount: 16,
+    totalValue: "48.9 ETH",
+    creator: "Neon Collective",
+    creationDate: "February 2024",
+    coverImage: "/cyberpunk-city-neon-futuristic-night.png",
+    type: "Art",
+  },
+  {
+    id: "neon-nights",
+    slug: "neon-nights",
+    name: "Neon Nights",
+    description:
+      "Vibrant nighttime scenes illuminated by neon lights and holographic displays in futuristic urban settings.",
+    assetCount: 12,
+    totalValue: "36.7 ETH",
+    creator: "Neon Collective",
+    creationDate: "March 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Neon+Nights",
+    type: "Art",
+  },
+  {
+    id: "digital-dystopia",
+    slug: "digital-dystopia",
+    name: "Digital Dystopia",
+    description: "Dark visions of technology-dominated futures exploring themes of surveillance and digital control.",
+    assetCount: 8,
+    totalValue: "24.1 ETH",
+    creator: "Neon Collective",
+    creationDate: "May 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Digital+Dystopia",
+    type: "Art",
+  },
+  {
+    id: "future-noir",
+    slug: "future-noir",
+    name: "Future Noir",
+    description:
+      "Film noir aesthetics reimagined in futuristic settings with dramatic lighting and mysterious atmospheres.",
+    assetCount: 5,
+    totalValue: "14.9 ETH",
+    creator: "Neon Collective",
+    creationDate: "July 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Future+Noir",
+    type: "Art",
+  },
+
+  // Quantum Labs Collections
+  {
+    id: "quantum-innovations",
+    slug: "quantum-innovations",
+    name: "Quantum Innovations",
+    description:
+      "Revolutionary quantum computing patents and algorithms that push the boundaries of computational science.",
+    assetCount: 8,
+    totalValue: "198.7 ETH",
+    creator: "Quantum Labs",
+    creationDate: "March 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Quantum+Innovations",
+    type: "Patent",
+  },
+  {
+    id: "computational-art",
+    slug: "computational-art",
+    name: "Computational Art",
+    description: "Artistic visualizations of quantum phenomena and computational processes.",
+    assetCount: 4,
+    totalValue: "88.6 ETH",
+    creator: "Quantum Labs",
+    creationDate: "May 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Computational+Art",
+    type: "Art",
+  },
+
+  // Digital Renaissance Collections
+  {
+    id: "classical-digital",
+    slug: "classical-digital",
+    name: "Classical Digital",
+    description:
+      "Classical art masterpieces reimagined through digital mediums, honoring traditional techniques while embracing modern technology.",
+    assetCount: 15,
+    totalValue: "89.3 ETH",
+    creator: "Digital Renaissance",
+    creationDate: "March 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Classical+Digital",
+    type: "Art",
+  },
+  {
+    id: "renaissance-nfts",
+    slug: "renaissance-nfts",
+    name: "Renaissance NFTs",
+    description:
+      "NFT collection inspired by Renaissance masters, featuring digital interpretations of classical compositions and techniques.",
+    assetCount: 10,
+    totalValue: "67.8 ETH",
+    creator: "Digital Renaissance",
+    creationDate: "April 2024",
+    coverImage: "/abstract-horizon-blue-purple.png",
+    type: "NFT",
+  },
+  {
+    id: "timeless-art",
+    slug: "timeless-art",
+    name: "Timeless Art",
+    description:
+      "Art pieces that transcend time periods, blending historical aesthetics with contemporary digital techniques.",
+    assetCount: 4,
+    totalValue: "41.3 ETH",
+    creator: "Digital Renaissance",
+    creationDate: "June 2024",
+    coverImage: "/placeholder.svg?height=400&width=600&text=Timeless+Art",
+    type: "Art",
+  },
+]
+
+// Enhanced assets data with more variety and better distribution
+export const assets: Asset[] = [
+  // Alex Chen's Assets
+  {
+    id: "1",
+    name: "Abstract Horizon #001",
+    creator: "Alex Chen",
+    verified: true,
+    image: "/abstract-horizon-blue-purple.png",
+    collection: "Digital Horizons",
+    licenseType: "Creative Commons",
+    description:
+      "A mesmerizing blend of blue and purple hues creating an abstract horizon that captures the essence of digital infinity.",
+    registrationDate: "January 15, 2024",
+    value: "3.8 ETH",
+    type: "Art",
+    templateType: "Digital Art",
+    templateId: "digital-art",
+    protectionLevel: 95,
+    metadata: {
+      style: "Abstract",
+      medium: "Digital",
+      dimensions: "3840x2160",
+      colorPalette: ["#4F46E5", "#7C3AED", "#EC4899"],
+    },
+    owner: "CollectorDAO",
+    createdAt: "2024-01-15T10:30:00Z",
+    numericValue: 3.8,
+  },
+  {
+    id: "2",
+    name: "Quantum Particle Dance",
+    creator: "Alex Chen",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=Quantum+Particle+Dance",
+    collection: "Quantum Realms",
+    licenseType: "Creative Commons",
+    description:
+      "Dynamic visualization of quantum particles in motion, representing the fundamental dance of matter at the subatomic level.",
+    registrationDate: "March 10, 2024",
+    value: "4.2 ETH",
+    type: "Art",
+    templateType: "Digital Art",
+    templateId: "digital-art",
+    protectionLevel: 92,
+    metadata: {
+      style: "Scientific Visualization",
+      medium: "Digital",
+      dimensions: "4096x4096",
+      animation: "60fps",
+    },
+    owner: "Alex Chen",
+    createdAt: "2024-03-10T14:20:00Z",
+    numericValue: 4.2,
+  },
+  {
+    id: "3",
+    name: "Dimensional Portal #003",
+    creator: "Alex Chen",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=Dimensional+Portal",
+    collection: "Abstract Dimensions",
+    licenseType: "Commercial",
+    description: "A gateway between dimensions rendered in stunning abstract geometry and ethereal lighting effects.",
+    registrationDate: "May 22, 2024",
+    value: "3.6 ETH",
+    type: "Art",
+    templateType: "Digital Art",
+    templateId: "digital-art",
+    protectionLevel: 89,
+    metadata: {
+      style: "Geometric Abstract",
+      medium: "Digital",
+      dimensions: "3840x2160",
+      effects: "Particle Systems",
+    },
+    owner: "MetaverseDAO",
+    createdAt: "2024-05-22T16:45:00Z",
+    numericValue: 3.6,
+  },
+
+  // Maya Rodriguez's Assets
+  {
+    id: "4",
+    name: "Quantum Music Waves",
+    creator: "Maya Rodriguez",
+    verified: true,
+    image: "/quantum-music-waves.png",
+    collection: "Audio Landscapes",
+    licenseType: "Commercial",
+    description:
+      "An innovative audio-visual representation of quantum sound waves, blending science and art in perfect harmony.",
+    registrationDate: "February 20, 2024",
+    value: "2.8 ETH",
+    type: "Audio",
+    templateType: "Audio Art",
+    templateId: "audio-art",
+    protectionLevel: 88,
+    metadata: {
+      duration: "4:32",
+      sampleRate: "96kHz",
+      format: "FLAC",
+      genre: "Ambient Electronic",
+    },
+    owner: "Maya Rodriguez",
+    createdAt: "2024-02-20T14:15:00Z",
+    numericValue: 2.8,
+  },
+  {
+    id: "5",
+    name: "Ethereal Journey",
+    creator: "Maya Rodriguez",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=Ethereal+Journey",
+    collection: "Sonic Journeys",
+    licenseType: "Creative Commons",
+    description:
+      "A transcendent audio experience that takes listeners through otherworldly soundscapes and emotional landscapes.",
+    registrationDate: "April 15, 2024",
+    value: "3.1 ETH",
+    type: "Audio",
+    templateType: "Audio Art",
+    templateId: "audio-art",
+    protectionLevel: 91,
+    metadata: {
+      duration: "7:18",
+      sampleRate: "48kHz",
+      format: "WAV",
+      genre: "Cinematic Ambient",
+    },
+    owner: "AudioCollective",
+    createdAt: "2024-04-15T11:30:00Z",
+    numericValue: 3.1,
+  },
+  {
+    id: "6",
+    name: "VR Spatial Symphony",
+    creator: "Maya Rodriguez",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=VR+Spatial+Symphony",
+    collection: "Metaverse Sounds",
+    licenseType: "Commercial",
+    description:
+      "Immersive spatial audio composition designed for virtual reality environments with 360-degree sound positioning.",
+    registrationDate: "June 8, 2024",
+    value: "2.4 ETH",
+    type: "Audio",
+    templateType: "Spatial Audio",
+    templateId: "spatial-audio",
+    protectionLevel: 94,
+    metadata: {
+      duration: "5:45",
+      format: "Ambisonic B-Format",
+      channels: "360° Spatial",
+      vrCompatible: true,
+    },
+    owner: "VRStudio",
+    createdAt: "2024-06-08T09:20:00Z",
+    numericValue: 2.4,
+  },
+
+  // Dr. Sarah Kim's Assets
+  {
+    id: "7",
+    name: "Neural Network Patent #2024-001",
+    creator: "Dr. Sarah Kim",
+    verified: true,
+    image: "/neural-network-patent.png",
+    collection: "AI Innovations",
+    licenseType: "Patent",
+    description:
+      "Revolutionary neural network architecture for enhanced machine learning performance with 40% efficiency improvement.",
+    registrationDate: "January 30, 2024",
+    value: "28.5 ETH",
+    type: "Patent",
+    templateType: "Technical Patent",
+    templateId: "patent",
+    protectionLevel: 99,
+    metadata: {
+      patentNumber: "US11234567B2",
+      filingDate: "2024-01-15",
+      inventors: ["Dr. Sarah Kim", "Dr. Michael Chen"],
+      claims: 24,
+    },
+    owner: "Dr. Sarah Kim",
+    createdAt: "2024-01-30T09:00:00Z",
+    numericValue: 28.5,
+  },
+  {
+    id: "8",
+    name: "Quantum ML Algorithm",
+    creator: "Dr. Sarah Kim",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=Quantum+ML+Algorithm",
+    collection: "ML Patents",
+    licenseType: "Patent",
+    description:
+      "Breakthrough quantum machine learning algorithm that leverages quantum computing for exponential speedup.",
+    registrationDate: "March 25, 2024",
+    value: "35.2 ETH",
+    type: "Patent",
+    templateType: "Technical Patent",
+    templateId: "patent",
+    protectionLevel: 98,
+    metadata: {
+      patentNumber: "US11345678B2",
+      filingDate: "2024-03-10",
+      inventors: ["Dr. Sarah Kim"],
+      claims: 18,
+    },
+    owner: "QuantumTech Inc",
+    createdAt: "2024-03-25T13:45:00Z",
+    numericValue: 35.2,
+  },
+
+  // TechCorp Labs Assets
+  {
+    id: "9",
+    name: "Blockchain Interface v3.0",
+    creator: "TechCorp Labs",
+    verified: true,
+    image: "/blockchain-software-interface.png",
+    collection: "Blockchain Suite",
+    licenseType: "MIT",
+    description:
+      "Next-generation blockchain interface software with enhanced security features and improved user experience.",
+    registrationDate: "February 10, 2024",
+    value: "12.8 ETH",
+    type: "Software",
+    templateType: "Software License",
+    templateId: "software",
+    protectionLevel: 96,
+    metadata: {
+      version: "3.0.1",
+      language: "TypeScript",
+      framework: "React",
+      license: "MIT",
+    },
+    owner: "TechCorp Labs",
+    createdAt: "2024-02-10T16:45:00Z",
+    numericValue: 12.8,
+  },
+  {
+    id: "10",
+    name: "DeFi Yield Protocol",
+    creator: "TechCorp Labs",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=DeFi+Yield+Protocol",
+    collection: "DeFi Protocols",
+    licenseType: "GPL-3.0",
+    description:
+      "Advanced DeFi protocol for optimized yield farming with automated risk management and portfolio rebalancing.",
+    registrationDate: "April 18, 2024",
+    value: "18.7 ETH",
+    type: "Software",
+    templateType: "Smart Contract",
+    templateId: "smart-contract",
+    protectionLevel: 97,
+    metadata: {
+      version: "1.2.0",
+      language: "Solidity",
+      audited: true,
+      gasOptimized: true,
+    },
+    owner: "DeFiDAO",
+    createdAt: "2024-04-18T10:15:00Z",
+    numericValue: 18.7,
+  },
+
+  // Virtual Architects Assets
+  {
+    id: "11",
+    name: "Metaverse Architecture #001",
+    creator: "Virtual Architects",
+    verified: true,
+    image: "/metaverse-architecture-virtual-space.png",
+    collection: "Metaverse Spaces",
+    licenseType: "Creative Commons",
+    description:
+      "Stunning architectural design for virtual spaces, featuring futuristic elements and immersive environments.",
+    registrationDate: "February 15, 2024",
+    value: "6.4 ETH",
+    type: "Art",
+    templateType: "3D Design",
+    templateId: "3d-design",
+    protectionLevel: 87,
+    metadata: {
+      software: "Blender",
+      polyCount: "2.8M",
+      textures: "4K PBR",
+      format: "FBX",
+    },
+    owner: "MetaverseDAO",
+    createdAt: "2024-02-15T11:20:00Z",
+    numericValue: 6.4,
+  },
+  {
+    id: "12",
+    name: "Neo-Tokyo Tower",
+    creator: "Virtual Architects",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=Neo+Tokyo+Tower",
+    collection: "Virtual Buildings",
+    licenseType: "Commercial",
+    description: "Futuristic skyscraper design inspired by Japanese architecture and cyberpunk aesthetics.",
+    registrationDate: "April 28, 2024",
+    value: "8.9 ETH",
+    type: "Art",
+    templateType: "3D Architecture",
+    templateId: "3d-architecture",
+    protectionLevel: 92,
+    metadata: {
+      software: "Blender + Unreal Engine",
+      polyCount: "4.2M",
+      textures: "8K PBR",
+      lighting: "Real-time Ray Tracing",
+    },
+    owner: "CyberCity Collective",
+    createdAt: "2024-04-28T15:30:00Z",
+    numericValue: 8.9,
+  },
+
+  // Neon Collective Assets
+  {
+    id: "13",
+    name: "Cyberpunk City #2077",
+    creator: "Neon Collective",
+    verified: false,
+    image: "/cyberpunk-city-neon-futuristic-night.png",
+    collection: "Cyberpunk Dreams",
+    licenseType: "Creative Commons",
+    description:
+      "A neon-lit cyberpunk cityscape that captures the essence of a futuristic dystopian world with stunning detail.",
+    registrationDate: "February 20, 2024",
+    value: "4.1 ETH",
+    type: "Art",
+    templateType: "Digital Art",
+    templateId: "digital-art",
+    protectionLevel: 78,
+    metadata: {
+      style: "Cyberpunk",
+      mood: "Dystopian",
+      lighting: "Neon",
+      era: "2077",
+    },
+    owner: "CyberCollector",
+    createdAt: "2024-02-20T20:30:00Z",
+    numericValue: 4.1,
+  },
+  {
+    id: "14",
+    name: "Neon Samurai",
+    creator: "Neon Collective",
+    verified: false,
+    image: "/placeholder.svg?height=400&width=600&text=Neon+Samurai",
+    collection: "Neon Nights",
+    licenseType: "Creative Commons",
+    description: "A cybernetic samurai warrior illuminated by neon lights in a rain-soaked Tokyo street.",
+    registrationDate: "March 18, 2024",
+    value: "3.7 ETH",
+    type: "Art",
+    templateType: "Character Art",
+    templateId: "character-art",
+    protectionLevel: 82,
+    metadata: {
+      style: "Cyberpunk Character",
+      medium: "Digital Painting",
+      dimensions: "2048x3072",
+      theme: "Samurai Cyberpunk",
+    },
+    owner: "NeonCollector",
+    createdAt: "2024-03-18T19:45:00Z",
+    numericValue: 3.7,
+  },
+
+  // Quantum Labs Assets
+  {
+    id: "15",
+    name: "Quantum Entanglement Protocol",
+    creator: "Quantum Labs",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=Quantum+Entanglement+Protocol",
+    collection: "Quantum Innovations",
+    licenseType: "Patent",
+    description: "Revolutionary quantum entanglement protocol for secure quantum communication networks.",
+    registrationDate: "March 12, 2024",
+    value: "45.8 ETH",
+    type: "Patent",
+    templateType: "Quantum Patent",
+    templateId: "quantum-patent",
+    protectionLevel: 99,
+    metadata: {
+      patentNumber: "US11456789B2",
+      filingDate: "2024-02-28",
+      inventors: ["Dr. Elena Vasquez", "Dr. James Wong"],
+      quantumBits: "1024",
+    },
+    owner: "Quantum Labs",
+    createdAt: "2024-03-12T08:30:00Z",
+    numericValue: 45.8,
+  },
+
+  // Digital Renaissance Assets
+  {
+    id: "16",
+    name: "Digital Mona Lisa Remix",
+    creator: "Digital Renaissance",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=Digital+Mona+Lisa",
+    collection: "Classical Digital",
+    licenseType: "Creative Commons",
+    description:
+      "A stunning digital reinterpretation of Da Vinci's Mona Lisa using modern AI and digital art techniques.",
+    registrationDate: "March 15, 2024",
+    value: "12.3 ETH",
+    type: "Art",
+    templateType: "Classical Remix",
+    templateId: "classical-remix",
+    protectionLevel: 94,
+    metadata: {
+      originalArtist: "Leonardo da Vinci",
+      technique: "AI-Enhanced Digital Painting",
+      style: "Renaissance Revival",
+      dimensions: "4096x6144",
+    },
+    owner: "ArtDAO",
+    createdAt: "2024-03-15T12:00:00Z",
+    numericValue: 12.3,
+  },
+  {
+    id: "17",
+    name: "The Birth of Digital Venus",
+    creator: "Digital Renaissance",
+    verified: true,
+    image: "/placeholder.svg?height=400&width=600&text=Digital+Venus",
+    collection: "Renaissance NFTs",
+    licenseType: "Limited Edition",
+    description: "Botticelli's Venus reimagined in a digital realm, emerging from binary code instead of sea foam.",
+    registrationDate: "April 22, 2024",
+    value: "15.7 ETH",
+    type: "NFT",
+    templateType: "Limited Edition NFT",
+    templateId: "limited-nft",
+    protectionLevel: 96,
+    metadata: {
+      originalArtist: "Sandro Botticelli",
+      edition: "1 of 1",
+      technique: "Digital Transformation",
+      blockchain: "Ethereum",
+    },
+    owner: "RenaissanceCollector",
+    createdAt: "2024-04-22T14:30:00Z",
+    numericValue: 15.7,
+  },
+
+  // Additional remix assets
+  {
+    id: "18",
+    name: "Quantum Horizon Remix",
+    creator: "Digital Renaissance",
+    verified: true,
+    image: "/abstract-horizon-blue-purple.png",
+    collection: "Timeless Art",
+    licenseType: "Creative Commons",
+    description:
+      "A creative remix of Alex Chen's Abstract Horizon, infused with classical Renaissance elements and quantum physics concepts.",
+    registrationDate: "June 10, 2024",
+    value: "5.2 ETH",
+    type: "Art",
+    templateType: "Remix Art",
+    templateId: "remix-art",
+    protectionLevel: 89,
+    metadata: {
+      originalAsset: "1",
+      remixType: "Style Transfer + Physics",
+      techniques: ["Classical Composition", "Quantum Visualization"],
+      inspiration: "Renaissance Masters + Modern Physics",
+    },
+    owner: "Digital Renaissance",
+    createdAt: "2024-06-10T16:20:00Z",
+    numericValue: 5.2,
+  },
+  {
+    id: "19",
+    name: "Cyberpunk Audio Landscape",
+    creator: "Maya Rodriguez",
+    verified: true,
+    image: "/cyberpunk-city-neon-futuristic-night.png",
+    collection: "Sonic Journeys",
+    licenseType: "Creative Commons",
+    description:
+      "An audio remix inspired by Neon Collective's Cyberpunk City, creating an immersive urban soundscape with electronic beats.",
+    registrationDate: "May 15, 2024",
+    value: "3.9 ETH",
+    type: "Audio",
+    templateType: "Audio Remix",
+    templateId: "audio-remix",
+    protectionLevel: 85,
+    metadata: {
+      originalAsset: "13",
+      remixType: "Audio Interpretation",
+      duration: "6:42",
+      genre: "Cyberpunk Ambient",
+      basedOn: "Cyberpunk City #2077",
+    },
+    owner: "CyberSounds Collective",
+    createdAt: "2024-05-15T11:15:00Z",
+    numericValue: 3.9,
+  },
+  {
+    id: "20",
+    name: "Architectural Soundscape",
+    creator: "Virtual Architects",
+    verified: true,
+    image: "/metaverse-architecture-virtual-space.png",
+    collection: "3D Environments",
+    licenseType: "Commercial",
+    description:
+      "A 3D architectural visualization enhanced with spatial audio design, creating an immersive multi-sensory experience.",
+    registrationDate: "July 8, 2024",
+    value: "7.8 ETH",
+    type: "Art",
+    templateType: "Mixed Media",
+    templateId: "mixed-media",
+    protectionLevel: 91,
+    metadata: {
+      mediaTypes: ["3D Model", "Spatial Audio"],
+      software: "Blender + Wwise",
+      experience: "VR Compatible",
+      duration: "Interactive",
+    },
+    owner: "ImmersiveDAO",
+    createdAt: "2024-07-08T13:45:00Z",
+    numericValue: 7.8,
   },
 ]
 
 // Templates data
 export const templates: Template[] = [
   {
-    id: "template-art-1",
-    name: "Digital Artwork",
-    description: "Template for digital art, illustrations, and graphic design works",
+    id: "digital-art",
+    name: "Digital Art",
+    description: "Perfect for digital artwork, illustrations, and creative visual content",
     type: "Art",
-    icon: "palette",
+    icon: "🎨",
     popularity: 95,
-    features: ["High-resolution image support", "Attribution tracking", "Derivative works control"],
+    features: ["High-resolution support", "Color palette analysis", "Style categorization"],
     suitableFor: ["Digital artists", "Illustrators", "Graphic designers"],
-    metadataFields: ["dimensions", "medium", "style", "colorPalette"],
+    metadataFields: ["style", "medium", "dimensions", "colorPalette"],
   },
   {
-    id: "template-audio-1",
-    name: "Music Track",
-    description: "Template for music tracks, songs, and audio compositions",
+    id: "audio-art",
+    name: "Audio Art",
+    description: "Designed for music, sound effects, and audio compositions",
     type: "Audio",
-    icon: "music",
-    popularity: 87,
-    features: ["Streaming rights management", "Sampling permissions", "Performance tracking"],
-    suitableFor: ["Musicians", "Composers", "Sound designers"],
-    metadataFields: ["duration", "bpm", "key", "genre", "instruments"],
-  },
-  {
-    id: "template-video-1",
-    name: "Video Content",
-    description: "Template for video content, films, and multimedia productions",
-    type: "Video",
-    icon: "video",
-    popularity: 83,
-    features: ["Distribution rights", "Streaming permissions", "Content ID protection"],
-    suitableFor: ["Filmmakers", "Content creators", "Production studios"],
-    metadataFields: ["duration", "resolution", "format", "frameRate"],
-  },
-  {
-    id: "template-software-1",
-    name: "Software Application",
-    description: "Template for software applications, code libraries, and algorithms",
-    type: "Software",
-    icon: "code",
-    popularity: 82,
-    features: ["Version control integration", "License enforcement", "API usage tracking"],
-    suitableFor: ["Developers", "Software companies", "Open source projects"],
-    metadataFields: ["language", "platform", "dependencies", "version"],
-  },
-  {
-    id: "template-nft-1",
-    name: "Collectible NFT",
-    description: "Template for collectible NFTs with provenance tracking",
-    type: "NFT",
-    icon: "hexagon",
-    popularity: 90,
-    features: ["Blockchain verification", "Royalty enforcement", "Provenance tracking"],
-    suitableFor: ["Digital artists", "Collectors", "NFT creators"],
-    metadataFields: ["blockchain", "tokenId", "edition", "rarity"],
-  },
-  {
-    id: "template-patent-1",
-    name: "Technical Patent",
-    description: "Template for technical patents and inventions",
-    type: "Patent",
-    icon: "lightbulb",
-    popularity: 75,
-    features: ["Prior art analysis", "Claim tracking", "Licensing management"],
-    suitableFor: ["Inventors", "R&D departments", "Research institutions"],
-    metadataFields: ["claims", "filingDate", "patentClass", "inventors"],
-  },
-  {
-    id: "template-trademark-1",
-    name: "Brand Trademark",
-    description: "Template for brand trademarks and commercial identifiers",
-    type: "Trademark",
-    icon: "badge",
+    icon: "🎵",
     popularity: 78,
-    features: ["Brand protection", "Usage monitoring", "Infringement detection"],
-    suitableFor: ["Brand owners", "Marketing agencies", "Legal firms"],
-    metadataFields: ["brandName", "category", "jurisdiction", "registrationNumber"],
+    features: ["Waveform analysis", "Audio fingerprinting", "Format conversion"],
+    suitableFor: ["Musicians", "Sound designers", "Audio engineers"],
+    metadataFields: ["duration", "sampleRate", "format", "genre"],
   },
   {
-    id: "template-document-1",
-    name: "Legal Document",
-    description: "Template for legal documents, contracts, and agreements",
-    type: "Document",
-    icon: "file-text",
-    popularity: 70,
-    features: ["Version control", "Digital signatures", "Access control"],
-    suitableFor: ["Legal professionals", "Business owners", "Consultants"],
-    metadataFields: ["documentType", "jurisdiction", "parties", "effectiveDate"],
-  },
-]
-
-// Collections data
-export const collections: Collection[] = [
-  {
-    id: "col-1",
-    name: "Dimensions",
-    description: "A collection of abstract digital artworks exploring dimensional concepts and geometric patterns",
-    assetCount: 3,
-    totalValue: "2.55 ETH",
-    creator: "0xArtist",
-    creationDate: "December 10, 2024",
-    coverImage: "/placeholder.svg?height=500&width=400&text=Dimensions+Collection",
-    type: "Art",
-  },
-  {
-    id: "col-2",
-    name: "Cosmic Series",
-    description: "Artworks depicting cosmic landscapes, celestial phenomena, and space exploration themes",
-    assetCount: 2,
-    totalValue: "1.95 ETH",
-    creator: "CryptoCreator",
-    creationDate: "January 15, 2025",
-    coverImage: "/placeholder.svg?height=400&width=400&text=Cosmic+Collection",
-    type: "Art",
-  },
-  {
-    id: "col-3",
-    name: "Neon Collection",
-    description: "Cyberpunk-inspired artworks with neon aesthetics and futuristic urban landscapes",
-    assetCount: 4,
-    totalValue: "3.2 ETH",
-    creator: "0xArtist",
-    creationDate: "February 5, 2025",
-    coverImage: "/placeholder.svg?height=380&width=400&text=Neon+Collection",
-    type: "Art",
-  },
-  {
-    id: "col-4",
-    name: "Audio Collection",
-    description: "Professional music tracks, sound compositions, and audio content for various media",
-    assetCount: 2,
-    totalValue: "1.2 ETH",
-    creator: "AudioProducer",
-    creationDate: "March 1, 2025",
-    coverImage: "/placeholder.svg?height=400&width=400&text=Audio+Collection",
-    type: "Audio",
-  },
-  {
-    id: "col-5",
-    name: "Tech Patents",
-    description: "Technical patents for blockchain, AI, and emerging technology innovations",
-    assetCount: 3,
-    totalValue: "5.8 ETH",
-    creator: "TechInnovator",
-    creationDate: "January 20, 2025",
-    coverImage: "/placeholder.svg?height=400&width=400&text=Tech+Patents",
+    id: "patent",
+    name: "Technical Patent",
+    description: "Comprehensive protection for technical innovations and inventions",
     type: "Patent",
+    icon: "⚗️",
+    popularity: 65,
+    features: ["Prior art search", "Claims validation", "International filing"],
+    suitableFor: ["Inventors", "Research institutions", "Tech companies"],
+    metadataFields: ["patentNumber", "filingDate", "inventors", "claims"],
   },
   {
-    id: "col-6",
-    name: "Video Content",
-    description: "Professional video productions, documentaries, and multimedia content",
-    assetCount: 1,
-    totalValue: "2.1 ETH",
-    creator: "FilmmakerPro",
-    creationDate: "February 15, 2025",
-    coverImage: "/placeholder.svg?height=400&width=400&text=Video+Content",
-    type: "Video",
-  },
-  {
-    id: "col-7",
-    name: "Software Assets",
-    description: "Software applications, algorithms, and code libraries for various platforms",
-    assetCount: 1,
-    totalValue: "1.8 ETH",
-    creator: "FinTechDev",
-    creationDate: "March 10, 2025",
-    coverImage: "/placeholder.svg?height=400&width=400&text=Software+Assets",
+    id: "software",
+    name: "Software License",
+    description: "Protect your software code, algorithms, and digital solutions",
     type: "Software",
+    icon: "💻",
+    popularity: 82,
+    features: ["Code analysis", "License compatibility", "Version tracking"],
+    suitableFor: ["Developers", "Software companies", "Open source projects"],
+    metadataFields: ["version", "language", "framework", "license"],
   },
   {
-    id: "col-8",
-    name: "Brand Assets",
-    description: "Trademark registrations, brand identities, and commercial design assets",
-    assetCount: 1,
-    totalValue: "1.2 ETH",
-    creator: "BrandDesigner",
-    creationDate: "January 15, 2025",
-    coverImage: "/placeholder.svg?height=400&width=400&text=Brand+Assets",
-    type: "Trademark",
+    id: "3d-design",
+    name: "3D Design",
+    description: "For 3D models, architectural designs, and virtual environments",
+    type: "Art",
+    icon: "🏗️",
+    popularity: 71,
+    features: ["3D model validation", "Texture analysis", "Polygon optimization"],
+    suitableFor: ["3D artists", "Architects", "Game developers"],
+    metadataFields: ["software", "polyCount", "textures", "format"],
   },
   {
-    id: "col-9",
-    name: "Genesis Collection",
-    description: "Rare and unique NFTs with historical significance and proven provenance",
-    assetCount: 1,
-    totalValue: "5.0 ETH",
-    creator: "NFTArtist",
-    creationDate: "December 1, 2024",
-    coverImage: "/placeholder.svg?height=400&width=400&text=Genesis+Collection",
+    id: "nft",
+    name: "NFT Collection",
+    description: "For non-fungible tokens and digital collectibles",
     type: "NFT",
+    icon: "💎",
+    popularity: 88,
+    features: ["Blockchain verification", "Rarity analysis", "Metadata validation"],
+    suitableFor: ["NFT creators", "Digital artists", "Collectors"],
+    metadataFields: ["blockchain", "tokenId", "rarity", "edition"],
   },
   {
-    id: "col-10",
-    name: "Legal Documents",
-    description: "Professional legal templates, contracts, and business documentation",
-    assetCount: 1,
-    totalValue: "0.25 ETH",
-    creator: "LegalEagle",
-    creationDate: "March 5, 2025",
-    coverImage: "/placeholder.svg?height=400&width=400&text=Legal+Documents",
-    type: "Document",
+    id: "remix-art",
+    name: "Remix Art",
+    description: "For derivative works and creative remixes of existing assets",
+    type: "Art",
+    icon: "🔄",
+    popularity: 43,
+    features: ["Original asset linking", "Attribution tracking", "Remix analytics"],
+    suitableFor: ["Remix artists", "Collaborators", "Creative communities"],
+    metadataFields: ["originalAsset", "remixType", "techniques", "inspiration"],
   },
 ]
 
-// Activity data
-export const recentActivity: ActivityRecord[] = [
+// Activity records
+export const activityRecords: ActivityRecord[] = [
   {
-    id: "act-1",
+    id: "1",
     type: "creation",
-    assetId: "5",
-    assetName: "Neon Genesis #78",
-    user: "0xArtist",
-    timestamp: "2 hours ago",
-    details: "Created new digital artwork",
-  },
-  {
-    id: "act-2",
-    type: "license",
     assetId: "1",
-    assetName: "Abstract Dimension #312",
-    user: "Studio XYZ",
-    timestamp: "1 day ago",
-    details: "Purchased commercial license",
+    assetName: "Abstract Horizon #001",
+    user: "Alex Chen",
+    timestamp: "2024-01-15T10:30:00Z",
+    details: "Created new digital art asset",
   },
   {
-    id: "act-3",
+    id: "2",
     type: "transfer",
-    assetId: "2",
-    assetName: "Cosmic Voyager #89",
-    user: "GalleryDAO",
-    timestamp: "3 days ago",
-    details: "Full ownership transfer",
+    assetId: "1",
+    assetName: "Abstract Horizon #001",
+    user: "CollectorDAO",
+    timestamp: "2024-01-16T14:20:00Z",
+    details: "Transferred from Alex Chen",
   },
   {
-    id: "act-4",
+    id: "3",
     type: "creation",
-    assetId: "11",
-    assetName: "Documentary: Future Cities",
-    user: "FilmmakerPro",
-    timestamp: "4 days ago",
-    details: "Registered video content",
+    assetId: "4",
+    assetName: "Quantum Music Waves",
+    user: "Maya Rodriguez",
+    timestamp: "2024-02-20T14:15:00Z",
+    details: "Created new audio art asset",
   },
   {
-    id: "act-5",
+    id: "4",
+    type: "creation",
+    assetId: "7",
+    assetName: "Neural Network Patent #2024-001",
+    user: "Dr. Sarah Kim",
+    timestamp: "2024-01-30T09:00:00Z",
+    details: "Filed new AI patent",
+  },
+  {
+    id: "5",
     type: "license",
     assetId: "9",
-    assetName: "Synthwave Beats Vol. 1",
-    user: "MediaCompany",
-    timestamp: "5 days ago",
-    details: "Licensed for commercial use",
-  },
-  {
-    id: "act-6",
-    type: "creation",
-    assetId: "15",
-    assetName: "TechBrand™ Logo",
-    user: "BrandDesigner",
-    timestamp: "1 week ago",
-    details: "Registered trademark",
-  },
-  {
-    id: "act-7",
-    type: "transfer",
-    assetId: "16",
-    assetName: "Rare Genesis NFT #001",
-    user: "CollectorPro",
-    timestamp: "2 weeks ago",
-    details: "High-value NFT acquisition",
+    assetName: "Blockchain Interface v3.0",
+    user: "Enterprise Client",
+    timestamp: "2024-02-12T11:30:00Z",
+    details: "Licensed software for commercial use",
   },
 ]
 
-// Helper functions with enhanced functionality
-export const getAssetsByType = (type: IPType): Asset[] => {
-  return assets.filter((asset) => asset.type === type)
+// Portfolio stats
+export const portfolioStats: PortfolioStats = {
+  totalAssets: 20,
+  totalValue: "287.4 ETH",
+  createdAssets: 18,
+  licensedAssets: 8,
+  protectionLevel: 91,
 }
 
-export const getAssetsByTemplate = (templateId: string): Asset[] => {
-  return assets.filter((asset) => asset.templateId === templateId)
+// Mock provenance data
+export const mockProvenanceData = {
+  "1": {
+    events: [
+      {
+        event: "Asset Created",
+        from: null,
+        to: "Alex Chen",
+        date: "2024-01-15",
+        transactionHash: "0xabc123...",
+        verified: true,
+        type: "creation" as const,
+      },
+      {
+        event: "Asset Transferred",
+        from: "Alex Chen",
+        to: "CollectorDAO",
+        date: "2024-01-16",
+        transactionHash: "0xdef456...",
+        verified: true,
+        type: "transfer" as const,
+        memo: "Purchased for collection",
+      },
+    ] as OwnershipRecord[],
+  },
 }
 
-export const getAssetsByCollection = (collectionName: string): Asset[] => {
-  return assets.filter((asset) => asset.collection === collectionName)
+// Users data
+export const users: User[] = [
+  {
+    address: "0x1a2b3c4d5e6f7g8h9i0j",
+    name: "Alex Chen",
+    avatar: "/placeholder.svg?height=40&width=40",
+    verified: true,
+    bio: "Digital artist specializing in abstract and futuristic designs.",
+    website: "https://alexchen.art",
+    joinDate: "2023-01-15",
+  },
+  {
+    address: "0x2b3c4d5e6f7g8h9i0j1k",
+    name: "Maya Rodriguez",
+    avatar: "/placeholder.svg?height=40&width=40",
+    verified: true,
+    bio: "Audio engineer and composer creating immersive soundscapes.",
+    website: "https://mayamusic.io",
+    joinDate: "2023-02-20",
+  },
+]
+
+// Helper functions
+export function getAssetById(id: string): Asset | undefined {
+  return assets.find((asset) => asset.id === id)
 }
 
-export const getTemplateById = (templateId: string): Template | undefined => {
-  return templates.find((template) => template.id === templateId)
+export function getCollectionBySlug(slug: string): Collection | undefined {
+  return collections.find((collection) => collection.slug === slug)
 }
 
-export const getAssetById = (assetId: string): Asset | undefined => {
-  return assets.find((asset) => asset.id === assetId)
+export function getCollectionById(id: string): Collection | undefined {
+  return collections.find((collection) => collection.id === id)
 }
 
-export const getCollectionById = (collectionId: string): Collection | undefined => {
-  return collections.find((collection) => collection.id === collectionId)
+export function getCreatorBySlug(slug: string): Creator | undefined {
+  return creators.find((creator) => creator.slug === slug)
 }
 
-export const getCollectionByName = (name: string): Collection | undefined => {
-  return collections.find((collection) => collection.name === name)
+export function getCreatorByName(name: string): Creator | undefined {
+  return creators.find((creator) => creator.name === name)
 }
 
-// Enhanced search functionality
-export const searchAssets = (query: string, type?: IPType): Asset[] => {
-  const filtered = assets.filter((asset) => {
-    const matchesQuery =
-      asset.name.toLowerCase().includes(query.toLowerCase()) ||
-      asset.description.toLowerCase().includes(query.toLowerCase()) ||
-      asset.creator.toLowerCase().includes(query.toLowerCase()) ||
-      (asset.collection && asset.collection.toLowerCase().includes(query.toLowerCase()))
+export function getTemplateById(id: string): Template | undefined {
+  return templates.find((template) => template.id === id)
+}
 
-    const matchesType = !type || asset.type === type
+export function getAssetsByCollection(collectionSlug: string): Asset[] {
+  const collection = getCollectionBySlug(collectionSlug)
+  if (!collection) return []
 
-    return matchesQuery && matchesType
+  return assets.filter((asset) => {
+    const assetCollectionSlug = asset.collection?.toLowerCase().replace(/\s+/g, "-")
+    return assetCollectionSlug === collectionSlug
   })
-
-  return filtered
 }
 
-// Get trending assets (by recent activity and value)
-export const getTrendingAssets = (limit = 6): Asset[] => {
-  return assets
-    .sort((a, b) => {
-      // Sort by creation date (newer first) and value (higher first)
-      const dateA = new Date(a.createdAt).getTime()
-      const dateB = new Date(b.createdAt).getTime()
-      if (dateB !== dateA) return dateB - dateA
-      return b.numericValue - a.numericValue
-    })
-    .slice(0, limit)
-}
-
-// Get featured collections
-export const getFeaturedCollections = (limit = 4): Collection[] => {
-  return collections
-    .sort((a, b) => {
-      // Sort by asset count and total value
-      const valueA = Number.parseFloat(a.totalValue.split(" ")[0])
-      const valueB = Number.parseFloat(b.totalValue.split(" ")[0])
-      if (b.assetCount !== a.assetCount) return b.assetCount - a.assetCount
-      return valueB - valueA
-    })
-    .slice(0, limit)
-}
-
-// Get user's assets
-export const getUserAssets = (userAddress: string): Asset[] => {
-  return assets.filter((asset) => asset.owner === userAddress)
-}
-
-// Get user's created assets
-export const getUserCreatedAssets = (creatorName: string): Asset[] => {
+export function getAssetsByCreator(creatorName: string): Asset[] {
   return assets.filter((asset) => asset.creator === creatorName)
 }
 
-// Asset statistics
-export const getAssetStats = () => {
-  const totalAssets = assets.length
-  const totalValue = assets.reduce((sum, asset) => sum + asset.numericValue, 0)
-  const avgValue = totalValue / totalAssets
-  const verifiedAssets = assets.filter((asset) => asset.verified).length
-  const verificationRate = (verifiedAssets / totalAssets) * 100
+export function getCollectionsByCreator(creatorName: string): Collection[] {
+  return collections.filter((collection) => collection.creator === creatorName)
+}
 
-  const typeDistribution = assets.reduce(
-    (acc, asset) => {
-      acc[asset.type] = (acc[asset.type] || 0) + 1
-      return acc
-    },
-    {} as Record<IPType, number>,
+export function getAssetProvenance(assetId: string) {
+  return mockProvenanceData[assetId as keyof typeof mockProvenanceData]
+}
+
+export function getUserByAddress(address: string): User | undefined {
+  return users.find((user) => user.address === address)
+}
+
+export function getRemixAssetsByCreator(creatorName: string): Asset[] {
+  return assets.filter(
+    (asset) => asset.creator === creatorName && (asset.templateType === "Remix Art" || asset.metadata?.originalAsset),
   )
-
-  return {
-    totalAssets,
-    totalValue,
-    avgValue,
-    verifiedAssets,
-    verificationRate,
-    typeDistribution,
-  }
 }
 
-export const getIconForType = (type: IPType): string => {
-  const iconMap: Record<IPType, string> = {
-    Art: "palette",
-    Audio: "music",
-    Video: "video",
-    Document: "file-text",
-    Patent: "lightbulb",
-    Trademark: "badge",
-    Software: "code",
-    NFT: "hexagon",
-    Other: "box",
-  }
+// Legacy exports for backward compatibility
+export const mockAssets = assets
+export const mockCollections = collections
+export const mockCreators = creators
+export const mockTemplates = templates
+export const mockActivityRecords = activityRecords
+export const mockPortfolioStats = portfolioStats
+export const mockUsers = users
 
-  return iconMap[type] || "box"
-}
-
-// Mock blockchain data for proof of ownership
-export const getBlockchainData = (assetId: string) => {
-  const asset = getAssetById(assetId)
-  if (!asset) return null
-
-  return {
-    blockchain: "Ethereum",
-    network: "Mainnet",
-    tokenStandard: asset.type === "NFT" ? "ERC-721" : "ERC-1155",
-    contractAddress: `0x${Math.random().toString(16).substr(2, 40)}`,
-    tokenId: assetId,
-    blockNumber: Math.floor(Math.random() * 1000000) + 18000000,
-    transactionHash: `0x${Math.random().toString(16).substr(2, 64)}`,
-    gasUsed: Math.floor(Math.random() * 100000) + 21000,
-    timestamp: asset.createdAt,
-  }
-}
-
-// Mock ownership history for provenance
-export const getOwnershipHistory = (assetId: string) => {
-  const asset = getAssetById(assetId)
-  if (!asset) return []
-
-  const history = [
-    {
-      event: "Asset Created",
-      from: null,
-      to: asset.creator,
-      date: asset.registrationDate,
-      transactionHash: `0x${Math.random().toString(16).substr(2, 64)}`,
-      verified: true,
-      type: "creation" as const,
-    },
-  ]
-
-  // Add some random ownership transfers for demonstration
-  if (asset.owner !== asset.creator) {
-    history.push({
-      event: "Ownership Transfer",
-      from: asset.creator,
-      to: asset.owner,
-      date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      }),
-      transactionHash: `0x${Math.random().toString(16).substr(2, 64)}`,
-      verified: true,
-      type: "transfer" as const,
-    })
-  }
-
-  return history.reverse() // Most recent first
-}
-
-// Get asset provenance data
-export const getAssetProvenance = (assetId: string) => {
-  return mockProvenanceData.find((data) => data.assetId === assetId)
-}
-
-// Calculate portfolio statistics with enhanced logic
-export const calculatePortfolioStats = (assets: Asset[]): PortfolioStats => {
-  const userAssets = assets.filter((a) => a.owner === "0x742d35Cc6634C0532925a3b844Bc454e4438f44e")
-  const createdAssets = assets.filter((a) => a.creator === "0xArtist").length
-  const totalValue = assets.reduce((sum, asset) => sum + asset.numericValue, 0)
-  const avgProtectionLevel = Math.round(
-    assets.reduce((sum, asset) => sum + (asset.protectionLevel || 0), 0) / assets.length,
-  )
-
-  // Count licensed assets (assets with commercial or educational licenses)
-  const licensedAssets = assets.filter(
-    (a) => a.licenseType.includes("Commercial") || a.licenseType.includes("Educational"),
-  ).length
-
-  return {
-    totalAssets: assets.length,
-    totalValue: `${(totalValue / 1000).toFixed(1)}k ETH`,
-    createdAssets,
-    licensedAssets,
-    protectionLevel: avgProtectionLevel,
-  }
+// Export all data as default
+export default {
+  assets,
+  collections,
+  creators,
+  templates,
+  activityRecords,
+  portfolioStats,
+  users,
+  mockProvenanceData,
 }

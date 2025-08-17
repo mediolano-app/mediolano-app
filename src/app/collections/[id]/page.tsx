@@ -206,7 +206,7 @@ export default function CollectionDetailPage() {
 
         <TabsContent value="nfts" className="space-y-6">
           <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-            <CollectionNFTs collectionId={collection.id} />
+            <CollectionNFTs collectionId={collection.id.toString()} />
           </Suspense>
         </TabsContent>
 
