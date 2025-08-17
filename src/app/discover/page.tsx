@@ -1,19 +1,11 @@
-import type { Metadata } from "next"
-import DiscoverResources from "@/components/discover/discover-resources"
-import DiscoverBenefitsCreators from "@/components/discover/discover-benefits"
-import DiscoverHero from "@/components/discover/discover-hero"
-import DiscoverFeatures from "@/components/discover/discover-features"
-import DiscoverFAQ from "@/components/discover/discover-faq"
+import type { Metadata } from "next";
+import { DiscoverPageClient } from "./discover-client";
 
-export default function AboutPage() {
-  return (
-    <div className="container mx-auto px-4 py-8 space-y-16">
-      <DiscoverHero />
-      <DiscoverBenefitsCreators />
-      <DiscoverFeatures />      
-      <DiscoverFAQ />
-      <DiscoverResources />
-    </div>
-  )
+export const metadata: Metadata = {
+  title: "Discover - Mediolano",
+  description: "Explore registered intellectual property assets and learn about the benefits of programmable IP on Starknet.",
+};
+
+export default function DiscoverPage() {
+  return <DiscoverPageClient />;
 }
-

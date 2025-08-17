@@ -1,39 +1,37 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { Providers } from "@/components/providers/Providers";
 import "./globals.css";
-import { StarknetProvider } from "@/components/starknet-provider";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
-import AnimatedBackground from "@/components/animated-bg";
-import { Toaster } from "@/components/ui/toaster";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Mediolano",
   description: "Programmable IP for the Integrity Web",
+  keywords: ["blockchain", "IP", "intellectual property", "starknet", "NFT"],
+  authors: [{ name: "Mediolano Team" }],
+  openGraph: {
+    title: "Mediolano",
+    description: "Programmable IP for the Integrity Web",
+    type: "website",
+    url: "https://mediolano.xyz",
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <StarknetProvider>
-            <AnimatedBackground />
-            <Header />
+      <body className={inter.className} suppressHydrationWarning>
+        <Providers>
+          <div className="min-h-screen bg-background">
             {children}
-            <Toaster />
-            <Footer />
-          </StarknetProvider>
-        </ThemeProvider>
+          </div>
+        </Providers>
       </body>
     </html>
   );

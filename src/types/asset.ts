@@ -64,7 +64,7 @@ export interface NFT {
 }
 
 
-export interface assetIP  {
+export interface assetIP {
   title: string;
   author: string;
   description: string;
@@ -87,7 +87,7 @@ export interface assetIP  {
 }
 
 
-export interface artworkIP  {
+export interface artworkIP {
   title: string;
   author: string;
   description: string;
@@ -114,7 +114,7 @@ export interface artworkIP  {
 }
 
 
-export interface audioIP  {
+export interface audioIP {
   title: string;
   author: string;
   description: string;
@@ -124,7 +124,7 @@ export interface audioIP  {
   album: string;
   genre: string;
   composer: string;
-  band: string; 
+  band: string;
   publisher: string;
   collection: string;
   tags: string;
@@ -142,7 +142,7 @@ export interface audioIP  {
   protectionDuration: string;
 }
 
-export interface documentIP  {
+export interface documentIP {
   title: string;
   description: string;
   type: string;
@@ -172,150 +172,150 @@ export interface documentIP  {
   protectionDuration: string;
 }
 
-export interface patentIP  {
-      title: string;
-      description: string;
-      type: string;
-      template: string;
-      author: string;
-      inventor: string;
-      patentType: string;
-      filingDate: string;
-      patentNumber: string;
-      status: string;
-      collection: string;
-      tags: string;
-      mediaUrl: string;
-      externalUrl: string;
-      licenseType: string;
-      licenseDetails: string;
-      version: string;
-      commercialUse: boolean;
-      modifications: boolean;
-      attribution: boolean;
-      filesCount: string;
-      transaction: string;
-      registrationDate: string;
-      protectionStatus: string;
-      protectionScope: string;
-      protectionDuration: string;
-}
-
-export interface publicationIP  {
-      title: string;
-      description: string;
-      type: string;
-      template: string;
-      author: string;
-      format: string;
-      categories: string;
-      isbn: string;
-      publisher: string;
-      date: string;
-      collection: string;
-      tags: string;
-      mediaUrl: string;
-      externalUrl: string;
-      licenseType: string;
-      licenseDetails: string;
-      version: string;
-      commercialUse: boolean;
-      modifications: boolean;
-      attribution: boolean;
-      filesCount: string;
-      transaction: string;
-      registrationDate: string;
-      protectionStatus: string;
-      protectionScope: string;
-      protectionDuration: string;
-}
-
-export interface rwaIP  {
+export interface patentIP {
   title: string;
   description: string;
   type: string;
   template: string;
-      rwa: string;
-      location: string;
-      valuation: string;
-      insurance: string;
-      structure: string;
-      documentation: string;
-      collection: string;
-      tags: string;
-      mediaUrl: string;
-      externalUrl: string;
-      licenseType: string;
-      licenseDetails: string;
-      version: string;
-      commercialUse: boolean;
-      modifications: boolean;
-      attribution: boolean;
-      filesCount: string;
-      transaction: string;
-      registrationDate: string;
-      protectionStatus: string;
-      protectionScope: string;
-      protectionDuration: string;
+  author: string;
+  inventor: string;
+  patentType: string;
+  filingDate: string;
+  patentNumber: string;
+  status: string;
+  collection: string;
+  tags: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  version: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  filesCount: string;
+  transaction: string;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
+}
+
+export interface publicationIP {
+  title: string;
+  description: string;
+  type: string;
+  template: string;
+  author: string;
+  format: string;
+  categories: string;
+  isbn: string;
+  publisher: string;
+  date: string;
+  collection: string;
+  tags: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  version: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  filesCount: string;
+  transaction: string;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
+}
+
+export interface rwaIP {
+  title: string;
+  description: string;
+  type: string;
+  template: string;
+  rwa: string;
+  location: string;
+  valuation: string;
+  insurance: string;
+  structure: string;
+  documentation: string;
+  collection: string;
+  tags: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  version: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  filesCount: string;
+  transaction: string;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
 }
 
 
-export interface softwareIP  {
-      title: string;
-      description: string;
-      type: string;
-      template: string;
-      developer: string;
-      versionCode: string;
-      releaseDate: string;
-      progammingLanguage: string;
-      sourceCode: string;
-      documentation: string;
-      repository: string;
-      collection: string;
-      tags: string;
-      mediaUrl: string;
-      externalUrl: string;
-      licenseType: string;
-      licenseDetails: string;
-      version: string;
-      commercialUse: boolean;
-      modifications: boolean;
-      attribution: boolean;
-      filesCount: string;
-      transaction: string;
-      registrationDate: string;
-      protectionStatus: string;
-      protectionScope: string;
-      protectionDuration: string;
+export interface softwareIP {
+  title: string;
+  description: string;
+  type: string;
+  template: string;
+  developer: string;
+  versionCode: string;
+  releaseDate: string;
+  progammingLanguage: string;
+  sourceCode: string;
+  documentation: string;
+  repository: string;
+  collection: string;
+  tags: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  version: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  filesCount: string;
+  transaction: string;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
 }
 
-export interface trademarkIP  {
-      title: string;
-      description: string;
-      type: string;
-      template: string;
-      movieType: string;
-      director: string;
-      duration: string;
-      studio: string;
-      genre: string;
-      collection: string;
-      tags: string;
-      mediaUrl: string;
-      externalUrl: string;
-      licenseType: string;
-      licenseDetails: string;
-      version: string;
-      commercialUse: boolean;
-      modifications: boolean;
-      attribution: boolean;
-      filesCount: string;
-      transaction: string;
-      registrationDate: string;
-      protectionStatus: string;
-      protectionScope: string;
-      protectionDuration: string;
+export interface trademarkIP {
+  title: string;
+  description: string;
+  type: string;
+  template: string;
+  movieType: string;
+  director: string;
+  duration: string;
+  studio: string;
+  genre: string;
+  collection: string;
+  tags: string;
+  mediaUrl: string;
+  externalUrl: string;
+  licenseType: string;
+  licenseDetails: string;
+  version: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  filesCount: string;
+  transaction: string;
+  registrationDate: string;
+  protectionStatus: string;
+  protectionScope: string;
+  protectionDuration: string;
 }
 
 
@@ -445,4 +445,35 @@ export interface Template {
   features: string[]
   suitableFor: string[]
   metadataFields: string[]
+}
+
+export interface MIPAsset {
+  id: string;
+  name: string;
+  creator: string;
+  collection: string;
+  timestamp: number;
+  tags: string[];
+  metadata: {
+    description?: string;
+    image?: string;
+    attributes?: Record<string, any>;
+  };
+  contractAddress: string;
+  tokenId: string;
+}
+
+export interface AssetFilter {
+  search?: string;
+  creator?: string;
+  collection?: string;
+  tags?: string[];
+  sortBy?: 'timestamp' | 'name' | 'creator';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface AssetQueryResult {
+  assets: MIPAsset[];
+  totalCount: number;
+  hasMore: boolean;
 }

@@ -49,12 +49,12 @@ import { Logo } from "@/components/header/logo"
 export function MainNav() {
   return (
     <div className="mr-4 hidden md:flex items-center space-x-4">
-      
-        <Logo />
+
+      <Logo />
 
       <NavigationMenu>
         <NavigationMenuList>
-          
+
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-background/20 backdrop-blur">
               <Rocket className="mr-2 h-4 w-4" />
@@ -121,8 +121,8 @@ export function MainNav() {
               </div>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          
-          
+
+
 
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
@@ -160,7 +160,7 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
-                
+
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
@@ -174,13 +174,19 @@ export function MainNav() {
                       Manage your account settings and visibility.
                     </p>
                   </Link>
+                  <Link
+                    href="/public-assets"
+                    className="nav-link"
+                  >
+                    Public Assets
+                  </Link>
                 </NavigationMenuLink>
               </div>
             </NavigationMenuContent>
           </NavigationMenuItem>
-         
-         
-         
+
+
+
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
               <Gem className="mr-2 h-4 w-4" />
@@ -188,8 +194,8 @@ export function MainNav() {
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              
-                
+
+
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
@@ -246,15 +252,15 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
-                
-                
+
+
               </div>
             </NavigationMenuContent>
           </NavigationMenuItem>
 
 
 
-          
+
         </NavigationMenuList>
       </NavigationMenu>
     </div>
