@@ -1,7 +1,6 @@
 "use client"
 
 import { Suspense, useState, useEffect } from "react"
-import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -46,8 +45,8 @@ export default function CollectionDetailPage() {
     return (
       <div className="container mx-auto py-10 xl:px-4">
         <div className="flex items-center gap-2 mb-6">
-          <Button variant="ghost" onClick={()=> router.back()} size="icon" asChild>
-              <ArrowLeft className="h-4 w-4" />
+          <Button variant="ghost" onClick={() => router.back()} size="icon">
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">Loading Collection...</h1>
         </div>
@@ -60,10 +59,8 @@ export default function CollectionDetailPage() {
     return (
       <div className="container mx-auto py-10 px-4">
         <div className="flex items-center gap-2 mb-6">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/collections">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">Error Loading Collection</h1>
         </div>
@@ -76,10 +73,8 @@ export default function CollectionDetailPage() {
     return (
       <div className="container mx-auto py-10 px-4">
         <div className="flex items-center gap-2 mb-6">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/collections">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">Collection Not Found</h1>
         </div>
@@ -100,10 +95,8 @@ export default function CollectionDetailPage() {
     <main className="container py-10 mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/collections">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-2xl font-bold">{collection.name}</h1>
           {isFeatured && (
@@ -206,7 +199,9 @@ export default function CollectionDetailPage() {
 
         <TabsContent value="nfts" className="space-y-6">
           <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-            <CollectionNFTs collectionId={collection.id.toString()} />
+
+            <CollectionNFTs collectionId={String(collection.id)} />
+
           </Suspense>
         </TabsContent>
 
