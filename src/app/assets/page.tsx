@@ -421,11 +421,17 @@ export default function AssetsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background/70 text-foreground pb-20">
      
       
       <main className="container mx-auto p-4 py-6">
-        {/* Dashboard Overview */}
+        
+        
+        
+        
+        
+        
+        {/* Dashboard Overview 
         <div className="mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -433,7 +439,6 @@ export default function AssetsPage() {
             transition={{ duration: 0.5 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
-            {/* Welcome and Stats */}
             <div className="space-y-4">
               <div>
                 <h2 className="text-3xl font-bold">Welcome back</h2>
@@ -536,7 +541,6 @@ export default function AssetsPage() {
               </Card>
             </div>
 
-            {/* Quick Actions and Trending */}
             <div className="space-y-4">
               
               <div className="grid grid-cols-2 gap-3">
@@ -672,8 +676,24 @@ export default function AssetsPage() {
             </div>
           </motion.div>
         </div>
+        */}
 
-        {/* Mobile Quick Actions */}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        {/* Mobile Quick Actions 
         <div className="md:hidden flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
           <Link href="/create/templates">
             <Button size="sm" className="flex items-center gap-2 whitespace-nowrap">
@@ -695,7 +715,7 @@ export default function AssetsPage() {
             <Zap className="h-4 w-4" />
             Quick Protect
           </Button>
-        </div>
+        </div>*/}
 
 
 
@@ -704,7 +724,7 @@ export default function AssetsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-2xl font-bold">Programmable IP</h2>
-              <p className="text-muted-foreground">Manage your intellectual property and licensing</p>
+              <p className="text-muted-foreground">Explore intellectual property onchain</p>
             </div>
 
             <div className="flex gap-2">
@@ -981,6 +1001,12 @@ export default function AssetsPage() {
             </TabsContent>
           </Tabs>
         </motion.div>
+
+
+
+
+
+        
       </main>
     </div>
   )

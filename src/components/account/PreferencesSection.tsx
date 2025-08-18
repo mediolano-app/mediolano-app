@@ -45,10 +45,10 @@ export const PreferencesSection: React.FC<PreferencesSectionProps> = ({
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="private-profile" className="text-sm font-normal">
-                  Private Profile
+                  Restrict Profile
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Make your profile visible only to connections
+                  Make your profile visible only to you
                 </p>
               </div>
               <Switch
@@ -72,8 +72,8 @@ export const PreferencesSection: React.FC<PreferencesSectionProps> = ({
                   <SelectValue placeholder="Select visibility" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="default">Default</SelectItem>
                   <SelectItem value="public">Public</SelectItem>
-                  <SelectItem value="friends">Friends Only</SelectItem>
                   <SelectItem value="private">Private</SelectItem>
                 </SelectContent>
               </Select>
@@ -85,7 +85,7 @@ export const PreferencesSection: React.FC<PreferencesSectionProps> = ({
         <div className="space-y-4">
           <h4 className="text-sm font-medium flex items-center gap-2">
             <Bell className="w-4 h-4" />
-            Notification Settings
+            Notifications
           </h4>
           
           <div className="space-y-4 pl-6">

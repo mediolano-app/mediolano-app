@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="gradient-background">
+      <body className="bg-background">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

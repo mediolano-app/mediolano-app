@@ -77,12 +77,12 @@ export function Footer() {
   return (
 
     <>
-    <DappInfo/>
+    {/*<DappInfo/>*/}
 
-    <footer className="bg-background text-foreground mt-20">
+    <footer className="bg-background/80 text-foreground">
       <div className="container mx-auto px-4 py-6 md:py-8 lg:py-10">
         
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8 mt-8">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8 pt-6">
 
             
             
@@ -101,7 +101,7 @@ export function Footer() {
                     >
                       <Link href={feature.link} className="block p-4">
                         <div className="flex items-center space-x-4">
-                          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center ml-blue group-hover:bg-primary/20 transition-colors duration-300">
+                          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-600/10 flex items-center justify-center ml-blue group-hover:bg-blue/40 transition-colors duration-300">
                             {feature.icon}
                           </div>
                           <div>
@@ -179,11 +179,11 @@ export function Footer() {
                 </ul>
                 <h3 className="mb-6 mt-6 text-sm font-semibold uppercase">Guidelines</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
-                    <li><Link href="/community-guidelines" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> Community</Link></li>
-                     <li><Link href="/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
-                    <li><Link href="/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance</Link></li>
-                    <li><Link href="/governance-charter" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Governance</Link></li>
+                    <li><Link href="/docs/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
+                    <li><Link href="/docs/community-guidelines" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> Community</Link></li>
+                     <li><Link href="/docs/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
+                    <li><Link href="/docs/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance</Link></li>
+                    <li><Link href="/docs/governance-charter" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Governance</Link></li>
                 </ul>
                 </div>
                 
@@ -282,7 +282,7 @@ export function Footer() {
 
             {/* Twitter Showcase */}
           <div className="mt-16 grid gap-8 md:grid-cols-2">
-            <Card>
+            <Card className="bg-background/20">
               <CardHeader>
                 <CardTitle>Join our community on X</CardTitle>
                 <CardDescription>Interact and stay updated with the latest news and announcements.</CardDescription>
@@ -304,7 +304,7 @@ export function Footer() {
             </Card>
 
             {/* GitHub Repository Showcase */}
-            <Card>
+            <Card className="bg-background/20">
               <CardHeader>
                 <CardTitle>Open-Source on GitHub</CardTitle>
                 <CardDescription>

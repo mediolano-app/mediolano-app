@@ -233,11 +233,15 @@ export default function CreatePage() {
   const selectedOptionData = creationOptions.find((opt) => opt.id === selectedOption)
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background/70 pb-20">
     
 
       <main className="container mx-auto p-4 max-w-10xl">
-        {/* Hero Section */}
+        
+        
+        
+        
+        {/* Hero Section 
         <div className="text-center py-8 md:py-12">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
             <Sparkles className="h-4 w-4" />
@@ -254,7 +258,6 @@ export default function CreatePage() {
             ownership, instant protection.
           </p>
 
-          {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">Zero</div>
@@ -274,7 +277,6 @@ export default function CreatePage() {
             </div>
           </div>
 
-          {/* Quick Actions */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
             <Link href="/create/asset">
               <Button size="lg" className="w-full sm:w-auto">
@@ -290,6 +292,11 @@ export default function CreatePage() {
             </Link>
           </div>
         </div>
+          */}
+
+
+
+
 
         {/* Search and Filters */}
         <div className="mb-8">
@@ -469,7 +476,7 @@ export default function CreatePage() {
                   {/* Benefits */}
                   <Card>
                     <CardContent className="p-4">
-                      <h4 className="font-medium mb-3">Why register with Mediolano?</h4>
+                      <h4 className="font-medium mb-3">Why tokenize with Mediolano?</h4>
                       <div className="space-y-2">
                         <div className="flex items-center gap-2 text-sm">
                           <CheckCircle className="h-4 w-4 text-green-500" />

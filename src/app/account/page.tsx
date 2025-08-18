@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/drawer";
 
 // Icons
-import {
+import { 
   Upload,
   RefreshCw,
   Award,
@@ -71,6 +71,7 @@ import {
   Key,
   Save,
 } from "lucide-react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 
 interface UploadedImages {
   avatarUrl?: string;
@@ -164,7 +165,7 @@ const INITIAL_USER_PROFILE: UserProfile = {
     discord: "",
     youtube: "",
   },
-  avatarUrl: "/avatar.jpg",
+  avatarUrl: "/background.jpg",
   coverUrl: "/background.jpg",
   bio: "",
   preferences: {
@@ -609,11 +610,11 @@ export default function UserAccount() {
         transactionResult = await updateProfileMulticall(personalInfo, socialLinks, profileSettings);
       }
 
-      console.log("✅ Transaction completed successfully:", transactionResult);
+      console.log("Transaction completed successfully:", transactionResult);
 
       // Success handling
       toast({
-        title: "Success! 🎉",
+        title: "Success!",
         description: profileExists
           ? "Your profile has been updated on the blockchain!"
           : "Your profile has been registered on the blockchain!",
@@ -623,7 +624,7 @@ export default function UserAccount() {
       setIsDrawerOpen(false);
 
       // Optional: Refresh profile data from contract
-      console.log("🔄 Refreshing profile data from blockchain...");
+      console.log("Refreshing profile data from blockchain...");
     } catch (err) {
     
       // Determine error type for better user feedback
@@ -671,7 +672,18 @@ export default function UserAccount() {
     <div className="min-h-screen">
       <div className="container mx-auto py-10">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">My Account (Preview)</h1>
+          &nbsp;
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Mediolano</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/account">My Account</BreadcrumbLink>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -697,12 +709,16 @@ export default function UserAccount() {
                 onUserChange={handleInputChange}
               />
 
+              <hr></hr>
+
               <SocialLinksSection
                 socialLinks={user.socialMedia}
                 onSocialLinksChange={(links) =>
                   setUser((prev) => ({ ...prev, socialMedia: links }))
                 }
               />
+
+               <hr></hr>
 
               <AdditionalInfoSection
                 user={{
@@ -712,6 +728,8 @@ export default function UserAccount() {
                 }}
                 onUserChange={handleInputChange}
               />
+
+              <hr></hr>
 
               <PreferencesSection
                 settings={{
@@ -739,7 +757,7 @@ export default function UserAccount() {
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <DrawerTrigger asChild>
             <Button
-              className="w-full"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white p-8 mt-4 rounded-lg text-lg"
               onClick={handleSave}
               disabled={
                 !isConnected ||
@@ -766,7 +784,7 @@ export default function UserAccount() {
           </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerTitle>Confirm Transaction</DrawerTitle>
+              <DrawerTitle>You're saving your data onchain</DrawerTitle>
               <DrawerDescription>
                 Please review and sign the transaction to save your profile and
                 preferences to the blockchain.
@@ -782,7 +800,7 @@ export default function UserAccount() {
 
               <Button
                 onClick={handleTransactionSign}
-                className="w-full"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 disabled={isContractUpdating}
               >
                 {isContractUpdating ? (
