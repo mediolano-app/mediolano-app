@@ -4,10 +4,11 @@ import { abi } from "@/abis/abi";
 import { type Abi } from "starknet";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
 import { pinataClient } from "@/utils/pinataClient";
+import { useNetworkConfig } from "../useNetworkConfig";
 
 export function useMIP() {
   const { address } = useAccount();
-  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP;
+  const { mipContract, currentNetwork, validation } = useNetworkConfig();
 
   const [balance, setBalance] = useState<BigInt>(BigInt(0));
   const [tBalance, setTBalance] = useState<number>(0);
@@ -15,9 +16,14 @@ export function useMIP() {
   const [tokenIdsError, setTokenIdsError] = useState<Error | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Validate contract availability
+  if (!mipContract) {
+    throw new Error(`MIP contract not configured for ${currentNetwork}`);
+  }
+
   const { contract } = useContract({
     abi: abi as Abi,
-    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
+    address: mipContract as `0x${string}`,
   });
 
   const {
@@ -27,7 +33,7 @@ export function useMIP() {
   } = useReadContract({
     abi: abi as Abi,
     functionName: "balance_of",
-    address: contractAddress as `0x${string}`,
+    address: mipContract as `0x${string}`,
     args: [address],
     watch: false,
   });

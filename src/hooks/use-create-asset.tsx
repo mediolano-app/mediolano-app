@@ -11,6 +11,7 @@ import {
   EXPLORER_URL,
 } from "@/services/constants";
 import { useToast } from "./use-toast";
+import { useNetworkConfig } from "./useNetworkConfig";
 
 export interface ICreateAsset {
   collection_id: string;
@@ -29,12 +30,18 @@ const COLLECTION_CONTRACT_ABI = ipCollectionAbi as Abi;
 export function useCreateAsset(): IMintReturnType {
   const { address } = useAccount();
   const { toast } = useToast();
+  const { collectionContract, getTransactionUrl, currentNetwork } = useNetworkConfig();
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Validate collection contract availability
+  if (!collectionContract) {
+    throw new Error(`Collection contract not configured for ${currentNetwork}`);
+  }
+
   const { contract } = useContract({
     abi: COLLECTION_CONTRACT_ABI as Abi,
-    address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
+    address: collectionContract as `0x${string}`,
   });
 
   const { sendAsync: mintAsset } = useSendTransaction({
@@ -71,12 +78,12 @@ export function useCreateAsset(): IMintReturnType {
             <div className="text-sm space-y-1">
               <p>Your mint transaction has been submitted successfully.</p>
               <a
-                href={`${EXPLORER_URL}/tx/${tx.transaction_hash}`}
+                href={getTransactionUrl(tx.transaction_hash)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline text-blue-600"
               >
-                View on StarkScan ↗
+                View on Explorer ↗
               </a>
             </div>
           ),

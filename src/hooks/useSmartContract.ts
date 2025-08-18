@@ -2,6 +2,7 @@
 
 import { useContract } from "@starknet-react/core";
 import { Contract } from "starknet";
+import { useNetworkConfig } from "./useNetworkConfig";
 
 // Placeholder ABI - replace with your actual contract ABI
 const contractAbi = [
@@ -30,13 +31,20 @@ const contractAbi = [
   // Add more functions as needed
 ];
 
-// Contract address from environment variable
-const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "";
-
 export function useSmartContract() {
+  const { mipContract, currentNetwork } = useNetworkConfig();
+
+  // Use network-aware contract address with fallback
+  const contractAddress = mipContract || process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "";
+
+  if (!contractAddress) {
+    throw new Error(`Smart contract address not configured for ${currentNetwork}`);
+  }
+
   const { contract } = useContract({
     abi: contractAbi,
     address: contractAddress,
   });
+
   return contract as Contract;
 }
