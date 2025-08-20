@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid, Gem, ArrowRightLeft, FileBadge, FileCheck, DollarSign, Grid2X2 } from 'lucide-react'
+import { Menu, Wallet, Copyright, FileText, Banknote, BookOpen, Users, Phone, User, Award, Settings, Briefcase, LayoutDashboard, Box, Grid, Gem, ArrowRightLeft, FileBadge, FileCheck, DollarSign, Grid2X2, Layers } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -26,11 +26,9 @@ const navigationItems = [
   {
     title: 'Start',
     items: [
-      { title: 'Discover', href: '/discover', icon: BookOpen },
+      { title: 'Learn', href: '/discover', icon: BookOpen },
       { title: 'Create', href: '/create', icon: Box },
-      { title: 'Create IP Collection', href: '/create/collection', icon: Grid2X2 },
-      { title: 'Create IP Asset', href: '/create/asset', icon: DollarSign },
-      { title: 'Create with IP Templates', href: '/create/templates', icon: Grid },
+      { title: 'Explore', href: '/Collections', icon: Layers },
     ],
   },
   {
@@ -44,8 +42,8 @@ const navigationItems = [
     title: 'Services',
     items: [
 
-      { title: 'Proof of Ownership', href: '/services/proof-of-ownership', icon: FileBadge },
-      { title: 'Proof of Licensing', href: '/services/proof-of-licensing', icon: FileCheck },
+      { title: 'Proof of Ownership', href: '/', icon: FileBadge },
+      { title: 'Remix', href: '/', icon: FileCheck },
       { title: 'Transfer', href: '/transfer', icon: ArrowRightLeft },
       { title: 'Licensing', href: '/licensing', icon: FileText },
       { title: 'Listings', href: '/listing', icon: Banknote },
@@ -55,7 +53,6 @@ const navigationItems = [
 
 const userMenuItems = [
   { title: 'My Account', href: '/account', icon: User },
-  { title: 'Settings', href: '/settings', icon: Settings },
 ]
 
 const appFeatures = [

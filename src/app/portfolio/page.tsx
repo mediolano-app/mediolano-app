@@ -26,9 +26,14 @@ const validCollections = collections.filter(collection => {
       <main className="container mx-auto px-4 py-6">
         <div className="space-y-1 mb-5 px-4 mx-auto">
           <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
-          <p className="text-muted-foreground">
-            Showcase and manage your digital assets
+          { address ? 
+            <p className="text-muted-foreground">
+              Showcase and manage your digital assets
+            </p> :
+           <p className="text-muted-foreground badge">
+            Connect your wallet to open your onchain portfolio
           </p>
+          }
         </div>
       </main>
 

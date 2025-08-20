@@ -60,7 +60,7 @@ export interface NFT {
   category?: string;
   collection?: string;
   tokenId?: string;
-  openseaUrl?: string;
+  externalUrl?: string;
 }
 
 
@@ -231,10 +231,10 @@ export interface publicationIP  {
 }
 
 export interface rwaIP  {
-  title: string;
-  description: string;
-  type: string;
-  template: string;
+      title: string;
+      description: string;
+      type: string;
+      template: string;
       rwa: string;
       location: string;
       valuation: string;
@@ -358,12 +358,12 @@ export interface OwnershipRecord {
 }
 
 export interface LicensingTerms {
+  type: string
   commercialUse: boolean
   modifications: boolean
   attribution: boolean
-  territoriesExcluded?: string[]
+  territory: string
   duration?: string
-  revenueSplit?: number
 }
 
 export interface Collection {
@@ -436,6 +436,9 @@ export interface PortfolioStats {
   recentViews: number
   protectionLevel: number
 }
+
+
+
 
 export interface Template {
   id: string

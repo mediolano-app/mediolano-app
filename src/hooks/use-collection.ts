@@ -128,8 +128,8 @@ async function processCollectionMetadata(
   // Create the collection object
   const collection: Collection = {
     id: id,
-    name: cleanName || 'Unnamed Collection',
-    description: ipfsMetadata?.description || 'No description available',
+    name: cleanName || 'MIP Collection',
+    description: ipfsMetadata?.description || 'Programmable IP Collection',
     image: image,
     nftAddress: nftAddress,
 

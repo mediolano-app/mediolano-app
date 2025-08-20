@@ -145,19 +145,7 @@ export default function CollectionDetailPage() {
           <div className="relative aspect-video rounded-lg overflow-hidden">
             <Image src={coverImage || "/placeholder.svg"} alt={collection.name} fill className="object-cover" />
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-2">
-            {/* Show collection image in preview spots */}
-            {Array.from({ length: 4 }, (_, index) => (
-              <div key={index} className="relative aspect-square rounded-md overflow-hidden">
-                <Image 
-                  src={collection.image || "/placeholder.svg"} 
-                  alt={`${collection.name} preview ${index + 1}`} 
-                  fill 
-                  className="object-cover" 
-                />
-              </div>
-            ))}
-          </div>
+    
         </div>
         <div className="space-y-4">
           <Card>

@@ -76,14 +76,14 @@ export function useCreateAsset(): IMintReturnType {
                 rel="noopener noreferrer"
                 className="underline text-blue-600"
               >
-                View on StarkScan ↗
+                View on Starknet Explorer ↗
               </a>
             </div>
           ),
         });
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : "Failed to mint asset";
+          err instanceof Error ? err.message : "Failed to mint Programmable IP";
 
         console.error("Mint Error:", err);
 

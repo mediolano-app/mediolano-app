@@ -156,15 +156,7 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
             // Get token details and metadata for each ID
             const tokenDetails = await Promise.all(
               tokenIds.map(async (tokenId) => {
-                let tokenIdParam = tokenId;
-                if (typeof tokenId === 'string') {
-                  const numTokenId = parseInt(tokenId);
-                  if (!isNaN(numTokenId)) {
-                    tokenIdParam = numTokenId.toString();
-                  }
-                }
-                
-                const token = await contract.call("get_token", [tokenIdParam]);
+                const token = await contract.call("get_token", [tokenId]);
                 
                 const processedToken = await processTokenMetadata(
                   tokenId,
