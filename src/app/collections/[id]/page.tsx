@@ -1,17 +1,20 @@
 "use client"
 
-import { Suspense, useState, useEffect } from "react"
+import React, { Suspense, useState, useEffect, useMemo } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Grid3X3, BarChart3, TrendingUp, Star, Plus, Edit } from "lucide-react"
+import { ArrowLeft, Grid3X3, BarChart3, TrendingUp, Star, Plus, Edit, Hash, ExternalLink } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useGetCollection } from "@/hooks/use-collection"
 import { useParams, useRouter } from "next/navigation"
 import { Collection } from "@/lib/types"
-import { shortenAddress } from "@/lib/utils"
+import { shortenAddress, normalizeStarknetAddress, toHexString } from "@/lib/utils"
+import { EXPLORER_URL } from "@/services/constants"
+import { useCollectionAssets } from "@/hooks/use-collection-assets"
 
 export default function CollectionDetailPage() {
   const params = useParams()
@@ -91,14 +94,30 @@ export default function CollectionDetailPage() {
   // Check if this is a featured collection (collection with id "5")
   const isFeatured = collection.id.toString() === "5"
 
+  
+  const contractHex = collection.nftAddress
+    ? normalizeStarknetAddress(String(collection.nftAddress))
+    : "N/A";
+  const ownerHex = collection.owner
+    ? normalizeStarknetAddress(String(collection.owner))
+    : "N/A";
+
   return (
-    <main className="container py-10 mx-auto">
+    <main className="container px-4 py-10 mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold">{collection.name}</h1>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <span>{collection.name}</span>
+            {collection.symbol && (
+              <Badge variant="outline" className="text-xs mt-1
+               px-2 py-0.5">
+                {collection.symbol}
+              </Badge>
+            )}
+          </h1>
           {isFeatured && (
             <Badge
               variant="secondary"
@@ -137,7 +156,7 @@ export default function CollectionDetailPage() {
               <div className="flex justify-between">
                 <div className="flex items-center gap-2">
                   <Grid3X3 className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Total NFTs</span>
+                  <span className="text-sm text-muted-foreground">Total Assets</span>
                 </div>
                 <span className="font-medium">{collection.itemCount}</span>
               </div>
@@ -156,14 +175,45 @@ export default function CollectionDetailPage() {
                 <span className="font-medium">{collection.totalMinted || 0}</span>
               </div>
               
-                             <div className="flex justify-between">
+               <div className="flex items-center justify-between gap-2">
                  <div className="flex items-center gap-2">
                    <Star className="h-4 w-4 text-muted-foreground" />
                    <span className="text-sm text-muted-foreground">Owner</span>
                  </div>
-                 <span className="font-medium text-xs font-mono" title={collection.owner || "N/A"}>
-                   {shortenAddress(collection.owner || "N/A")}
+                 <div className="flex items-center gap-2">
+                   <span className="font-medium text-xs font-mono" title={ownerHex}>
+                     {shortenAddress(ownerHex)}
+                   </span>
+                   <a
+                     className="inline-flex items-center justify-center h-7 px-2 rounded-md text-sm"
+                     href={`${EXPLORER_URL?.replace(/\/$/, "")}/contract/${ownerHex}`}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     title="Open in explorer"
+                   >
+                     <ExternalLink className="h-3.5 w-3.5" />
+                   </a>
+                 </div>
+               </div>
+               <div className="flex items-center justify-between gap-2">
+                 <div className="flex items-center gap-2">
+                   <Hash className="h-4 w-4 text-muted-foreground" />
+                   <span className="text-sm text-muted-foreground">Address</span>
+                 </div>
+                 <div className="flex items-center gap-2">
+                   <span className="font-medium text-xs font-mono" title={contractHex}>
+                     {shortenAddress(contractHex)}
                  </span>
+                   <a
+                     className="inline-flex items-center justify-center h-7 px-2  rounded-md text-sm"
+                     href={`${EXPLORER_URL?.replace(/\/$/, "")}/contract/${contractHex}`}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     title="Open in explorer"
+                   >
+                     <ExternalLink className="h-3.5 w-3.5" />
+                   </a>
+                 </div>
                </div>
             </CardContent>
           </Card>
@@ -186,10 +236,11 @@ export default function CollectionDetailPage() {
         </TabsList>
 
         <TabsContent value="nfts" className="space-y-6">
-          <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-
-            <CollectionNFTs collectionId={String(collection.id)} />
-
+          <Suspense fallback={<Skeleton className="h-16 w-full" />}>
+            <CollectionNFTs
+              nftAddress={String(collection.nftAddress)}
+              totalSupply={Number(collection.totalSupply || collection.itemCount || 0)}
+            />
           </Suspense>
         </TabsContent>
 
@@ -273,13 +324,84 @@ export default function CollectionDetailPage() {
   )
 }
 
-function CollectionNFTs({ collectionId }: { collectionId: string }) {
-  // For now, show a placeholder since we don't have individual NFT data
-  return (
-    <div className="text-center py-12">
-      <p className="text-muted-foreground">NFTs from this collection will be displayed here</p>
-      <p className="text-sm text-muted-foreground mt-2">Collection ID: {collectionId}</p>
-    </div>
-  )
-}
+const CollectionNFTs = React.memo(({ nftAddress, totalSupply }: { nftAddress: string; totalSupply: number }) => {
+  const paramsLocal = useParams();
+  const idParam = String(paramsLocal?.id || "");
+  
+  // Memoize the hook call parameters
+  const hookParams = useMemo(() => ({
+    totalSupply,
+    limit: Math.min(totalSupply || 10, 10),//limit is ten for now
+  }), [totalSupply]);
+  
+  const { assets, loading, error } = useCollectionAssets(
+    toHexString(nftAddress) as `0x${string}`, 
+    hookParams
+  );
 
+  if (loading && assets.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center h-12">
+          <p className="text-muted-foreground mb-2">Discovering collection assets...</p>
+          </div>
+        
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-500 mb-2">Error loading collection assets</p>
+        <p className="text-sm text-muted-foreground">{error}</p>
+      </div>
+    );
+  }
+
+  if (assets.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">No assets found for this collection.</p>
+        <p className="text-sm text-muted-foreground mt-1">Collection NFT ID: {idParam}</p>
+        <p className="text-sm text-muted-foreground mt-1">Total Supply: {totalSupply || "Unknown"}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Collection Assets ({assets.length})</h3>
+        <p className="text-sm text-muted-foreground">
+          Token IDs: {assets.length} of {totalSupply}
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+        {assets.map((a) => (
+          <Link key={a.id} href={`/asset/${a.id}`}>
+            <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer group">
+              <div className="relative aspect-square overflow-hidden">
+                <Image 
+                  src={a.image || "/placeholder.svg"} 
+                  alt={a.name} 
+                  fill 
+                  className="object-cover transition-transform duration-200 group-hover:scale-102" 
+                />
+              </div>
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium truncate" title={a.name}>{a.name}</span>
+                  <Badge variant="outline">#{a.tokenId}</Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+});
+
+CollectionNFTs.displayName = 'CollectionNFTs';
