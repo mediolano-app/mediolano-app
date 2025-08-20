@@ -20,51 +20,44 @@ export default function CollectionsPage() {
     return isValid;
   });
 
-  if (!address) {
-    return (
-      <div className="container mx-auto px-4 py-8 mb-20">
-          Please connect your wallet to view your collections
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8 mb-20">
-        <Alert variant="destructive">{error}</Alert>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto px-4 py-8 mb-20">
       <div className="container py-10 space-y-8">
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">Collections</h1>
+          <h1 className="text-4xl font-bold tracking-tight">My Collections</h1>
           <p className="text-muted-foreground">Browse and manage your IP Collections</p>
         </div>
 
-        {loading ? (
-          <StatsSkeleton />
-        ) : (
-          <CollectionStats
-            totalCollections={validCollections.length}
-            totalAssets={stats.totalNFTs}
-            totalValue={stats.totalValue}
-            topCollection={stats.topCollection}
-            collections={validCollections}
-          />
-        )}
-
-        {loading ? (
-          <CollectionsSkeleton />
-        ) : validCollections.length === 0 ? (
+        {!address ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground mb-5">No collections found. Create your first collection to get started.</p>
-            <Link href="/create/collection"><Button>Create Collection</Button></Link>
+            <p className="text-muted-foreground">Please connect your wallet to view your collections</p>
           </div>
+        ) : error ? (
+          <Alert variant="destructive">{error}</Alert>
+        ) : loading ? (
+          <>
+            <StatsSkeleton />
+            <CollectionsSkeleton />
+          </>
         ) : (
-          <CollectionsPortfolioGrid collections={validCollections} />
+          <>
+            <CollectionStats
+              totalCollections={validCollections.length}
+              totalAssets={stats.totalNFTs}
+              totalValue={stats.totalValue}
+              topCollection={stats.topCollection}
+              collections={validCollections}
+            />
+
+            {validCollections.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-5">No collections found. Create your first collection to get started.</p>
+                <Link href="/create/collection"><Button>Create Collection</Button></Link>
+              </div>
+            ) : (
+              <CollectionsPortfolioGrid collections={validCollections} />
+            )}
+          </>
         )}
       </div>
     </div>

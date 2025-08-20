@@ -3,33 +3,62 @@ import { Separator } from "@/components/ui/separator"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { FileCheck, Box, Code, History, PlusCircle } from "lucide-react"
+import { AssetDetail, DisplayAsset } from "@/hooks/use-asset"
 
 interface OverviewTabProps {
-  asset: {
-    description: string
-    licenseTerms: string
-    collection: string
-    blockchain: string
-    tokenStandard: string
-    contract: string
-    name: string
-    image: string
-    attributes: Array<{ trait_type: string; value: string }>
-    id: string
-    author: {
-      name: string
-    }
-    licenseType: string
-  }
-  tokenOwnerAddress?: string
+  asset: AssetDetail | DisplayAsset
 }
 
-export function OverviewTab({ asset, tokenOwnerAddress }: OverviewTabProps) {
+export function OverviewTab({ asset }: OverviewTabProps) {
+  const isDisplayAsset = (asset: AssetDetail | DisplayAsset): asset is DisplayAsset => {
+    return 'licenseTerms' in asset;
+  };
+
+  // Get display values based on asset type
+  const getDisplayValues = () => {
+    if (isDisplayAsset(asset)) {
+      return {
+        name: asset.name,
+        description: asset.description,
+        image: asset.image,
+        attributes: asset.attributes,
+        id: asset.id,
+        licenseTerms: asset.licenseTerms,
+        collection: asset.collection,
+        blockchain: asset.blockchain,
+        tokenStandard: asset.tokenStandard,
+        contract: asset.contract,
+        author: asset.author,
+        licenseType: asset.licenseType,
+        owner: asset.owner.address,
+        version: asset.version,
+      };
+    }
+    return {
+      name: asset.name,
+      description: asset.description || "",
+      image: asset.image || "/placeholder.svg",
+      attributes: asset.attributes || [],
+      id: asset.id,
+      licenseTerms: "Not specified",
+      collection: asset.collectionName || "Not specified",
+      blockchain: "Starknet",
+      tokenStandard: "ERC-721",
+      contract: asset.nftAddress,
+      author: { name: asset.owner || "Unknown" },
+      licenseType: "Not specified",
+      owner: asset.owner || "Unknown",
+      version: "1.0", 
+    };
+  };
+
+  const displayValues = getDisplayValues();
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold mb-2">Description</h2>
-        <p className="text-muted-foreground">{asset.description}</p>
+        <p className="text-muted-foreground">{displayValues.description}</p>
       </div>
 
       <Separator />
@@ -40,7 +69,7 @@ export function OverviewTab({ asset, tokenOwnerAddress }: OverviewTabProps) {
             <FileCheck className="h-8 w-8 text-primary" />
             <div>
               <h3 className="text-sm">License</h3>
-              <p className="text-lg text-muted-foreground">{asset.licenseTerms}</p>
+              <p className="text-lg capitalize text-muted-foreground">{displayValues.licenseTerms}</p>
             </div>
           </CardContent>
         </Card>
@@ -49,7 +78,7 @@ export function OverviewTab({ asset, tokenOwnerAddress }: OverviewTabProps) {
             <Box className="h-8 w-8 text-primary" />
             <div>
               <h3 className="text-sm">IP Version</h3>
-              <p className="text-lg text-muted-foreground">1</p>
+              <p className="text-lg text-muted-foreground">{displayValues.version}</p>
             </div>
           </CardContent>
         </Card>
@@ -62,20 +91,20 @@ export function OverviewTab({ asset, tokenOwnerAddress }: OverviewTabProps) {
         <dl className="grid grid-cols-2 gap-4">
           <div className="rounded-lg border p-3">
             <dt className="text-sm text-muted-foreground">Collection</dt>
-            <dd className="font-medium">{asset.collection}</dd>
+            <dd className="font-medium">{displayValues.collection}</dd>
           </div>
           <div className="rounded-lg border p-3">
             <dt className="text-sm text-muted-foreground">Blockchain</dt>
-            <dd className="font-medium">{asset.blockchain}</dd>
+            <dd className="font-medium">{displayValues.blockchain}</dd>
           </div>
           <div className="rounded-lg border p-3">
             <dt className="text-sm text-muted-foreground">Token Standard</dt>
-            <dd className="font-medium">{asset.tokenStandard}</dd>
+            <dd className="font-medium">{displayValues.tokenStandard}</dd>
           </div>
           <div className="rounded-lg border p-3">
             <dt className="text-sm text-muted-foreground">Contract</dt>
-            <dd className="font-medium truncate" title={asset.contract}>
-              {asset.contract}
+            <dd className="font-medium truncate" title={displayValues.contract}>
+              {displayValues.contract}
             </dd>
           </div>
         </dl>
@@ -96,14 +125,14 @@ export function OverviewTab({ asset, tokenOwnerAddress }: OverviewTabProps) {
                 <pre className="text-sm">
                   {JSON.stringify(
                     {
-                      name: asset.name,
-                      description: asset.description,
-                      image: asset.image,
-                      attributes: asset.attributes,
-                      tokenId: asset.id,
-                      author: asset.author.name,
-                      licenseType: asset.licenseType,
-                      licenseTerms: asset.licenseTerms,
+                      name: displayValues.name,
+                      description: displayValues.description,
+                      image: displayValues.image,
+                      attributes: displayValues.attributes,
+                      tokenId: displayValues.id,
+                      author: displayValues.author.name,
+                      licenseType: displayValues.licenseType,
+                      licenseTerms: displayValues.licenseTerms,
                     },
                     null,
                     2,
@@ -113,6 +142,7 @@ export function OverviewTab({ asset, tokenOwnerAddress }: OverviewTabProps) {
             </AccordionContent>
           </AccordionItem>
 
+          {/* TODO: Add proper history management */}
           <AccordionItem value="history">
             <AccordionTrigger className="py-4">
               <div className="flex items-center">
@@ -128,7 +158,7 @@ export function OverviewTab({ asset, tokenOwnerAddress }: OverviewTabProps) {
                   </div>
                   <div>
                     <p className="font-medium">License Updated</p>
-                    <p className="text-sm">{tokenOwnerAddress?.slice(0,20)} updated</p>
+                    <p className="text-sm">{typeof displayValues.owner === 'string' ? displayValues.owner.slice(0,20) : displayValues.owner} updated</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -137,7 +167,7 @@ export function OverviewTab({ asset, tokenOwnerAddress }: OverviewTabProps) {
                   </div>
                   <div>
                     <p className="font-medium">Created</p>
-                    <p className="text-sm">{tokenOwnerAddress?.slice(0,20)} minted this asset</p>
+                    <p className="text-sm">{typeof displayValues.owner === 'string' ? displayValues.owner.slice(0,20) : displayValues.owner} minted this asset</p>
                   </div>
                 </div>
               </div>

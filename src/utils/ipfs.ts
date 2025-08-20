@@ -7,6 +7,7 @@ export interface IPFSMetadata {
   type?: string;
   creator?: string | { name: string; address: string };
   attributes?: Array<{ trait_type: string; value: string }>;
+  properties?: Record<string, unknown>;
   registrationDate?: string;
   medium?: string;
   fileType?: string;
@@ -124,55 +125,7 @@ export async function fetchIPFSMetadata(cid: string, bypassCache = false): Promi
   return null;
 }
 
-/**
- * Recognize the IP type by metadata
- * @param {IPFSMetadata} metadata 
- * @returns {string} 
- */
-export function determineIPType(metadata: IPFSMetadata | null): string {
-  if (!metadata) return 'Generic';
-  
 
-  if (metadata.type && typeof metadata.type === 'string') {
-    const t = metadata.type.trim().toLowerCase();
-    // Map common aliases/synonyms to the expected IPType labels
-    if (/(^|\b)(art|digital art|painting|illustration)($|\b)/.test(t)) return 'Art';
-    if (/(^|\b)(audio|music|sound)($|\b)/.test(t)) return 'Audio';
-    if (/(^|\b)(video|film|movie)($|\b)/.test(t)) return 'Video';
-    if (/(^|\b)(software|code|app|application)($|\b)/.test(t)) return 'Software';
-    if (/(^|\b)(document|documents|pdf)($|\b)/.test(t)) return 'Documents';
-    if (/(^|\b)(publication|publications|book|journal)($|\b)/.test(t)) return 'Publications';
-    if (/(^|\b)(patent|patents)($|\b)/.test(t)) return 'Patents';
-    if (/(^|\b)(post|blog|article)($|\b)/.test(t)) return 'Posts';
-    if (/(^|\b)(rwa|real world asset|real-world asset|real estate)($|\b)/.test(t)) return 'RWA';
-    if (/(^|\b)(nft|token)($|\b)/.test(t)) return 'NFT';
-  }
-  
-  if (metadata.medium === 'Digital Art' || metadata.medium === 'Physical Art' || 
-      metadata.medium === 'Painting' || metadata.medium === 'Illustration') {
-    return 'Art';
-  }
-  
-  if (metadata.fileType) {
-    if (metadata.fileType.startsWith('audio/')) return 'Audio';
-    if (metadata.fileType.startsWith('video/')) return 'Video';
-    if (metadata.fileType.includes('code') || metadata.fileType.includes('javascript')) return 'Software';
-    if (metadata.fileType === 'application/pdf') return 'Documents';
-  }
-  
-  if (metadata.duration || metadata.genre || metadata.bpm) return 'Audio';
-  if (metadata.resolution || metadata.framerate) return 'Video';
-  if (metadata.yearCreated && metadata.artistName) return 'Art';
-  if (metadata.version && (metadata.external_url || metadata.repository)) return 'Software';
-  if (metadata.patent_number || metadata.patent_date) return 'Patents';
-  
-  
-  if (metadata.tokenId || metadata.tokenStandard || metadata.blockchain) return 'NFT';
- 
-  
-  
-  return 'Generic';
-}
 
 /**
  * Stract the known CDIs
@@ -221,7 +174,7 @@ export function combineData(ipfsData: IPFSMetadata | null, mockData: AssetType):
     owner: mockData.owner, // Mantener el owner actual
     image: ipfsData.image || mockData.image,
     attributes: ipfsData.attributes || mockData.attributes,
-    type: determineIPType(ipfsData),
+    type: ipfsData.type || mockData.type,
     registrationDate: ipfsData.registrationDate || mockData.registrationDate
   };
   
@@ -310,19 +263,16 @@ export function processIPFSHashToUrl(input: string, fallbackUrl: string): string
   if (typeof input !== 'string') return fallbackUrl;
   
   let processedUrl = input.replace(/\0/g, '').trim();
-  console.log(`Processing IPFS input:`, processedUrl);
+  
   
   // Handle undefined prefix first - this is the most common case
   if (processedUrl.startsWith('undefined/')) {
     const cid = processedUrl.replace('undefined/', '');
-    console.log(`Extracted CID from undefined/ prefix:`, cid, `(length: ${cid.length})`);
-    // Validate CID length and format - must be at least 34 characters (IPFS v0) or 46+ (IPFS v1)
+        // Validate CID length and format - must be at least 34 characters (IPFS v0) or 46+ (IPFS v1)
     if (cid.match(/^[a-zA-Z0-9]{34,}$/)) {
       const gatewayUrl = `${IPFS_GATEWAYS[0]}${cid}`;
-      console.log(`Converted undefined/ prefix to gateway URL:`, gatewayUrl);
       return gatewayUrl;
     } else {
-      console.log(`Invalid CID length or format (${cid.length} chars):`, cid);
       return fallbackUrl;
     }
   }

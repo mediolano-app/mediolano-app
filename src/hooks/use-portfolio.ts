@@ -197,7 +197,7 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
 
             tokensMap[collection.id.toString()] = tokenDetails;
           } catch (err) {
-            
+            console.error("Error loading tokens:", err);
           }
         })
       );
@@ -237,7 +237,7 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
       });
 
     } catch (err) {
-      console.error("❌ Error loading tokens:", err);
+      console.error("Error loading tokens:", err);
     }
   }, [contract, address, collections, processTokenMetadata]);
 
@@ -258,100 +258,4 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
     refetch
   };
 }
-// Debug function to test token fetching directly
-export async function debugTokenFetching(
-  collectionId: string,
-  userAddress: string,
-  contractAddress: string
-) {
-  console.log(`🧪 DEBUG: Testing token fetching directly`);
-  console.log(`Input:`, { collectionId, userAddress, contractAddress });
-  
-  try {
-    // Import required modules
-    const { RpcProvider, Contract } = await import("starknet");
-    const { ipCollectionAbi } = await import("@/abis/ip_collection");
-    
-    // Initialize provider and contract
-    const provider = new RpcProvider({ nodeUrl: "https://starknet-sepolia.public.blastapi.io" });
-    const contract = new Contract(ipCollectionAbi, contractAddress, provider);
-    
-    console.log(`✅ Provider and contract initialized`);
-    
-    // Test collection ownership
-    console.log(`🔍 Testing collection ownership...`);
-    const isOwner = await contract.is_collection_owner(collectionId, userAddress);
-    console.log(`  Is owner:`, isOwner);
-    
-    // Test listing user tokens with different parameter formats
-    console.log(`🔍 Testing list_user_tokens_per_collection with different formats...`);
-    
-    // Test 1: String format
-    console.log(`  Test 1: String format (collectionId: "${collectionId}")`);
-    try {
-      const tokenIds1 = await contract.list_user_tokens_per_collection(collectionId, userAddress);
-      console.log(`    Result:`, tokenIds1);
-    } catch (error) {
-      console.log(`    Error:`, error);
-    }
-    
-    // Test 2: Number format
-    console.log(`  Test 2: Number format (collectionId: ${parseInt(collectionId)})`);
-    try {
-      const tokenIds2 = await contract.list_user_tokens_per_collection(parseInt(collectionId), userAddress);
-      console.log(`    Result:`, tokenIds2);
-    } catch (error) {
-      console.log(`    Error:`, error);
-    }
-    
-    // Test 3: uint256 format
-    console.log(`  Test 3: uint256 format`);
-    try {
-      const { uint256 } = await import("starknet");
-      const collectionIdUint256 = uint256.bnToUint256(collectionId);
-      const tokenIds3 = await contract.list_user_tokens_per_collection(collectionIdUint256, userAddress);
-      console.log(`    Result:`, tokenIds3);
-    } catch (error) {
-      console.log(`    Error:`, error);
-    }
-    
-    // Test 4: Try with different user address format
-    console.log(`  Test 4: Different user address format`);
-    try {
-      const userAddressWithout0x = userAddress.replace('0x', '');
-      const tokenIds4 = await contract.list_user_tokens_per_collection(collectionId, userAddressWithout0x);
-      console.log(`    Result:`, tokenIds4);
-    } catch (error) {
-      console.log(`    Error:`, error);
-    }
-    
-    // If any of the above worked, test getting token details
-    console.log(`🔍 Testing get_token for first token...`);
-    try {
-      const tokenData = await contract.get_token("1"); // Try with token ID 1
-      console.log(`  Token data for ID 1:`, tokenData);
-      
-      // Test metadata URI
-      if (tokenData.metadata_uri) {
-        console.log(`🔍 Testing metadata URI:`, tokenData.metadata_uri);
-        
-        // Test IPFS fetch
-        const { fetchIPFSMetadata } = await import("@/utils/ipfs");
-        const cidMatch = tokenData.metadata_uri.match(/\/ipfs\/([a-zA-Z0-9]+)/);
-        if (cidMatch) {
-          const cid = cidMatch[1];
-          console.log(`  Extracted CID:`, cid);
-          
-          const metadata = await fetchIPFSMetadata(cid);
-          console.log(`  IPFS metadata:`, metadata);
-        }
-      }
-    } catch (error) {
-      console.log(`  Error getting token data:`, error);
-    }
-    
-  } catch (error) {
-    console.error(`❌ Error in debugTokenFetching:`, error);
-    console.error(`Error details:`, error instanceof Error ? error.message : String(error));
-  }
-}
+

@@ -1,3 +1,4 @@
+import type { IPType } from "./types";
 /**
  * Application-wide constants
  */
@@ -51,4 +52,20 @@ export const FEATURED_COLLECTION_IDS = [
 
 // Contract addresses   
 //export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
+
+// Central list of allowed IP types used across detection and UI
+export const ALLOWED_IP_TYPES: IPType[] = [
+  "Audio",
+  "Art",
+  "Documents",
+  "NFT",
+  "Video",
+  "Patents",
+  "Posts",
+  "Publications",
+  "RWA",
+  "Software",
+  "Custom",
+  "Generic",
+] as const;
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -30,198 +30,224 @@ import {
   Clock,
   Calendar,
   Hash,
-  Globe,
-  Layers,
   FileCode,
   Database,
   Cpu,
-  BookMarked,
-  Landmark,
-  Scale,
-  Lightbulb,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { fetchIPFSMetadata, determineIPType, getKnownCids, combineData, AssetType, IPFSMetadata } from "@/utils/ipfs"
+import { fetchIPFSMetadata, getKnownCids, combineData, AssetType, IPFSMetadata } from "@/utils/ipfs"
+import { determineIPType } from "@/utils/ip-type-detection"
+import { IPType } from "@/lib/types"
+import { mockIPTypeData } from "@/lib/mockData"
 
-// Define the possible IP types
-export type IPType =
-  | "Audio"
-  | "Art"
-  | "Documents"
-  | "NFT"
-  | "Video"
-  | "Patents"
-  | "Posts"
-  | "Publications"
-  | "RWA"
-  | "Software"
-  | "Custom"
-  | "Generic";
 
-export type IPTypeDataType = {
-  [key: string]: any;
-};
+export type IPTypeDataType = Record<string, unknown>;
 
-// Mock data for each IP type
-const mockIPTypeData: Record<string, IPTypeDataType> = {
-  Audio: {
-    duration: "3:45",
-    genre: "Electronic",
-    bpm: 128,
-    key: "C Minor",
-    releaseDate: "2025-01-15",
-    audioFormat: "WAV",
-    sampleRate: "48kHz",
-    channels: 2,
-    composer: "John Doe",
-    publisher: "Electronic Music Ltd",
-    isrc: "USRC17607839",
-    lyrics: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-    previewUrl: "/placeholder.mp3",
-  },
-  Art: {
-    medium: "Digital",
-    dimensions: "3000x2000 px",
-    style: "Abstract",
-    colorPalette: ["#FF5733", "#33FF57", "#3357FF", "#F3FF33"],
-    creationDate: "2024-12-10",
-    software: "Adobe Photoshop",
-    printEditions: 10,
-    exhibition: "Digital Art Expo 2025",
-    materials: ["Digital Canvas", "Procedural Textures"],
-    technique: "Digital Painting",
-  },
-  Documents: {
-    documentType: "Legal Agreement",
-    pageCount: 24,
-    wordCount: 5432,
-    language: "English",
-    creationDate: "2025-02-20",
-    lastModified: "2025-03-05",
-    signatories: ["Alice Corp", "Bob LLC"],
-    jurisdiction: "Delaware, USA",
-    fileFormat: "PDF",
-    keywords: ["contract", "agreement", "terms", "conditions"],
-  },
-  NFT: {
-    blockchain: "Ethereum",
-    tokenStandard: "ERC-721",
-    contractAddress: "0x1234567890abcdef1234567890abcdef12345678",
-    tokenId: "42",
-    mintDate: "2025-01-30",
-    editions: 1,
-    rarity: "Legendary",
-    traits: [
-      { trait_type: "Background", value: "Cosmic" },
-      { trait_type: "Character", value: "Robot" },
-      { trait_type: "Accessory", value: "Laser Sword" },
-    ],
-    marketplace: "OpenSea",
-    previousOwners: 3,
-  },
-  Video: {
-    duration: "12:34",
-    resolution: "4K (3840x2160)",
-    frameRate: "60 fps",
-    codec: "H.265/HEVC",
-    director: "Jane Smith",
-    releaseDate: "2025-02-15",
-    genre: "Sci-Fi",
-    cast: ["Actor One", "Actor Two", "Actor Three"],
-    aspectRatio: "16:9",
-    language: "English",
-    subtitles: ["English", "Spanish", "French"],
-    previewUrl: "/placeholder.mp4",
-  },
-  Patents: {
-    patentType: "Utility",
-    filingDate: "2024-11-05",
-    publicationDate: "2025-05-10",
-    grantDate: "2025-08-15",
-    patentNumber: "US 12,345,678",
-    inventors: ["Inventor One", "Inventor Two"],
-    assignee: "Tech Innovations Inc.",
-    jurisdiction: "United States",
-    classification: "G06F 21/00",
-    status: "Granted",
-    expirationDate: "2045-11-05",
-    claims: 15,
-  },
-  Posts: {
-    platform: "Medium",
-    publicationDate: "2025-03-01",
-    wordCount: 1250,
-    readTime: "5 min",
-    category: "Technology",
-    tags: ["blockchain", "crypto", "web3", "nft"],
-    views: 12500,
-    likes: 843,
-    comments: 56,
-    url: "https://medium.com/@author/article-title",
-    lastUpdated: "2025-03-02",
-  },
-  Publications: {
-    publicationType: "Book",
-    publisher: "Tech Publishing House",
-    publicationDate: "2025-01-20",
-    isbn: "978-3-16-148410-0",
-    edition: "First Edition",
-    pageCount: 320,
-    language: "English",
-    genre: "Non-fiction",
-    format: ["Hardcover", "eBook", "Audiobook"],
-    contributors: ["Editor: Jane Editor", "Illustrator: John Artist"],
-    reviews: 4.8,
-  },
-  RWA: {
-    assetType: "Real Estate",
-    location: "123 Main St, New York, NY",
-    acquisitionDate: "2024-12-15",
-    value: "$1,250,000",
-    tokenizationDate: "2025-01-10",
-    fractionalized: true,
-    totalShares: 1000,
-    regulatoryCompliance: ["SEC", "FINRA"],
-    insurancePolicy: "POL-12345-XYZ",
-    custodian: "Digital Asset Trust",
-    lastValuation: "2025-03-01",
-    appreciationRate: "5.2% annually",
-  },
-  Software: {
-    softwareType: "Mobile Application",
-    version: "2.1.0",
-    releaseDate: "2025-02-10",
-    programmingLanguages: ["Swift", "Kotlin"],
-    platforms: ["iOS", "Android"],
-    license: "Proprietary",
-    dependencies: ["React Native", "Firebase", "Redux"],
-    apiDocumentation: "https://api.example.com/docs",
-    sourceCodeRepository: "https://github.com/example/app",
-    buildInstructions: "See README.md in repository",
-    features: ["Authentication", "Push Notifications", "Offline Mode"],
-  },
-  Custom: {
-    customType: "Mixed Media Installation",
-    dimensions: "3m x 4m x 2.5m",
-    materials: ["Digital Displays", "Sculptural Elements", "Interactive Sensors"],
-    creationDate: "2025-01-25",
-    exhibition: "Future Art Biennale 2025",
-    interactivity: true,
-    powerRequirements: "220V, 15A",
-    installationGuide: "Available upon request",
-    maintenanceSchedule: "Quarterly",
-    components: ["Visual Display", "Audio System", "Motion Sensors", "Custom Software"],
-  },
-  Generic: {
-    type: "Generic IP",
-    registrationDate: "2025-01-01",
-    createdAt: "2024-12-25",
-    creator: "Unknown Creator",
-    format: "Digital",
-    license: "Standard",
-    notes: "Generic metadata for fallback purposes",
-  },
-};
+
+const asText = (value: unknown, fallback = ""): string => {
+  if (value === null || value === undefined) return fallback
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value)
+  return fallback
+}
+
+
+const getField = (obj: Record<string, unknown> | undefined, key: string): string => {
+  return asText(obj?.[key])
+}
+
+const isStringArray = (value: unknown): value is string[] => Array.isArray(value) && value.every((v) => typeof v === "string")
+
+type Trait = { trait_type: string; value: string }
+const isTraitArray = (value: unknown): value is Trait[] => Array.isArray(value) && value.every((v) => v && typeof v === "object" && "trait_type" in v && "value" in v)
+
+
+type AudioData = {
+  duration?: string
+  genre?: string
+  bpm?: number
+  key?: string
+  releaseDate?: string
+  audioFormat?: string
+  sampleRate?: string
+  channels?: number
+  composer?: string
+  publisher?: string
+  isrc?: string
+}
+
+type ArtData = {
+  medium?: string
+  dimensions?: string
+  style?: string
+  creationDate?: string
+  colorPalette?: string[]
+  software?: string
+  printEditions?: number
+  materials?: string[]
+  technique?: string
+  exhibition?: string
+}
+
+type NFTData = {
+  tokenStandard?: string
+  blockchain?: string
+  tokenId?: string | number
+  contractAddress?: string
+  mintDate?: string
+  traits?: Trait[]
+  editions?: number
+  rarity?: string
+  marketplace?: string
+  previousOwners?: number
+}
+
+type VideoData = {
+  duration?: string
+  resolution?: string
+  frameRate?: string
+  codec?: string
+  director?: string
+  releaseDate?: string
+  genre?: string
+  cast?: string[]
+  aspectRatio?: string
+  language?: string
+  subtitles?: string[]
+}
+
+type PostsData = {
+  platform?: string
+  publicationDate?: string
+  wordCount?: number
+  readTime?: string
+  category?: string
+  License?: string
+  license?: string
+  ["Commercial Use"]?: string
+  Modifications?: string
+  Attribution?: string
+  ["Protection Status"]?: string
+  ["Protection Scope"]?: string
+  ["IP Version"]?: string
+  protection_duration?: string
+  collection?: string
+  creator?: string
+  registration_date?: string
+  Tags?: string
+}
+
+type SoftwareData = {
+  softwareType?: string
+  version?: string
+  releaseDate?: string
+  license?: string
+  platforms?: string[]
+  programmingLanguages?: string[]
+  dependencies?: string[]
+  features?: string[]
+  sourceCodeRepository?: string
+  apiDocumentation?: string
+}
+
+const toNumber = (v: unknown): number | undefined => {
+  if (typeof v === "number") return Number.isFinite(v) ? v : undefined
+  if (typeof v === "string") {
+    const n = Number(v)
+    return Number.isFinite(n) ? n : undefined
+  }
+  return undefined
+}
+
+// Pickers that coerce unknown data to typed shapes
+const pickAudio = (d: IPTypeDataType): AudioData => ({
+  duration: asText(d.duration),
+  genre: asText(d.genre),
+  bpm: toNumber(d.bpm),
+  key: asText(d.key),
+  releaseDate: asText(d.releaseDate),
+  audioFormat: asText(d.audioFormat),
+  sampleRate: asText(d.sampleRate),
+  channels: toNumber(d.channels),
+  composer: asText(d.composer),
+  publisher: asText(d.publisher),
+  isrc: asText(d.isrc),
+})
+
+const pickArt = (d: IPTypeDataType): ArtData => ({
+  medium: asText(d.medium),
+  dimensions: asText(d.dimensions),
+  style: asText(d.style),
+  creationDate: asText(d.creationDate),
+  colorPalette: isStringArray(d.colorPalette) ? d.colorPalette : [],
+  software: asText(d.software),
+  printEditions: toNumber(d.printEditions),
+  materials: isStringArray(d.materials) ? d.materials : [],
+  technique: asText(d.technique),
+  exhibition: asText(d.exhibition),
+})
+
+const pickNFT = (d: IPTypeDataType): NFTData => ({
+  tokenStandard: asText(d.tokenStandard),
+  blockchain: asText(d.blockchain),
+  tokenId: asText(d.tokenId),
+  contractAddress: asText(d.contractAddress),
+  mintDate: asText(d.mintDate),
+  traits: isTraitArray(d.traits) ? (d.traits as Trait[]) : [],
+  editions: toNumber(d.editions),
+  rarity: asText(d.rarity),
+  marketplace: asText(d.marketplace),
+  previousOwners: toNumber(d.previousOwners),
+})
+
+const pickVideo = (d: IPTypeDataType): VideoData => ({
+  duration: asText(d.duration),
+  resolution: asText(d.resolution),
+  frameRate: asText(d.frameRate),
+  codec: asText(d.codec),
+  director: asText(d.director),
+  releaseDate: asText(d.releaseDate),
+  genre: asText(d.genre),
+  cast: isStringArray(d.cast) ? d.cast : [],
+  aspectRatio: asText(d.aspectRatio),
+  language: asText(d.language),
+  subtitles: isStringArray(d.subtitles) ? d.subtitles : [],
+})
+
+const pickPosts = (d: IPTypeDataType): PostsData => ({
+  platform: asText(d.platform),
+  publicationDate: asText(d.publicationDate),
+  wordCount: toNumber(d.wordCount),
+  readTime: asText(d.readTime),
+  category: asText(d.category),
+  License: getField(d as Record<string, unknown>, "License"),
+  license: getField(d as Record<string, unknown>, "license"),
+  ["Commercial Use"]: getField(d as Record<string, unknown>, "Commercial Use"),
+  Modifications: getField(d as Record<string, unknown>, "Modifications"),
+  Attribution: getField(d as Record<string, unknown>, "Attribution"),
+  ["Protection Status"]: getField(d as Record<string, unknown>, "Protection Status"),
+  ["Protection Scope"]: getField(d as Record<string, unknown>, "Protection Scope"),
+  ["IP Version"]: getField(d as Record<string, unknown>, "IP Version"),
+  protection_duration: getField(d as Record<string, unknown>, "protection_duration"),
+  collection: asText(d.collection),
+  creator: asText(d.creator),
+  registration_date: getField(d as Record<string, unknown>, "registration_date"),
+  Tags: getField(d as Record<string, unknown>, "Tags"),
+})
+
+const pickSoftware = (d: IPTypeDataType): SoftwareData => ({
+  softwareType: asText(d.softwareType),
+  version: asText(d.version),
+  releaseDate: asText(d.releaseDate),
+  license: asText(d.license),
+  platforms: isStringArray(d.platforms) ? d.platforms : [],
+  programmingLanguages: isStringArray(d.programmingLanguages) ? d.programmingLanguages : [],
+  dependencies: isStringArray(d.dependencies) ? d.dependencies : [],
+  features: isStringArray(d.features) ? d.features : [],
+  sourceCodeRepository: asText(d.sourceCodeRepository),
+  apiDocumentation: asText(d.apiDocumentation),
+})
+
+
 
 interface IPTypeInfoProps {
   asset: AssetType; 
@@ -259,7 +285,9 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         }
         
         if (fetchedMetadata) {
-          const detectedType = determineIPType(fetchedMetadata) as IPType
+          let detectedType: IPType = "Generic"
+      
+          detectedType = determineIPType(asset, fetchedMetadata)
           
           const finalData = combineData(fetchedMetadata, asset)
           
@@ -267,21 +295,19 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
           setMergedData(finalData)
           setIpType(detectedType)
         } else {
-          let detectedType = determineTypeFromAsset(asset)
-          
+          // When no IPFS metadata, default to Generic 
           setIpfsMetadata(null)
           setMergedData(asset)
-          setIpType(detectedType)
+          setIpType("Generic")
         }
       } catch (error) {
         console.error("Error loading IPFS data:", error)
         setIpfsError(error as Error)
         
-        const fallbackType = determineTypeFromAsset(asset)
-        
+        // On error, also default to Generic
         setIpfsMetadata(null)
         setMergedData(asset)
-        setIpType(fallbackType)
+        setIpType("Generic")
       } finally {
         setIsLoading(false)
       }
@@ -290,55 +316,64 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
     loadIPFSData()
   }, [asset])
 
-  const determineTypeFromAsset = (asset: AssetType): IPType => {
-    if (!asset) return "Generic"
-    
-    if (asset.type && Object.keys(mockIPTypeData).includes(asset.type)) {
-      return asset.type as IPType
-    }
-    
-    const name = asset.name ? asset.name.toLowerCase() : ""
-
-    if (name.includes("audio") || name.includes("music") || name.includes("sound")) return "Audio"
-    if (name.includes("art") || name.includes("painting") || name.includes("abstract")) return "Art"
-    if (name.includes("document") || name.includes("paper") || name.includes("contract")) return "Documents"
-    if (name.includes("nft") || name.includes("token") || name.includes("crypto")) return "NFT"
-    if (name.includes("video") || name.includes("film") || name.includes("movie")) return "Video"
-    if (name.includes("patent") || name.includes("invention")) return "Patents"
-    if (name.includes("post") || name.includes("article") || name.includes("blog")) return "Posts"
-    if (name.includes("book") || name.includes("publication") || name.includes("journal")) return "Publications"
-    if (name.includes("real") || name.includes("property") || name.includes("asset")) return "RWA"
-    if (name.includes("software") || name.includes("app") || name.includes("code")) return "Software"
-
-    const id = Number.parseInt(asset.id)
-    const types: IPType[] = [
-      "Audio",
-      "Art",
-      "Documents",
-      "NFT",
-      "Video",
-      "Patents",
-      "Posts",
-      "Publications",
-      "RWA",
-      "Software",
-      "Custom",
-    ]
-    return types[id % types.length]
-  }
+  
 
   const getTypeData = (): IPTypeDataType => {
     if (!mergedData) {
       return mockIPTypeData[ipType] || mockIPTypeData.Generic;
     }
     
+    // Extract data from IPFS metadata attributes and properties
+    const extractedData: IPTypeDataType = {}
+    
+    if (ipfsMetadata?.attributes && Array.isArray(ipfsMetadata.attributes)) {
+      ipfsMetadata.attributes.forEach(attr => {
+        if (attr.trait_type && attr.value) {
+          extractedData[attr.trait_type] = attr.value
+        }
+      })
+    }
+    
+    if (ipfsMetadata?.properties && typeof ipfsMetadata.properties === 'object') {
+      Object.entries(ipfsMetadata.properties).forEach(([key, value]) => {
+        extractedData[key] = value
+      })
+    }
+      
     return {
       ...mockIPTypeData[ipType],
-      ...(ipfsMetadata || {}),
-    };
+      ...extractedData,
+      // Include basic metadata coerced to text
+      name: asText(ipfsMetadata?.name ?? mergedData.name),
+      description: asText(ipfsMetadata?.description ?? mergedData.description),
+      image: asText(ipfsMetadata?.image ?? mergedData.image),
+    } as IPTypeDataType;
   }
 
   const typeData = getTypeData()
+  // typed view of the data for the current ipType
+  const typedData = useMemo(() => {
+    switch (ipType) {
+      case "Audio":
+        return pickAudio(typeData) as AudioData
+      case "Art":
+        return pickArt(typeData) as ArtData
+      case "NFT":
+        return pickNFT(typeData) as NFTData
+      case "Video":
+        return pickVideo(typeData) as VideoData
+      case "Posts":
+        return pickPosts(typeData) as PostsData
+      case "Software":
+        return pickSoftware(typeData) as SoftwareData
+      default:
+        return typeData
+    }
+  }, [ipType, typeData])
+  void typedData
+  // Coerce potentially unknown values for JSX conditionals
+  const sourceCodeRepository = asText((typeData as Record<string, unknown>).sourceCodeRepository)
+  const apiDocumentation = asText((typeData as Record<string, unknown>).apiDocumentation)
 
   const getIconComponent = (type: IPType) => {
     switch (type) {
@@ -479,7 +514,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                   <h3 className="font-medium">Audio Preview</h3>
                 </div>
                 <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-                  {typeData.audioFormat}
+                  {asText(typeData.audioFormat)}
                 </Badge>
               </div>
 
@@ -492,7 +527,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                     <div className="text-sm">
                       <span className="font-medium">00:00</span>
                       <span className="mx-1">/</span>
-                      <span>{typeData.duration}</span>
+                      <span>{asText(typeData.duration)}</span>
                     </div>
                   </div>
                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsMuted(!isMuted)}>
@@ -508,31 +543,31 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <p className="text-sm text-muted-foreground">Duration</p>
                 <p className="font-medium flex items-center gap-1">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  {typeData.duration}
+                  {asText(typeData.duration)}
                 </p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Genre</p>
-                <p className="font-medium">{typeData.genre}</p>
+                <p className="font-medium">{asText(typeData.genre)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">BPM</p>
-                <p className="font-medium">{typeData.bpm}</p>
+                <p className="font-medium">{asText(typeData.bpm)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Key</p>
-                <p className="font-medium">{typeData.key}</p>
+                <p className="font-medium">{asText(typeData.key)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Release Date</p>
                 <p className="font-medium flex items-center gap-1">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  {typeData.releaseDate}
+                  {asText(typeData.releaseDate)}
                 </p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">ISRC</p>
-                <p className="font-medium">{typeData.isrc}</p>
+                <p className="font-medium">{asText(typeData.isrc)}</p>
               </div>
             </div>
 
@@ -543,11 +578,11 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Sample Rate</p>
-                  <p className="font-medium">{typeData.sampleRate}</p>
+                  <p className="font-medium">{asText(typeData.sampleRate)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Channels</p>
-                  <p className="font-medium">{typeData.channels}</p>
+                  <p className="font-medium">{asText(typeData.channels)}</p>
                 </div>
               </div>
             </div>
@@ -559,11 +594,11 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Composer</p>
-                  <p className="font-medium">{typeData.composer}</p>
+                  <p className="font-medium">{asText(typeData.composer)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Publisher</p>
-                  <p className="font-medium">{typeData.publisher}</p>
+                  <p className="font-medium">{asText(typeData.publisher)}</p>
                 </div>
               </div>
             </div>
@@ -587,21 +622,21 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Medium</p>
-                <p className="font-medium">{typeData.medium}</p>
+                <p className="font-medium">{asText(typeData.medium)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Dimensions</p>
-                <p className="font-medium">{typeData.dimensions}</p>
+                <p className="font-medium">{asText(typeData.dimensions)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Style</p>
-                <p className="font-medium">{typeData.style}</p>
+                <p className="font-medium">{asText(typeData.style)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Creation Date</p>
                 <p className="font-medium flex items-center gap-1">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  {typeData.creationDate}
+                  {asText(typeData.creationDate)}
                 </p>
               </div>
             </div>
@@ -611,7 +646,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="space-y-2">
               <h3 className="font-medium">Color Palette</h3>
               <div className="flex gap-2">
-                {typeData.colorPalette && Array.isArray(typeData.colorPalette) && typeData.colorPalette.map((color, index) => (
+                {isStringArray(typeData.colorPalette) && typeData.colorPalette.map((color, index) => (
                   <div key={index} className="flex flex-col items-center">
                     <div className="h-8 w-8 rounded-full border" style={{ backgroundColor: color }}></div>
                     <span className="text-xs mt-1">{color}</span>
@@ -627,11 +662,11 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Software Used</p>
-                  <p className="font-medium">{typeData.software}</p>
+                  <p className="font-medium">{asText(typeData.software)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Print Editions</p>
-                  <p className="font-medium">{typeData.printEditions}</p>
+                  <p className="font-medium">{asText(typeData.printEditions)}</p>
                 </div>
               </div>
             </div>
@@ -644,7 +679,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Materials</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.materials && Array.isArray(typeData.materials) && typeData.materials.map((material, index) => (
+                    {isStringArray(typeData.materials) && typeData.materials.map((material, index) => (
                       <Badge key={index} variant="outline">
                         {material}
                       </Badge>
@@ -653,14 +688,14 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Technique</p>
-                  <p className="font-medium">{typeData.technique}</p>
+                  <p className="font-medium">{asText(typeData.technique)}</p>
                 </div>
               </div>
             </div>
 
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Exhibition History</p>
-              <p className="font-medium">{typeData.exhibition}</p>
+              <p className="font-medium">{asText(typeData.exhibition)}</p>
             </div>
 
             <div className="flex justify-end gap-2">
@@ -686,31 +721,31 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                   <h3 className="font-medium">Token Information</h3>
                 </div>
                 <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-                  {typeData.tokenStandard}
+                  {asText(typeData.tokenStandard)}
                 </Badge>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Blockchain</p>
-                  <p className="font-medium">{typeData.blockchain}</p>
+                  <p className="font-medium">{asText(typeData.blockchain)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Token ID</p>
                   <p className="font-medium flex items-center gap-1">
                     <Hash className="h-4 w-4 text-muted-foreground" />
-                    {typeData.tokenId}
+                    {asText(typeData.tokenId)}
                   </p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Contract Address</p>
-                  <p className="font-mono text-xs truncate">{typeData.contractAddress}</p>
+                  <p className="font-mono text-xs truncate">{asText(typeData.contractAddress)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Mint Date</p>
                   <p className="font-medium flex items-center gap-1">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {typeData.mintDate}
+                    {asText(typeData.mintDate)}
                   </p>
                 </div>
               </div>
@@ -721,7 +756,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="space-y-2">
               <h3 className="font-medium">Traits</h3>
               <div className="grid grid-cols-3 gap-2">
-                {typeData.traits && Array.isArray(typeData.traits) && typeData.traits.map((trait, index) => (
+                {isTraitArray(typeData.traits) && typeData.traits.map((trait, index) => (
                   <div key={index} className="rounded-lg border p-2 text-center">
                     <p className="text-xs text-muted-foreground">{trait.trait_type}</p>
                     <p className="font-medium truncate">{trait.value}</p>
@@ -735,26 +770,26 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Editions</p>
-                <p className="font-medium">{typeData.editions}</p>
+                <p className="font-medium">{asText(typeData.editions)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Rarity</p>
-                <p className="font-medium">{typeData.rarity}</p>
+                <p className="font-medium">{asText(typeData.rarity)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Marketplace</p>
-                <p className="font-medium">{typeData.marketplace}</p>
+                <p className="font-medium">{asText(typeData.marketplace)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Previous Owners</p>
-                <p className="font-medium">{typeData.previousOwners}</p>
+                <p className="font-medium">{asText(typeData.previousOwners)}</p>
               </div>
             </div>
 
             <div className="flex justify-end gap-2">
               <Button variant="outline" className="flex items-center gap-2">
                 <ExternalLink className="h-4 w-4" />
-                View on {typeData.marketplace || "Marketplace"}
+                View on {asText(typeData.marketplace) || "Marketplace"}
               </Button>
               <Button variant="outline" className="flex items-center gap-2">
                 <ExternalLink className="h-4 w-4" />
@@ -774,7 +809,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                   <h3 className="font-medium">Video Preview</h3>
                 </div>
                 <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-                  {typeData.resolution}
+                  {asText(typeData.resolution)}
                 </Badge>
               </div>
 
@@ -790,20 +825,20 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <p className="text-sm text-muted-foreground">Duration</p>
                 <p className="font-medium flex items-center gap-1">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  {typeData.duration}
+                  {asText(typeData.duration)}
                 </p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Frame Rate</p>
-                <p className="font-medium">{typeData.frameRate}</p>
+                <p className="font-medium">{asText(typeData.frameRate)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Codec</p>
-                <p className="font-medium">{typeData.codec}</p>
+                <p className="font-medium">{asText(typeData.codec)}</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Aspect Ratio</p>
-                <p className="font-medium">{typeData.aspectRatio}</p>
+                <p className="font-medium">{asText(typeData.aspectRatio)}</p>
               </div>
             </div>
 
@@ -814,13 +849,13 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Director</p>
-                  <p className="font-medium">{typeData.director}</p>
+                  <p className="font-medium">{asText(typeData.director)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Release Date</p>
                   <p className="font-medium flex items-center gap-1">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {typeData.releaseDate}
+                    {asText(typeData.releaseDate)}
                   </p>
                 </div>
               </div>
@@ -834,7 +869,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Cast</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.cast && Array.isArray(typeData.cast) && typeData.cast.map((actor, index) => (
+                    {isStringArray(typeData.cast) && typeData.cast.map((actor, index) => (
                       <Badge key={index} variant="outline">
                         {actor}
                       </Badge>
@@ -843,9 +878,9 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Language & Subtitles</p>
-                  <p className="font-medium">{typeData.language}</p>
+                  <p className="font-medium">{asText(typeData.language)}</p>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {typeData.subtitles && Array.isArray(typeData.subtitles) && typeData.subtitles.map((language, index) => (
+                    {isStringArray(typeData.subtitles) && typeData.subtitles.map((language, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
                         {language}
                       </Badge>
@@ -868,6 +903,131 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
           </div>
         )
 
+      case "Posts":
+        return (
+          <div className="space-y-4">
+            <div className={cn("rounded-lg p-4", colorClasses.bgLight)}>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className={colorClasses.text} />
+                  <h3 className="font-medium">Post Information</h3>
+                </div>
+                <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
+                  {asText(typeData.platform) || "Blog Post"}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Publication Date</p>
+                  <p className="font-medium flex items-center gap-1">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    {asText((typeData as Record<string, unknown>).publicationDate) || getField(typeData as Record<string, unknown>, "registration_date") || "Not specified"}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Word Count</p>
+                  <p className="font-medium">{asText(typeData.wordCount) || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Read Time</p>
+                  <p className="font-medium">{asText(typeData.readTime) || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Category</p>
+                  <p className="font-medium">{asText(typeData.category) || "Not specified"}</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <h3 className="font-medium">License & Rights</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">License Type</p>
+                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "License") || getField(typeData as Record<string, unknown>, "license") || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Commercial Use</p>
+                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Commercial Use") === "true" ? "Allowed" : "Not Allowed"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Modifications</p>
+                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Modifications") === "true" ? "Allowed" : "Not Allowed"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Attribution Required</p>
+                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Attribution") === "true" ? "Yes" : "No"}</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <h3 className="font-medium">Protection Details</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Protection Status</p>
+                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Protection Status") || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Protection Scope</p>
+                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Protection Scope") || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">IP Version</p>
+                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "IP Version") || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Protection Duration</p>
+                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "protection_duration") || "Not specified"}</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <h3 className="font-medium">Collection Information</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Collection</p>
+                  <p className="font-medium">{asText(typeData.collection) || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Creator</p>
+                  <p className="font-medium">{asText(typeData.creator) || "Not specified"}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Registration Date</p>
+                  <p className="font-medium flex items-center gap-1">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    {getField(typeData as Record<string, unknown>, "registration_date") || "Not specified"}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">Tags</p>
+                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Tags") || "No tags"}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" className="flex items-center gap-2">
+                <ExternalLink className="h-4 w-4" />
+                View Original Post
+              </Button>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Download Content
+              </Button>
+            </div>
+          </div>
+        )
+
       case "Software":
         return (
           <div className="space-y-4">
@@ -878,30 +1038,30 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                   <h3 className="font-medium">Software Information</h3>
                 </div>
                 <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-                  {typeData.softwareType}
+                  {asText(typeData.softwareType)}
                 </Badge>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Version</p>
-                  <p className="font-medium">{typeData.version}</p>
+                  <p className="font-medium">{asText(typeData.version)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Release Date</p>
                   <p className="font-medium flex items-center gap-1">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {typeData.releaseDate}
+                    {asText(typeData.releaseDate)}
                   </p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">License</p>
-                  <p className="font-medium">{typeData.license}</p>
+                  <p className="font-medium">{asText(typeData.license)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Platforms</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.platforms && Array.isArray(typeData.platforms) && typeData.platforms.map((platform, index) => (
+                    {isStringArray(typeData.platforms) && typeData.platforms.map((platform, index) => (
                       <Badge key={index} variant="outline">
                         {platform}
                       </Badge>
@@ -919,7 +1079,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Programming Languages</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.programmingLanguages && Array.isArray(typeData.programmingLanguages) && typeData.programmingLanguages.map((lang, index) => (
+                    {isStringArray(typeData.programmingLanguages) && typeData.programmingLanguages.map((lang, index) => (
                       <Badge key={index} variant="outline">
                         {lang}
                       </Badge>
@@ -929,7 +1089,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Dependencies</p>
                   <div className="flex flex-wrap gap-1">
-                    {typeData.dependencies && Array.isArray(typeData.dependencies) && typeData.dependencies.map((dep, index) => (
+                    {isStringArray(typeData.dependencies) && typeData.dependencies.map((dep, index) => (
                       <Badge key={index} variant="outline">
                         {dep}
                       </Badge>
@@ -944,7 +1104,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="space-y-2">
               <h3 className="font-medium">Features</h3>
               <div className="flex flex-wrap gap-1">
-                {typeData.features && Array.isArray(typeData.features) && typeData.features.map((feature, index) => (
+                {isStringArray(typeData.features) && typeData.features.map((feature, index) => (
                   <Badge key={index} variant="outline">
                     {feature}
                   </Badge>
@@ -957,7 +1117,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="space-y-2">
               <h3 className="font-medium">Resources</h3>
               <div className="grid grid-cols-1 gap-2">
-                {typeData.sourceCodeRepository && (
+                {sourceCodeRepository && (
                   <div className="flex items-center justify-between rounded-md border p-2">
                     <div className="flex items-center gap-2">
                       <FileCode className="h-4 w-4 text-muted-foreground" />
@@ -969,7 +1129,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                     </Button>
                   </div>
                 )}
-                {typeData.apiDocumentation && (
+                {apiDocumentation && (
                   <div className="flex items-center justify-between rounded-md border p-2">
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-muted-foreground" />
@@ -1004,7 +1164,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               <Alert>
                 <Info className="h-4 w-4" />
                 <AlertDescription>
-                  This asset's metadata was retrieved from IPFS {asset.ipfsCid ? "(" + asset.ipfsCid.substring(0, 8) + "...)" : ""}.
+                  This asset&apos;s metadata was retrieved from IPFS {asset.ipfsCid ? "(" + asset.ipfsCid.substring(0, 8) + "...)" : ""}.
                 </AlertDescription>
               </Alert>
             )}
@@ -1019,7 +1179,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             )}
             
             <div className="grid grid-cols-2 gap-4">
-              {typeData && Object.entries(typeData)
+              {typeData && Object.entries(typeData as Record<string, unknown>)
                 .filter(([key]) => !['id', 'image', 'name', 'description'].includes(key))
                 .map(([key, value]) => {
                   if (typeof value === 'object' && value !== null) {
@@ -1029,7 +1189,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                   return (
                     <div key={key} className="space-y-1">
                       <p className="text-sm text-muted-foreground capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
-                      <p className="font-medium">{String(value)}</p>
+                      <p className="font-medium">{String((value as string | number | boolean | null | undefined) ?? '')}</p>
                     </div>
                   )
                 })}
@@ -1050,7 +1210,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <CardTitle className="text-xl">{ipType} IP Template</CardTitle>
           </div>
           <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
-            #{asset.id}
+            #{Number(asset.tokenId)}
           </Badge>
         </div>
         
