@@ -26,8 +26,8 @@ export default function PortfolioPage() {
       <div className="container mx-auto px-4 py-8 mt-5 mb-20">
         <div className="space-y-1 mb-5">
           <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
-          <p className="text-muted-foreground">
-            Please connect your wallet to view your portfolio
+          <p className="text-muted-foreground badge">
+            Connect your wallet to open your onchain portfolio
           </p>
         </div>
       </div>
@@ -49,7 +49,7 @@ export default function PortfolioPage() {
   }
 
   return (
-    <div className="bg-background/70 p-8">
+    <div className="bg-background/70 p-8 mb-20">
       <main className="container mx-auto px-4 py-6">
       <div className="space-y-1 mb-5">
         <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>

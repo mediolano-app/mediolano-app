@@ -34,7 +34,7 @@ import { useAccount } from "@starknet-react/core";
 import {
   CoverImageUploader,
   CoverImageUploaderRef,
-} from "@/components/mediaUploader";
+} from "@/components/media-uploader";
 import { useIpfsUpload } from "@/hooks/useIpfs";
 import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
 

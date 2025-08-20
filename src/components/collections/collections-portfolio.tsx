@@ -377,35 +377,22 @@ function CollectionActionDropdown({ collectionId }: { collectionId: string }) {
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation()
-            // Handle edit collection action
-            console.log("Edit Collection:", collectionId)
+            
+            // Replace 'address' with the actual property name for the collection address
+            const explorerUrl = process.env.NEXT_PUBLIC_EXPLORER_URL
+            const collectionAddress = collectionId // or use collection.address if available
+            if (explorerUrl && collectionAddress) {
+              window.open(`${explorerUrl}/contract/${collectionAddress}`, "_blank")
+            }
+            
           }}
         >
           <Edit className="mr-2 h-4 w-4" />
-          Edit Collection
+          View Collection on Explorer
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation()
-            // Handle add NFT action
-            console.log("Add Programmable IP to Collection:", collectionId)
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Create New Asset
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation()
-            // Handle delete collection action
-            console.log("Delete Collection:", collectionId)
-          }}
-          className="text-destructive focus:text-destructive"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete Collection
-        </DropdownMenuItem>
+
+        
+        
       </DropdownMenuContent>
     </DropdownMenu>
   )

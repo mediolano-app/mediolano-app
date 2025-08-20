@@ -61,24 +61,24 @@ export function CollectionStats({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{totalCollections}</div>
-          <p className="text-xs text-muted-foreground">Across {totalAssets} NFTs</p>
+          <p className="text-xs text-muted-foreground">with {totalAssets} IPs</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Portfolio Value</CardTitle>
+          <CardTitle className="text-sm font-medium">IP Assets</CardTitle>
           <Wallet className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalValue.toFixed(2)} STRK</div>
-          <p className="text-xs text-muted-foreground">≈ ${(totalValue / 10 ** 18).toLocaleString()}</p>
+          <div className="text-2xl font-bold">{totalAssets}</div>
+          <p className="text-xs text-muted-foreground">onchain</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Collection Growth</CardTitle>
+          <CardTitle className="text-sm font-medium">Growth</CardTitle>
           <div>
             <Tabs defaultValue={timeframe} onValueChange={(v) => setTimeframe(v as "day" | "week" | "month" | "year")}>
               <TabsList className="h-7 w-fit">
@@ -106,12 +106,12 @@ export function CollectionStats({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Average Collection Size</CardTitle>
+          <CardTitle className="text-sm font-medium">Average Collection</CardTitle>
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{Math.round(averageCollectionSize)}</div>
-          <p className="text-xs text-muted-foreground">NFTs per collection</p>
+          <p className="text-xs text-muted-foreground">IPs per collection</p>
         </CardContent>
       </Card>
     </div>

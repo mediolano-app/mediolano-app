@@ -130,9 +130,9 @@ export default function CreatorNFTPortfolio() {
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="all">My IP Collection</TabsTrigger>
+          <TabsTrigger value="all">Collections</TabsTrigger>
           <TabsTrigger value="licensings" disabled>
-            Licensings
+            Remixes
           </TabsTrigger>
         </TabsList>
 
@@ -163,7 +163,7 @@ export default function CreatorNFTPortfolio() {
         </TabsContent>
 
         <TabsContent value="licensings" className="space-y-4">
-          <NFTLicensings />
+          {/*<NFTLicensings />*/}
         </TabsContent>
       </Tabs>
     </div>
