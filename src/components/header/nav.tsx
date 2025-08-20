@@ -181,6 +181,7 @@ export function MainNav() {
          
          
          
+         {/*
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
               <Gem className="mr-2 h-4 w-4" />
@@ -251,6 +252,7 @@ export function MainNav() {
               </div>
             </NavigationMenuContent>
           </NavigationMenuItem>
+          */}
 
 
 

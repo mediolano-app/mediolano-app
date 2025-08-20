@@ -42,8 +42,8 @@ const navigationItems = [
     title: 'Services',
     items: [
 
-      { title: 'Proof of Ownership', href: '/services/proof-of-ownership', icon: FileBadge },
-      { title: 'Proof of Licensing', href: '/services/proof-of-licensing', icon: FileCheck },
+      { title: 'Proof of Ownership', href: '/', icon: FileBadge },
+      { title: 'Remix', href: '/', icon: FileCheck },
       { title: 'Transfer', href: '/transfer', icon: ArrowRightLeft },
       { title: 'Licensing', href: '/licensing', icon: FileText },
       { title: 'Listings', href: '/listing', icon: Banknote },
