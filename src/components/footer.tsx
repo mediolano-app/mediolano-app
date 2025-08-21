@@ -37,6 +37,8 @@ import {
   Brain,
   Box,
   Scroll,
+  Lock,
+  Shield,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -75,12 +77,12 @@ export function Footer() {
   return (
 
     <>
-    <DappInfo/>
+    {/*<DappInfo/>*/}
 
-    <footer className="bg-background text-foreground mt-20">
+    <footer className="bg-background/80 text-foreground">
       <div className="container mx-auto px-4 py-6 md:py-8 lg:py-10">
         
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8 mt-8">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8 pt-6">
 
             
             
@@ -99,7 +101,7 @@ export function Footer() {
                     >
                       <Link href={feature.link} className="block p-4">
                         <div className="flex items-center space-x-4">
-                          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center ml-blue group-hover:bg-primary/20 transition-colors duration-300">
+                          <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-600/10 flex items-center justify-center ml-blue group-hover:bg-blue/40 transition-colors duration-300">
                             {feature.icon}
                           </div>
                           <div>
@@ -146,7 +148,9 @@ export function Footer() {
                   <li><Link href="/create/asset" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
                   <li><Link href="/create/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
                   <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
-                  <li><Link href="/licensing" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Licensing</Link></li>
+                  <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Portfolio</Link></li>
+                  <li><Link href="/portfolio/collections" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> My Collections</Link></li>
+                  <li><Link href="/portfolio/dashboard" className="flex items-center hover:underline"><LayoutDashboard className="w-4 h-4 mr-2 ml-blue" /> Assets Dashboard</Link></li>
                   <li><Link href="/transfer" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" /> Transfer</Link></li>
                 </ul>
             </div>
@@ -170,11 +174,16 @@ export function Footer() {
                 <div>
                 <h3 className="mb-6 text-sm font-semibold uppercase">Manage</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> Portfolio</Link></li>
-                    <li><Link href="/portfolio/collections" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> My Collections</Link></li>
-                    <li><Link href="/portfolio/dashboard" className="flex items-center hover:underline"><LayoutDashboard className="w-4 h-4 mr-2 ml-blue" /> Assets Dashboard</Link></li>
                     <li><Link href="/account" className="flex items-center hover:underline"><User className="w-4 h-4 mr-2 ml-blue" /> My Account</Link></li>
                     <li><Link href="/settings" className="flex items-center hover:underline"><Cog className="w-4 h-4 mr-2 ml-blue" /> Settings</Link></li>
+                </ul>
+                <h3 className="mb-6 mt-6 text-sm font-semibold uppercase">Guidelines</h3>
+                <ul className="space-y-4">
+                    <li><Link href="/docs/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
+                    <li><Link href="/docs/community-guidelines" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> Community</Link></li>
+                     <li><Link href="/docs/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
+                    <li><Link href="/docs/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance</Link></li>
+                    <li><Link href="/docs/governance-charter" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Governance</Link></li>
                 </ul>
                 </div>
                 
@@ -192,6 +201,7 @@ export function Footer() {
 
             {/* Mediolano */}
             <div className="space-y-4 lg:col-span-1 bg-blue-600/10 p-4 rounded-lg">
+            
             <Link href="/" className="flex items-center space-x-2">
                 <motion.span
                 className="text-1xl font-bold"
@@ -202,11 +212,12 @@ export function Footer() {
                 Programmable IP for the Integrity Web
                 </motion.span>
             </Link>
+
             <p className="text-muted-foreground mr-5">
-            Seamlessly tokenize intellectual property leveraging Starknet’s unparalleled high-speed, low-cost (fraction of a cent) and smart contract intelligence for digital assets.
-            Mediolano empower creators, collectors and organizations with permissionless Programmable IP services using blockchain and zero-knowledge.
-                proofs.
-            </p><br></br>
+            Mediolano is a decentralized innovation hub to empower creators, developers, business, AI agents and communities to assert ownership, exchange value, and unlock new revenue streams. 
+            </p>
+            <p className="text-muted-foreground mr-5">
+            By seamlessly integrating smart contracts with zero knowledge-proofs, Mediolano bridges the gap between intelligence and real-world application — turning code, content, and culture into programmable, sovereign assets.            </p><br></br>
             <div className="flex space-x-4">
             <div className="flex items-center space-x-2">
           
@@ -271,29 +282,29 @@ export function Footer() {
 
             {/* Twitter Showcase */}
           <div className="mt-16 grid gap-8 md:grid-cols-2">
-            <Card>
+            <Card className="bg-background/20">
               <CardHeader>
                 <CardTitle>Join our community on X</CardTitle>
-                <CardDescription>Interact and stay updated with the latest news and announcements from Mediolano.</CardDescription>
+                <CardDescription>Interact and stay updated with the latest news and announcements.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-4 mb-4">
                   <Twitter className="h-8 w-8 ml-blue" />
                   <div>
                     <h4 className="text-sm font-semibold">@MediolanoApp</h4>
-                    <p className="text-xs text-muted-foreground">Official Mediolano Twitter</p>
+                    <p className="text-xs text-muted-foreground">Official Mediolano X Account</p>
                   </div>
                 </div>
                 <Button variant="outline" asChild className="w-full">
                   <Link href="https://twitter.com/MediolanoApp" target="_blank" rel="noopener noreferrer">
-                    <Twitter className="mr-2 h-4 w-4" /> Follow on X/Twitter
+                    <Twitter className="mr-2 h-4 w-4" /> Join on X/Twitter
                   </Link>
                 </Button>
               </CardContent>
             </Card>
 
             {/* GitHub Repository Showcase */}
-            <Card>
+            <Card className="bg-background/20">
               <CardHeader>
                 <CardTitle>Open-Source on GitHub</CardTitle>
                 <CardDescription>
@@ -305,18 +316,18 @@ export function Footer() {
                   <div className="flex items-center space-x-4">
                     <Github className="h-8 w-8 ml-blue" />
                     <div>
-                      <h4 className="text-sm font-semibold">mediolano-app</h4>
+                      <h4 className="text-sm font-semibold">Mediolano</h4>
                       <p className="text-xs text-muted-foreground">Core smart contracts, APIs, dApps</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Badge variant="secondary" className="flex items-center space-x-1">
                       <Star className="h-3 w-3" />
-                      <span>43</span>
+                      <span>Auditable</span>
                     </Badge>
                     <Badge variant="secondary" className="flex items-center space-x-1">
-                      <GitFork className="h-3 w-3" />
-                      <span>27</span>
+                      <Lock className="h-3 w-3" />
+                      <span>Permissionless</span>
                     </Badge>
                   </div>
                 </div>
@@ -342,22 +353,12 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
           <p className="text-sm text-muted-foreground text-center sm:text-left">
-            &copy; 2025 Mediolano. All rights reserved.
+            Mediolano DAO &copy; 2025
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-            <Link href="/faq" className="hover:underline">
-              FAQ
+            <Link href="https://mediolano.xyz/" className="hover:underline">
+              Mediolano.xyz
             </Link>
-            <Link href="#" className="hover:underline">
-              Terms of Privacy
-            </Link>
-            <Link href="/terms-of-use" className="hover:underline">
-              Terms of Use
-            </Link>
-            <Link href="#" className="hover:underline">
-              Community Guidelines
-            </Link>
-            
           </div>
         </div>
       </div>

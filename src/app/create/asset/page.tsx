@@ -87,7 +87,7 @@ export default function CreateAssetPage() {
       toast({
         title: "Error",
         description:
-          error instanceof Error ? error.message : "Failed to mint asset",
+          error instanceof Error ? error.message : "Failed to mint Programmable IP",
         variant: "destructive",
       });
     }
@@ -102,7 +102,7 @@ export default function CreateAssetPage() {
           </DialogContent>
         </Dialog>
       )}
-      <div className="min-h-screen">
+      <div className="min-h-screen bg-background/70 text-foreground pb-20">
         {/* Mobile Preview Modal */}
         {showMobilePreview && (
           <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden">

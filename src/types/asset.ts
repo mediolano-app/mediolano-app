@@ -60,7 +60,7 @@ export interface NFT {
   category?: string;
   collection?: string;
   tokenId?: string;
-  openseaUrl?: string;
+  externalUrl?: string;
 }
 
 
@@ -231,10 +231,10 @@ export interface publicationIP  {
 }
 
 export interface rwaIP  {
-  title: string;
-  description: string;
-  type: string;
-  template: string;
+      title: string;
+      description: string;
+      type: string;
+      template: string;
       rwa: string;
       location: string;
       valuation: string;
@@ -320,7 +320,7 @@ export interface trademarkIP  {
 
 
 
-export type IPType = "Basic" | "Art" | "Audio" | "Video" | "Document" | "Patent" | "RWA" | "Trademark" | "Software" | "NFT" | "Custom"
+export type IPType = "Art" | "Audio" | "Video" | "Document" | "Patent" | "RWA" | "Software" | "NFT" | "Custom"
 
 export type LicenseType = "Creative Commons" | "Commercial Use" | "Personal Use" | "Exclusive Rights" | "Open Source"
 
@@ -328,24 +328,26 @@ export type LicenseType = "Creative Commons" | "Commercial Use" | "Personal Use"
 
 export interface Creator {
   id: string
-  username: string
+  slug: string // Add slug for creator routing
   name: string
-  avatar: string
-  banner?: string
+  address: string
+  avatar?: string
   verified: boolean
-  wallet: string
-  bio: string
-  location?: string
+  bio?: string
   website?: string
   twitter?: string
   instagram?: string
+  discord?: string
+  joinDate: string
+  totalAssets: number
+  totalValue: string
+  totalSales: number
   followers: number
   following: number
-  assets: number
-  collections?: number
-  joined: string
-  specialties?: string[]
-  achievements?: string[]
+  collections: string[] // Collection IDs
+  specialties: IPType[]
+  location?: string
+  isActive: boolean
 }
 
 
@@ -356,12 +358,12 @@ export interface OwnershipRecord {
 }
 
 export interface LicensingTerms {
+  type: string
   commercialUse: boolean
   modifications: boolean
   attribution: boolean
-  territoriesExcluded?: string[]
+  territory: string
   duration?: string
-  revenueSplit?: number
 }
 
 export interface Collection {
@@ -434,6 +436,9 @@ export interface PortfolioStats {
   recentViews: number
   protectionLevel: number
 }
+
+
+
 
 export interface Template {
   id: string

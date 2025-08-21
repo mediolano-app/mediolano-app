@@ -8,8 +8,8 @@ import AnimatedBackground from "@/components/animated-bg";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "Mediolano Dapp",
-  description: "Programmable IP for the Integrity Web. Powered on Starknet",
+  title: "Mediolano",
+  description: "Programmable IP for the Integrity Web",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="gradient-background">
+      <body className="bg-background">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

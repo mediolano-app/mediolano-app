@@ -57,10 +57,6 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import type { IPType } from "@/types/asset"
-import { 
-  getKnownCids, 
-  loadIPFSMetadataInBackground 
-} from '@/utils/ipfs';
 
 // temporary data - would be mixed with IPFS data if is necessary
 import { assets as mockAssets, recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
@@ -93,47 +89,27 @@ export default function AssetsPage() {
   const [filterTemplate, setFilterTemplate] = useState<string>("all")
   const [assets, setAssets] = useState<EnhancedAsset[]>([])
 
-  console.log(assets);
-
+  // Use mock assets until real implementation is ready
   useEffect(() => {
-    // Cargar datos y enriquecerlos con información de IPFS
-    const loadAssetsWithIPFS = async () => {
-      setLoading(true);
-      try {
-        // Obtener los CIDs conocidos
-        const knownCids = getKnownCids();
-
-        // Enriquecer los assets mock con información de IPFS
-        const enhancedAssets = mockAssets.map((asset) => {
-          const ipfsCid = knownCids[asset.id] || null;
-          
-          // Retornar el asset enriquecido
-          return {
-            ...asset,
-            ...(ipfsCid && { ipfsCid })
-          } as EnhancedAsset;
-        });
-
-        // Actualizar el estado con los assets enriquecidos inmediatamente
-        setAssets(enhancedAssets);
-        setLoading(false);
-
-        // Cargar metadatos de IPFS en segundo plano
-        loadIPFSMetadataInBackground(
-          enhancedAssets,
-          (updatedAssets) => {
-            setAssets(updatedAssets);
-          }
-        );
-      } catch (error) {
-        console.error("Error loading assets with IPFS data:", error);
-        // En caso de error, usar los datos mock sin modificar
-        setAssets(mockAssets as EnhancedAsset[]);
-        setLoading(false);
-      }
-    };
-
-    loadAssetsWithIPFS();
+    setLoading(true);
+    const transformed: EnhancedAsset[] = mockAssets.map((a) => ({
+      id: a.id,
+      name: a.name,
+      creator: a.creator,
+      verified: a.verified,
+      image: a.image,
+      collection: a.collection,
+      licenseType: a.licenseType,
+      description: a.description,
+      registrationDate: a.registrationDate,
+      type: a.type as IPType,
+      templateType: a.templateType,
+      protectionLevel: a.protectionLevel,
+      value: a.value,
+      ipfsCid: undefined,
+    }));
+    setAssets(transformed);
+    setLoading(false);
   }, []);
 
 
@@ -406,7 +382,7 @@ export default function AssetsPage() {
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Link href={`/assets/${asset.id}`}>
+                <Link href={`/asset/${asset.id}`}>
                   <Button size="sm">
                     View IP
                     <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
@@ -421,11 +397,17 @@ export default function AssetsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background/70 text-foreground pb-20">
      
       
       <main className="container mx-auto p-4 py-6">
-        {/* Dashboard Overview */}
+        
+        
+        
+        
+        
+        
+        {/* Dashboard Overview 
         <div className="mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -433,7 +415,6 @@ export default function AssetsPage() {
             transition={{ duration: 0.5 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
-            {/* Welcome and Stats */}
             <div className="space-y-4">
               <div>
                 <h2 className="text-3xl font-bold">Welcome back</h2>
@@ -536,7 +517,6 @@ export default function AssetsPage() {
               </Card>
             </div>
 
-            {/* Quick Actions and Trending */}
             <div className="space-y-4">
               
               <div className="grid grid-cols-2 gap-3">
@@ -672,8 +652,24 @@ export default function AssetsPage() {
             </div>
           </motion.div>
         </div>
+        */}
 
-        {/* Mobile Quick Actions */}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        {/* Mobile Quick Actions 
         <div className="md:hidden flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
           <Link href="/create/templates">
             <Button size="sm" className="flex items-center gap-2 whitespace-nowrap">
@@ -695,7 +691,7 @@ export default function AssetsPage() {
             <Zap className="h-4 w-4" />
             Quick Protect
           </Button>
-        </div>
+        </div>*/}
 
 
 
@@ -704,7 +700,7 @@ export default function AssetsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-2xl font-bold">Programmable IP</h2>
-              <p className="text-muted-foreground">Manage your intellectual property and licensing</p>
+              <p className="text-muted-foreground">Explore intellectual property onchain</p>
             </div>
 
             <div className="flex gap-2">
@@ -981,6 +977,12 @@ export default function AssetsPage() {
             </TabsContent>
           </Tabs>
         </motion.div>
+
+
+
+
+
+        
       </main>
     </div>
   )

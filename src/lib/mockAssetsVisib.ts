@@ -10,6 +10,6 @@ export const mockAssets: Asset[] = Array.from({ length: 50 }, (_, i) => ({
   category: ["Art", "Collectibles", "Gaming", "Music"][Math.floor(Math.random() * 4)],
   collection: collections[Math.floor(Math.random() * collections.length)],
   tokenId: Math.floor(Math.random() * 10000).toString(),
-  openseaUrl: `https://opensea.io/assets/ethereum/0x123.../${i + 1}`,
+  externalUrl: `https://mediolano.app/assets/starknet/0x123.../${i + 1}`,
 }))
 

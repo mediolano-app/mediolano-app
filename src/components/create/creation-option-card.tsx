@@ -68,15 +68,14 @@ export function CreationOptionCard({ option, isSelected, onSelect }: CreationOpt
       {/* Badges */}
       <div className="absolute top-3 right-3 flex flex-col gap-1">
         {option.popular && (
-          <Badge className="gap-1 bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300 shadow-sm">
+          <Badge className="gap-1 bg-transparent shadow-sm text-amber-500">
             <Star className="h-3 w-3" />
             Popular
           </Badge>
         )}
         {option.trending && (
           <Badge
-            variant="outline"
-            className="gap-1 border-emerald-200 text-emerald-700 bg-emerald-50 dark:bg-emerald-950 shadow-sm"
+            className="gap-1 text-purple-700 bg-transparent shadow-sm"
           >
             <TrendingUp className="h-3 w-3" />
             Trending
@@ -175,8 +174,8 @@ function getColorClasses(gradient: string) {
       return { bgLight: "bg-blue-100 dark:bg-blue-900/30" }
     case "from-purple-500 to-pink-500":
       return { bgLight: "bg-purple-100 dark:bg-purple-900/30" }
-    case "from-emerald-500 to-teal-500":
-      return { bgLight: "bg-emerald-100 dark:bg-emerald-900/30" }
+    case "from-purple-500 to-teal-500":
+      return { bgLight: "bg-purple-100 dark:bg-purple-900/30" }
     case "from-orange-500 to-red-500":
       return { bgLight: "bg-orange-100 dark:bg-orange-900/30" }
     case "from-indigo-500 to-purple-500":

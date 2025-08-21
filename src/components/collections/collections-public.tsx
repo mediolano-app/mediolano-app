@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import Image from "next/image"
 import { getNFTs } from "@/lib/mockupPortfolioData"
 import type { Collection } from "@/lib/types"
@@ -41,7 +41,6 @@ import {
 type SortOption = "value-high" | "value-low" | "name-asc" | "name-desc" | "size-high" | "size-low"
 
 export function CollectionsGrid({ collections }: { collections: Collection[] }) {
-  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortOption, setSortOption] = useState<SortOption>("value-high")
@@ -51,7 +50,7 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
   // Filter collections based on search query and featured status
   const filteredCollections = collections.filter((collection) => {
     const matchesSearch = collection.name.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesFeatured = featuredOnly ? collection.id === "bored-ape" || collection.id === "cryptopunks" : true // Mock featured collections
+    const matchesFeatured = featuredOnly ? String(collection.id) === "bored-ape" || String(collection.id) === "cryptopunks" : true // Mock featured collections
     return matchesSearch && matchesFeatured
   })
 
@@ -69,17 +68,17 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
   const sortedCollections = [...filteredCollections].sort((a, b) => {
     switch (sortOption) {
       case "value-high":
-        return getCollectionValue(b.id) - getCollectionValue(a.id)
+        return getCollectionValue(String(b.id)) - getCollectionValue(String(a.id))
       case "value-low":
-        return getCollectionValue(a.id) - getCollectionValue(b.id)
+        return getCollectionValue(String(a.id)) - getCollectionValue(String(b.id))
       case "name-asc":
         return a.name.localeCompare(b.name)
       case "name-desc":
         return b.name.localeCompare(a.name)
       case "size-high":
-        return getCollectionNFTCount(b.id) - getCollectionNFTCount(a.id)
+        return getCollectionNFTCount(String(b.id)) - getCollectionNFTCount(String(a.id))
       case "size-low":
-        return getCollectionNFTCount(a.id) - getCollectionNFTCount(b.id)
+        return getCollectionNFTCount(String(a.id)) - getCollectionNFTCount(String(b.id))
       default:
         return 0
     }
@@ -93,20 +92,19 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
   }
 
   // Find featured collections for the featured section
-  const featuredCollections = collections.filter((c) => c.id === "bored-ape" || c.id === "cryptopunks").slice(0, 1)
+  const featuredCollections = collections.filter((c) => String(c.id) === "bored-ape" || String(c.id) === "cryptopunks").slice(0, 1)
   const featuredCollection = featuredCollections.length > 0 ? featuredCollections[0] : null
 
   return (
     <div className="space-y-8">
       {featuredCollection && (
         <div className="mb-10">
-          
-          <FeaturedCollectionCard
-            collection={featuredCollection}
-            nftCount={getCollectionNFTCount(featuredCollection.id)}
-            totalValue={getCollectionValue(featuredCollection.id)}
-            onClick={() => router.push(`/collections/${featuredCollection.id}`)}
-          />
+          <Link href={`/collections/${featuredCollection.id}`}>
+            <FeaturedCollectionCard
+               collection={featuredCollection}
+               nftCount={featuredCollection.itemCount}
+            />
+          </Link>
         </div>
       )}
 
@@ -180,26 +178,26 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedCollections.map((collection) => (
-            <CollectionCard
-              key={collection.id}
-              collection={collection}
-              nftCount={getCollectionNFTCount(collection.id)}
-              totalValue={getCollectionValue(collection.id)}
-              onClick={() => router.push(`/collections/${collection.id}`)}
-            />
+          {sortedCollections.map((collection: Collection) => (
+            <Link href={`/collections/${String(collection.id)}`} key={String(collection.id)}>
+              <CollectionCard
+               key={String(collection.id)}
+               collection={collection}
+               nftCount={collection.itemCount}
+               
+             />
+             </Link>
           ))}
         </div>
       ) : (
         <div className="space-y-4">
           {sortedCollections.map((collection) => (
-            <CollectionListItem
-              key={collection.id}
-              collection={collection}
-              nftCount={getCollectionNFTCount(collection.id)}
-              totalValue={getCollectionValue(collection.id)}
-              onClick={() => router.push(`/collections/${collection.id}`)}
-            />
+            <Link href={`/collections/${String(collection.id)}`} key={String(collection.id)}>
+              <CollectionListItem
+                 collection={collection}
+                 nftCount={collection.itemCount}
+              />
+            </Link>
           ))}
         </div>
       )}
@@ -210,20 +208,18 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
 interface CollectionCardProps {
   collection: Collection
   nftCount: number
-  totalValue: number
-  onClick: () => void
 }
+ 
 
-function CollectionCard({ collection, nftCount, totalValue, onClick }: CollectionCardProps) {
-  // Get a random image from the collection to display as cover
-  const nfts = getNFTs().filter((nft) => nft.collection.id === collection.id)
-  const coverImage = nfts.length > 0 ? nfts[0].image : "/background.jpg"
 
-  // Check if this is a featured collection (mock data)
-  const isFeatured = collection.id === "bored-ape" || collection.id === "cryptopunks"
+function CollectionCard({ collection, nftCount }: CollectionCardProps) {
+  const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
+  if(isFeatured) {console.log("featured collection", collection.id)}
+  console.log("collection", collection.id)
+  const coverImage = collection.image || "/background.jpg"
 
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group" onClick={onClick}>
+    <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group">
       <div className="relative h-64 w-full">
         <Image
           src={coverImage || "/background.jpg"}
@@ -250,7 +246,7 @@ function CollectionCard({ collection, nftCount, totalValue, onClick }: Collectio
       </div>
       <CardHeader className="pb-2 flex flex-row justify-between items-start">
         <h3 className="text-xl font-bold">{collection.name}</h3>
-        <CollectionActionDropdown collectionId={collection.id} />
+        <CollectionActionDropdown collectionId={String(collection.id)} />
       </CardHeader>
       <CardContent className="pb-2">
         <p className="text-sm text-muted-foreground line-clamp-2">
@@ -258,8 +254,8 @@ function CollectionCard({ collection, nftCount, totalValue, onClick }: Collectio
         </p>
       </CardContent>
       <CardFooter>
-        <div className="flex justify-between w-full">
-          <div className="flex items-center gap-1 text-sm mt-4">
+        <div className="flex items-center pt-4 justify-between w-full">
+          <div className="flex items-center gap-1 text-sm">
             <Grid3X3 className="h-4 w-4 text-muted-foreground" />
             <span>{nftCount} Assets</span>
           </div>
@@ -273,19 +269,13 @@ function CollectionCard({ collection, nftCount, totalValue, onClick }: Collectio
   )
 }
 
-function CollectionListItem({ collection, nftCount, totalValue, onClick }: CollectionCardProps) {
-  // Get a random image from the collection to display as cover
-  const nfts = getNFTs().filter((nft) => nft.collection.id === collection.id)
-  const coverImage = nfts.length > 0 ? nfts[0].image : "/placeholder.svg?height=400&width=600"
-
-  // Check if this is a featured collection (mock data)
-  const isFeatured = collection.id === "bored-ape" || collection.id === "cryptopunks"
+function CollectionListItem({ collection, nftCount }: CollectionCardProps) {
+  // Use the collection's image from IPFS metadata
+  const coverImage = collection.image || "/placeholder.svg?height=400&width=600"
+   const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
 
   return (
-    <div
-      className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors"
-      onClick={onClick}
-    >
+    <div className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors">
       <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
         <Image src={coverImage || "/backgroound.jpg"} alt={collection.name} fill className="object-cover" />
       </div>
@@ -319,25 +309,22 @@ function CollectionListItem({ collection, nftCount, totalValue, onClick }: Colle
             <span>{nftCount} NFTs</span>
           </div>
           <div className="flex items-center gap-1 text-sm">
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            <span>{totalValue.toFixed(2)} STRK</span>
+             <BarChart3 className="h-4 w-4 text-muted-foreground" />
+             <span>-- STRK</span>
           </div>
         </div>
-        <CollectionActionDropdown collectionId={collection.id} />
+        <CollectionActionDropdown collectionId={String(collection.id)} />
       </div>
     </div>
   )
 }
 
-function FeaturedCollectionCard({ collection, nftCount, totalValue, onClick }: CollectionCardProps) {
-  // Get images from the collection to display
-  const nfts = getNFTs()
-    .filter((nft) => nft.collection.id === collection.id)
-    .slice(0, 4)
-  const coverImage = nfts.length > 0 ? nfts[0].image : "/background.jpg"
+export function FeaturedCollectionCard({ collection, nftCount }: CollectionCardProps) {
+  
+  const coverImage = collection.image || "/background.jpg"
 
   return (
-    <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all" onClick={onClick}>
+    <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
         <div className="relative h-64 md:h-auto">
           <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
@@ -354,8 +341,8 @@ function FeaturedCollectionCard({ collection, nftCount, totalValue, onClick }: C
         <div className="p-4 md:p-6 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start">
-              <h2 className="text-xl md:text-2xl font-bold mb-2">{collection.name}</h2>
-              <CollectionActionDropdown collectionId={collection.id} />
+               <h2 className="text-xl md:text-2xl font-bold mb-2">{collection.name}</h2>
+               <CollectionActionDropdown collectionId={String(collection.id)} />
             </div>
             <p className="text-sm text-muted-foreground mb-4 line-clamp-3 md:line-clamp-none">
               {collection.description}
@@ -366,10 +353,10 @@ function FeaturedCollectionCard({ collection, nftCount, totalValue, onClick }: C
                 <p className="text-xs md:text-sm text-muted-foreground">Total Assets</p>
                 <p className="text-lg md:text-xl font-bold">{nftCount}</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-xs md:text-sm text-muted-foreground">Total Value</p>
-                <p className="text-lg md:text-xl font-bold">{totalValue.toFixed(2)} STRK</p>
-              </div>
+            <div className="space-y-1">
+                 <p className="text-xs md:text-sm text-muted-foreground">Total Value</p>
+                 <p className="text-lg md:text-xl font-bold">-- STRK</p>
+               </div>
               {collection.floorPrice && (
                 <div className="space-y-1">
                   <p className="text-xs md:text-sm text-muted-foreground">Floor Price</p>
@@ -378,22 +365,48 @@ function FeaturedCollectionCard({ collection, nftCount, totalValue, onClick }: C
               )}
             </div>
           </div>
-
-          <div className="hidden md:block">
-            <p className="text-sm font-medium mb-2">Preview</p>
-            <div className="flex gap-2">
-              {nfts.map((nft, index) => (
-                <div key={nft.id} className="relative h-12 w-12 rounded-md overflow-hidden">
-                  <Image
-                    src={nft.image || "/background.jpg"}
-                    alt={`${collection.name} NFT ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+            <div className="hidden md:block">
+             <p className="text-sm font-medium mb-2">Preview</p>
+             <div className="flex gap-2">
+               {/* Show collection image in small preview sizes */}
+               <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                 <Image
+                   src={collection.image}
+                   alt={`${collection.name} preview`}
+                   fill
+                   className="object-cover"
+                   sizes="48px"
+                 />
+               </div>
+               <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                 <Image
+                   src={collection.image}
+                   alt={`${collection.name} preview`}
+                   fill
+                   className="object-cover"
+                   sizes="48px"
+                 />
+               </div>
+               <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                 <Image
+                   src={collection.image}
+                   alt={`${collection.name} preview`}
+                   fill
+                   className="object-cover"
+                   sizes="48px"
+                 />
+               </div>
+               <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                 <Image
+                   src={collection.image}
+                   alt={`${collection.name} preview`}
+                   fill
+                   className="object-cover"
+                   sizes="48px"
+                 />
+               </div>
+             </div>
+           </div>
         </div>
       </div>
     </div>

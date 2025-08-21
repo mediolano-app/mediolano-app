@@ -85,7 +85,7 @@ export default function ListingIP() {
   const router = useRouter();
 
   const handleNavigation = (id: string) => {
-    router.push(`/assets/${id}`);
+    router.push(`/asset/${id}`);
   };
 
   const [listingData, setListingData] = useState<Listing>({

@@ -34,7 +34,7 @@ import { useAccount } from "@starknet-react/core";
 import {
   CoverImageUploader,
   CoverImageUploaderRef,
-} from "@/components/mediaUploader";
+} from "@/components/media-uploader";
 import { useIpfsUpload } from "@/hooks/useIpfs";
 import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
 
@@ -43,7 +43,7 @@ export default function CreateCollectionView({
 }: {
   isModalMode?: boolean;
 }) {
-  const { uploadToIpfs, loading: upload_loading } = useIpfsUpload();
+  const { uploadToIpfs, loading: upload_loading, uploadImageFromUrl } = useIpfsUpload();
   const uploaderRef = useRef<CoverImageUploaderRef>(null);
   const { createCollection, isCreating, error } = useCollection();
   const { toast } = useToast();
@@ -78,17 +78,31 @@ export default function CreateCollectionView({
       };
 
       const file = uploaderRef.current?.getFile();
+      const imageUrl = uploaderRef.current?.getImageUrl();
 
-      if (!file) {
+      // Ensure we have either a file or a valid image URL
+      if (!file && !imageUrl) {
         toast({
-          title: "Select a Valid file and try again",
+          title: "Image Required",
+          description: "Please provide an image for your collection",
           variant: "destructive",
         });
         return;
       }
 
-      const result = await uploadToIpfs(file, submitData, "coverImage");
-      console.log("Uploaded:", result);
+      let result;
+      if (file) {
+        // Upload file to IPFS
+        result = await uploadToIpfs(file, submitData, "coverImage");
+      } else {
+        // Use image URL (external URL or default placeholder)
+        const imageUrl = uploaderRef.current?.getImageUrl() || "/placeholder.svg";
+        console.log("Uploading image from URL to IPFS:", imageUrl);
+        result = await uploadImageFromUrl(imageUrl, submitData, "coverImage");
+      }
+
+      console.log("Upload result:", result);
+      console.log("Metadata URL:", result?.metadataUrl);
       await createCollection({
         base_uri: result?.metadataUrl,
         name: formData?.name,
@@ -138,7 +152,7 @@ export default function CreateCollectionView({
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background/70 text-foreground pb-20">
       <main className="container mx-auto px-4 py-8">
         {!isModalMode && (
           <Link href="/create">
@@ -152,8 +166,7 @@ export default function CreateCollectionView({
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Create New Collection</h1>
           <p className="text-muted-foreground">
-            Mint a new collection to organize your intellectual property assets
-            onchain
+            Mint a new collection to organize your intellectual property assets onchain
           </p>
         </div>
 
@@ -239,7 +252,6 @@ export default function CreateCollectionView({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="private">Private</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -378,12 +390,12 @@ export default function CreateCollectionView({
                             Making the most of your collection page helps others
                             better understand your project.
                           </p>
-                          <ul className="list-disc list-inside text-xs space-y-1 text-muted-foreground">
-                            <li>Choose a collection name</li>
-                            <li>Fill in your collection details</li>
-                            <li>Add image / media</li>
-                            <li>Link out to your links</li>
-                          </ul>
+                            <ul className="list-disc list-inside text-xs space-y-1 text-muted-foreground">
+                             <li>Choose a collection name</li>
+                             <li>Fill in your collection details</li>
+                             <li>Add image (upload file or provide URL)</li>
+                             <li>Configure collection settings</li>
+                           </ul>
                         </div>
                       </div>
                     </TabsContent>

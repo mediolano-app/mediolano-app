@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect } from "react";
 import { useConnect, useAccount, useDisconnect } from "@starknet-react/core";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,28 +13,26 @@ import {
 } from "@/components/ui/dialog";
 import {
   Wallet,
-  User,
-  Gift,
-  Settings,
   LogOut,
   Rocket,
   Box,
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { RpcProvider, constants } from "starknet";
 import type {
   ArgentWebWallet,
-  SessionAccountInterface,
 } from "@argent/invisible-sdk";
+import { useNetwork } from "@/components/starknet-provider";
+import { NetworkSwitcher } from "./network-switcher";
 
 export function WalletConnect() {
   const { connect, connectors } = useConnect();
   const { account, address } = useAccount();
   const { disconnect } = useDisconnect();
   const [open, setOpen] = React.useState(false);
-  const envName = process.env.NEXT_PUBLIC_ENV_NAME as "mainnet" | "sepolia";
-  const isMainnet = envName === "mainnet";
+  const { currentNetwork, switchNetwork, networkConfig } = useNetwork();
+  const isMainnet = currentNetwork === "mainnet";
   const chainId = isMainnet
     ? constants.StarknetChainId.SN_MAIN
     : constants.StarknetChainId.SN_SEPOLIA;
@@ -68,10 +66,10 @@ export function WalletConnect() {
       nodeUrl: process.env.NEXT_PUBLIC_RPC_URL,
       headers: JSON.parse(process.env.NEXT_PUBLIC_RPC_HEADERS || "{}"),
     });
-  }, []);
+  }, [chainId]);
 
   // Initialize Argent Web Wallet on client side only
-  useEffect(() => {
+  React.useEffect(() => {
     if (typeof window === "undefined") return;
 
     const initializeArgentWallet = async () => {
@@ -80,7 +78,7 @@ export function WalletConnect() {
 
         const wallet = ArgentWebWallet.init({
           appName: "Mediolano Dapp",
-          environment: envName || "sepolia",
+          environment: currentNetwork,
           sessionParams: {
             allowedMethods: [
               {
@@ -101,7 +99,7 @@ export function WalletConnect() {
     };
 
     initializeArgentWallet();
-  }, []);
+  }, [currentNetwork]);
 
   // Auto-connect on component mount
   useEffect(() => {
@@ -139,6 +137,20 @@ export function WalletConnect() {
         console.error("Failed to connect to ArgentWebWallet", err);
       });
   }, [argentWebWallet, provider]);
+
+  // Handle network switch - disconnect user first
+  const handleNetworkSwitch = async (newNetwork: 'mainnet' | 'sepolia') => {
+    // Disconnect current connections before switching
+    if (invisibleAccount) {
+      setInvisibleAccount(undefined);
+    }
+    if (address) {
+      disconnect();
+    }
+    
+    // Switch network
+    switchNetwork(newNetwork);
+  };
 
   // Handle Argent Invisible Wallet connection
   const handleInvisibleWalletConnect = async () => {
@@ -262,51 +274,21 @@ export function WalletConnect() {
               ? `Connected: ${currentAddress?.slice(
                   0,
                   6
-                )}...${currentAddress?.slice(-4)}`
+                )}...${currentAddress?.slice(-4)} on ${networkConfig.name}`
               : "Please connect to Starknet Sepolia *"}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
-          
-          
           {isConnected ? (
-            <div className="grid gap-4">
-              
-              <Link href="/discover">
-                <Button variant="outline" className="justify-start w-full">
-                  <Rocket className="mr-2 h-4 w-4" />
-                  Discover
-                </Button>
-              </Link>
-
-              <Link href="/create">
-                <Button variant="outline" className="justify-start w-full">
-                  <Box className="mr-2 h-4 w-4" />
-                  Create
-                </Button>
-              </Link>
-
-              {/* Account Menu
-              <Button variant="outline" className="justify-start">
-                <User className="mr-2 h-4 w-4" />
-                My Account
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Gift className="mr-2 h-4 w-4" />
-                Rewards
-              </Button>
-              <Button variant="outline" className="justify-start">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Button>
-               */}
+            <div className="flex gap-4 items-center">
+              <NetworkSwitcher />
               <Button
-                variant="destructive"
-                onClick={handleDisconnect}
-                className="justify-start"
+              variant="destructive"
+              onClick={handleDisconnect}
+              className="flex items-center"
               >
-                <LogOut className="mr-2 h-4 w-4" />
-                Disconnect
+              <LogOut className="mr-2 h-4 w-4" />
+              Disconnect
               </Button>
             </div>
           ) : (
@@ -349,8 +331,7 @@ export function WalletConnect() {
 
               <div className="alert alert-warning">
                 <p className="text-sm">
-                  * Mediolano Dapp is under development and connected to the testnet. Please make sure your wallet is connect on{" "}
-                  <strong>Starknet Sepolia</strong> to interact.
+                  * Mediolano Dapp is under development, use for testing purposes only.
                 </p>
               </div>
             </div>

@@ -10,10 +10,10 @@ export default function AssetsPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <h1 className="text-2xl font-bold">Assets</h1>
         <div className="flex gap-2">
-          <Link href="/assets/create">
+          <Link href="/create">
             <Button variant="outline" className="w-full sm:w-auto">
               <Plus className="mr-2 h-4 w-4" />
-              New Asset
+              Create Asset
             </Button>
           </Link>
           <Link href="/create-license">

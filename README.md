@@ -1,21 +1,19 @@
+<img width="1252" height="888" alt="image" src="https://github.com/user-attachments/assets/29a76a8b-9d05-489f-945b-eacca9b17996" />
+
+> [!IMPORTANT]
+> Mediolano dapp is in constant development. Use for testing purposes only. 
 
 Quick links:
 <br>
-<a href="https://ip.mediolano.app">Mediolano Dapp (Sepolia)</a>
+<a href="https://ip.mediolano.app">Mediolano Dapp</a>
 <br>
 <a href="https://mediolano.xyz">Website mediolano.xyz</a>
 <br>
-<a href="https://t.me/MediolanoStarknet">Telegram</a>
+<a href="https://t.me/MediolanoStarknet">Telegram< Group</a>
 <br>
 <a href="https://x.com/mediolanoapp">X / Twitter</a>
 <br>
 
----
-
-![Mediolano.app](https://mediolano.app/wp-content/uploads/2025/03/Mediolano-Dapp-20250310alpha.png)
-
-> [!IMPORTANT]
-> Mediolano dapp is in constant development and the current version runs on Starknet's Sepolia devnet. Use for testing purposes only. 
 
 ## Programmable IP for the Integrity Web
 
@@ -41,9 +39,6 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 - Gas Fee Abstraction: AVNU Paymaster integration eliminates gas fee barriers for seamless user experience. (Experimental feature)
 
 
-[![YouTube](http://i.ytimg.com/vi/uvskLmxmt7M/hqdefault.jpg)](https://www.youtube.com/watch?v=uvskLmxmt7M)
-
-
 
 ## Roadmap
 
@@ -57,13 +52,23 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 - [x] MIP Dapp @ Starknet Sepolia **25.06**
 
-- [X] MIP Protocol v2 @ Starknet Sepolia **25.07**
+- [X] MIP Protocol @ Starknet Mainnet **25.07**
 
-- [ ] MIP Protocol v2 @ Starknet Mainnet **25.07**
+- [X] MIP Collections Protocol @ Starknet Sepolia **25.07**
 
-- [ ] MIP Dapp @ Starknet Mainnet **25.07**
+- [X] MIP Dapp @ Starknet Mainnet **25.08**
 
-- [ ] Mediolano Dapp @ Starknet Mainnet **25.07**
+- [X] MIP Collections Protocol @ Starknet Mainnet **25.08**
+
+- [ ] Mediolano Dapp @ Starknet Mainnet **25.09**
+
+- [ ] Medialane Protocol @ Starknet Sepolia **25.08**
+
+- [ ] Medialane Dapp @ Starknet Sepolia **25.09**
+
+- [ ] Medialane Protocol @ Starknet Mainnet **25.11**
+
+- [ ] Medialane Dapp @ Starknet Mainnet **25.11**
 
 
 ## Contributing
