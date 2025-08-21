@@ -158,7 +158,9 @@ export function useIpfsUpload() {
           ...metadata,
         };
 
+
         console.log("Uploading metadata with image URL:", metadataWithImage);
+        
         const result = await uploadMetadataToIpfs(metadataWithImage);
 
         setProgress(100); // done
