@@ -79,10 +79,10 @@ export function useIpfsUpload() {
 
         // Upload metadata
         const metadataWithImage = {
-          ...metadata,
-          image: uploadedFileUrl,
-          description: metadata?.description,
           name: metadata?.title || metadata?.name,
+          description: metadata?.description,
+          image: uploadedFileUrl,
+          ...metadata,
         };
 
         const result = await uploadMetadataToIpfs(metadataWithImage);
@@ -160,7 +160,7 @@ export function useIpfsUpload() {
 
 
         console.log("Uploading metadata with image URL:", metadataWithImage);
-        
+
         const result = await uploadMetadataToIpfs(metadataWithImage);
 
         setProgress(100); // done
