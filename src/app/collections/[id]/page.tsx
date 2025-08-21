@@ -129,14 +129,10 @@ export default function CollectionDetailPage() {
           )}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-1">
+            <Button variant="outline" className="gap-1" onClick={() => router.push("/create")}>
             <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Add NFT</span>
-          </Button>
-          <Button variant="outline" className="gap-1">
-            <Edit className="h-4 w-4" />
-            <span className="hidden sm:inline">Edit</span>
-          </Button>
+            <span className="hidden sm:inline">Create Asset</span>
+            </Button>
         </div>
       </div>
 

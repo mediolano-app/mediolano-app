@@ -152,10 +152,10 @@ export function useIpfsUpload() {
 
         // Upload metadata with image URL
         const metadataWithImage = {
-          ...metadata,
-          [imageKey]: uploadedFileUrl,
-          description: metadata?.description,
           name: metadata?.title || metadata?.name,
+          description: metadata?.description,
+          [imageKey]: uploadedFileUrl,
+          ...metadata,
         };
 
         console.log("Uploading metadata with image URL:", metadataWithImage);

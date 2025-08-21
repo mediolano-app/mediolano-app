@@ -94,7 +94,7 @@ export default function CollectionsPage() {
                   <Grid3X3 className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Collections</p>
+                  <p className="text-sm text-muted-foreground">Collections</p>
                   <p className="text-2xl font-bold">{stats.totalCollections}</p>
                 </div>
               </div>
