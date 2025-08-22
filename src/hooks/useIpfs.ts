@@ -82,7 +82,7 @@ export function useIpfsUpload() {
           name: metadata?.title || metadata?.name,
           description: metadata?.description,
           image: uploadedFileUrl,
-
+          ...metadata,
         };
 
         const result = await uploadMetadataToIpfs(metadataWithImage);
