@@ -159,15 +159,15 @@ export function Footer() {
                 <h3 className="mb-6 text-sm font-semibold uppercase">IP Templates</h3>
                 <ul className="space-y-4">
                     <li><Link href="/create/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Custom</Link></li>
-                    <li><Link href="/create/template/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Artwork</Link></li>
-                    <li><Link href="/create/template/audio" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2 ml-blue" /> Audio</Link></li>
-                    <li><Link href="/create/template/document" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
-                    <li><Link href="/create/template/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2 ml-blue" /> NFT</Link></li>
-                    <li><Link href="/create/template/patent" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Patent</Link></li>
-                    <li><Link href="/create/template/publication" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2 ml-blue" /> Publication</Link></li>
-                    <li><Link href="/create/template/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2 ml-blue" /> Real World Assets</Link></li> 
-                    <li><Link href="/create/template/software" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> Software</Link></li>
-                    <li><Link href="/create/template/video" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Video</Link></li>
+                    <li><Link href="/create/templates/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Artwork</Link></li>
+                    <li><Link href="/create/templates/audio" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2 ml-blue" /> Audio</Link></li>
+                    <li><Link href="/create/templates/documents" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
+                    <li><Link href="/create/templates/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2 ml-blue" /> NFT</Link></li>
+                    <li><Link href="/create/templates/patents" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Patent</Link></li>
+                    <li><Link href="/create/templates/publications" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2 ml-blue" /> Publication</Link></li>
+                    <li><Link href="/create/templates/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2 ml-blue" /> Real World Assets</Link></li> 
+                    <li><Link href="/create/templates/software" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> Software</Link></li>
+                    <li><Link href="/create/templates/video" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Video</Link></li>
                 </ul>
                 </div>
 
