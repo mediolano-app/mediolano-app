@@ -149,16 +149,13 @@ export function Footer() {
                   <li><Link href="/create/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
                   <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
                   <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Portfolio</Link></li>
-                  <li><Link href="/portfolio/collections" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> My Collections</Link></li>
-                  <li><Link href="/portfolio/dashboard" className="flex items-center hover:underline"><LayoutDashboard className="w-4 h-4 mr-2 ml-blue" /> Assets Dashboard</Link></li>
-                  <li><Link href="/transfer" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" /> Transfer</Link></li>
                 </ul>
             </div>
 
                 <div>
                 <h3 className="mb-6 text-sm font-semibold uppercase">IP Templates</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/create/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Custom</Link></li>
+                    <li><Link href="/create/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> General</Link></li>
                     <li><Link href="/create/templates/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Artwork</Link></li>
                     <li><Link href="/create/templates/audio" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2 ml-blue" /> Audio</Link></li>
                     <li><Link href="/create/templates/documents" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
@@ -175,7 +172,6 @@ export function Footer() {
                 <h3 className="mb-6 text-sm font-semibold uppercase">Manage</h3>
                 <ul className="space-y-4">
                     <li><Link href="/account" className="flex items-center hover:underline"><User className="w-4 h-4 mr-2 ml-blue" /> My Account</Link></li>
-                    <li><Link href="/settings" className="flex items-center hover:underline"><Cog className="w-4 h-4 mr-2 ml-blue" /> Settings</Link></li>
                 </ul>
                 <h3 className="mb-6 mt-6 text-sm font-semibold uppercase">Guidelines</h3>
                 <ul className="space-y-4">
