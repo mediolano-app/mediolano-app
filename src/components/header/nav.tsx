@@ -58,7 +58,7 @@ export function MainNav() {
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-background/20 backdrop-blur">
               <Rocket className="mr-2 h-4 w-4" />
-              Start
+              Create
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -69,7 +69,7 @@ export function MainNav() {
                       href="/create"
                     >
                       <Box className="h-6 w-6 text-blue-600" />
-                      <div className="mb-2 mt-4 text-lg font-medium">Create</div>
+                      <div className="mb-2 mt-4 text-lg font-medium">Start</div>
                       <p className="text-sm leading-tight text-muted-foreground">
                         Tokenize your creative work and intellectual property
                       </p>
@@ -79,42 +79,42 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/discover"
+                    href="/create/collection"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <Brain className="mr-2 h-4 w-4  text-blue-600" />
-                      Discover
+                      Collections
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Learn how to get started and protect your work.
+                      Create a collection of digital assets
                     </p>
                   </Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/portfolio"
+                    href="/create/asset"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <LayoutGrid className="mr-2 h-4 w-4  text-blue-600" />
-                      Portfolio
+                      Programmable IP
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      View and manage your digital assets.
+                      Tokenize intellectual property with programmable features
                     </p>
                   </Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/collections"
+                    href="/create/templates"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <FileCode className="mr-2 h-4 w-4  text-blue-600" />
-                      Explore
+                      IP Templates
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Discover and explore intellectual property onchain.
+                      Create your IP using templates for common use cases
                     </p>
                   </Link>
                 </NavigationMenuLink>
@@ -145,21 +145,6 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
-
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/transfer"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <ArrowRightLeft className="mr-2 h-4 w-4  text-blue-600" />
-                      Transfer
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Transfer your assets.
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
                 
                 <NavigationMenuLink asChild>
                   <Link
@@ -171,7 +156,7 @@ export function MainNav() {
                       Account
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Manage your account settings and visibility.
+                      Manage your account settings.
                     </p>
                   </Link>
                 </NavigationMenuLink>

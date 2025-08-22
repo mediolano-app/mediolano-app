@@ -39,6 +39,7 @@ import {
   Scroll,
   Lock,
   Shield,
+  Layers,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -49,10 +50,12 @@ import DappInfo from './dapp-info';
 
 const features = [
   { icon: <Brain className="h-6 w-6" />, title: "Discover", description: "IP for the Integrity Web", link: "/discover" },
-  { icon: <Box className="h-6 w-6" />, title: "Tokenize IP", description: "Create Programmable IP", link: "/create" },
-  { icon: <LayoutGrid className="h-6 w-6" />, title: "Manage Assets", description: "Manage IP onchain", link: "/portfolio" },
-  { icon: <ScrollText className="h-6 w-6" />, title: "Licensing Assets", description: "Register new license", link: "/licensing" },
-]
+  { icon: <Box className="h-6 w-6" />, title: "Tokenize", description: "Create Programmable IP", link: "/create" },
+  { icon: <Layers className="h-6 w-6" />, title: "Collections", description: "Create and manage collections", link: "/create/collection" },
+  { icon: <FileCheck className="h-6 w-6" />, title: "Create IP", description: "Tokenize intellectual property onchain", link: "/create/asset" },
+  { icon: <FileCode className="h-6 w-6" />, title: "Templates", description: "IP Templates for common use cases", link: "/create/templates" },
+  { icon: <LayoutGrid className="h-6 w-6" />, title: "Manage", description: "Manage IP onchain", link: "/portfolio" },
+  ]
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),

@@ -24,11 +24,12 @@ import { WalletConnect } from "@/components/header/wallet-connect"
 
 const navigationItems = [
   {
-    title: 'Start',
+    title: 'Create',
     items: [
-      { title: 'Learn', href: '/discover', icon: BookOpen },
-      { title: 'Create', href: '/create', icon: Box },
-      { title: 'Explore', href: '/Collections', icon: Layers },
+      { title: 'Start', href: '/create', icon: BookOpen },
+      { title: 'Create Collections', href: '/create/collection', icon: Box },
+      { title: 'Create IP', href: '/create/asset', icon: Layers },
+      { title: 'IP Templates', href: '/create/templates', icon: Grid2X2 },
     ],
   },
   {
