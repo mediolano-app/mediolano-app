@@ -2,12 +2,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNetwork } from '@/components/starknet-provider';
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from '@starknet-react/core';
-import { Network } from "lucide-react";
+import { Network, CheckCircle, AlertTriangle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { constants } from "starknet";
+import { useNetworkConfig } from '@/hooks/useNetworkConfig';
+import { TokenizationService } from '@/services/tokenization';
 
 export function NetworkSwitcher() {
-  const { currentNetwork, networkConfig, switchNetwork } = useNetwork();
+  const { currentNetwork, networkConfig, switchNetwork, isNetworkSwitching } = useNetwork();
+  const { validation, isProductionReady } = useNetworkConfig();
   const { address, chainId } = useAccount();
   const { disconnect } = useDisconnect();
   const { connect, connectors } = useConnect();
@@ -17,6 +21,37 @@ export function NetworkSwitcher() {
 
   const [open, setOpen] = useState(false);
   const switcherRef = useRef<HTMLDivElement>(null);
+
+  const networkToChainId = {
+    mainnet: constants.StarknetChainId.SN_MAIN,
+    sepolia: constants.StarknetChainId.SN_SEPOLIA,
+  };
+
+  // Get network status for each network
+  const getNetworkStatus = (network: 'mainnet' | 'sepolia') => {
+    const networkValidation = TokenizationService.validateNetwork(network);
+    const isRecommended = TokenizationService.getRecommendedNetwork(currentNetwork) === network;
+
+    return {
+      isValid: networkValidation.isValid,
+      hasWarnings: networkValidation.warnings.length > 0,
+      isRecommended,
+      errors: networkValidation.errors,
+      warnings: networkValidation.warnings
+    };
+  };
+
+  // Get status icon for network
+  const getNetworkIcon = (network: 'mainnet' | 'sepolia') => {
+    const status = getNetworkStatus(network);
+    if (status.isValid) {
+      return <CheckCircle className="h-3 w-3 text-green-500" />;
+    }
+    if (status.hasWarnings) {
+      return <AlertTriangle className="h-3 w-3 text-yellow-500" />;
+    }
+    return <AlertTriangle className="h-3 w-3 text-red-500" />;
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
