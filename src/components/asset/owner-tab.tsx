@@ -17,10 +17,12 @@ interface OwnerTabProps {
     }
     createdAt: string
   }
-  tokenOwnerAddress?: string
 }
 
-export function OwnerTab({ asset, tokenOwnerAddress }: OwnerTabProps) {
+// Safely coerce any value to string for display
+const toText = (value: unknown): string => (value === undefined || value === null ? "" : String(value))
+
+export function OwnerTab({ asset}: OwnerTabProps) {
   return (
     <div className="space-y-6">
       <Card>
@@ -30,12 +32,12 @@ export function OwnerTab({ asset, tokenOwnerAddress }: OwnerTabProps) {
         <CardContent>
           <div className="flex items-start gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage src={asset.owner.avatar} alt={asset.owner.name} />
-              <AvatarFallback>{asset.owner.name.substring(0, 2)}</AvatarFallback>
+              <AvatarImage src={asset.owner?.avatar} alt={toText(asset.owner?.name)} />
+              <AvatarFallback>{toText(asset?.owner?.name).substring(0, 2)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold truncate">{tokenOwnerAddress?.slice(0,20)}...</h3>
+                <h3 className="text-sm font-semibold truncate">{toText(asset?.owner?.name).slice(0,20)}{toText(asset?.owner?.name).length > 20 ? "..." : ""}</h3>
               </div>
               
               <div className="mt-4 flex gap-2">
@@ -56,12 +58,12 @@ export function OwnerTab({ asset, tokenOwnerAddress }: OwnerTabProps) {
         <CardContent>
           <div className="flex items-start gap-4">
             <Avatar className="h-16 w-16">
-              <AvatarImage src={asset.author.avatar} alt={asset.author.name} />
-              <AvatarFallback>{asset.author.name.substring(0, 2)}</AvatarFallback>
+              <AvatarImage src={asset.author.avatar} alt={toText(asset.author.name)} />
+              <AvatarFallback>{toText(asset.author.name).substring(0, 2)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold truncate">{tokenOwnerAddress?.slice(0,20)}...</h3>
+                <h3 className="text-sm font-semibold truncate">{toText(asset.author.name).slice(0,20)}{toText(asset.author.name).length > 20 ? "..." : ""}</h3>
               </div>
               <p className="text-sm text-muted-foreground">{asset.author.bio}</p>
 
@@ -92,7 +94,7 @@ export function OwnerTab({ asset, tokenOwnerAddress }: OwnerTabProps) {
                 <p className="text-sm">Transferred</p>
                 <p className="text-sm text-muted-foreground">{asset.owner.acquired}</p>
                 <p className="text-sm">
-                  From {tokenOwnerAddress?.slice(0,20)} to {tokenOwnerAddress?.slice(0,20)}
+                  From {toText(asset?.owner?.name).slice(0,20)} to {toText(asset?.owner?.name).slice(0,20)}
                 </p>
               </div>
             </div>
@@ -103,7 +105,7 @@ export function OwnerTab({ asset, tokenOwnerAddress }: OwnerTabProps) {
               <div>
                 <p className="text-sm">Created</p>
                 <p className="text-sm text-muted-foreground">{asset.createdAt}</p>
-                <p className="text-sm">By {tokenOwnerAddress?.slice(0,20)}</p>
+                <p className="text-sm">By {toText(asset?.owner?.name).slice(0,20)}</p>
               </div>
             </div>
           </div>

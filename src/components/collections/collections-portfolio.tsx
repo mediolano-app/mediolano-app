@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import Image from "next/image"
 import type { Collection } from "@/lib/types";
 import { CollectionValidator } from "@/lib/types";
@@ -42,7 +42,6 @@ import { isCollectionFeatured } from "@/lib/utils";
 type SortOption = "value-high" | "value-low" | "name-asc" | "name-desc" | "size-high" | "size-low"
 
 export function CollectionsPortfolioGrid({ collections }: { collections: Collection[] }) {
-  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortOption, setSortOption] = useState<SortOption>("size-high")
@@ -164,21 +163,21 @@ export function CollectionsPortfolioGrid({ collections }: { collections: Collect
       ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedCollections.map((collection) => (
-            <CollectionCard
-              key={collection.id}
-              collection={collection}
-              onClick={() => router.push(`/collections/${collection.id}`)}
-            />
+            <Link key={collection.id} href={`/collections/${collection.id}`}>
+              <CollectionCard
+                collection={collection}
+              />
+            </Link>
           ))}
         </div>
       ) : (
         <div className="space-y-4">
           {sortedCollections.map((collection) => (
-            <CollectionListItem
-              key={collection.id}
-              collection={collection}
-              onClick={() => router.push(`/collections/${collection.id}`)}
-            />
+            <Link key={collection.id} href={`/collections/${collection.id}`}>
+              <CollectionListItem
+                collection={collection}
+              />
+            </Link>
           ))}
         </div>
       )}
@@ -188,13 +187,12 @@ export function CollectionsPortfolioGrid({ collections }: { collections: Collect
 
 interface CollectionCardProps {
   collection: Collection
-  onClick: () => void
 }
 
-function CollectionCard({ collection, onClick }: CollectionCardProps) {
+function CollectionCard({ collection }: CollectionCardProps) {
   const isFeatured = isCollectionFeatured(collection.id);
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group" onClick={onClick}>
+    <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group">
       <div className="relative h-64 w-full">
         <Image
           src={collection.image || "/background.jpg"}
@@ -221,7 +219,7 @@ function CollectionCard({ collection, onClick }: CollectionCardProps) {
       </div>
       <CardHeader className="pb-2 flex flex-row justify-between items-start">
         <h3 className="text-xl font-bold">{collection.name}</h3>
-        <CollectionActionDropdown collectionId={collection.id} />
+        <CollectionActionDropdown collectionId={collection.id.toString()} />
       </CardHeader>
       <CardContent className="pb-2">
         <p className="text-sm text-muted-foreground line-clamp-2">
@@ -244,12 +242,11 @@ function CollectionCard({ collection, onClick }: CollectionCardProps) {
   )
 }
 
-function CollectionListItem({ collection, onClick }: CollectionCardProps) {
+function CollectionListItem({ collection }: CollectionCardProps) {
   const isFeatured = isCollectionFeatured(collection.id);
   return (
     <div
       className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors"
-      onClick={onClick}
     >
       <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
         <Image src={collection.image || "/placeholder.svg?height=400&width=600"} alt={collection.name} fill className="object-cover" />
@@ -288,17 +285,17 @@ function CollectionListItem({ collection, onClick }: CollectionCardProps) {
             <span>{collection.floorPrice ? `${collection.floorPrice} STRK` : 'No floor price'}</span>
           </div>
         </div>
-        <CollectionActionDropdown collectionId={collection.id} />
+        <CollectionActionDropdown collectionId={collection.id.toString()} />
       </div>
     </div>
   )
 }
 
-function FeaturedCollectionCard({ collection, onClick }: CollectionCardProps) {
+function FeaturedCollectionCard({ collection }: CollectionCardProps) {
   const isFeatured = isCollectionFeatured(collection.id);
   
   return (
-    <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all" onClick={onClick}>
+    <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
         <div className="relative h-64 md:h-auto">
           <Image src={collection.image || "/background.jpg"} alt={collection.name} fill className="object-cover" />
@@ -318,7 +315,7 @@ function FeaturedCollectionCard({ collection, onClick }: CollectionCardProps) {
           <div>
             <div className="flex justify-between items-start">
               <h2 className="text-xl md:text-2xl font-bold mb-2">{collection.name}</h2>
-              <CollectionActionDropdown collectionId={collection.id} />
+              <CollectionActionDropdown collectionId={collection.id.toString()} />
             </div>
             <p className="text-sm text-muted-foreground mb-4 line-clamp-3 md:line-clamp-none">
               {collection.description}
@@ -377,35 +374,22 @@ function CollectionActionDropdown({ collectionId }: { collectionId: string }) {
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation()
-            // Handle edit collection action
-            console.log("Edit Collection:", collectionId)
+            
+            // Replace 'address' with the actual property name for the collection address
+            const explorerUrl = process.env.NEXT_PUBLIC_EXPLORER_URL
+            const collectionAddress = collectionId // or use collection.address if available
+            if (explorerUrl && collectionAddress) {
+              window.open(`${explorerUrl}/contract/${collectionAddress}`, "_blank")
+            }
+            
           }}
         >
           <Edit className="mr-2 h-4 w-4" />
-          Edit Collection
+          View Collection on Explorer
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation()
-            // Handle add NFT action
-            console.log("Add Programmable IP to Collection:", collectionId)
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Create New Asset
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation()
-            // Handle delete collection action
-            console.log("Delete Collection:", collectionId)
-          }}
-          className="text-destructive focus:text-destructive"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete Collection
-        </DropdownMenuItem>
+
+        
+        
       </DropdownMenuContent>
     </DropdownMenu>
   )

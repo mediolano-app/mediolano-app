@@ -57,10 +57,6 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import type { IPType } from "@/types/asset"
-import { 
-  getKnownCids, 
-  loadIPFSMetadataInBackground 
-} from '@/utils/ipfs';
 
 // temporary data - would be mixed with IPFS data if is necessary
 import { assets as mockAssets, recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
@@ -93,47 +89,27 @@ export default function AssetsPage() {
   const [filterTemplate, setFilterTemplate] = useState<string>("all")
   const [assets, setAssets] = useState<EnhancedAsset[]>([])
 
-  console.log(assets);
-
+  // Use mock assets until real implementation is ready
   useEffect(() => {
-    // Cargar datos y enriquecerlos con información de IPFS
-    const loadAssetsWithIPFS = async () => {
-      setLoading(true);
-      try {
-        // Obtener los CIDs conocidos
-        const knownCids = getKnownCids();
-
-        // Enriquecer los assets mock con información de IPFS
-        const enhancedAssets = mockAssets.map((asset) => {
-          const ipfsCid = knownCids[asset.id] || null;
-          
-          // Retornar el asset enriquecido
-          return {
-            ...asset,
-            ...(ipfsCid && { ipfsCid })
-          } as EnhancedAsset;
-        });
-
-        // Actualizar el estado con los assets enriquecidos inmediatamente
-        setAssets(enhancedAssets);
-        setLoading(false);
-
-        // Cargar metadatos de IPFS en segundo plano
-        loadIPFSMetadataInBackground(
-          enhancedAssets,
-          (updatedAssets) => {
-            setAssets(updatedAssets);
-          }
-        );
-      } catch (error) {
-        console.error("Error loading assets with IPFS data:", error);
-        // En caso de error, usar los datos mock sin modificar
-        setAssets(mockAssets as EnhancedAsset[]);
-        setLoading(false);
-      }
-    };
-
-    loadAssetsWithIPFS();
+    setLoading(true);
+    const transformed: EnhancedAsset[] = mockAssets.map((a) => ({
+      id: a.id,
+      name: a.name,
+      creator: a.creator,
+      verified: a.verified,
+      image: a.image,
+      collection: a.collection,
+      licenseType: a.licenseType,
+      description: a.description,
+      registrationDate: a.registrationDate,
+      type: a.type as IPType,
+      templateType: a.templateType,
+      protectionLevel: a.protectionLevel,
+      value: a.value,
+      ipfsCid: undefined,
+    }));
+    setAssets(transformed);
+    setLoading(false);
   }, []);
 
 
@@ -406,7 +382,7 @@ export default function AssetsPage() {
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Link href={`/assets/${asset.id}`}>
+                <Link href={`/asset/${asset.id}`}>
                   <Button size="sm">
                     View IP
                     <ExternalLink className="ml-1.5 h-3.5 w-3.5" />

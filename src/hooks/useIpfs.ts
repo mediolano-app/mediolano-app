@@ -39,7 +39,7 @@ export function useIpfsUpload() {
       const metadataUpload = await pinata.upload.public
         .json(metadata)
         .url(metadataSignedUrl);
-      const uploadedMetadataUrl = `${IPFS_URL}/${metadataUpload.cid}`;
+      const uploadedMetadataUrl = `${IPFS_URL}/ipfs/${metadataUpload.cid}`;
       setMetadataUrl(uploadedMetadataUrl);
 
       return {
@@ -74,15 +74,15 @@ export function useIpfsUpload() {
         const fileUpload = await pinata.upload.public
           .file(file)
           .url(fileSignedUrl);
-        const uploadedFileUrl = `${IPFS_URL}/${fileUpload.cid}`;
+        const uploadedFileUrl = `${IPFS_URL}/ipfs/${fileUpload.cid}`;
         setFileUrl(uploadedFileUrl);
 
         // Upload metadata
         const metadataWithImage = {
-          ...metadata,
-          image: uploadedFileUrl,
-          description: metadata?.description,
           name: metadata?.title || metadata?.name,
+          description: metadata?.description,
+          image: uploadedFileUrl,
+          ...metadata,
         };
 
         const result = await uploadMetadataToIpfs(metadataWithImage);
@@ -152,13 +152,15 @@ export function useIpfsUpload() {
 
         // Upload metadata with image URL
         const metadataWithImage = {
-          ...metadata,
-          [imageKey]: uploadedFileUrl,
-          description: metadata?.description,
           name: metadata?.title || metadata?.name,
+          description: metadata?.description,
+          [imageKey]: uploadedFileUrl,
+          ...metadata,
         };
 
+
         console.log("Uploading metadata with image URL:", metadataWithImage);
+
         const result = await uploadMetadataToIpfs(metadataWithImage);
 
         setProgress(100); // done

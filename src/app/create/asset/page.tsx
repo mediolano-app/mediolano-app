@@ -87,7 +87,7 @@ export default function CreateAssetPage() {
       toast({
         title: "Error",
         description:
-          error instanceof Error ? error.message : "Failed to mint asset",
+          error instanceof Error ? error.message : "Failed to mint Programmable IP",
         variant: "destructive",
       });
     }
