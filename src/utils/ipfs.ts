@@ -255,67 +255,68 @@ export function clearIPFSCache(cid?: string): void {
 /**
  * Process IPFS hash to URL
  * Converts various IPFS input formats to proper gateway URLs
- * @param {string} input - The IPFS input (CID, undefined/CID, ipfs:/, or gateway URL)
+ * @param {string} input - The IPFS input (CID, undefined/CID, ipfs:/, ipfs://, ipfs:ipfs/, or gateway URL)
  * @param {string} fallbackUrl - Fallback URL if processing fails
  * @returns {string} Processed URL or fallback
  */
 export function processIPFSHashToUrl(input: string, fallbackUrl: string): string {
-  if (typeof input !== 'string') return fallbackUrl;
-  
-  let processedUrl = input.replace(/\0/g, '').trim();
-  
-  
-  // Handle undefined prefix first - this is the most common case
-  if (processedUrl.startsWith('undefined/')) {
-    const cid = processedUrl.replace('undefined/', '');
-        // Validate CID length and format - must be at least 34 characters (IPFS v0) or 46+ (IPFS v1)
-    if (cid.match(/^[a-zA-Z0-9]{34,}$/)) {
-      const gatewayUrl = `${IPFS_GATEWAYS[0]}${cid}`;
-      return gatewayUrl;
+  if (typeof input !== "string") return fallbackUrl;
+
+  let processedUrl = input.replace(/\0/g, "").trim();
+
+  // Handle undefined prefix
+  if (processedUrl.startsWith("undefined/")) {
+    const cid = processedUrl.replace("undefined/", "");
+    if (cid.match(/^[a-zA-Z0-9]+$/) && cid.length >= 34) {
+      return `${IPFS_GATEWAYS[0]}${cid}`;
     } else {
       return fallbackUrl;
     }
   }
-  
-  // reject any input that's too short to be a valid CID
-  if (processedUrl.length < 46 && !processedUrl.startsWith('http') && !processedUrl.startsWith('/')) {
-    console.log(`Input too short to be valid IPFS CID (${processedUrl.length} chars):`, processedUrl);
+
+  // Reject inputs too short to be valid CIDs
+  if (
+    processedUrl.length < 34 &&
+    !processedUrl.startsWith("http") &&
+    !processedUrl.startsWith("/")
+  ) {
+    console.log(
+      `Input too short to be valid IPFS CID (${processedUrl.length} chars):`,
+      processedUrl
+    );
     return fallbackUrl;
   }
-  
 
-  
-  // Handle raw IPFS CIDs (must be at least 46 characters)
-  if (processedUrl.match(/^[a-zA-Z0-9]{46,}$/)) {
-    processedUrl = `${IPFS_GATEWAYS[0]}${processedUrl}`;
+  // Raw CID
+  if (processedUrl.match(/^[a-zA-Z0-9]+$/) && processedUrl.length >= 34) {
+    return `${IPFS_GATEWAYS[0]}${processedUrl}`;
+  }
+
+  // Existing gateway URLs
+  if (IPFS_GATEWAYS.some((gateway) => processedUrl.startsWith(gateway))) {
     return processedUrl;
   }
-  
-  // Handle existing gateway URLs
-  if (IPFS_GATEWAYS.some(gateway => processedUrl.startsWith(gateway))) {
-    return processedUrl;
+
+  // ipfs:/CID, ipfs://CID, ipfs:ipfs/CID
+  if (processedUrl.startsWith("ipfs:")) {
+    const cid = processedUrl.replace(/^ipfs:(?:ipfs)?\/+/, "");
+    return `${IPFS_GATEWAYS[1]}${cid}`;
   }
-  
-  // Handle ipfs:/ protocol
-  if (processedUrl.startsWith('ipfs:/')) {
-    processedUrl = processedUrl.replace('ipfs:/', `${IPFS_GATEWAYS[0]}`);
-    return processedUrl;
-  }
-  
-  // If it's already a valid HTTP/HTTPS URL, validate it's a proper IPFS gateway URL
-  if (processedUrl.startsWith('http')) {
-    // If it's an IPFS gateway URL, validate the CID length
-    if (processedUrl.includes('/ipfs/')) {
-      const cidMatch = processedUrl.match(/\/ipfs\/([a-zA-Z0-9]+)/);
-      if (cidMatch && cidMatch[1].length < 46) {
-        console.log(`Invalid IPFS gateway URL - CID too short (${cidMatch[1].length} chars):`, processedUrl);
-        return fallbackUrl;
-      }
+
+
+  // Already a normal http(s) URL (non-gateway or direct IPFS path)
+  if (processedUrl.startsWith("http")) {
+    const cidMatch = processedUrl.match(/\/ipfs\/([a-zA-Z0-9]+)/);
+    if (cidMatch && cidMatch[1].length < 34) {
+      console.log(
+        `Invalid IPFS gateway URL - CID too short (${cidMatch[1].length} chars):`,
+        processedUrl
+      );
+      return fallbackUrl;
     }
-    console.log("processedUrl", processedUrl);
     return processedUrl;
   }
-  
-  console.log(`IPFS input not recognized, using fallback:`, fallbackUrl);
+
+  console.log("IPFS input not recognized, using fallback:", fallbackUrl);
   return fallbackUrl || "";
 }
