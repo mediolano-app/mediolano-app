@@ -33,13 +33,13 @@ export function useIpfsUpload() {
     return interval;
   };
 
- const uploadMetadataToIpfs = async (metadata: IpfsMetadata) => {
+  const uploadMetadataToIpfs = async (metadata: IpfsMetadata) => {
     try {
       const metadataSignedUrl = await getSignedUrl();
       const metadataUpload = await pinata.upload.public
         .json(metadata)
         .url(metadataSignedUrl);
-          const uploadedMetadataUrl = `ipfs://${metadataUpload.cid}`;
+      const uploadedMetadataUrl = `ipfs://${metadataUpload.cid}`;
       setMetadataUrl(uploadedMetadataUrl);
 
       return {
@@ -47,7 +47,8 @@ export function useIpfsUpload() {
         cid: metadataUpload.cid,
       };
     } catch (err) {
-      const error = err instanceof Error ? err : new Error("Metadata upload failed");
+      const error =
+        err instanceof Error ? err : new Error("Metadata upload failed");
       setError(error);
       throw error;
     }
@@ -74,12 +75,14 @@ export function useIpfsUpload() {
         const fileUpload = await pinata.upload.public
           .file(file)
           .url(fileSignedUrl);
-          const uploadedFileUrl = `ipfs://${fileUpload.cid}`;
+        const uploadedFileUrl = `ipfs://${fileUpload.cid}`;
+        const assetUrl = `${IPFS_URL}/ipfs/${fileUpload.cid}`;
         setFileUrl(uploadedFileUrl);
 
         // Upload metadata
         const metadataWithImage = {
           ...metadata,
+          assetUrl: assetUrl,
           image: uploadedFileUrl,
         };
 
@@ -121,13 +124,13 @@ export function useIpfsUpload() {
         let uploadedFileUrl = imageUrl;
 
         // Only call server API if it's a full URL (not a relative path like /placeholder.svg)
-        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
           // Call server-side API to fetch and upload image
           console.log("Calling server API to upload image from URL...");
-          const response = await fetch('/api/upload-image-from-url', {
-            method: 'POST',
+          const response = await fetch("/api/upload-image-from-url", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
               imageUrl,
@@ -137,7 +140,9 @@ export function useIpfsUpload() {
 
           if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to upload image from URL');
+            throw new Error(
+              errorData.error || "Failed to upload image from URL"
+            );
           }
 
           const uploadResult = await response.json();
@@ -156,7 +161,6 @@ export function useIpfsUpload() {
           ...metadata,
         };
 
-
         console.log("Uploading metadata with image URL:", metadataWithImage);
 
         const result = await uploadMetadataToIpfs(metadataWithImage);
@@ -171,7 +175,10 @@ export function useIpfsUpload() {
         };
       } catch (err) {
         clearInterval(progressInterval);
-        const error = err instanceof Error ? err : new Error("Image upload from URL failed");
+        const error =
+          err instanceof Error
+            ? err
+            : new Error("Image upload from URL failed");
         setError(error);
         throw error;
       } finally {
