@@ -49,12 +49,11 @@ import Image from "next/image";
 import DappInfo from './dapp-info';
 
 const features = [
-  { icon: <Brain className="h-6 w-6" />, title: "Discover", description: "IP for the Integrity Web", link: "/discover" },
-  { icon: <Box className="h-6 w-6" />, title: "Tokenize", description: "Create Programmable IP", link: "/create" },
-  { icon: <Layers className="h-6 w-6" />, title: "Collections", description: "Create and manage collections", link: "/create/collection" },
-  { icon: <FileCheck className="h-6 w-6" />, title: "Create IP", description: "Tokenize intellectual property onchain", link: "/create/asset" },
+  { icon: <Brain className="h-6 w-6" />, title: "Learn", description: "IP for the Integrity Web", link: "/discover" },
+  { icon: <Box className="h-6 w-6" />, title: "Create", description: "Create Programmable IP", link: "/create" },
+  { icon: <Layers className="h-6 w-6" />, title: "Collections", description: "Explorer IP collections", link: "/collections" },
   { icon: <FileCode className="h-6 w-6" />, title: "Templates", description: "IP Templates for common use cases", link: "/create/templates" },
-  { icon: <LayoutGrid className="h-6 w-6" />, title: "Manage", description: "Manage IP onchain", link: "/portfolio" },
+  { icon: <LayoutGrid className="h-6 w-6" />, title: "IP Portfolio", description: "Manage IP onchain", link: "/portfolio" },
   ]
 
 const formSchema = z.object({
