@@ -263,7 +263,6 @@ export function processIPFSHashToUrl(input: string, fallbackUrl: string): string
   if (typeof input !== "string") return fallbackUrl;
 
   let processedUrl = input.replace(/\0/g, "").trim();
-  console.log("input", input);
 
   // Handle undefined prefix
   if (processedUrl.startsWith("undefined/")) {
@@ -301,7 +300,6 @@ export function processIPFSHashToUrl(input: string, fallbackUrl: string): string
   // ipfs:/CID, ipfs://CID, ipfs:ipfs/CID
   if (processedUrl.startsWith("ipfs:")) {
     const cid = processedUrl.replace(/^ipfs:(?:ipfs)?\/+/, "");
-    console.log(cid,"cid")
     return `${IPFS_GATEWAYS[1]}${cid}`;
   }
 
