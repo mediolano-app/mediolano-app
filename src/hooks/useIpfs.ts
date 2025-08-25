@@ -33,13 +33,13 @@ export function useIpfsUpload() {
     return interval;
   };
 
-  const uploadMetadataToIpfs = useCallback(async (metadata: IpfsMetadata) => {
+ const uploadMetadataToIpfs = async (metadata: IpfsMetadata) => {
     try {
       const metadataSignedUrl = await getSignedUrl();
       const metadataUpload = await pinata.upload.public
         .json(metadata)
         .url(metadataSignedUrl);
-      const uploadedMetadataUrl = `${IPFS_URL}/ipfs/${metadataUpload.cid}`;
+          const uploadedMetadataUrl = `ipfs://${metadataUpload.cid}`;
       setMetadataUrl(uploadedMetadataUrl);
 
       return {
@@ -51,7 +51,7 @@ export function useIpfsUpload() {
       setError(error);
       throw error;
     }
-  }, []);
+  };
 
   const uploadToIpfs = useCallback(
     async (
@@ -74,15 +74,13 @@ export function useIpfsUpload() {
         const fileUpload = await pinata.upload.public
           .file(file)
           .url(fileSignedUrl);
-        const uploadedFileUrl = `${IPFS_URL}/ipfs/${fileUpload.cid}`;
+          const uploadedFileUrl = `ipfs://${fileUpload.cid}`;
         setFileUrl(uploadedFileUrl);
 
         // Upload metadata
         const metadataWithImage = {
-          name: metadata?.title || metadata?.name,
-          description: metadata?.description,
-          image: uploadedFileUrl,
           ...metadata,
+          image: uploadedFileUrl,
         };
 
         const result = await uploadMetadataToIpfs(metadataWithImage);
@@ -105,7 +103,7 @@ export function useIpfsUpload() {
         setTimeout(() => setProgress(0), 1000); // optional: reset progress after delay
       }
     },
-    [uploadMetadataToIpfs]
+    []
   );
 
   const uploadImageFromUrl = useCallback(
