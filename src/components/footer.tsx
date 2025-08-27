@@ -51,9 +51,8 @@ import DappInfo from './dapp-info';
 const features = [
   { icon: <Brain className="h-6 w-6" />, title: "Learn", description: "IP for the Integrity Web", link: "/discover" },
   { icon: <Box className="h-6 w-6" />, title: "Create", description: "Create Programmable IP", link: "/create" },
-  { icon: <Layers className="h-6 w-6" />, title: "Collections", description: "Explorer IP collections", link: "/collections" },
-  { icon: <FileCode className="h-6 w-6" />, title: "Templates", description: "IP Templates for common use cases", link: "/create/templates" },
-  { icon: <LayoutGrid className="h-6 w-6" />, title: "IP Portfolio", description: "Manage IP onchain", link: "/portfolio" },
+  { icon: <Layers className="h-6 w-6" />, title: "Explore", description: "Explorer IP collections", link: "/collections" },
+  { icon: <LayoutGrid className="h-6 w-6" />, title: "Manage", description: "Manage IP onchain", link: "/portfolio" },
   ]
 
 const formSchema = z.object({
