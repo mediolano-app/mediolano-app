@@ -1,983 +1,486 @@
 export const userSettingsAbi = [
   {
-    name: "UpgradeableImpl",
-    type: "impl",
-    interface_name: "openzeppelin_upgrades::interface::IUpgradeable",
+    "type": "impl",
+    "name": "UserPublicProfileImpl",
+    "interface_name": "publicprofile::IUserPublicProfile"
   },
   {
-    name: "openzeppelin_upgrades::interface::IUpgradeable",
-    type: "interface",
-    items: [
+    "type": "struct",
+    "name": "core::byte_array::ByteArray",
+    "members": [
       {
-        name: "upgrade",
-        type: "function",
-        inputs: [
-          {
-            name: "new_class_hash",
-            type: "core::starknet::class_hash::ClassHash",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
+        "name": "data",
+        "type": "core::array::Array::<core::bytes_31::bytes31>"
       },
-    ],
+      {
+        "name": "pending_word",
+        "type": "core::felt252"
+      },
+      {
+        "name": "pending_word_len",
+        "type": "core::integer::u32"
+      }
+    ]
   },
   {
-    name: "EncryptedPreferencesRegistryImpl",
-    type: "impl",
-    interface_name:
-      "user_settings::interfaces::settings_interfaces::IEncryptedPreferencesRegistry",
+    "type": "struct",
+    "name": "publicprofile::PersonalInfo",
+    "members": [
+      {
+        "name": "username",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "name",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "bio",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "location",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "email",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "phone",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "org",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "website",
+        "type": "core::byte_array::ByteArray"
+      }
+    ]
   },
   {
-    name: "core::option::Option::<core::felt252>",
-    type: "enum",
-    variants: [
+    "type": "struct",
+    "name": "publicprofile::SocialMediaLinks",
+    "members": [
       {
-        name: "Some",
-        type: "core::felt252",
+        "name": "x_handle",
+        "type": "core::byte_array::ByteArray"
       },
       {
-        name: "None",
-        type: "()",
+        "name": "linkedin",
+        "type": "core::byte_array::ByteArray"
       },
-    ],
+      {
+        "name": "instagram",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "tiktok",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "facebook",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "discord",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "youtube",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "github",
+        "type": "core::byte_array::ByteArray"
+      }
+    ]
   },
   {
-    name: "core::bool",
-    type: "enum",
-    variants: [
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
       {
-        name: "False",
-        type: "()",
+        "name": "False",
+        "type": "()"
       },
       {
-        name: "True",
-        type: "()",
-      },
-    ],
+        "name": "True",
+        "type": "()"
+      }
+    ]
   },
   {
-    name: "core::option::Option::<core::integer::u8>",
-    type: "enum",
-    variants: [
+    "type": "struct",
+    "name": "publicprofile::ProfileSettings",
+    "members": [
       {
-        name: "Some",
-        type: "core::integer::u8",
+        "name": "display_public_profile",
+        "type": "core::bool"
       },
       {
-        name: "None",
-        type: "()",
+        "name": "email_notifications",
+        "type": "core::bool"
       },
-    ],
+      {
+        "name": "marketplace_profile",
+        "type": "core::bool"
+      }
+    ]
   },
   {
-    name: "core::option::Option::<core::bool>",
-    type: "enum",
-    variants: [
+    "type": "struct",
+    "name": "publicprofile::UserProfile",
+    "members": [
       {
-        name: "Some",
-        type: "core::bool",
+        "name": "username",
+        "type": "core::byte_array::ByteArray"
       },
       {
-        name: "None",
-        type: "()",
+        "name": "name",
+        "type": "core::byte_array::ByteArray"
       },
-    ],
+      {
+        "name": "bio",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "location",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "email",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "phone",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "org",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "website",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "x_handle",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "linkedin",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "instagram",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "tiktok",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "facebook",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "discord",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "youtube",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "github",
+        "type": "core::byte_array::ByteArray"
+      },
+      {
+        "name": "display_public_profile",
+        "type": "core::bool"
+      },
+      {
+        "name": "email_notifications",
+        "type": "core::bool"
+      },
+      {
+        "name": "marketplace_profile",
+        "type": "core::bool"
+      },
+      {
+        "name": "is_registered",
+        "type": "core::bool"
+      },
+      {
+        "name": "last_updated",
+        "type": "core::integer::u64"
+      }
+    ]
   },
   {
-    name: "user_settings::structs::settings_structs::AccountSetting",
-    type: "struct",
-    members: [
+    "type": "interface",
+    "name": "publicprofile::IUserPublicProfile",
+    "items": [
       {
-        name: "name",
-        type: "core::felt252",
+        "type": "function",
+        "name": "register_profile",
+        "inputs": [
+          {
+            "name": "personal_info",
+            "type": "publicprofile::PersonalInfo"
+          },
+          {
+            "name": "social_links",
+            "type": "publicprofile::SocialMediaLinks"
+          },
+          {
+            "name": "settings",
+            "type": "publicprofile::ProfileSettings"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
       },
       {
-        name: "email",
-        type: "core::felt252",
+        "type": "function",
+        "name": "update_personal_info",
+        "inputs": [
+          {
+            "name": "personal_info",
+            "type": "publicprofile::PersonalInfo"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
       },
       {
-        name: "username",
-        type: "core::felt252",
+        "type": "function",
+        "name": "update_social_links",
+        "inputs": [
+          {
+            "name": "social_links",
+            "type": "publicprofile::SocialMediaLinks"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
       },
-    ],
+      {
+        "type": "function",
+        "name": "update_settings",
+        "inputs": [
+          {
+            "name": "settings",
+            "type": "publicprofile::ProfileSettings"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "get_profile",
+        "inputs": [
+          {
+            "name": "user",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "publicprofile::UserProfile"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_personal_info",
+        "inputs": [
+          {
+            "name": "user",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "publicprofile::PersonalInfo"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_social_links",
+        "inputs": [
+          {
+            "name": "user",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "publicprofile::SocialMediaLinks"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_settings",
+        "inputs": [
+          {
+            "name": "user",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "publicprofile::ProfileSettings"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "is_profile_registered",
+        "inputs": [
+          {
+            "name": "user",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_profile_count",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u32"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "get_username",
+        "inputs": [
+          {
+            "name": "user",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::byte_array::ByteArray"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "is_profile_public",
+        "inputs": [
+          {
+            "name": "user",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
   },
   {
-    name: "user_settings::structs::settings_structs::NetworkType",
-    type: "enum",
-    variants: [
+    "type": "event",
+    "name": "publicprofile::UserPublicProfile::ProfileRegistered",
+    "kind": "struct",
+    "members": [
       {
-        name: "TESTNET",
-        type: "()",
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        name: "MAINNET",
-        type: "()",
+        "name": "username",
+        "type": "core::byte_array::ByteArray",
+        "kind": "data"
       },
-    ],
+      {
+        "name": "timestamp",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
   },
   {
-    name: "user_settings::structs::settings_structs::GasPricePreference",
-    type: "enum",
-    variants: [
+    "type": "event",
+    "name": "publicprofile::UserPublicProfile::ProfileUpdated",
+    "kind": "struct",
+    "members": [
       {
-        name: "LOW",
-        type: "()",
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        name: "MEDIUM",
-        type: "()",
-      },
-      {
-        name: "HIGH",
-        type: "()",
-      },
-    ],
+        "name": "timestamp",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
   },
   {
-    name: "user_settings::structs::settings_structs::NetworkSettings",
-    type: "struct",
-    members: [
+    "type": "event",
+    "name": "publicprofile::UserPublicProfile::SettingsUpdated",
+    "kind": "struct",
+    "members": [
       {
-        name: "network_type",
-        type: "user_settings::structs::settings_structs::NetworkType",
+        "name": "user",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
       },
       {
-        name: "gas_price_preference",
-        type: "user_settings::structs::settings_structs::GasPricePreference",
-      },
-    ],
+        "name": "timestamp",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
   },
   {
-    name: "user_settings::structs::settings_structs::IPProtectionLevel",
-    type: "enum",
-    variants: [
-      {
-        name: "STANDARD",
-        type: "()",
-      },
-      {
-        name: "ADVANCED",
-        type: "()",
-      },
-    ],
-  },
-  {
-    name: "user_settings::structs::settings_structs::IPSettings",
-    type: "struct",
-    members: [
-      {
-        name: "ip_protection_level",
-        type: "user_settings::structs::settings_structs::IPProtectionLevel",
-      },
-      {
-        name: "automatic_ip_registration",
-        type: "core::bool",
-      },
-    ],
-  },
-  {
-    name: "user_settings::structs::settings_structs::NotificationSettings",
-    type: "struct",
-    members: [
-      {
-        name: "enabled",
-        type: "core::bool",
-      },
-      {
-        name: "ip_updates",
-        type: "core::bool",
-      },
-      {
-        name: "blockchain_events",
-        type: "core::bool",
-      },
-      {
-        name: "account_activity",
-        type: "core::bool",
-      },
-    ],
-  },
-  {
-    name: "user_settings::structs::settings_structs::Security",
-    type: "struct",
-    members: [
-      {
-        name: "two_factor_authentication",
-        type: "core::bool",
-      },
-      {
-        name: "password",
-        type: "core::felt252",
-      },
-    ],
-  },
-  {
-    name: "user_settings::structs::settings_structs::AdvancedSettings",
-    type: "struct",
-    members: [
-      {
-        name: "api_key",
-        type: "core::felt252",
-      },
-      {
-        name: "data_retention",
-        type: "core::integer::u64",
-      },
-    ],
-  },
-  {
-    name: "user_settings::structs::settings_structs::XVerification",
-    type: "struct",
-    members: [
-      {
-        name: "is_verified",
-        type: "core::bool",
-      },
-      {
-        name: "handler",
-        type: "core::felt252",
-      },
-      {
-        name: "user_address",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-    ],
-  },
-  {
-    name: "user_settings::structs::settings_structs::FacebookVerification",
-    type: "struct",
-    members: [
-      {
-        name: "is_verified",
-        type: "core::bool",
-      },
-      {
-        name: "handler",
-        type: "core::felt252",
-      },
-      {
-        name: "user_address",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-    ],
-  },
-  {
-    name: "user_settings::structs::settings_structs::SocialVerification",
-    type: "struct",
-    members: [
-      {
-        name: "x_verification_status",
-        type: "user_settings::structs::settings_structs::XVerification",
-      },
-      {
-        name: "facebook_verification_status",
-        type: "user_settings::structs::settings_structs::FacebookVerification",
-      },
-    ],
-  },
-  {
-    name: "user_settings::interfaces::settings_interfaces::IEncryptedPreferencesRegistry",
-    type: "interface",
-    items: [
-      {
-        name: "store_account_details",
-        type: "function",
-        inputs: [
-          {
-            name: "name",
-            type: "core::felt252",
-          },
-          {
-            name: "email",
-            type: "core::felt252",
-          },
-          {
-            name: "username",
-            type: "core::felt252",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "update_account_details",
-        type: "function",
-        inputs: [
-          {
-            name: "name",
-            type: "core::option::Option::<core::felt252>",
-          },
-          {
-            name: "email",
-            type: "core::option::Option::<core::felt252>",
-          },
-          {
-            name: "username",
-            type: "core::option::Option::<core::felt252>",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "store_ip_management_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "protection_level",
-            type: "core::integer::u8",
-          },
-          {
-            name: "automatic_ip_registration",
-            type: "core::bool",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "update_ip_management_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "protection_level",
-            type: "core::option::Option::<core::integer::u8>",
-          },
-          {
-            name: "automatic_ip_registration",
-            type: "core::option::Option::<core::bool>",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "store_notification_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "enable_notifications",
-            type: "core::bool",
-          },
-          {
-            name: "ip_updates",
-            type: "core::bool",
-          },
-          {
-            name: "blockchain_events",
-            type: "core::bool",
-          },
-          {
-            name: "account_activity",
-            type: "core::bool",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "update_notification_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "enable_notifications",
-            type: "core::option::Option::<core::bool>",
-          },
-          {
-            name: "ip_updates",
-            type: "core::option::Option::<core::bool>",
-          },
-          {
-            name: "blockchain_events",
-            type: "core::option::Option::<core::bool>",
-          },
-          {
-            name: "account_activity",
-            type: "core::option::Option::<core::bool>",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "store_security_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "password",
-            type: "core::felt252",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "update_security_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "password",
-            type: "core::felt252",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "store_network_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "network_type",
-            type: "core::integer::u8",
-          },
-          {
-            name: "gas_price_preference",
-            type: "core::integer::u8",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "update_network_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "network_type",
-            type: "core::option::Option::<core::integer::u8>",
-          },
-          {
-            name: "gas_price_preference",
-            type: "core::option::Option::<core::integer::u8>",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "store_advanced_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "api_key",
-            type: "core::felt252",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "store_X_verification",
-        type: "function",
-        inputs: [
-          {
-            name: "x_verified",
-            type: "core::bool",
-          },
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-          {
-            name: "handler",
-            type: "core::felt252",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "regenerate_api_key",
-        type: "function",
-        inputs: [
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [
-          {
-            type: "core::felt252",
-          },
-        ],
-        state_mutability: "external",
-      },
-      {
-        name: "delete_account",
-        type: "function",
-        inputs: [
-          {
-            name: "timestamp",
-            type: "core::integer::u64",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "get_account_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "user",
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        outputs: [
-          {
-            type: "user_settings::structs::settings_structs::AccountSetting",
-          },
-        ],
-        state_mutability: "view",
-      },
-      {
-        name: "get_network_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "user",
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        outputs: [
-          {
-            type: "user_settings::structs::settings_structs::NetworkSettings",
-          },
-        ],
-        state_mutability: "view",
-      },
-      {
-        name: "get_ip_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "user",
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        outputs: [
-          {
-            type: "user_settings::structs::settings_structs::IPSettings",
-          },
-        ],
-        state_mutability: "view",
-      },
-      {
-        name: "get_notification_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "user",
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        outputs: [
-          {
-            type: "user_settings::structs::settings_structs::NotificationSettings",
-          },
-        ],
-        state_mutability: "view",
-      },
-      {
-        name: "get_security_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "user",
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        outputs: [
-          {
-            type: "user_settings::structs::settings_structs::Security",
-          },
-        ],
-        state_mutability: "view",
-      },
-      {
-        name: "get_advanced_settings",
-        type: "function",
-        inputs: [
-          {
-            name: "user",
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        outputs: [
-          {
-            type: "user_settings::structs::settings_structs::AdvancedSettings",
-          },
-        ],
-        state_mutability: "view",
-      },
-      {
-        name: "get_social_verification",
-        type: "function",
-        inputs: [
-          {
-            name: "user",
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        outputs: [
-          {
-            type: "user_settings::structs::settings_structs::SocialVerification",
-          },
-        ],
-        state_mutability: "view",
-      },
-    ],
-  },
-  {
-    name: "OwnableMixinImpl",
-    type: "impl",
-    interface_name: "openzeppelin_access::ownable::interface::OwnableABI",
-  },
-  {
-    name: "openzeppelin_access::ownable::interface::OwnableABI",
-    type: "interface",
-    items: [
-      {
-        name: "owner",
-        type: "function",
-        inputs: [],
-        outputs: [
-          {
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        state_mutability: "view",
-      },
-      {
-        name: "transfer_ownership",
-        type: "function",
-        inputs: [
-          {
-            name: "new_owner",
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "renounce_ownership",
-        type: "function",
-        inputs: [],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "transferOwnership",
-        type: "function",
-        inputs: [
-          {
-            name: "newOwner",
-            type: "core::starknet::contract_address::ContractAddress",
-          },
-        ],
-        outputs: [],
-        state_mutability: "external",
-      },
-      {
-        name: "renounceOwnership",
-        type: "function",
-        inputs: [],
-        outputs: [],
-        state_mutability: "external",
-      },
-    ],
-  },
-  {
-    name: "constructor",
-    type: "constructor",
-    inputs: [
-      {
-        name: "owner",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        name: "mediolano_app",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-    ],
-  },
-  {
-    kind: "struct",
-    name: "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferred",
-    type: "event",
-    members: [
-      {
-        kind: "key",
-        name: "previous_owner",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        kind: "key",
-        name: "new_owner",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-    ],
-  },
-  {
-    kind: "struct",
-    name: "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
-    type: "event",
-    members: [
-      {
-        kind: "key",
-        name: "previous_owner",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        kind: "key",
-        name: "new_owner",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-    ],
-  },
-  {
-    kind: "enum",
-    name: "openzeppelin_access::ownable::ownable::OwnableComponent::Event",
-    type: "event",
-    variants: [
-      {
-        kind: "nested",
-        name: "OwnershipTransferred",
-        type: "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferred",
-      },
-      {
-        kind: "nested",
-        name: "OwnershipTransferStarted",
-        type: "openzeppelin_access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
-      },
-    ],
-  },
-  {
-    kind: "struct",
-    name: "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded",
-    type: "event",
-    members: [
-      {
-        kind: "data",
-        name: "class_hash",
-        type: "core::starknet::class_hash::ClassHash",
-      },
-    ],
-  },
-  {
-    kind: "enum",
-    name: "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Event",
-    type: "event",
-    variants: [
-      {
-        kind: "nested",
-        name: "Upgraded",
-        type: "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Upgraded",
-      },
-    ],
-  },
-  {
-    kind: "struct",
-    name: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::SettingUpdated",
-    type: "event",
-    members: [
-      {
-        kind: "key",
-        name: "user",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        kind: "data",
-        name: "setting_type",
-        type: "core::felt252",
-      },
-      {
-        kind: "data",
-        name: "timestamp",
-        type: "core::integer::u64",
-      },
-    ],
-  },
-  {
-    kind: "struct",
-    name: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::SettingRemoved",
-    type: "event",
-    members: [
-      {
-        kind: "key",
-        name: "user",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        kind: "data",
-        name: "setting_type",
-        type: "core::felt252",
-      },
-      {
-        kind: "data",
-        name: "timestamp",
-        type: "core::integer::u64",
-      },
-    ],
-  },
-  {
-    kind: "struct",
-    name: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::WalletKeyUpdated",
-    type: "event",
-    members: [
-      {
-        kind: "key",
-        name: "user",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        kind: "data",
-        name: "pub_key",
-        type: "core::felt252",
-      },
-      {
-        kind: "data",
-        name: "version",
-        type: "core::felt252",
-      },
-      {
-        kind: "data",
-        name: "timestamp",
-        type: "core::integer::u64",
-      },
-    ],
-  },
-  {
-    kind: "struct",
-    name: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::SocialVerificationUpdated",
-    type: "event",
-    members: [
-      {
-        kind: "key",
-        name: "user",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        kind: "data",
-        name: "x_verified",
-        type: "core::bool",
-      },
-      {
-        kind: "data",
-        name: "timestamp",
-        type: "core::integer::u64",
-      },
-    ],
-  },
-  {
-    kind: "struct",
-    name: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::AccountDeleted",
-    type: "event",
-    members: [
-      {
-        kind: "key",
-        name: "user",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        kind: "data",
-        name: "setting",
-        type: "core::felt252",
-      },
-      {
-        kind: "data",
-        name: "timestamp",
-        type: "core::integer::u64",
-      },
-    ],
-  },
-  {
-    kind: "enum",
-    name: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::Event",
-    type: "event",
-    variants: [
-      {
-        kind: "flat",
-        name: "OwnableEvent",
-        type: "openzeppelin_access::ownable::ownable::OwnableComponent::Event",
-      },
-      {
-        kind: "flat",
-        name: "UpgradeableEvent",
-        type: "openzeppelin_upgrades::upgradeable::UpgradeableComponent::Event",
-      },
-      {
-        kind: "nested",
-        name: "SettingUpdated",
-        type: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::SettingUpdated",
-      },
-      {
-        kind: "nested",
-        name: "SettingRemoved",
-        type: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::SettingRemoved",
-      },
-      {
-        kind: "nested",
-        name: "WalletKeyUpdated",
-        type: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::WalletKeyUpdated",
-      },
-      {
-        kind: "nested",
-        name: "SocialVerificationUpdated",
-        type: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::SocialVerificationUpdated",
-      },
-      {
-        kind: "nested",
-        name: "AccountDeleted",
-        type: "user_settings::EncryptedPreferencesRegistry::EncryptedPreferencesRegistry::AccountDeleted",
-      },
-    ],
-  },
-];
+    "type": "event",
+    "name": "publicprofile::UserPublicProfile::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "ProfileRegistered",
+        "type": "publicprofile::UserPublicProfile::ProfileRegistered",
+        "kind": "nested"
+      },
+      {
+        "name": "ProfileUpdated",
+        "type": "publicprofile::UserPublicProfile::ProfileUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "SettingsUpdated",
+        "type": "publicprofile::UserPublicProfile::SettingsUpdated",
+        "kind": "nested"
+      }
+    ]
+  }
+]

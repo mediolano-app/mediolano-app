@@ -1,25 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Bell,
-  Globe,
   Lock,
   Settings,
-  Shield,
   User,
   Zap,
   CheckCircle,
@@ -37,10 +28,6 @@ const mockUser = {
   language: "en",
   twoFactorEnabled: 0,
   notificationsEnabled: 1,
-  ipProtectionLevel: "standard",
-  networkType: "testnet",
-  gasPrice: "medium",
-  autoRegistration: 1,
   notificationTypes: {
     ipUpdates: 1,
     blockchainEvents: 0,
@@ -51,11 +38,15 @@ const mockUser = {
   apiKey: 0,
 };
 
+const mock_new_settings_data = {
+  displayPublicProfile: 1,
+  emailNotifications: 1,
+  marketplaceProfile: 0,
+}
+
 export default function SettingsPage() {
   const {
     getAccountSettings,
-    getIpSettings,
-    getNetworkSettings,
     getNotificationSettings,
     getSecuritySettings,
     getAdvancedSettings,
@@ -71,6 +62,8 @@ export default function SettingsPage() {
     "idle"
   );
 
+  const [settings, setSettings] = useState(mock_new_settings_data);
+
   // Generic updater for flat fields
   type Update = [key: string, value: any] | Record<string, any>;
 
@@ -81,6 +74,16 @@ export default function SettingsPage() {
         return { ...prevUser, [key]: value };
       }
       return { ...prevUser, ...update };
+    });
+  };
+
+  const update_new_settings = (update: Update) => {
+    setSettings((prevSettings) => {
+      if (Array.isArray(update)) {
+        const [key, value] = update;
+        return { ...prevSettings, [key]: value };
+      }
+      return { ...prevSettings, ...update };
     });
   };
 
@@ -111,58 +114,21 @@ export default function SettingsPage() {
 
         const [
           accountSettingRes,
-          ipSettingRes,
           notificationSettingRes,
           securitySettingsRes,
-          networkSettingsRes,
           advancedSettingsRes,
         ] = await Promise.all([
           getAccountSettings(walletAddress),
-          getIpSettings(walletAddress),
           getNotificationSettings(walletAddress),
           getSecuritySettings(walletAddress),
-          getNetworkSettings(walletAddress),
           getAdvancedSettings(walletAddress),
         ]);
-
-        // Extract ip protection level
-        const ipProtectionLevelRaw = ipSettingRes?.ip_protection_level?.variant;
-        const ipProtectionLevel =
-          ipProtectionLevelRaw && "STANDARD" in ipProtectionLevelRaw
-            ? "0"
-            : "1";
-
-        const networkTypeMap: Record<string, string> = {
-          MAINNET: "0",
-          TESTNET: "1",
-        };
-
-        const gasPriceMap: Record<string, string> = {
-          LOW: "0",
-          MEDIUM: "1",
-          HIGH: "2",
-        };
-
-        // Extract variant keys
-        const networkTypeKey = Object.keys(
-          networkSettingsRes.network_type.variant
-        )[0];
-        const gasPriceKey = Object.keys(
-          networkSettingsRes.gas_price_preference.variant
-        )[0];
-
-        // Extract auto registration as number (0 or 1)
-        const autoRegistration = ipSettingRes?.automatic_ip_registration
-          ? 1
-          : 0;
 
         // Update user state
         updateUser({
           name: decode(accountSettingRes?.name),
           email: decode(accountSettingRes?.email),
           username: decode(accountSettingRes?.username),
-          ipProtectionLevel,
-          autoRegistration,
           notificationsEnabled: notificationSettingRes.enabled ? 1 : 0,
           notificationTypes: {
             ipUpdates:
@@ -185,8 +151,6 @@ export default function SettingsPage() {
             ? 1
             : 0,
           password: Number(securitySettingsRes.password),
-          networkType: networkTypeMap[networkTypeKey],
-          gasPrice: gasPriceMap[gasPriceKey],
           dataRetention: Number(advancedSettingsRes.data_retention),
           apiKey: Number(advancedSettingsRes.api_key),
         });
@@ -198,7 +162,7 @@ export default function SettingsPage() {
     };
 
     fetchSettings();
-  }, [walletAddress, getAccountSettings, getIpSettings]);
+  }, [walletAddress, getAccountSettings, getNotificationSettings, getSecuritySettings, getAdvancedSettings]);
 
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
@@ -265,53 +229,71 @@ export default function SettingsPage() {
           </div>
         </Card>
 
+        {/* IP Management removed */}
         <Card className="flex flex-col">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Shield className="mr-2" /> IP Management
+              <Settings className="mr-2" /> New Profile Settings
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 flex-1">
-            <div>
-              <Label htmlFor="ip-protection">IP Protection Level</Label>
-              <Select
-                value={user.ipProtectionLevel}
-                onValueChange={(value) =>
-                  updateUser(["ipProtectionLevel", value])
-                }
-              >
-                <SelectTrigger id="ip-protection">
-                  <SelectValue placeholder="Select Protection Level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">Standard</SelectItem>
-                  <SelectItem value="1">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+
+
             <div className="flex items-center space-x-2">
               <Switch
-                id="auto-registration"
-                checked={user.autoRegistration === 1}
+                id="display-public-profile"
+                checked={settings.displayPublicProfile === 1}
                 onCheckedChange={(checked: boolean) =>
-                  updateUser(["autoRegistration", checked ? 1 : 0])
+                  update_new_settings(["displayPublicProfile", checked ? 1 : 0])
                 }
               />
-              <Label htmlFor="auto-registration">
-                Automatic IP Registration
+              <Label htmlFor="display-public-profile">
+                Display Public Profile
               </Label>
             </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="email-notifications"
+                checked={settings.emailNotifications === 1}
+                onCheckedChange={(checked: boolean) =>
+                  update_new_settings(["emailNotifications", checked ? 1 : 0])
+                }
+              />
+              <Label htmlFor="email-notifications">
+                Get Email Notifications
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="marketplace-profile"
+                checked={settings.marketplaceProfile === 1}
+                onCheckedChange={(checked: boolean) =>
+                  update_new_settings(["marketplaceProfile", checked ? 1 : 0])
+                }
+              />
+              <Label htmlFor="marketplace-profile">
+                Enable Marketplace Profile
+              </Label>
+            </div>
+
           </CardContent>
           <div className="flex justify-end p-5">
             <Button
               onClick={async (e) => {
-                console.log(user);
+                console.log("Saving new profile settings:", settings);
                 await executeSettingsCall({
-                  method: "store_ip_management_settings",
+                  method: "update_settings",
                   args: [
-                    user.ipProtectionLevel,
-                    Boolean(user.autoRegistration),
-                    toEpochTime(new Date().toISOString()),
+                    {
+                      display_public_profile:
+                        settings.displayPublicProfile === 1,
+                      email_notifications:
+                        settings.emailNotifications === 1,
+                      marketplace_profile:
+                        settings.marketplaceProfile === 1,
+                    },
                   ],
                 });
               }}
@@ -470,68 +452,7 @@ export default function SettingsPage() {
           </div>
         </Card>
 
-        <Card className="flex flex-col">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Globe className="mr-2" /> Network Settings
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 flex-1">
-            <div>
-              <Label htmlFor="network-type">Network Type</Label>
-              <Select
-                value={user.networkType}
-                onValueChange={(value) => updateUser(["networkType", value])}
-              >
-                <SelectTrigger id="network-type">
-                  <SelectValue placeholder="Select Network Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">Mainnet</SelectItem>
-                  <SelectItem value="1">Testnet</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="gas-price">Gas Price Preference</Label>
-              <Select
-                value={user.gasPrice}
-                onValueChange={(value) => updateUser(["gasPrice", value])}
-              >
-                <SelectTrigger id="gas-price">
-                  <SelectValue placeholder="Select Gas Price" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0">Low</SelectItem>
-                  <SelectItem value="1">Medium</SelectItem>
-                  <SelectItem value="2">High</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-          <div className="flex justify-end p-5">
-            <Button
-              onClick={async (e) => {
-                console.log(user);
-                await executeSettingsCall({
-                  method: "store_network_settings",
-                  args: [
-                    user.networkType,
-                    user.gasPrice,
-                    toEpochTime(new Date().toISOString()),
-                  ],
-                });
-              }}
-              disabled={saveStatus === "saving"}
-            >
-              {saveStatus === "saving"
-                ? "Saving..."
-                : saveStatus === "saved"
-                ? "Saved!"
-                : "Save Changes"}
-            </Button>
-          </div>
-        </Card>
+        {/* Network Settings removed */}
 
         <Card className="flex flex-col">
           <CardHeader>

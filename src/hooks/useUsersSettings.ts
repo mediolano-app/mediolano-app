@@ -30,23 +30,7 @@ export const useUsersSettings = () => {
   const getAccountSettings = useCallback(
     async (user: `0x${string}`) => {
       if (!contract) return null;
-      return contract.get_account_settings(user);
-    },
-    [contract]
-  );
-
-  const getNetworkSettings = useCallback(
-    async (user: string) => {
-      if (!contract) return null;
-      return contract.get_network_settings(user);
-    },
-    [contract]
-  );
-
-  const getIpSettings = useCallback(
-    async (user: string) => {
-      if (!contract) return null;
-      return contract.get_ip_settings(user);
+      return contract.get_settings(user);
     },
     [contract]
   );
@@ -132,8 +116,6 @@ export const useUsersSettings = () => {
 
   return {
     getAccountSettings,
-    getNetworkSettings,
-    getIpSettings,
     getNotificationSettings,
     getSecuritySettings,
     getAdvancedSettings,
