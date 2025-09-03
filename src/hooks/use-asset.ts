@@ -149,14 +149,14 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
     return {
       id: asset.id,
       tokenId: asset.tokenId,
-      name: asset.name || "Unknown IP",
+      name: asset.name || "Untitled",
       tags: asset.tags || [],
       author: {
         name: creator,
         address: tokenOwnerAddress,
         avatar: asset.image || "/background.jpg",
         verified: false,
-        bio: "Creator bio (Preview).",
+        bio: "",
         website: asset.external_url || "https://ip.mediolano.app",
       },
       creator: {
@@ -164,7 +164,7 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
         address: tokenOwnerAddress,
         avatar: asset.image || "/background.jpg",
         verified: false,
-        bio: "Creator bio (Preview).",
+        bio: "",
         website: asset.external_url || "https://ip.mediolano.app",
       },
       owner: {
@@ -194,8 +194,8 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
         { trait_type: "Protection", value: "Proof of Ownership" },
       ],
       licenseInfo: {
-        type: licenseAttributeType?.value || asset.licenseType|| "(Preview)",
-        terms: licenseAttributeTerms?.value || "(Preview)",
+        type: licenseAttributeType?.value || asset.licenseType|| "Unknown",
+        terms: licenseAttributeTerms?.value || "Unknown",
         allowCommercial: commercialUseAttribute?.value === "true",
         allowDerivatives: modificationsAttribute?.value === "true",
         requireAttribution: attributionAttribute?.value === "true",

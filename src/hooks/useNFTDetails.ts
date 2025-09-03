@@ -76,10 +76,10 @@ export function useNFTDetails(tokenId: number) {
   }, [tokenURI]);
 
   const nftData: NFTData = {
-    title: metadata?.name || nftName || "Unnamed NFT",
+    title: metadata?.name || nftName || "Untitled",
     description: metadata?.description || "",
     nftId: "NFT #" + tokenId,
-    symbol: nftSymbol || "NIL",
+    symbol: nftSymbol || "MIP",
     tokenId: tokenId.toString(),
     tokenURI: tokenURI || "",
     owner: tokenOwner || "",

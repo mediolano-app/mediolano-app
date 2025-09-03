@@ -129,7 +129,7 @@ async function processCollectionMetadata(
   const collection: Collection = {
     id: id,
     name: cleanName || 'MIP Collection',
-    description: ipfsMetadata?.description || 'Programmable IP Collection',
+    description: ipfsMetadata?.description || 'Programmable Intellectual Property Collection',
     image: image,
     nftAddress: nftAddress,
 
