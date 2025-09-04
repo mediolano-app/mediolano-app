@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,11 +28,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import NFTCard from "@/components/nft-card";
+import { useParams } from "next/navigation";
 import {
-  getCollectionBySlug,
-  getAssetsByCollection,
-  getCreatorByName,
-} from "@/lib/mock-data";
+  getCollectionMetadata,
+  getCollectionAssets,
+} from "@/hooks/use-collection-new";
+import { Collection, Asset } from "@/types/asset";
 
 interface CollectionPageProps {
   params: {
@@ -47,20 +48,65 @@ interface CollectionPageProps {
   Display the Assets
   Include Search and Pagination for Assets
 */
-export default function CollectionPage({ params }: CollectionPageProps) {
-  const { slug } = params;
+export default function CollectionPage() {
+  const params = useParams();
+  const slug = params.slug as string;
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [copied, setCopied] = useState<string | null>(null);
+  const [collection, setCollection] = useState<Collection | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [collectionAssets, setCollectionAssets] = useState<Asset[]>([]);
+  const [assetsLoading, setAssetsLoading] = useState(true);
 
-  // Get collection from mock data
-  const collection = getCollectionBySlug(slug);
-  const collectionAssets = collection
-    ? getAssetsByCollection(collection.name)
-    : [];
-  const creator = collection ? getCreatorByName(collection.creator) : null;
+  useEffect(() => {
+    async function fetchCollection() {
+      if (slug) {
+        try {
+          const data = await getCollectionMetadata(slug);
+          setCollection(data);
+        } catch (err) {
+          setError("Failed to fetch collection.");
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
+    fetchCollection();
+  }, [slug]);
 
-  if (!collection) {
+  useEffect(() => {
+    async function fetchAssets() {
+      if (collection?.contractAddress) {
+        setAssetsLoading(true);
+        try {
+          const data = await getCollectionAssets(collection.contractAddress);
+          setCollectionAssets(data);
+        } catch (err) {
+          console.error("Failed to fetch assets:", err);
+        } finally {
+          setAssetsLoading(false);
+        }
+      }
+    }
+    fetchAssets();
+  }, [collection]);
+
+  const creator = collection?.creator;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl font-bold">Loading Collection...</h1>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !collection) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -145,7 +191,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
                       variant="outline"
                       className="bg-white/20 text-white backdrop-blur-sm border-white/30"
                     >
-                      {collection.assetCount} assets
+                      {collection.assets} assets
                     </Badge>
                   </div>
                 </div>
@@ -197,9 +243,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
                       <p className="text-sm text-muted-foreground">
                         Total Assets
                       </p>
-                      <p className="text-2xl font-bold">
-                        {collection.assetCount}
-                      </p>
+                      <p className="text-2xl font-bold">{collection.assets}</p>
                     </div>
                     <Grid3X3 className="h-8 w-8 text-muted-foreground" />
                   </div>
@@ -242,7 +286,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
                     <div>
                       <p className="text-sm text-muted-foreground">Owners</p>
                       <p className="text-2xl font-bold">
-                        {Math.ceil(collection.assetCount * 0.7)}
+                        {Math.ceil(collection.assets * 0.7)}
                       </p>
                     </div>
                     <Users className="h-8 w-8 text-muted-foreground" />
@@ -266,11 +310,15 @@ export default function CollectionPage({ params }: CollectionPageProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleCopy(collection.slug, "address")}
+                    onClick={() =>
+                      handleCopy(collection.contractAddress, "address")
+                    }
                     className="h-auto p-1 font-mono text-xs"
                   >
-                    {collection.slug.substring(0, 6)}...
-                    {collection.slug.substring(collection.slug.length - 4)}
+                    {collection.contractAddress.substring(0, 6)}...
+                    {collection.contractAddress.substring(
+                      collection.contractAddress.length - 4,
+                    )}
                     <Copy className="h-3 w-3 ml-1" />
                   </Button>
                 </div>
@@ -279,7 +327,7 @@ export default function CollectionPage({ params }: CollectionPageProps) {
                   <span className="text-sm text-muted-foreground">
                     Blockchain
                   </span>
-                  <Badge variant="outline">Ethereum</Badge>
+                  <Badge variant="outline">{collection.blockchain}</Badge>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -291,74 +339,75 @@ export default function CollectionPage({ params }: CollectionPageProps) {
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Created</span>
-                  <span className="text-sm">{collection.creationDate}</span>
+                  <span className="text-sm">
+                    {new Date(collection.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
 
                 <div className="pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full bg-transparent"
+                  <a
+                    href={`https://starkscan.co/contract/${collection.contractAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full"
                   >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    View on Etherscan
-                  </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full bg-transparent"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View on StarkScan
+                    </Button>
+                  </a>
                 </div>
               </CardContent>
             </Card>
 
             {/* Creator Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Creator</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage
-                      src={
-                        creator?.avatar || "/placeholder.svg?height=40&width=40"
-                      }
-                      alt={collection.creator}
-                    />
-                    <AvatarFallback>
-                      {collection.creator.substring(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {creator ? (
-                        <Link href={`/creators/${creator.slug}`}>
+            {creator && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Creator</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage
+                        src={
+                          creator?.avatar ||
+                          "/placeholder.svg?height=40&width=40"
+                        }
+                        alt={creator.name}
+                      />
+                      <AvatarFallback>
+                        {creator.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Link href={`/creators/${creator.id}`}>
                           <h3 className="font-semibold hover:text-primary transition-colors cursor-pointer">
-                            {collection.creator}
+                            {creator.name}
                           </h3>
                         </Link>
-                      ) : (
-                        <h3 className="font-semibold">{collection.creator}</h3>
-                      )}
-                      {creator?.verified && (
-                        <Badge variant="secondary">
-                          <Shield className="h-3 w-3 mr-1" />
-                          Verified
-                        </Badge>
-                      )}
-                    </div>
-                    {creator && (
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {creator.bio}
-                      </p>
-                    )}
-                    {creator && (
-                      <Link href={`/creators/${creator.slug}`}>
+                        {creator?.verified && (
+                          <Badge variant="secondary">
+                            <Shield className="h-3 w-3 mr-1" />
+                            Verified
+                          </Badge>
+                        )}
+                      </div>
+                      <Link href={`/creators/${creator.id}`}>
                         <Button variant="outline" size="sm">
                           View Profile
                         </Button>
                       </Link>
-                    )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
 
@@ -384,10 +433,12 @@ export default function CollectionPage({ params }: CollectionPageProps) {
             </div>
           </div>
 
-          {filteredAssets.length > 0 ? (
+          {assetsLoading ? (
+            <div className="text-center py-12">Loading assets...</div>
+          ) : filteredAssets.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredAssets.map((asset) => (
-                <NFTCard key={asset.id} asset={asset} />
+                <NFTCard key={asset.id} asset={asset as Asset} />
               ))}
             </div>
           ) : (

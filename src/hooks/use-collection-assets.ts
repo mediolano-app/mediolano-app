@@ -21,7 +21,7 @@ type Options = {
 
 export function useCollectionAssets(
   nftAddress?: `0x${string}`,
-  options: Options = {}
+  options: Options = {},
 ) {
   const [assets, setAssets] = useState<CollectionAsset[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -50,7 +50,7 @@ export function useCollectionAssets(
           if (res !== undefined)
             supply = parseInt(
               (res as { toString?: () => string } | string)?.toString?.() ??
-                String(res)
+                String(res),
             );
         } catch (e) {
           try {
@@ -60,7 +60,7 @@ export function useCollectionAssets(
             if (res2 !== undefined)
               supply = parseInt(
                 (res2 as { toString?: () => string } | string)?.toString?.() ??
-                  String(res2)
+                  String(res2),
               );
           } catch (e2) {
             supply = 0;
@@ -98,7 +98,7 @@ export function useCollectionAssets(
                 } catch (e3) {
                   console.log(
                     `All owner functions failed for token ${tokenId}:`,
-                    { e1, e2, e3 }
+                    { e1, e2, e3 },
                   );
                   continue;
                 }
@@ -155,7 +155,7 @@ export function useCollectionAssets(
 
           if (tokenUri) {
             const match = tokenUri.match(
-              /(?:\/ipfs\/|ipfs:(?:\/\/|ipfs\/))([a-zA-Z0-9]+)/
+              /(?:\/ipfs\/|ipfs:(?:\/\/|ipfs\/))([a-zA-Z0-9]+)/,
             );
             if (match) {
               try {
@@ -163,7 +163,7 @@ export function useCollectionAssets(
                 name = (meta?.name as string) || name;
                 image = processIPFSHashToUrl(
                   (meta?.image as string) || "",
-                  "/placeholder.svg"
+                  "/placeholder.svg",
                 );
               } catch (metaError) {
                 // Continue with default values if metadata fetch fails
@@ -213,6 +213,6 @@ export function useCollectionAssets(
 
   return useMemo(
     () => ({ assets, loading, error, reload: load }),
-    [assets, loading, error, load]
+    [assets, loading, error, load],
   );
 }
