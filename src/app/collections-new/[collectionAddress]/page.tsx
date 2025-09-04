@@ -37,7 +37,7 @@ import { Collection, Asset } from "@/types/asset";
 
 interface CollectionPageProps {
   params: {
-    slug: string;
+    collectionAddress: string;
   };
 }
 /*
@@ -50,7 +50,7 @@ interface CollectionPageProps {
 */
 export default function CollectionPage() {
   const params = useParams();
-  const slug = params.slug as string;
+  const collectionAddress = params.collectionAddress as string;
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [copied, setCopied] = useState<string | null>(null);
@@ -62,9 +62,9 @@ export default function CollectionPage() {
 
   useEffect(() => {
     async function fetchCollection() {
-      if (slug) {
+      if (collectionAddress) {
         try {
-          const data = await getCollectionMetadata(slug);
+          const data = await getCollectionMetadata(collectionAddress);
           setCollection(data);
         } catch (err) {
           setError("Failed to fetch collection.");
@@ -75,7 +75,7 @@ export default function CollectionPage() {
       }
     }
     fetchCollection();
-  }, [slug]);
+  }, [collectionAddress]);
 
   useEffect(() => {
     async function fetchAssets() {
@@ -388,7 +388,9 @@ export default function CollectionPage() {
                       <div className="flex items-center gap-2 mb-1">
                         <Link href={`/creators/${creator.id}`}>
                           <h3 className="font-semibold hover:text-primary transition-colors cursor-pointer">
-                            {creator.name}
+                            {creator.name.length > 10
+                              ? creator.name.substring(0, 10) + "..."
+                              : creator.name}
                           </h3>
                         </Link>
                         {creator?.verified && (
