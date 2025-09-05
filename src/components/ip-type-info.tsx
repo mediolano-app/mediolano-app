@@ -269,16 +269,13 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         setIsLoading(false)
         return
       }
-
       setIsLoading(true)
       try {
         let cid = asset.ipfsCid
-        
         if (!cid) {
           const knownCids = getKnownCids()
           cid = knownCids[asset.id]
         }
-        
         let fetchedMetadata: IPFSMetadata | null = null
         if (cid) {
           fetchedMetadata = await fetchIPFSMetadata(cid)
@@ -290,7 +287,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
           detectedType = determineIPType(asset, fetchedMetadata)
           
           const finalData = combineData(fetchedMetadata, asset)
-          
           setIpfsMetadata(fetchedMetadata)
           setMergedData(finalData)
           setIpType(detectedType)

@@ -149,7 +149,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   <Badge
                     key={index}
                     variant="outline"
-                    className="bg-background"
+                    className="bg-background capitalize"
                   >
                     {tag}
                   </Badge>

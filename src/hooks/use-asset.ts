@@ -52,30 +52,29 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
       const tokenId = Number(tokenIdInput);
       // owner
       const ownerRaw = await (contract as unknown as {
-        get_token_owner?: (id: number) => Promise<unknown>;
+        owner_of?: (id: number) => Promise<unknown>;
         ownerOf?: (id: number) => Promise<unknown>;
-      }).get_token_owner?.(tokenId).catch(async () => {
+      }).owner_of?.(tokenId).catch(async () => {
         const owned = await (contract as unknown as { ownerOf: (id: number) => Promise<unknown> }).ownerOf(tokenId);
         return owned;
       });
       const owner = ownerRaw as `0x${string}`;
-
+      
       // token URI
       const uriRaw = await (contract as unknown as {
-        get_token_uri?: (id: number) => Promise<unknown>;
+        token_uri?: (id: number) => Promise<unknown>;
         tokenURI?: (id: number) => Promise<unknown>;
-      }).get_token_uri?.(tokenId).catch(async () => {
+      }).token_uri?.(tokenId).catch(async () => {
         const r = await (contract as unknown as { tokenURI: (id: number) => Promise<unknown> }).tokenURI(tokenId);
         return r;
       });
       const tokenURI = String(uriRaw || "");
 
-
       // ipfs metadata
       let ipfsCid: string | undefined;
       let metadata: IPFSMetadata | null = null;
       if (tokenURI) {
-        const match = tokenURI.match(/\/ipfs\/([a-zA-Z0-9]+)/);
+        const match = tokenURI.match(/ipfs:\/\/([a-zA-Z0-9]+)/);
         if (match) {
           ipfsCid = match[1];
           metadata = await fetchIPFSMetadata(ipfsCid);
