@@ -105,32 +105,35 @@ export const COLLECTION_NFT_ABI = [
   },
   {
     "type": "impl",
+    "name": "ERC721MetadataCamelOnly",
+    "interface_name": "openzeppelin_token::erc721::interface::IERC721MetadataCamelOnly"
+  },
+  {
+    "type": "interface",
+    "name": "openzeppelin_token::erc721::interface::IERC721MetadataCamelOnly",
+    "items": [
+      {
+        "type": "function",
+        "name": "tokenURI",
+        "inputs": [
+          {
+            "name": "tokenId",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::byte_array::ByteArray"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "impl",
     "name": "IPNftImpl",
     "interface_name": "ip_collection_erc_721::interfaces::IIPNFT::IIPNft"
-  },
-  {
-    "type": "struct",
-    "name": "core::array::Span::<core::integer::u256>",
-    "members": [
-      {
-        "name": "snapshot",
-        "type": "@core::array::Array::<core::integer::u256>"
-      }
-    ]
-  },
-  {
-    "type": "enum",
-    "name": "core::bool",
-    "variants": [
-      {
-        "name": "False",
-        "type": "()"
-      },
-      {
-        "name": "True",
-        "type": "()"
-      }
-    ]
   },
   {
     "type": "interface",
@@ -170,26 +173,6 @@ export const COLLECTION_NFT_ABI = [
       },
       {
         "type": "function",
-        "name": "transfer",
-        "inputs": [
-          {
-            "name": "from",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "to",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
-          {
-            "name": "token_id",
-            "type": "core::integer::u256"
-          }
-        ],
-        "outputs": [],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
         "name": "get_collection_id",
         "inputs": [],
         "outputs": [
@@ -212,79 +195,11 @@ export const COLLECTION_NFT_ABI = [
       },
       {
         "type": "function",
-        "name": "get_all_user_tokens",
-        "inputs": [
-          {
-            "name": "user",
-            "type": "core::starknet::contract_address::ContractAddress"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::array::Span::<core::integer::u256>"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "get_total_supply",
+        "name": "base_uri",
         "inputs": [],
         "outputs": [
           {
-            "type": "core::integer::u256"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "get_token_uri",
-        "inputs": [
-          {
-            "name": "token_id",
-            "type": "core::integer::u256"
-          }
-        ],
-        "outputs": [
-          {
             "type": "core::byte_array::ByteArray"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "get_token_owner",
-        "inputs": [
-          {
-            "name": "token_id",
-            "type": "core::integer::u256"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::starknet::contract_address::ContractAddress"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "is_approved_for_token",
-        "inputs": [
-          {
-            "name": "token_id",
-            "type": "core::integer::u256"
-          },
-          {
-            "name": "spender",
-            "type": "core::starknet::contract_address::ContractAddress"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::bool"
           }
         ],
         "state_mutability": "view"
@@ -303,6 +218,20 @@ export const COLLECTION_NFT_ABI = [
       {
         "name": "snapshot",
         "type": "@core::array::Array::<core::felt252>"
+      }
+    ]
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
       }
     ]
   },
@@ -597,33 +526,6 @@ export const COLLECTION_NFT_ABI = [
   },
   {
     "type": "impl",
-    "name": "ERC721MetadataCamelOnly",
-    "interface_name": "openzeppelin_token::erc721::interface::IERC721MetadataCamelOnly"
-  },
-  {
-    "type": "interface",
-    "name": "openzeppelin_token::erc721::interface::IERC721MetadataCamelOnly",
-    "items": [
-      {
-        "type": "function",
-        "name": "tokenURI",
-        "inputs": [
-          {
-            "name": "tokenId",
-            "type": "core::integer::u256"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::byte_array::ByteArray"
-          }
-        ],
-        "state_mutability": "view"
-      }
-    ]
-  },
-  {
-    "type": "impl",
     "name": "OwnableMixinImpl",
     "interface_name": "openzeppelin_access::ownable::interface::OwnableABI"
   },
@@ -734,6 +636,128 @@ export const COLLECTION_NFT_ABI = [
         "outputs": [
           {
             "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "view"
+      }
+    ]
+  },
+  {
+    "type": "impl",
+    "name": "AccessControlCamelImpl",
+    "interface_name": "openzeppelin_access::accesscontrol::interface::IAccessControlCamel"
+  },
+  {
+    "type": "interface",
+    "name": "openzeppelin_access::accesscontrol::interface::IAccessControlCamel",
+    "items": [
+      {
+        "type": "function",
+        "name": "hasRole",
+        "inputs": [
+          {
+            "name": "role",
+            "type": "core::felt252"
+          },
+          {
+            "name": "account",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "getRoleAdmin",
+        "inputs": [
+          {
+            "name": "role",
+            "type": "core::felt252"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::felt252"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "grantRole",
+        "inputs": [
+          {
+            "name": "role",
+            "type": "core::felt252"
+          },
+          {
+            "name": "account",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "revokeRole",
+        "inputs": [
+          {
+            "name": "role",
+            "type": "core::felt252"
+          },
+          {
+            "name": "account",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "renounceRole",
+        "inputs": [
+          {
+            "name": "role",
+            "type": "core::felt252"
+          },
+          {
+            "name": "account",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      }
+    ]
+  },
+  {
+    "type": "impl",
+    "name": "SRC5Impl",
+    "interface_name": "openzeppelin_introspection::interface::ISRC5"
+  },
+  {
+    "type": "interface",
+    "name": "openzeppelin_introspection::interface::ISRC5",
+    "items": [
+      {
+        "type": "function",
+        "name": "supports_interface",
+        "inputs": [
+          {
+            "name": "interface_id",
+            "type": "core::felt252"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
           }
         ],
         "state_mutability": "view"
