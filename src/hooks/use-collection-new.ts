@@ -1,4 +1,4 @@
-import { Collection, Asset } from "@/types/asset";
+import { Collection, Asset, LicenseType } from "@/types/asset";
 import { RpcProvider, Contract } from "starknet";
 
 async function getContract(provider: RpcProvider, contractAddress: string) {
@@ -103,6 +103,7 @@ function mapStringToLicenseType(value: string) {
       return "Personal Use";
     case "exclusive":
     case "exclusive rights":
+    case "all-rights-reserved":
       return "Exclusive Rights";
     case "mit":
     case "apache-2.0":
@@ -197,7 +198,11 @@ export async function getCollectionAssets(
     const licenseAttribute = meta.metadata.attributes.find(
       (attr) => attr.trait_type === "License",
     );
-    const licenseType = mapStringToLicenseType(licenseAttribute.value)!;
+    const licenseType: LicenseType = mapStringToLicenseType(
+      licenseAttribute.value,
+    )!;
+
+    licenseType.toLowerCase();
 
     const IPAttribute = meta.metadata.attributes.find(
       (attr) => attr.trait_type === "Type",
