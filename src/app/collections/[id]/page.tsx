@@ -2,12 +2,11 @@
 
 import React, { Suspense, useState, useEffect, useMemo } from "react"
 import Image from "next/image"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Grid3X3, BarChart3, TrendingUp, Star, Plus, Edit, Hash, ExternalLink } from "lucide-react"
+import { ArrowLeft, Grid3X3, BarChart3, TrendingUp, Star, Plus, Hash, ExternalLink } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useGetCollection } from "@/hooks/use-collection"
 import { useParams, useRouter } from "next/navigation"
@@ -15,6 +14,7 @@ import { Collection } from "@/lib/types"
 import { shortenAddress, normalizeStarknetAddress, toHexString } from "@/lib/utils"
 import { EXPLORER_URL } from "@/services/constants"
 import { useCollectionAssets } from "@/hooks/use-collection-assets"
+import { ProgressiveAssetGrid } from "@/components/collections/progressive-asset-grid"
 
 export default function CollectionDetailPage() {
   const params = useParams()
@@ -321,82 +321,25 @@ export default function CollectionDetailPage() {
 }
 
 const CollectionNFTs = React.memo(({ nftAddress, totalSupply }: { nftAddress: string; totalSupply: number }) => {
-  const paramsLocal = useParams();
-  const idParam = String(paramsLocal?.id || "");
-  
   // Memoize the hook call parameters
   const hookParams = useMemo(() => ({
     totalSupply,
     limit: Math.min(totalSupply || 10, 10),//limit is ten for now
   }), [totalSupply]);
   
-  const { assets, loading, error } = useCollectionAssets(
+  const { assets, loading, error, loadedCount, totalCount } = useCollectionAssets(
     toHexString(nftAddress) as `0x${string}`, 
     hookParams
   );
 
-  if (loading && assets.length === 0) {
-    return (
-      <div className="space-y-4">
-        <div className="text-center h-12">
-          <p className="text-muted-foreground mb-2">Discovering collection assets...</p>
-          </div>
-        
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-red-500 mb-2">Error loading collection assets</p>
-        <p className="text-sm text-muted-foreground">{error}</p>
-      </div>
-    );
-  }
-
-  if (assets.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">No assets found for this collection.</p>
-        <p className="text-sm text-muted-foreground mt-1">Collection NFT ID: {idParam}</p>
-        <p className="text-sm text-muted-foreground mt-1">Total Supply: {totalSupply || "Unknown"}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Collection Assets ({assets.length})</h3>
-        <p className="text-sm text-muted-foreground">
-          Token IDs: {assets.length} of {totalSupply}
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-        {assets.map((a) => (
-          <Link key={a.id} href={`/asset/${a.id}`}>
-            <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer group">
-              <div className="relative aspect-square overflow-hidden">
-                <Image 
-                  src={a.image || "/placeholder.svg"} 
-                  alt={a.name} 
-                  fill 
-                  className="object-cover transition-transform duration-200 group-hover:scale-102" 
-                />
-              </div>
-              <CardContent className="p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium truncate" title={a.name}>{a.name}</span>
-                  <Badge variant="outline">#{a.tokenId}</Badge>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
-    </div>
+    <ProgressiveAssetGrid 
+      assets={assets}
+      loading={loading}
+      loadedCount={loadedCount}
+      totalCount={totalCount}
+      error={error}
+    />
   );
 });
 
