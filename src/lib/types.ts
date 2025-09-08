@@ -47,6 +47,8 @@ export interface Collection {
   requireApproval?: boolean;
 }
 
+
+
 /**
  * Data validation utilities for Collection objects
  */

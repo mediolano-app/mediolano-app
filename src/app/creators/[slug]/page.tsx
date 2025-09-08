@@ -36,6 +36,15 @@ import Link from "next/link"
 import { CollectionCard } from "@/components/collection-card"
 import NFTCard from "@/components/nft-card"
 import { getCreatorBySlug, getCollectionsByCreator, getAssetsByCreator, getRemixAssetsByCreator } from "@/lib/mock-data"
+import { fetchUserCollections } from "@/lib/starknet-user"
+import {
+  useGetCollections,
+  useIsCollectionOwner,
+} from "@/hooks/use-collection";
+import { useGetCollection } from "@/hooks/use-collection"
+import { Asset } from "@/types/asset"
+import { useAccount } from "@starknet-react/core"
+import { Collection } from "@/lib/types"
 
 interface CreatorPageProps {
   params: {
@@ -50,8 +59,50 @@ export default function CreatorPage({ params }: CreatorPageProps) {
   const [activeTab, setActiveTab] = useState("collections")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [filterType, setFilterType] = useState<string>("all")
+  const [slug, setSlug] = useState<string | undefined>();
+  const [collectionsError, setCollectionsError] = useState<string | null>(null);
+  const [collectionsData, setCollectionsData] = useState<Collection[]>([])
+    const { fetchCollection } = useGetCollection()
+      const { address: walletAddress } = useAccount();
 
-  const creator = getCreatorBySlug(params.slug)
+      const {
+    collections,
+    loading: collection_loading,
+    error: collection_error,
+    reload,
+  } = useGetCollections(walletAddress as `0x${string}`);
+
+  console.log('collection', collections)
+
+     useEffect(() => {
+  const loadCollections = async () => {
+    setLoading(true);
+    setCollectionsError(null);
+    try {
+      const data = await Promise.all(
+        collections.map((collection) => fetchCollection(collection?.id as string))
+      );
+      setCollectionsData(data as Collection[]);
+    } catch (err) {
+      setCollectionsError(err instanceof Error ? err.message : "Failed to fetch collections");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (collections && collections.length > 0) {
+    loadCollections();
+  }
+}, [collections]);
+
+useEffect(() => {
+  (async () => {
+    const p = await params;
+    setSlug(p.slug);
+  })();
+}, [params]);
+
+  const creator = slug ? getCreatorBySlug(slug) : undefined
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 800)
@@ -88,25 +139,27 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     )
   }
 
-  const creatorCollections = getCollectionsByCreator(creator.name)
+
   const creatorAssets = getAssetsByCreator(creator.name)
   const remixAssets = getRemixAssetsByCreator(creator.name)
 
-  const filteredCollections = creatorCollections.filter(
+  const filteredCollections = collections.filter(
     (collection) =>
       collection.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       collection.description.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
-  const filteredAssets = creatorAssets.filter((asset) => {
+  const filteredAssets = collectionsData.filter((asset) => {
     const matchesSearch =
       asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       asset.description.toLowerCase().includes(searchQuery.toLowerCase())
 
-    const matchesFilter = filterType === "all" || asset.type.toLowerCase() === filterType.toLowerCase()
+    const matchesFilter = filterType === "all" || asset.type?.toLowerCase() === filterType.toLowerCase()
 
     return matchesSearch && matchesFilter
   })
+
+  //  console.log('filtered assets', filteredAssets)
 
   const handleCopyAddress = async () => {
     try {
@@ -153,7 +206,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                 <AvatarFallback className="text-white text-2xl md:text-3xl font-bold bg-gradient-to-br from-blue-500 to-purple-600">
                   {creator.name
                     .split(" ")
-                    .map((n) => n[0])
+                    .map((n: any) => n[0])
                     .join("")}
                 </AvatarFallback>
               </Avatar>
@@ -165,7 +218,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                   {creator.verified && <CheckCircle className="h-6 w-6 text-blue-400" />}
                 </div>
                 <div className="flex flex-wrap justify-center gap-2">
-                  {creator.specialties.slice(0, 2).map((specialty) => (
+                  {creator.specialties.slice(0, 2).map((specialty: any) => (
                     <Badge key={specialty} className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
                       {specialty}
                     </Badge>
@@ -177,7 +230,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             {/* Main Info - Hidden on mobile, shown on larger screens */}
             <div className="hidden lg:block flex-1 text-white">
               <div className="flex items-center gap-3 mb-4">
-                <h1 className="text-4xl xl:text-5xl font-bold">{creator.name}</h1>
+                <h1 className="text-4xl xl:text-5xl font-bold">{creator.name.slice(0, 5)}...{creator.name.slice(-5)}</h1>
                 {creator.verified && <CheckCircle className="h-8 w-8 text-blue-400" />}
               </div>
 
@@ -201,7 +254,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-8">
-                {creator.specialties.map((specialty) => (
+                {creator.specialties.map((specialty: any) => (
                   <Badge
                     key={specialty}
                     className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-sm px-3 py-1"
@@ -243,13 +296,13 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             <div className="hidden xl:grid grid-cols-2 gap-4 min-w-[280px]">
               <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold">{creatorCollections.length}</div>
+                  <div className="text-2xl font-bold">{collections.length}</div>
                   <div className="text-sm text-white/80">Collections</div>
                 </CardContent>
               </Card>
               <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold">{creator.totalAssets}</div>
+                  <div className="text-2xl font-bold">{collectionsData.length}</div>
                   <div className="text-sm text-white/80">Assets</div>
                 </CardContent>
               </Card>
@@ -308,7 +361,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
               <CardContent className="p-4 text-center">
                 <FolderOpen className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{creatorCollections.length}</div>
+                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{collections.length}</div>
                 <div className="text-sm text-blue-700 dark:text-blue-300">Collections</div>
               </CardContent>
             </Card>
@@ -316,7 +369,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
               <CardContent className="p-4 text-center">
                 <Palette className="h-6 w-6 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-900 dark:text-green-100">{creator.totalAssets}</div>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">{collectionsData.length}</div>
                 <div className="text-sm text-green-700 dark:text-green-300">Assets</div>
               </CardContent>
             </Card>
