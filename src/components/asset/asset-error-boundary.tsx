@@ -122,7 +122,7 @@ export class AssetErrorBoundary extends React.Component<
 }
 
 // Default fallback component
-export function DefaultAssetErrorFallback({ error: _error, retry }: { error: Error; retry: () => void }) {
+export function DefaultAssetErrorFallback({ error: _, retry }: { error: Error; retry: () => void }) {
   return (
     <div className="w-full flex flex-col items-center justify-center p-12 space-y-4">
       <AlertCircle className="h-12 w-12 text-muted-foreground" />

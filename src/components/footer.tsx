@@ -278,7 +278,7 @@ export function Footer() {
 
 
             {/* Twitter Showcase */}
-          <div className="mt-16 grid gap-8 md:grid-cols-2">
+          <div className="mt-16 grid max-w-full grid-cols-1 w-full gap-8 md:grid-cols-2">
             <Card className="bg-background/20">
               <CardHeader>
                 <CardTitle>Join our community on X</CardTitle>
@@ -309,7 +309,7 @@ export function Footer() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <Github className="h-8 w-8 ml-blue" />
                     <div>

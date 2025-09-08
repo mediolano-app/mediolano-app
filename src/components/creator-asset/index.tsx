@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
@@ -51,11 +52,12 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
   const { slug } = resolvedParams;
   const decodedSlug = decodeURIComponent(slug || "").replace(/%2D/g, "-");
   const [nftAddress, tokenIdStr] = decodedSlug.split("-");
+  const router = useRouter();
   
   const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online";
   const tokenId = Number(tokenIdStr);
 
-  const { displayAsset: asset, loading, loadingState, error } = useAsset(
+  const { displayAsset: asset, loading, loadingState, error, uiState, showSkeleton, notFound } = useAsset(
     nftAddress as `0x${string}`,
     Number.isFinite(tokenId) ? tokenId : undefined
   );
@@ -78,9 +80,21 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
             </Button>
           </Link>
           
-          {(loading || (!asset && !error)) ? (
+          {showSkeleton || uiState === 'loading' ? (
             <AssetLoadingState loadingState={loadingState} error={error} onRetry={reload} />
-          ) : error ? (
+          ) : uiState === 'not_found' || notFound ? (
+            <div className="w-full flex flex-col items-center justify-center p-12 space-y-4">
+              <div className="text-center space-y-2">
+                <div className="text-lg font-semibold">This asset doesn&apos;t exist or has been removed.</div>
+              </div>
+              <button
+                onClick={() => router.back()}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              >
+                Go Back
+              </button>
+            </div>
+          ) : uiState === 'error' || error ? (
             (() => {
               const errorMessage = typeof error === 'string' ? error :
                 (typeof error === 'object' && error !== null && 'message' in error)
@@ -186,7 +200,12 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
               <Button disabled variant="outline" className="flex-1">
                 Share
               </Button>
-              <Link className="flex-1" target="_blank" href={`${EXPLORER_URL}/nft/${nftAddress}/${tokenId}`}>
+              <Link
+                className="flex-1"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${EXPLORER_URL}/nft/${nftAddress}/${tokenId}`}
+              >
                 <Button variant="outline" className="w-full">
                 View on Explorer
                 </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, AlertTriangle, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -141,6 +141,14 @@ export function NetworkStatusIndicator({
     return "text-yellow-600";
   };
 
+  // Deterministic mapping for background classes with a safe fallback
+  const getStatusBgClass = () => {
+    if (!isOnline) return "bg-destructive";
+    if (rpcStatus === 'connected') return "bg-green-600";
+    if (rpcStatus === 'disconnected') return "bg-destructive";
+    return "bg-yellow-600";
+  };
+
   const getStatusText = () => {
     if (!isOnline) return "Offline";
     if (rpcStatus === 'connected') return "Connected";
@@ -150,7 +158,7 @@ export function NetworkStatusIndicator({
 
   return (
     <div className={`flex items-center space-x-2 text-xs ${className}`}>
-      <div className={`h-2 w-2 rounded-full ${getStatusColor().replace('text-', 'bg-')}`} />
+      <div className={`h-2 w-2 rounded-full ${getStatusBgClass()}`} />
       <span className={getStatusColor()}>{getStatusText()}</span>
     </div>
   );

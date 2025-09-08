@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useContract } from "@starknet-react/core";
 import type { Abi } from "starknet";
 import { COLLECTION_NFT_ABI } from "@/abis/ip_nft";
@@ -33,6 +33,9 @@ export function useCollectionAssets(
     abi: COLLECTION_NFT_ABI as unknown as Abi,
     address: (nftAddress as `0x${string}`) || undefined,
   });
+  // Cache detected method names to avoid multiple fallbacks per token
+  const ownerMethodRef = useRef<"ownerOf" | "owner_of" | null>(null);
+  const uriMethodRef = useRef<"token_uri" | "tokenURI" | null>(null);
   // Helper function to load a single asset
   const loadSingleAsset = useCallback(async (tokenId: number): Promise<CollectionAsset | null> => {
     if (!contract) return null;
@@ -41,21 +44,28 @@ export function useCollectionAssets(
       // Check if token exists by getting owner
       let ownerExists = false;
       try {
-        let ownerRaw;
-        try {
-          ownerRaw = await contract.call("ownerOf", [tokenId]);
-        } catch {
-          try {
-            ownerRaw = await contract.call("get_token_owner", [tokenId]);
-          } catch {
+        let ownerRaw: unknown = undefined;
+        // Use cached method if known; otherwise detect and cache
+        if (ownerMethodRef.current) {
+          ownerRaw = await contract.call(ownerMethodRef.current, [tokenId]);
+        } else {
+          const methods: Array<"ownerOf" | "owner_of"> = [
+            "owner_of",
+            "ownerOf",
+          ];
+          for (const m of methods) {
             try {
-              ownerRaw = await contract.call("get_owner", [tokenId]);
+              ownerRaw = await contract.call(m, [tokenId]);
+              ownerMethodRef.current = m;
+              break;
             } catch {
-              return null; // Token doesn't exist
+              // try next
             }
           }
+          if (ownerMethodRef.current === null) {
+            return null; // no supported method
+          }
         }
-
         if (
           ownerRaw &&
           ownerRaw !== "0x0" &&
@@ -74,17 +84,21 @@ export function useCollectionAssets(
       // Get token URI
       let tokenUri = "";
       try {
-        let tokenUriRaw;
-        try {
-          tokenUriRaw = await contract.call("token_uri", [tokenId]);
-        } catch {
-          try {
-            tokenUriRaw = await contract.call("tokenURI", [tokenId]);
-          } catch {
+        let tokenUriRaw: unknown = undefined;
+        if (uriMethodRef.current) {
+          tokenUriRaw = await contract.call(uriMethodRef.current, [tokenId]);
+        } else {
+          const methods: Array<"token_uri" | "tokenURI"> = [
+            "token_uri",
+            "tokenURI",
+          ];
+          for (const m of methods) {
             try {
-              tokenUriRaw = await contract.call("get_token_uri", [tokenId]);
+              tokenUriRaw = await contract.call(m, [tokenId]);
+              uriMethodRef.current = m;
+              break;
             } catch {
-              // Continue with default values
+              // try next
             }
           }
         }
