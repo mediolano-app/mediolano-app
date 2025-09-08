@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
+import { FileText, Loader } from "lucide-react";
 import { AssetPreview } from "@/components/asset-creation/asset-preview";
 import { AssetFormCore } from "@/components/asset-creation/asset-form-core";
 import { LicensingOptions } from "@/components/asset-creation/licensing-options";
@@ -21,11 +21,17 @@ import {
 } from "@/hooks/use-collection";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import CreateCollectionView from "@/components/collections/create-collection";
+import { MintSuccessDrawer } from "@/components/mint-success-drawer";
+import { IMintResult } from "@/hooks/use-create-asset";
+import { normalizeStarknetAddress } from "@/lib/utils";
 
 export default function CreateAssetPage() {
   const { toast } = useToast();
   const [openCollection, setOpenCollection] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [showSuccessDrawer, setShowSuccessDrawer] = useState(false);
+  const [mintResult, setMintResult] = useState<IMintResult | null>(null);
   const { address: walletAddress } = useAccount();
   const { uploadToIpfs, loading: upload_loading } = useIpfsUpload();
   const { createAsset, isCreating } = useCreateAsset();
@@ -55,6 +61,7 @@ export default function CreateAssetPage() {
       return;
     }
     if (!canSubmit()) return;
+    setLoading(true);
 
     // Create metadata object (in production, this would be uploaded to IPFS)
     const metadata = {
@@ -72,6 +79,12 @@ export default function CreateAssetPage() {
       ],
     };
 
+    const collectionNftAddress = collections.find(collection => parseInt(collection.id.toString()) === parseInt(formState?.collection))?.nftAddress;
+
+    const contractHex = collectionNftAddress
+      ? normalizeStarknetAddress(String(collectionNftAddress))
+      : "N/A";
+
     try {
       //Extra Check for collection ownership
       const isOwner = await checkOwnership(
@@ -84,14 +97,23 @@ export default function CreateAssetPage() {
       //Upload media and metadata.
       const result = await uploadToIpfs(formState?.mediaFile as File, metadata);
       //Then make contract call.
-      await createAsset({
+
+      const mintResult = await createAsset({
         collection_id: formState?.collection,
         recipient: walletAddress as string,
         token_uri: result?.metadataUrl,
+        collection_nft_address: contractHex,
       });
 
-      // Redirect to success page
-      // router.push("/create/asset/success");
+      // Show success drawer with mint result
+      setMintResult(mintResult);
+      setShowSuccessDrawer(true);
+
+      // Show success toast
+      toast({
+        title: "🎉 Asset Minted Successfully!",
+        description: "Your Programmable IP has been registered on the blockchain.",
+      });
     } catch (error) {
       console.error("Error minting asset:", error);
       toast({
@@ -103,6 +125,8 @@ export default function CreateAssetPage() {
         variant: "destructive",
       });
     }
+
+    setLoading(false);
   };
 
   return (
@@ -183,12 +207,14 @@ export default function CreateAssetPage() {
                     isCreating ||
                     upload_loading ||
                     !walletAddress ||
-                    !formState.collection
+                    !formState.collection ||
+                    loading
                   }
                   size="lg"
                   className="px-8"
                 >
-                  {isCreating ? "Creating Asset..." : "Create Asset"}
+                  {loading && <Loader className="animate-spin h-5 w-" />}
+                  {loading ? isCreating ? "Creating Asset..." : "Performing Checks" : "Create Asset"}
                 </Button>
               </div>
             </div>
@@ -232,6 +258,18 @@ export default function CreateAssetPage() {
           </div>
         </main>
       </div>
+
+      {/* Mint Success Drawer */}
+      {mintResult && (
+        <MintSuccessDrawer
+          isOpen={showSuccessDrawer}
+          onOpenChange={setShowSuccessDrawer}
+          mintResult={mintResult}
+          assetTitle={formState.title}
+          assetDescription={formState.description}
+          assetType={selectedTemplate?.name}
+        />
+      )}
     </>
   );
 }
