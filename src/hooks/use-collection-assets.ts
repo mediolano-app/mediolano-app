@@ -21,7 +21,7 @@ type Options = {
 
 export function useCollectionAssets(
   nftAddress?: `0x${string}`,
-  options: Options = {}
+  options: Options = {},
 ) {
   const [assets, setAssets] = useState<CollectionAsset[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -150,7 +150,7 @@ export function useCollectionAssets(
           if (res !== undefined)
             supply = parseInt(
               (res as { toString?: () => string } | string)?.toString?.() ??
-                String(res)
+                String(res),
             );
         } catch {
           try {
@@ -160,7 +160,7 @@ export function useCollectionAssets(
             if (res2 !== undefined)
               supply = parseInt(
                 (res2 as { toString?: () => string } | string)?.toString?.() ??
-                  String(res2)
+                  String(res2),
               );
           } catch {
             supply = 0;
