@@ -1,55 +1,64 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { MoreVertical, ExternalLink, Share2, Flag, Send, CheckCircle, GitBranch, Shield } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { TransferAssetDialog } from "@/components/transfer-asset-dialog"
-import { ReportAssetDialog } from "@/components/report-asset-dialog"
-import { RemixButton } from "@/components/remix/remix-button"
-import type { Asset } from "@/types/asset"
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  MoreVertical,
+  ExternalLink,
+  Share2,
+  Flag,
+  Send,
+  CheckCircle,
+  GitBranch,
+  Shield,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { TransferAssetDialog } from "@/components/transfer-asset-dialog";
+import { ReportAssetDialog } from "@/components/report-asset-dialog";
+import { RemixButton } from "@/components/remix/remix-button";
+import type { Asset } from "@/types/asset";
 
 interface NFTCardProps {
-  asset: Asset
-  view?: "grid" | "list"
+  asset: Asset;
+  view?: "grid" | "list";
 }
 
 function NFTCard({ asset, view = "grid" }: NFTCardProps) {
-  const [isTransferOpen, setIsTransferOpen] = useState(false)
-  const [isReportOpen, setIsReportOpen] = useState(false)
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/assets/${asset.id}`
+    const url = `${window.location.origin}/asset/${asset.id}`;
     if (navigator.share) {
       try {
         await navigator.share({
           title: asset.name,
           text: asset.description,
           url: url,
-        })
+        });
       } catch (error) {
-        console.error("Error sharing:", error)
+        console.error("Error sharing:", error);
       }
     } else {
       try {
-        await navigator.clipboard.writeText(url)
+        await navigator.clipboard.writeText(url);
         // You could add a toast notification here
       } catch (error) {
-        console.error("Failed to copy:", error)
+        console.error("Failed to copy:", error);
       }
     }
-  }
+  };
 
   if (view === "list") {
     return (
@@ -58,7 +67,7 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
           <CardContent className="p-4">
             <div className="flex gap-4">
               {/* Asset Image */}
-              <Link href={`/assets/${asset.id}`} className="flex-shrink-0">
+              <Link href={`/asset/${asset.id}`} className="flex-shrink-0">
                 <div className="relative w-20 h-20 bg-gradient-to-br from-muted/50 to-muted rounded-lg overflow-hidden">
                   <Image
                     src={asset.image || "/placeholder.svg"}
@@ -74,7 +83,7 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <Link href={`/assets/${asset.id}`}>
+                    <Link href={`/asset/${asset.id}`}>
                       <h3 className="font-semibold text-lg hover:text-primary transition-colors truncate">
                         {asset.name}
                       </h3>
@@ -85,12 +94,20 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                           src={`/placeholder-40x40.png?text=${asset.creator.substring(0, 2)}`}
                           alt={asset.creator}
                         />
-                        <AvatarFallback className="text-xs">{asset.creator.substring(0, 2)}</AvatarFallback>
+                        <AvatarFallback className="text-xs">
+                          {asset.creator.substring(0, 2)}
+                        </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm text-muted-foreground">{asset.creator}</span>
-                      {asset.verified && <CheckCircle className="h-4 w-4 text-blue-600" />}
+                      <span className="text-sm text-muted-foreground">
+                        {asset.creator}
+                      </span>
+                      {asset.verified && (
+                        <CheckCircle className="h-4 w-4 text-blue-600" />
+                      )}
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{asset.description}</p>
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                      {asset.description}
+                    </p>
                   </div>
 
                   <DropdownMenu>
@@ -101,7 +118,7 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
-                        <Link href={`/assets/${asset.id}`}>
+                        <Link href={`/asset/${asset.id}`}>
                           <ExternalLink className="h-4 w-4 mr-2" />
                           View Details
                         </Link>
@@ -146,7 +163,9 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                       </Badge>
                     )}
                   </div>
-                  <span className="text-xs text-muted-foreground">{asset.registrationDate}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {asset.registrationDate}
+                  </span>
                 </div>
               </div>
             </div>
@@ -160,9 +179,13 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
           onTransferComplete={() => setIsTransferOpen(false)}
         />
 
-        <ReportAssetDialog asset={asset} open={isReportOpen} onOpenChange={setIsReportOpen} />
+        <ReportAssetDialog
+          asset={asset}
+          open={isReportOpen}
+          onOpenChange={setIsReportOpen}
+        />
       </>
-    )
+    );
   }
 
   return (
@@ -170,7 +193,7 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
       <Card className="group hover:shadow-lg transition-all duration-200">
         <CardContent className="p-0">
           {/* Asset Image */}
-          <Link href={`/assets/${asset.id}`}>
+          <Link href={`/asset/${asset.id}`}>
             <div className="relative aspect-square bg-gradient-to-br from-muted/50 to-muted overflow-hidden rounded-t-lg">
               <Image
                 src={asset.image || "/placeholder.svg"}
@@ -197,7 +220,7 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link href={`/assets/${asset.id}`}>
+                      <Link href={`/asset/${asset.id}`}>
                         <ExternalLink className="h-4 w-4 mr-2" />
                         View Details
                       </Link>
@@ -236,7 +259,7 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
           {/* Asset Info */}
           <div className="p-4 space-y-3">
             <div className="space-y-2">
-              <Link href={`/assets/${asset.id}`}>
+              <Link href={`/asset/${asset.id}`}>
                 <h3 className="font-semibold text-lg hover:text-primary transition-colors line-clamp-1">
                   {asset.name}
                 </h3>
@@ -247,16 +270,24 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                     src={`/placeholder-40x40.png?text=${asset.creator.substring(0, 2)}`}
                     alt={asset.creator}
                   />
-                  <AvatarFallback className="text-xs">{asset.creator.substring(0, 2)}</AvatarFallback>
+                  <AvatarFallback className="text-xs">
+                    {asset.creator.substring(0, 2)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex items-center gap-1 min-w-0">
-                  <span className="text-sm text-muted-foreground truncate">{asset.creator}</span>
-                  {asset.verified && <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />}
+                  <span className="text-sm text-muted-foreground truncate">
+                    {asset.creator}
+                  </span>
+                  {asset.verified && (
+                    <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  )}
                 </div>
               </div>
             </div>
 
-            <p className="text-sm text-muted-foreground line-clamp-2">{asset.description}</p>
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {asset.description}
+            </p>
 
             <div className="flex items-center justify-between">
               <div className="flex flex-wrap gap-1">
@@ -265,15 +296,23 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                 </Badge>
                 {asset.collection && (
                   <Badge variant="secondary" className="text-xs">
-                    {asset.collection}
+                    {asset.collection.substring(0, 6)}...
+                    {asset.collection.substring(asset.collection.length - 3)}
                   </Badge>
                 )}
               </div>
-              <span className="text-xs text-muted-foreground">{asset.registrationDate}</span>
+              <span className="text-xs text-muted-foreground">
+                {asset.registrationDate}
+              </span>
             </div>
 
             <div className="flex gap-2 pt-2">
-              <RemixButton asset={asset} variant="outline" size="sm" className="flex-1" />
+              <RemixButton
+                asset={asset}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              />
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/proof-of-ownership/${asset.id}`}>
                   <Shield className="h-4 w-4" />
@@ -291,9 +330,13 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
         onTransferComplete={() => setIsTransferOpen(false)}
       />
 
-      <ReportAssetDialog asset={asset} open={isReportOpen} onOpenChange={setIsReportOpen} />
+      <ReportAssetDialog
+        asset={asset}
+        open={isReportOpen}
+        onOpenChange={setIsReportOpen}
+      />
     </>
-  )
+  );
 }
 
-export default NFTCard
+export default NFTCard;

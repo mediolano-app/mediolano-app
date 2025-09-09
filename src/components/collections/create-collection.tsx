@@ -34,7 +34,7 @@ import { useAccount } from "@starknet-react/core";
 import {
   CoverImageUploader,
   CoverImageUploaderRef,
-} from "@/components/mediaUploader";
+} from "@/components/media-uploader";
 import { useIpfsUpload } from "@/hooks/useIpfs";
 import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
 
@@ -166,8 +166,7 @@ export default function CreateCollectionView({
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Create New Collection</h1>
           <p className="text-muted-foreground">
-            Mint a new collection to organize your intellectual property assets
-            onchain
+            Mint a new collection to organize your intellectual property assets onchain
           </p>
         </div>
 
@@ -253,7 +252,6 @@ export default function CreateCollectionView({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="private">Private</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

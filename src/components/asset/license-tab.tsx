@@ -29,7 +29,7 @@ export function LicenseTab({ asset }: LicenseTabProps) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-semibold">{asset.licenseInfo.type}</h2>
+              <h2 className="text-xl capitalize font-semibold">{asset.licenseInfo.type}</h2>
               <p className="text-muted-foreground">{asset.licenseInfo.terms}</p>
             </div>
           </div>

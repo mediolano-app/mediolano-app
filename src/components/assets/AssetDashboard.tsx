@@ -102,7 +102,7 @@ export default function AssetDashboard({ initialAssets }: { initialAssets: Asset
               <TableRow key={asset.id}>
                 <TableCell className="font-medium">
                   <Link
-                    href={asset.openseaUrl}
+                    href={asset.externalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center hover:underline"
@@ -128,9 +128,9 @@ export default function AssetDashboard({ initialAssets }: { initialAssets: Asset
                   <Switch checked={asset.isVisible} onCheckedChange={() => toggleVisibility(asset.id)} />
                 </TableCell>
                 <TableCell>
-                  {asset.openseaUrl && asset.tokenId && (
+                  {asset.externalUrl && asset.tokenId && (
                     <Link
-                      href={`https://starkscan.io/token/${asset.openseaUrl.split("/")[5]}?a=${asset.tokenId}`}
+                      href={`https://starkscan.io/token/${asset.externalUrl.split("/")[5]}?a=${asset.tokenId}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"

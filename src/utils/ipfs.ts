@@ -7,6 +7,7 @@ export interface IPFSMetadata {
   type?: string;
   creator?: string | { name: string; address: string };
   attributes?: Array<{ trait_type: string; value: string }>;
+  properties?: Record<string, unknown>;
   registrationDate?: string;
   medium?: string;
   fileType?: string;
@@ -38,6 +39,7 @@ export interface AssetType {
   description?: string;
   image?: string;
   ipfsCid?: string;
+  metadataUrl?: string;
   type?: string;
   creator: string | { name: string; address: string }; 
   owner: string | { name: string; address: string }; 
@@ -123,42 +125,7 @@ export async function fetchIPFSMetadata(cid: string, bypassCache = false): Promi
   return null;
 }
 
-/**
- * Recognize the IP type by metadata
- * @param {IPFSMetadata} metadata 
- * @returns {string} 
- */
-export function determineIPType(metadata: IPFSMetadata | null): string {
-  if (!metadata) return 'Generic';
-  
-  if (metadata.type) {
-    return metadata.type;
-  }
-  
-  if (metadata.medium === 'Digital Art' || metadata.medium === 'Physical Art' || 
-      metadata.medium === 'Painting' || metadata.medium === 'Illustration') {
-    return 'Art';
-  }
-  
-  if (metadata.fileType) {
-    if (metadata.fileType.startsWith('audio/')) return 'Audio';
-    if (metadata.fileType.startsWith('video/')) return 'Video';
-    if (metadata.fileType.includes('code') || metadata.fileType.includes('javascript')) return 'Software';
-  }
-  
-  if (metadata.duration || metadata.genre || metadata.bpm) return 'Audio';
-  if (metadata.resolution || metadata.framerate) return 'Video';
-  if (metadata.yearCreated && metadata.artistName) return 'Art';
-  if (metadata.version && (metadata.external_url || metadata.repository)) return 'Software';
-  if (metadata.patent_number || metadata.patent_date) return 'Patent';
-  if (metadata.trademark_number) return 'Trademark';
-  
-  if (metadata.tokenId || metadata.tokenStandard || metadata.blockchain) return 'NFT';
-  
-  if (metadata.pages || metadata.authors || metadata.publisher) return 'Document';
-  
-  return 'Generic';
-}
+
 
 /**
  * Stract the known CDIs
@@ -207,7 +174,7 @@ export function combineData(ipfsData: IPFSMetadata | null, mockData: AssetType):
     owner: mockData.owner, // Mantener el owner actual
     image: ipfsData.image || mockData.image,
     attributes: ipfsData.attributes || mockData.attributes,
-    type: determineIPType(ipfsData),
+    type: ipfsData.type || mockData.type,
     registrationDate: ipfsData.registrationDate || mockData.registrationDate
   };
   
@@ -288,70 +255,68 @@ export function clearIPFSCache(cid?: string): void {
 /**
  * Process IPFS hash to URL
  * Converts various IPFS input formats to proper gateway URLs
- * @param {string} input - The IPFS input (CID, undefined/CID, ipfs:/, or gateway URL)
+ * @param {string} input - The IPFS input (CID, undefined/CID, ipfs:/, ipfs://, ipfs:ipfs/, or gateway URL)
  * @param {string} fallbackUrl - Fallback URL if processing fails
  * @returns {string} Processed URL or fallback
  */
 export function processIPFSHashToUrl(input: string, fallbackUrl: string): string {
-  if (typeof input !== 'string') return fallbackUrl;
-  
-  let processedUrl = input.replace(/\0/g, '').trim();
-  console.log(`Processing IPFS input:`, processedUrl);
-  
-  // Handle undefined prefix first - this is the most common case
-  if (processedUrl.startsWith('undefined/')) {
-    const cid = processedUrl.replace('undefined/', '');
-    console.log(`Extracted CID from undefined/ prefix:`, cid, `(length: ${cid.length})`);
-    // Validate CID length and format - must be at least 34 characters (IPFS v0) or 46+ (IPFS v1)
-    if (cid.match(/^[a-zA-Z0-9]{34,}$/)) {
-      const gatewayUrl = `${IPFS_GATEWAYS[0]}${cid}`;
-      console.log(`Converted undefined/ prefix to gateway URL:`, gatewayUrl);
-      return gatewayUrl;
+  if (typeof input !== "string") return fallbackUrl;
+
+  let processedUrl = input.replace(/\0/g, "").trim();
+
+  // Handle undefined prefix
+  if (processedUrl.startsWith("undefined/")) {
+    const cid = processedUrl.replace("undefined/", "");
+    if (cid.match(/^[a-zA-Z0-9]+$/) && cid.length >= 34) {
+      return `${IPFS_GATEWAYS[0]}${cid}`;
     } else {
-      console.log(`Invalid CID length or format (${cid.length} chars):`, cid);
       return fallbackUrl;
     }
   }
-  
-  // reject any input that's too short to be a valid CID
-  if (processedUrl.length < 46 && !processedUrl.startsWith('http') && !processedUrl.startsWith('/')) {
-    console.log(`Input too short to be valid IPFS CID (${processedUrl.length} chars):`, processedUrl);
+
+  // Reject inputs too short to be valid CIDs
+  if (
+    processedUrl.length < 34 &&
+    !processedUrl.startsWith("http") &&
+    !processedUrl.startsWith("/")
+  ) {
+    console.log(
+      `Input too short to be valid IPFS CID (${processedUrl.length} chars):`,
+      processedUrl
+    );
     return fallbackUrl;
   }
-  
 
-  
-  // Handle raw IPFS CIDs (must be at least 46 characters)
-  if (processedUrl.match(/^[a-zA-Z0-9]{46,}$/)) {
-    processedUrl = `${IPFS_GATEWAYS[0]}${processedUrl}`;
+  // Raw CID
+  if (processedUrl.match(/^[a-zA-Z0-9]+$/) && processedUrl.length >= 34) {
+    return `${IPFS_GATEWAYS[0]}${processedUrl}`;
+  }
+
+  // Existing gateway URLs
+  if (IPFS_GATEWAYS.some((gateway) => processedUrl.startsWith(gateway))) {
     return processedUrl;
   }
-  
-  // Handle existing gateway URLs
-  if (IPFS_GATEWAYS.some(gateway => processedUrl.startsWith(gateway))) {
-    return processedUrl;
+
+  // ipfs:/CID, ipfs://CID, ipfs:ipfs/CID
+  if (processedUrl.startsWith("ipfs:")) {
+    const cid = processedUrl.replace(/^ipfs:(?:ipfs)?\/+/, "");
+    return `${IPFS_GATEWAYS[1]}${cid}`;
   }
-  
-  // Handle ipfs:/ protocol
-  if (processedUrl.startsWith('ipfs:/')) {
-    processedUrl = processedUrl.replace('ipfs:/', `${IPFS_GATEWAYS[0]}`);
-    return processedUrl;
-  }
-  
-  // If it's already a valid HTTP/HTTPS URL, validate it's a proper IPFS gateway URL
-  if (processedUrl.startsWith('http')) {
-    // If it's an IPFS gateway URL, validate the CID length
-    if (processedUrl.includes('/ipfs/')) {
-      const cidMatch = processedUrl.match(/\/ipfs\/([a-zA-Z0-9]+)/);
-      if (cidMatch && cidMatch[1].length < 46) {
-        console.log(`Invalid IPFS gateway URL - CID too short (${cidMatch[1].length} chars):`, processedUrl);
-        return fallbackUrl;
-      }
+
+
+  // Already a normal http(s) URL (non-gateway or direct IPFS path)
+  if (processedUrl.startsWith("http")) {
+    const cidMatch = processedUrl.match(/\/ipfs\/([a-zA-Z0-9]+)/);
+    if (cidMatch && cidMatch[1].length < 34) {
+      console.log(
+        `Invalid IPFS gateway URL - CID too short (${cidMatch[1].length} chars):`,
+        processedUrl
+      );
+      return fallbackUrl;
     }
-    console.log("processedUrl", processedUrl);
     return processedUrl;
   }
-  
-  console.log(`IPFS input not recognized, using fallback:`, fallbackUrl);
+
+  console.log("IPFS input not recognized, using fallback:", fallbackUrl);
   return fallbackUrl || "";
 }

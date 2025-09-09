@@ -16,76 +16,67 @@ export default function PortfolioPage() {
   const { collections, stats, loading, error } = usePortfolio();
 
   // Validate collections before passing to components
-  const validCollections = collections.filter(collection => {
+const validCollections = collections.filter(collection => {
     const isValid = CollectionValidator.isValid(collection);
     return isValid;
   });
 
-  if (!address) {
-    return (
-      <div className="container mx-auto px-4 py-8 mt-5 mb-20">
-        <div className="space-y-1 mb-5">
-          <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
-          <p className="text-muted-foreground">
-            Please connect your wallet to view your portfolio
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto px-4 py-8 mt-5 mb-20">
-        <div className="space-y-1 mb-5">
-          <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
-          <p className="text-muted-foreground">
-            Showcase and manage your digital assets
-          </p>
-        </div>
-        <Alert variant="destructive">{error}</Alert>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-background/70 p-8">
       <main className="container mx-auto px-4 py-6">
-      <div className="space-y-1 mb-5">
-        <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
-        <p className="text-muted-foreground">
-          Showcase and manage your digital assets
-        </p>
-      </div>
-      </main>
-      <Suspense fallback={<PortfolioSkeleton />}>
-        <div className="space-y-8">
-          {loading ? (
-            <StatsSkeleton />
-          ) : (
-            <CollectionStats
-              totalCollections={validCollections.length}
-              totalAssets={stats.totalNFTs}
-              totalValue={stats.totalValue}
-              topCollection={stats.topCollection}
-              collections={validCollections}
-            />
-          )}
-
-          {loading ? (
-            <CollectionsSkeleton />
-          ) : validCollections.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground mb-5">No collections found. Create your first collection to get started.</p>
-              <Button variant="outline" asChild>
-                <Link href="/create/collection">Create Collection</Link>
-              </Button>
-            </div>
-          ) : (
-            <CollectionsPortfolioGrid collections={validCollections} />
-          )}
+        <div className="space-y-1 mb-5 px-4 mx-auto">
+          <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
+          { address ? 
+            <p className="text-muted-foreground">
+              Showcase and manage your digital assets
+            </p> :
+           <p className="text-muted-foreground badge">
+            Connect your wallet to open your onchain portfolio
+          </p>
+          }
         </div>
-      </Suspense>
+      </main>
+
+      {/* Show message when no wallet is connected */}
+      {!address && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Please connect your wallet to view your portfolio</p>
+        </div>
+      )}
+
+      {/* Show content when wallet is connected */}
+      {address && (
+        <Suspense fallback={<PortfolioSkeleton />}>
+          <div className="space-y-8 container mx-auto">
+            {loading ? (
+              <StatsSkeleton />
+            ) : (
+              <CollectionStats
+                totalCollections={validCollections.length}
+                totalAssets={stats.totalNFTs}
+                totalValue={stats.totalValue}
+                topCollection={stats.topCollection}
+                collections={validCollections}
+              />
+            )}
+
+            {loading ? (
+              <CollectionsSkeleton />
+            ) : error ? (
+              <Alert variant="destructive">{error}</Alert>
+            ) : validCollections.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-5">No collections found. Create your first collection to get started.</p>
+                <Button variant="outline" asChild>
+                  <Link href="/create/collection">Create Collection</Link>
+                </Button>
+              </div>
+            ) : (
+                <CollectionsPortfolioGrid collections={validCollections} />
+            )}
+          </div>
+        </Suspense>
+      )}
     </div>
   );
 }

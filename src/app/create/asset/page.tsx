@@ -56,11 +56,21 @@ export default function CreateAssetPage() {
     }
     if (!canSubmit()) return;
 
-    const metaData = {
-      ...formState,
+    // Create metadata object (in production, this would be uploaded to IPFS)
+    const metadata = {
+      name: formState.title,
+      description: formState.description,
+      external_url: "",
+      attributes: [
+        { trait_type: "Type", value: formState.assetType },
+        { trait_type: "License", value: formState.licenseType },
+        {
+          trait_type: "Geographic Scope",
+          value: formState.geographicScope,
+        },
+        { trait_type: "Tags", value: formState.tags.join(", ") },
+      ],
     };
-    delete metaData.mediaPreviewUrl;
-    delete metaData.mediaFile;
 
     try {
       //Extra Check for collection ownership
@@ -72,7 +82,7 @@ export default function CreateAssetPage() {
         throw new Error("You are not the owner of this collection");
       }
       //Upload media and metadata.
-      const result = await uploadToIpfs(formState?.mediaFile as File, metaData);
+      const result = await uploadToIpfs(formState?.mediaFile as File, metadata);
       //Then make contract call.
       await createAsset({
         collection_id: formState?.collection,
@@ -87,7 +97,9 @@ export default function CreateAssetPage() {
       toast({
         title: "Error",
         description:
-          error instanceof Error ? error.message : "Failed to mint asset",
+          error instanceof Error
+            ? error.message
+            : "Failed to mint Programmable IP",
         variant: "destructive",
       });
     }

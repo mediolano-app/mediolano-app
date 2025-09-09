@@ -39,6 +39,7 @@ import {
   Scroll,
   Lock,
   Shield,
+  Layers,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -48,11 +49,11 @@ import Image from "next/image";
 import DappInfo from './dapp-info';
 
 const features = [
-  { icon: <Brain className="h-6 w-6" />, title: "Discover", description: "IP for the Integrity Web", link: "/discover" },
-  { icon: <Box className="h-6 w-6" />, title: "Tokenize IP", description: "Create Programmable IP", link: "/create" },
-  { icon: <LayoutGrid className="h-6 w-6" />, title: "Manage Assets", description: "Manage IP onchain", link: "/portfolio" },
-  { icon: <ScrollText className="h-6 w-6" />, title: "Licensing Assets", description: "Register new license", link: "/licensing" },
-]
+  { icon: <Brain className="h-6 w-6" />, title: "Learn", description: "IP for the Integrity Web", link: "/discover" },
+  { icon: <Box className="h-6 w-6" />, title: "Create", description: "Create Programmable IP", link: "/create" },
+  { icon: <Layers className="h-6 w-6" />, title: "Explore", description: "Explorer IP collections", link: "/collections" },
+  { icon: <LayoutGrid className="h-6 w-6" />, title: "Manage", description: "Manage IP onchain", link: "/portfolio" },
+  ]
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -149,25 +150,22 @@ export function Footer() {
                   <li><Link href="/create/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
                   <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
                   <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Portfolio</Link></li>
-                  <li><Link href="/portfolio/collections" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" /> My Collections</Link></li>
-                  <li><Link href="/portfolio/dashboard" className="flex items-center hover:underline"><LayoutDashboard className="w-4 h-4 mr-2 ml-blue" /> Assets Dashboard</Link></li>
-                  <li><Link href="/transfer" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" /> Transfer</Link></li>
                 </ul>
             </div>
 
                 <div>
                 <h3 className="mb-6 text-sm font-semibold uppercase">IP Templates</h3>
                 <ul className="space-y-4">
-                    <li><Link href="/create/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> Custom</Link></li>
-                    <li><Link href="/create/template/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Artwork</Link></li>
-                    <li><Link href="/create/template/audio" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2 ml-blue" /> Audio</Link></li>
-                    <li><Link href="/create/template/document" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
-                    <li><Link href="/create/template/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2 ml-blue" /> NFT</Link></li>
-                    <li><Link href="/create/template/patent" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Patent</Link></li>
-                    <li><Link href="/create/template/publication" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2 ml-blue" /> Publication</Link></li>
-                    <li><Link href="/create/template/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2 ml-blue" /> Real World Assets</Link></li> 
-                    <li><Link href="/create/template/software" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> Software</Link></li>
-                    <li><Link href="/create/template/video" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Video</Link></li>
+                    <li><Link href="/create/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> General</Link></li>
+                    <li><Link href="/create/templates/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Artwork</Link></li>
+                    <li><Link href="/create/templates/audio" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2 ml-blue" /> Audio</Link></li>
+                    <li><Link href="/create/templates/documents" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
+                    <li><Link href="/create/templates/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2 ml-blue" /> NFT</Link></li>
+                    <li><Link href="/create/templates/patents" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Patent</Link></li>
+                    <li><Link href="/create/templates/publications" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2 ml-blue" /> Publication</Link></li>
+                    <li><Link href="/create/templates/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2 ml-blue" /> Real World Assets</Link></li> 
+                    <li><Link href="/create/templates/software" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> Software</Link></li>
+                    <li><Link href="/create/templates/video" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Video</Link></li>
                 </ul>
                 </div>
 
@@ -175,7 +173,6 @@ export function Footer() {
                 <h3 className="mb-6 text-sm font-semibold uppercase">Manage</h3>
                 <ul className="space-y-4">
                     <li><Link href="/account" className="flex items-center hover:underline"><User className="w-4 h-4 mr-2 ml-blue" /> My Account</Link></li>
-                    <li><Link href="/settings" className="flex items-center hover:underline"><Cog className="w-4 h-4 mr-2 ml-blue" /> Settings</Link></li>
                 </ul>
                 <h3 className="mb-6 mt-6 text-sm font-semibold uppercase">Guidelines</h3>
                 <ul className="space-y-4">
@@ -281,7 +278,7 @@ export function Footer() {
 
 
             {/* Twitter Showcase */}
-          <div className="mt-16 grid gap-8 md:grid-cols-2">
+          <div className="mt-16 grid max-w-full grid-cols-1 w-full gap-8 md:grid-cols-2">
             <Card className="bg-background/20">
               <CardHeader>
                 <CardTitle>Join our community on X</CardTitle>
@@ -312,7 +309,7 @@ export function Footer() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <Github className="h-8 w-8 ml-blue" />
                     <div>

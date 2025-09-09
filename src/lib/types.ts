@@ -293,3 +293,75 @@ export interface UserProfile {
   transactions: Transaction[];
   stats: UserStats;
 }
+
+// possible IP types
+export type IPType =
+  | "Audio"
+  | "Art"
+  | "Documents"
+  | "NFT"
+  | "Video"
+  | "Patents"
+  | "Posts"
+  | "Publications"
+  | "RWA"
+  | "Software"
+  | "Custom"
+  | "Generic";
+
+  
+export interface DisplayAsset {
+    id: string;
+    tags: string[];
+    tokenId: number;
+    name: string;
+    author: {
+      name: string;
+      address: string;
+      avatar: string;
+      verified: boolean;
+      bio: string;
+      website: string;
+    };
+    creator: {
+      name: string;
+      address: string;
+      avatar: string;
+      verified: boolean;
+      bio: string;
+      website: string;
+    };
+    owner: {
+      name: string;
+      address: string;
+      avatar: string;
+      verified: boolean;
+      acquired: string;
+    };
+    description: string;
+    template: string;
+    image: string;
+    createdAt: string;
+    collection: string;
+    blockchain: string;
+    tokenStandard: string;
+    licenseType: string;
+    licenseDetails: string;
+    version: string;
+    commercialUse: boolean;
+    modifications: boolean;
+    attribution: boolean;
+    licenseTerms: string;
+    contract: string;
+    attributes: Array<{ trait_type: string; value: string }>;
+    licenseInfo: {
+      type: string;
+      terms: string;
+      allowCommercial: boolean;
+      allowDerivatives: boolean;
+      requireAttribution: boolean;
+      royaltyPercentage: number;
+    };
+    ipfsCid?: string;
+    type: string;
+  }
