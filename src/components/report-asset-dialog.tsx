@@ -20,12 +20,15 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Flag, AlertTriangle, CheckCircle, Loader2 } from "lucide-react"
 
+type ContentType = "asset" | "collection" | "user"
+
 interface ReportAssetDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  assetId: string
-  assetName: string
-  assetCreator: string
+  contentId: string
+  contentName: string
+  contentCreator?: string
+  contentType?: ContentType
 }
 
 const reportReasons = [
@@ -38,7 +41,14 @@ const reportReasons = [
   { value: "other", label: "Other" },
 ]
 
-export function ReportAssetDialog({ open, onOpenChange, assetId, assetName, assetCreator }: ReportAssetDialogProps) {
+export function ReportAssetDialog({ 
+  open, 
+  onOpenChange, 
+  contentId, 
+  contentName, 
+  contentCreator,
+  contentType = "asset"
+}: ReportAssetDialogProps) {
   const [step, setStep] = useState<"form" | "submitting" | "success">("form")
   const [formData, setFormData] = useState({
     reason: "",
@@ -46,6 +56,21 @@ export function ReportAssetDialog({ open, onOpenChange, assetId, assetName, asse
     email: "",
     agreeToPolicy: false,
   })
+
+  const getContentTypeDisplayName = () => {
+    switch (contentType) {
+      case "asset": return "Asset"
+      case "collection": return "Collection"
+      case "user": return "User Profile"
+      default: return "Content"
+    }
+  }
+
+  const getReportDescription = () => {
+    const contentTypeName = getContentTypeDisplayName()
+    const creatorText = contentCreator ? ` by ${contentCreator}` : ""
+    return `Report "${contentName}"${creatorText} for policy violations or legal issues.`
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -93,10 +118,10 @@ export function ReportAssetDialog({ open, onOpenChange, assetId, assetName, asse
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Flag className="h-5 w-5 text-red-500" />
-            Report Asset
+            Report {getContentTypeDisplayName()}
           </DialogTitle>
           <DialogDescription>
-            Report "{assetName}" by {assetCreator} for policy violations or legal issues.
+            {getReportDescription()}
           </DialogDescription>
         </DialogHeader>
 
@@ -212,7 +237,7 @@ export function ReportAssetDialog({ open, onOpenChange, assetId, assetName, asse
                 necessary.
               </p>
               <p className="text-xs text-muted-foreground">
-                Report ID: #{assetId}-{Date.now().toString().slice(-6)}
+                Report ID: #{contentType.toUpperCase()}-{contentId}-{Date.now().toString().slice(-6)}
               </p>
             </div>
           </div>

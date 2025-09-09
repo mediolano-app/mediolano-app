@@ -36,7 +36,9 @@ import {
   Star,
   Filter,
   Box,
+  X,
 } from "lucide-react"
+import { ReportAssetDialog } from "@/components/report-asset-dialog"
 
 type SortOption = "value-high" | "value-low" | "name-asc" | "name-desc" | "size-high" | "size-low"
 
@@ -45,6 +47,11 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortOption, setSortOption] = useState<SortOption>("value-high")
   const [featuredOnly, setFeaturedOnly] = useState(false)
+  const [reportDialogState, setReportDialogState] = useState<{ isOpen: boolean; collectionId: string; collectionName: string }>({
+    isOpen: false,
+    collectionId: "",
+    collectionName: ""
+  })
   const nfts = getNFTs()
 
   // Filter collections based on search query and featured status
@@ -99,12 +106,15 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
     <div className="space-y-8">
       {featuredCollection && (
         <div className="mb-10">
-          <Link href={`/collections/${featuredCollection.id}`}>
-            <FeaturedCollectionCard
-               collection={featuredCollection}
-               nftCount={featuredCollection.itemCount}
-            />
-          </Link>
+          <FeaturedCollectionCard
+            collection={featuredCollection}
+            nftCount={featuredCollection.itemCount}
+            onReportClick={() => setReportDialogState({
+              isOpen: true,
+              collectionId: String(featuredCollection.id),
+              collectionName: featuredCollection.name
+            })}
+          />
         </div>
       )}
 
@@ -177,30 +187,44 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
           <p className="text-muted-foreground">No collections found matching your criteria</p>
         </div>
       ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 relative">
           {sortedCollections.map((collection: Collection) => (
-            <Link href={`/collections/${String(collection.id)}`} key={String(collection.id)}>
-              <CollectionCard
-               key={String(collection.id)}
-               collection={collection}
-               nftCount={collection.itemCount}
-               
-             />
-             </Link>
+            <CollectionCard
+              key={String(collection.id)}
+              collection={collection}
+              nftCount={collection.itemCount}
+              onReportClick={() => setReportDialogState({
+                isOpen: true,
+                collectionId: String(collection.id),
+                collectionName: collection.name
+              })}
+            />
           ))}
         </div>
       ) : (
         <div className="space-y-4">
           {sortedCollections.map((collection) => (
-            <Link href={`/collections/${String(collection.id)}`} key={String(collection.id)}>
-              <CollectionListItem
-                 collection={collection}
-                 nftCount={collection.itemCount}
-              />
-            </Link>
+            <CollectionListItem
+              key={String(collection.id)}
+              collection={collection}
+              nftCount={collection.itemCount}
+              onReportClick={() => setReportDialogState({
+                isOpen: true,
+                collectionId: String(collection.id),
+                collectionName: collection.name
+              })}
+            />
           ))}
         </div>
       )}
+      
+      <ReportAssetDialog
+        contentId={reportDialogState.collectionId}
+        contentName={reportDialogState.collectionName}
+        contentType="collection"
+        open={reportDialogState.isOpen}
+        onOpenChange={(open) => setReportDialogState(prev => ({ ...prev, isOpen: open }))}
+      />
     </div>
   )
 }
@@ -208,11 +232,12 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
 interface CollectionCardProps {
   collection: Collection
   nftCount: number
+  onReportClick: () => void
 }
  
 
 
-function CollectionCard({ collection, nftCount }: CollectionCardProps) {
+function CollectionCard({ collection, nftCount, onReportClick }: CollectionCardProps) {
   const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
   if(isFeatured) {console.log("featured collection", collection.id)}
   console.log("collection", collection.id)
@@ -220,33 +245,37 @@ function CollectionCard({ collection, nftCount }: CollectionCardProps) {
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group">
-      <div className="relative h-64 w-full">
-        <Image
-          src={coverImage || "/background.jpg"}
-          alt={collection.name}
-          fill
-          className="object-cover transition-all duration-300 group-hover:brightness-90"
-        />
-        {collection.floorPrice && (
-          <div className="absolute bottom-2 right-2">
-            <Badge className="bg-blue/80 backdrop-blur-sm">Floor: {collection.floorPrice} STRK</Badge>
-          </div>
-        )}
-        {isFeatured && (
-          <div className="absolute top-2 left-2">
-            <Badge
-              variant="secondary"
-              className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
-            >
-              <Star className="h-3 w-3 mr-1 fill-current" />
-              Featured
-            </Badge>
-          </div>
-        )}
-      </div>
+      <Link href={`/collections/${String(collection.id)}`}>
+        <div className="relative h-64 w-full">
+          <Image
+            src={coverImage || "/background.jpg"}
+            alt={collection.name}
+            fill
+            className="object-cover transition-all duration-300 group-hover:brightness-90"
+          />
+          {collection.floorPrice && (
+            <div className="absolute bottom-2 right-2">
+              <Badge className="bg-blue/80 backdrop-blur-sm">Floor: {collection.floorPrice} STRK</Badge>
+            </div>
+          )}
+          {isFeatured && (
+            <div className="absolute top-2 left-2">
+              <Badge
+                variant="secondary"
+                className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
+              >
+                <Star className="h-3 w-3 mr-1 fill-current" />
+                Featured
+              </Badge>
+            </div>
+          )}
+        </div>
+      </Link>
       <CardHeader className="pb-2 flex flex-row justify-between items-start">
-        <h3 className="text-xl font-bold">{collection.name}</h3>
-        <CollectionActionDropdown collectionId={String(collection.id)} />
+        <Link href={`/collections/${String(collection.id)}`}>
+          <h3 className="text-xl font-bold hover:text-primary transition-colors">{collection.name}</h3>
+        </Link>
+        <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
       </CardHeader>
       <CardContent className="pb-2">
         <p className="text-sm text-muted-foreground line-clamp-2">
@@ -269,40 +298,40 @@ function CollectionCard({ collection, nftCount }: CollectionCardProps) {
   )
 }
 
-function CollectionListItem({ collection, nftCount }: CollectionCardProps) {
+function CollectionListItem({ collection, nftCount, onReportClick }: CollectionCardProps) {
   // Use the collection's image from IPFS metadata
   const coverImage = collection.image || "/placeholder.svg?height=400&width=600"
    const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
 
   return (
-    <div className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors">
-      <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
-        <Image src={coverImage || "/backgroound.jpg"} alt={collection.name} fill className="object-cover" />
-      </div>
+    <div className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
+      <Link href={`/collections/${String(collection.id)}`} className="flex items-center gap-4 flex-grow cursor-pointer">
+        <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
+          <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
+        </div>
 
-      <div className="flex-grow min-w-0">
-        <div className="flex items-start">
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-medium">{collection.name}</h3>
-              {isFeatured && (
-                <Badge
-                  variant="secondary"
-                  className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
-                >
-                  <Star className="h-3 w-3 mr-1 fill-current" />
-                  Featured
-                </Badge>
-              )}
+        <div className="flex-grow min-w-0">
+          <div className="flex items-start">
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-medium hover:text-primary transition-colors">{collection.name}</h3>
+                {isFeatured && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
+                  >
+                    <Star className="h-3 w-3 mr-1 fill-current" />
+                    Featured
+                  </Badge>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground line-clamp-1">
+                {collection.description || "No description available"}
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground line-clamp-1">
-              {collection.description || "No description available"}
-            </p>
           </div>
         </div>
-      </div>
 
-      <div className="flex items-center gap-2 sm:gap-4">
         <div className="hidden sm:flex flex-col items-end">
           <div className="flex items-center gap-1 text-sm">
             <Grid3X3 className="h-4 w-4 text-muted-foreground" />
@@ -313,36 +342,41 @@ function CollectionListItem({ collection, nftCount }: CollectionCardProps) {
              <span>-- STRK</span>
           </div>
         </div>
-        <CollectionActionDropdown collectionId={String(collection.id)} />
-      </div>
+      </Link>
+      
+      <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
     </div>
   )
 }
 
-export function FeaturedCollectionCard({ collection, nftCount }: CollectionCardProps) {
+export function FeaturedCollectionCard({ collection, nftCount, onReportClick }: CollectionCardProps) {
   
   const coverImage = collection.image || "/background.jpg"
 
   return (
     <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-        <div className="relative h-64 md:h-auto">
-          <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
-          <div className="absolute top-4 left-4">
-            <Badge
-              variant="secondary"
-              className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
-            >
-              <Star className="h-3 w-3 mr-1 fill-current" />
-              Featured Collection
-            </Badge>
+        <Link href={`/collections/${String(collection.id)}`}>
+          <div className="relative h-64 md:h-auto">
+            <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover hover:brightness-90 transition-all duration-300" />
+            <div className="absolute top-4 left-4">
+              <Badge
+                variant="secondary"
+                className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
+              >
+                <Star className="h-3 w-3 mr-1 fill-current" />
+                Featured Collection
+              </Badge>
+            </div>
           </div>
-        </div>
+        </Link>
         <div className="p-4 md:p-6 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start">
-               <h2 className="text-xl md:text-2xl font-bold mb-2">{collection.name}</h2>
-               <CollectionActionDropdown collectionId={String(collection.id)} />
+               <Link href={`/collections/${String(collection.id)}`}>
+                 <h2 className="text-xl md:text-2xl font-bold mb-2 hover:text-primary transition-colors">{collection.name}</h2>
+               </Link>
+               <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
             </div>
             <p className="text-sm text-muted-foreground mb-4 line-clamp-3 md:line-clamp-none">
               {collection.description}
@@ -413,7 +447,7 @@ export function FeaturedCollectionCard({ collection, nftCount }: CollectionCardP
   )
 }
 
-function CollectionActionDropdown({ collectionId }: { collectionId: string }) {
+function CollectionActionDropdown({ collectionId, collectionName, onReportClick }: { collectionId: string; collectionName?: string; onReportClick: () => void }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -425,7 +459,6 @@ function CollectionActionDropdown({ collectionId }: { collectionId: string }) {
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation()
-            // Handle edit collection action
             console.log("Edit Collection:", collectionId)
           }}
         >
@@ -435,7 +468,6 @@ function CollectionActionDropdown({ collectionId }: { collectionId: string }) {
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation()
-            // Handle add NFT action
             console.log("Add Programmable IP to Collection:", collectionId)
           }}
         >
@@ -446,7 +478,16 @@ function CollectionActionDropdown({ collectionId }: { collectionId: string }) {
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation()
-            // Handle delete collection action
+            onReportClick()
+          }}
+          className="text-destructive focus:text-destructive"
+        >
+          <X className="mr-2 h-4 w-4" />
+          Report Collection
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation()
             console.log("Delete Collection:", collectionId)
           }}
           className="text-destructive focus:text-destructive"
