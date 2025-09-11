@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FileText, Loader } from "lucide-react";
 import { AssetPreview } from "@/components/asset-creation/asset-preview";
@@ -32,6 +32,7 @@ export default function CreateAssetPage() {
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [showSuccessDrawer, setShowSuccessDrawer] = useState(false);
   const [mintResult, setMintResult] = useState<IMintResult | null>(null);
+  const [hasUserEditedCreator, setHasUserEditedCreator] = useState(false);
   const { address: walletAddress } = useAccount();
   const { uploadToIpfs, loading: upload_loading } = useIpfsUpload();
   const { createAsset, isCreating } = useCreateAsset();
@@ -45,6 +46,20 @@ export default function CreateAssetPage() {
     error: collection_error,
     reload,
   } = useGetCollections(walletAddress);
+
+  // Auto-populate creator field with wallet address
+  useEffect(() => {
+    if (walletAddress && formState.creator === "" && !hasUserEditedCreator) {
+      updateFormField("creator", walletAddress);
+    }
+  }, [walletAddress, updateFormField, hasUserEditedCreator]);
+
+  const handleCreatorFieldChange = (field: "creator", value: string) => {
+    if (field === "creator") {
+      setHasUserEditedCreator(true);
+    }
+    updateFormField(field, value);
+  };
 
   // Get selected template
   const selectedTemplate = getTemplateById(formState.assetType);
@@ -70,6 +85,7 @@ export default function CreateAssetPage() {
       external_url: "",
       attributes: [
         { trait_type: "Type", value: formState.assetType },
+        { trait_type: "Creator", value: formState.creator },
         { trait_type: "License", value: formState.licenseType },
         {
           trait_type: "Geographic Scope",
@@ -181,6 +197,7 @@ export default function CreateAssetPage() {
                 selectedTemplate={selectedTemplate}
                 onTemplateChange={handleTemplateChange}
                 showTemplateSelector={true}
+                onCreatorFieldChange={handleCreatorFieldChange}
               />
 
               {/* Template-Specific Fields */}

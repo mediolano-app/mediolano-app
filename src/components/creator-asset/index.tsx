@@ -157,7 +157,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
 
                 <div className="mt-6">
                   <IPTypeInfo
-                    asset={{ ...asset, ipfsCid: asset.ipfsCid || undefined }}
+                    asset={{ ...asset, ipfsCid: asset.ipfsCid, contractAddress: nftAddress || undefined }}
                   />
                 </div>
               </div>
@@ -210,11 +210,6 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     <Button variant="outline" className="w-full">
                       View on Explorer
                     </Button>
-                    <Link className="flex-1" target="_blank" href={`${EXPLORER_URL}/nft/${nftAddress}/${tokenId}`}>
-                      <Button variant="outline" className="w-full">
-                        View on Explorer
-                      </Button>
-                    </Link>
                   </Link>
                 </div>
               </div>

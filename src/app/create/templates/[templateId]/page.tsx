@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Eye } from "lucide-react"
-import Link from "next/link"
 
 import { AssetPreview } from "@/components/asset-creation/asset-preview"
 import { AssetConfirmation } from "@/components/asset-creation/asset-confirmation"
@@ -14,15 +12,18 @@ import { TemplateInfoCard } from "@/components/asset-creation/template-info-card
 import { TemplateSpecificFields } from "@/components/asset-creation/template-specific-fields"
 import { useAssetForm } from "@/hooks/use-asset-form"
 import { templates, getTemplateById } from "@/lib/templates"
+import { useAccount } from "@starknet-react/core"
 
 export default function CreateAssetFromTemplate() {
   const params = useParams()
   const router = useRouter()
   const templateId = params.templateId as string
+  const { address: walletAddress } = useAccount()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showMobilePreview, setShowMobilePreview] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [hasUserEditedCreator, setHasUserEditedCreator] = useState(false)
 
   // Find the template
   const template = getTemplateById(templateId)
@@ -31,6 +32,20 @@ export default function CreateAssetFromTemplate() {
   const { formState, updateFormField, handleFileChange, canSubmit } = useAssetForm({
     assetType: templateId,
   })
+
+  // Auto-populate creator field with wallet address
+  useEffect(() => {
+    if (walletAddress && formState.creator === "" && !hasUserEditedCreator) {
+      updateFormField("creator", walletAddress);
+    }
+  }, [walletAddress, updateFormField, hasUserEditedCreator]);
+
+  const handleCreatorFieldChange = (field: "creator", value: string) => {
+    if (field === "creator") {
+      setHasUserEditedCreator(true);
+    }
+    updateFormField(field, value);
+  };
 
   // Redirect if template not found
   useEffect(() => {
@@ -95,6 +110,10 @@ export default function CreateAssetFromTemplate() {
               selectedTemplate={template}
               onTemplateChange={handleTemplateChange}
               showTemplateSelector={false}
+              onCreatorFieldChange={handleCreatorFieldChange}
+              collections={[]}
+              isLoadingCollections={false}
+              collectionError={null}
             />
 
             {/* Template-Specific Fields */}
