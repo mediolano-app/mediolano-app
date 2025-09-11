@@ -28,23 +28,29 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import type { AssetFormState } from "@/hooks/use-asset-form";
+
+interface CollectionSummary { id: string | number; name: string }
+interface TemplateSummary { id: string; name: string }
+
 interface AssetFormCoreProps {
-  formState: any;
-  updateFormField: (field: string, value: any) => void;
+  formState: AssetFormState;
+  updateFormField: (field: string, value: unknown) => void;
   handleFileChange: (file: File | null) => void;
-  templates?: any[];
-  selectedTemplate?: any;
+  templates?: TemplateSummary[];
+  selectedTemplate?: TemplateSummary & Record<string, unknown>;
   onTemplateChange?: (templateId: string) => void;
   showTemplateSelector?: boolean;
-  collections: any;
+  collections: CollectionSummary[];
   isLoadingCollections?: boolean;
-  collectionError: any;
+  collectionError: unknown;
   openCollectionModal?: () => void;
   refetchCollections?: () => void;
+  onCreatorFieldChange?: (field: "creator", value: string) => void;
 }
 
 const getIconForTemplate = (templateId: string) => {
-  const icons: Record<string, any> = {
+  const icons: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
     audio: Music,
     art: Palette,
     video: Video,
@@ -69,6 +75,7 @@ export function AssetFormCore({
   collectionError,
   refetchCollections,
   showTemplateSelector = true,
+  onCreatorFieldChange,
 }: AssetFormCoreProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -132,9 +139,7 @@ export function AssetFormCore({
     }
   };
   const selectedCollection = (collectionId: string) =>
-    collections.find(
-      (c: { id: string }) => String(c.id) === String(collectionId)
-    );
+    collections.find((c) => String(c.id) === String(collectionId));
 
   return (
     <div className="space-y-6">
@@ -157,7 +162,7 @@ export function AssetFormCore({
                   <SelectValue placeholder="Select asset type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {templates.map((template) => {
+                  {templates.map((template: TemplateSummary) => {
                     const Icon = getIconForTemplate(template.id);
                     return (
                       <SelectItem key={template.id} value={template.id}>
@@ -186,7 +191,7 @@ export function AssetFormCore({
               </Label>
               <p className="text-sm text-muted-foreground">
                 Add the main file for your{" "}
-                {selectedTemplate?.name.toLowerCase() || "asset"}
+                {selectedTemplate?.name?.toLowerCase() || "asset"}
               </p>
             </div>
 
@@ -262,7 +267,7 @@ export function AssetFormCore({
             <Input
               id="title"
               placeholder={`Give your ${
-                selectedTemplate?.name.toLowerCase() || "asset"
+                selectedTemplate?.name?.toLowerCase() || "asset"
               } a compelling title`}
               value={formState.title}
               onChange={(e) => updateFormField("title", e.target.value)}
@@ -279,7 +284,7 @@ export function AssetFormCore({
             <Textarea
               id="description"
               placeholder={`Describe your ${
-                selectedTemplate?.name.toLowerCase() || "asset"
+                selectedTemplate?.name?.toLowerCase() || "asset"
               } and what makes it unique...`}
               value={formState.description}
               onChange={(e) => updateFormField("description", e.target.value)}
@@ -287,6 +292,23 @@ export function AssetFormCore({
               className="resize-none text-base"
               required
             />
+          </div>
+
+          {/* Creator */}
+          <div className="space-y-2">
+            <Label htmlFor="creator" className="text-base font-medium">
+              Creator
+            </Label>
+            <Input
+              id="creator"
+              placeholder="Your name or organization"
+              value={formState.creator}
+              onChange={(e) => (onCreatorFieldChange || updateFormField)("creator", e.target.value)}
+              className="h-12 text-base"
+            />
+            <p className="text-sm text-muted-foreground">
+              Defaults to your wallet address. You can edit this to add your name or organization.
+            </p>
           </div>
 
           {/* Tags */}
@@ -317,7 +339,7 @@ export function AssetFormCore({
               />
               <p className="text-sm text-muted-foreground">
                 Add relevant tags to help others discover your{" "}
-                {selectedTemplate?.name.toLowerCase() || "asset"}
+                {selectedTemplate?.name?.toLowerCase() || "asset"}
               </p>
             </div>
           </div>
@@ -332,7 +354,10 @@ export function AssetFormCore({
               value={formState.collection}
               onValueChange={(e) => [
                 updateFormField("collection", e),
-                updateFormField("collectionName", selectedCollection(e).name),
+                updateFormField(
+                  "collectionName",
+                  selectedCollection(e)?.name ?? ""
+                ),
               ]}
               disabled={isLoadingCollections && !collections?.length}
             >
@@ -358,7 +383,7 @@ export function AssetFormCore({
                   </div>
                 ) : collections?.length > 0 ? (
                   collections.map(
-                    (collection: { id: string; name: string }) => (
+                    (collection: CollectionSummary) => (
                       <SelectItem
                         key={collection.id}
                         value={String(collection.id)}

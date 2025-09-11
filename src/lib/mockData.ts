@@ -189,7 +189,7 @@ export const mockIPTypeData: Record<string, IPTypeDataType> = {
     keywords: ["contract", "agreement", "terms", "conditions"],
   },
   NFT: {
-    blockchain: "Ethereum",
+    blockchain: "Starknet",
     tokenStandard: "ERC-721",
     contractAddress: "0x1234567890abcdef1234567890abcdef12345678",
     tokenId: "42",
