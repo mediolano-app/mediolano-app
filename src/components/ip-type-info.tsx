@@ -730,12 +730,12 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                   <p className="text-sm text-muted-foreground">Token ID</p>
                   <p className="font-medium flex items-center gap-1">
                     <Hash className="h-4 w-4 text-muted-foreground" />
-                    {asText(typeData.tokenId)}
+                    {asText(asset.tokenId)}
                   </p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Contract Address</p>
-                  <p className="font-mono text-xs truncate">{asText(typeData.contractAddress)}</p>
+                  <p className="font-mono text-xs truncate">{asText(asset.contractAddress)}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Mint Date</p>
@@ -752,10 +752,10 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             <div className="space-y-2">
               <h3 className="font-medium">Traits</h3>
               <div className="grid grid-cols-3 gap-2">
-                {isTraitArray(typeData.traits) && typeData.traits.map((trait, index) => (
+                {isTraitArray(asset.attributes) && asset.attributes.map((trait, index) => (
                   <div key={index} className="rounded-lg border p-2 text-center">
-                    <p className="text-xs text-muted-foreground">{trait.trait_type}</p>
-                    <p className="font-medium truncate">{trait.value}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{trait.trait_type}</p>
+                    <p className="font-medium capitalize truncate">{trait.value}</p>
                   </div>
                 ))}
               </div>

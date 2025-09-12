@@ -2,13 +2,15 @@
 
 import { useState, useCallback } from "react"
 
-interface AssetFormState {
+export interface AssetFormState {
   // Basic fields
   title: string
   description: string
   tags: string[]
   collection: string
+  collectionName?: string
   assetType: string
+  creator: string
 
   // Media
   mediaFile?: File | null
@@ -20,7 +22,7 @@ interface AssetFormState {
   geographicScope: string
 
   // Template-specific metadata
-  metadataFields: Record<string, any>
+  metadataFields: Record<string, unknown>
 }
 
 const initialState: AssetFormState = {
@@ -28,7 +30,9 @@ const initialState: AssetFormState = {
   description: "",
   tags: [],
   collection: "",
+  collectionName: "",
   assetType: "general",
+  creator: "",
   mediaFile: null,
   mediaPreviewUrl: null,
   licenseType: "all-rights-reserved",
@@ -43,7 +47,7 @@ export function useAssetForm(defaultValues?: Partial<AssetFormState>) {
     ...defaultValues,
   })
 
-  const updateFormField = useCallback((field: string, value: any) => {
+  const updateFormField = useCallback((field: string, value: unknown) => {
     setFormState((prev) => ({
       ...prev,
       [field]: value,

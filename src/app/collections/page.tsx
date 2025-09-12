@@ -1,14 +1,21 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { CollectionsGrid, FeaturedCollectionCard } from "@/components/collections/collections-public"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useGetAllCollections } from "@/hooks/use-collection"
+import { ReportAssetDialog } from "@/components/report-asset-dialog"
 
 export default function CollectionsPage() {
   const router = useRouter();
   const { collections, loading, error } = useGetAllCollections();
   const featuredCollectionId = "5";
+  const [reportDialogState, setReportDialogState] = useState<{ isOpen: boolean; collectionId: string; collectionName: string }>({
+    isOpen: false,
+    collectionId: "",
+    collectionName: ""
+  });
 
   return (
     <div className="container mx-auto px-4 py-8 mb-20">
@@ -29,34 +36,35 @@ export default function CollectionsPage() {
         )}
 
         {/* Show collections when loaded successfully */}
-        {!loading && !error && collections && collections.length > 0 && (
-          <div className="mb-10">
-            {(() => {
-              // Find featured collection otherwise use the first collection
-              const featuredCollection = collections.find(c => c.id.toString() === featuredCollectionId) || collections[0];
-              const remainingCollections = collections.find(c => c.id.toString() === featuredCollectionId) 
-                ? collections.filter(c => c.id.toString() !== featuredCollectionId)
-                : collections.slice(1);
-              
-              return (
-                <>
-                  <div onClick={() => router.push(`/collections/${featuredCollection.id}`)}>
-                    <FeaturedCollectionCard
-                      collection={featuredCollection}
-                      nftCount={featuredCollection.itemCount}
-                    />
-                  </div>
-                  {/* collections in grid */}
-                  {remainingCollections.length > 0 && (
-                    <div className="mt-8">
-                      <CollectionsGrid collections={remainingCollections} />
-                    </div>
-                  )}
-                </>
-              );
-            })()}
-          </div>
-        )}
+        {!loading && !error && collections && collections.length > 0 && (() => {
+          // Find featured collection otherwise use the first collection
+          const featuredCollection = collections.find(c => c.id.toString() === featuredCollectionId) || collections[0];
+          const remainingCollections = collections.find(c => c.id.toString() === featuredCollectionId) 
+            ? collections.filter(c => c.id.toString() !== featuredCollectionId)
+            : collections.slice(1);
+          
+          return (
+            <div className="mb-10">
+              <div onClick={() => router.push(`/collections/${featuredCollection.id}`)}>
+                <FeaturedCollectionCard
+                  collection={featuredCollection}
+                  nftCount={featuredCollection.itemCount}
+                  onReportClick={() => setReportDialogState({
+                    isOpen: true,
+                    collectionId: String(featuredCollection.id),
+                    collectionName: featuredCollection.name
+                  })}
+                />
+              </div>
+              {/* collections in grid */}
+              {remainingCollections.length > 0 && (
+                <div className="mt-8">
+                  <CollectionsGrid collections={remainingCollections} />
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Show no collections message */}
         {!loading && !error && (!collections || collections.length === 0) && (
@@ -65,6 +73,14 @@ export default function CollectionsPage() {
           </div>
         )}
       </div>
+      
+      <ReportAssetDialog
+        contentId={reportDialogState.collectionId}
+        contentName={reportDialogState.collectionName}
+        contentType="collection"
+        open={reportDialogState.isOpen}
+        onOpenChange={(open) => setReportDialogState(prev => ({ ...prev, isOpen: open }))}
+      />
     </div>
   );
 }

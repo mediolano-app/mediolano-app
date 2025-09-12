@@ -180,7 +180,10 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
         />
 
         <ReportAssetDialog
-          asset={asset}
+          contentId={asset.id}
+          contentName={asset.name}
+          contentCreator={asset.creator}
+          contentType="asset"
           open={isReportOpen}
           onOpenChange={setIsReportOpen}
         />
@@ -331,7 +334,10 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
       />
 
       <ReportAssetDialog
-        asset={asset}
+        contentId={asset.id}
+        contentName={asset.name}
+        contentCreator={asset.creator}
+        contentType="asset"
         open={isReportOpen}
         onOpenChange={setIsReportOpen}
       />
