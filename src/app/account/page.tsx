@@ -474,9 +474,29 @@ export default function UserAccount() {
             ...prevUser,
             address: address,
           }));
+            toast({
+            title: "No Settings Found",
+            description: "Default options loaded. You can customize and save your profile settings.",
+            action: (
+              <div className="flex items-center gap-1 text-blue-600">
+                <Info className="w-4 h-4" />
+              </div>
+            ),
+          })
+
         }
       } catch (err) {
         console.error("Failed to load user settings:", err);
+          toast({
+          title: "Failed to Load Settings",
+          description: "There was an error loading your profile. Using default settings.",
+          variant: "destructive",
+          action: (
+            <div className="flex items-center gap-1">
+              <AlertCircle className="w-4 h-4" />
+            </div>
+          ),
+        })
       } finally {
         setIsLoading(false);
       }
