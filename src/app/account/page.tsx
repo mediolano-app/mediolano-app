@@ -2,6 +2,8 @@
 
 import { useState, ChangeEvent, useEffect, useCallback } from "react";
 import { useAccount } from "@starknet-react/core";
+import { Contract } from "starknet";
+import { accountABI } from "@/abis/account";
 import {
   useAccountContract,
   type PersonalInfo,
@@ -195,7 +197,7 @@ const getStarknetExplorerUrl = (txHash: string, network: "mainnet" | "sepolia" =
 
 export default function UserAccount() {
   // Wallet connection
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, account} = useAccount();
   const { toast } = useToast();
 
   // Account contract operations
@@ -397,15 +399,14 @@ export default function UserAccount() {
           })
 
           // Load complete profile data
-          const [profileData, personalInfo, socialLinks, settings] =
+          const [profileData, personalInfo, socialLinks] =
             await Promise.all([
               getProfile(address),
               getPersonalInfo(address),
               getSocialLinks(address),
-              getSettings(address),
             ]);
 
-          if (personalInfo && socialLinks && settings) {
+          if (personalInfo && socialLinks &&  profileData) {
             setUser((prevUser: UserProfile) => ({
               ...prevUser,
               address: address,
@@ -429,11 +430,33 @@ export default function UserAccount() {
               },
               preferences: {
                 ...prevUser.preferences,
-                publicProfile: settings.display_public_profile || false,
-                emailNotifications: settings.email_notifications || false,
-                marketProfile: settings.marketplace_profile || false,
+                publicProfile: profileData?.display_public_profile || false,
+                emailNotifications: profileData?.email_notifications || false,
+                marketProfile: profileData?.marketplace_profile || false,
               },
             }));
+              // Owner-bound settings read: call through connected wallet so contract sees caller
+          const contractAddress = process.env
+            .NEXT_PUBLIC_ACCOUNT_CONTRACT_ADDRESS as `0x${string}` | undefined;
+          if (account && contractAddress) {
+            try {
+              const ownerContract = new Contract(accountABI as any, contractAddress, account);
+              const ownerSettings = await (ownerContract as any).get_settings(address);
+              if (ownerSettings) {
+                setUser((prevUser: UserProfile) => ({
+                  ...prevUser,
+                  preferences: {
+                    ...prevUser.preferences,
+                    publicProfile: ownerSettings.display_public_profile || false,
+                    emailNotifications: ownerSettings.email_notifications || false,
+                    marketProfile: ownerSettings.marketplace_profile || false,
+                  },
+                }));
+              }
+            } catch (_) {
+              
+            }
+            
              toast({
               title: "Settings Loaded Successfully",
               description: "Your profile settings have been loaded from the blockchain.",
@@ -444,38 +467,18 @@ export default function UserAccount() {
               ),
             })
           }
+          }
         } else {
           console.log("Profile not registered, using defaults");
           setUser((prevUser: UserProfile) => ({
             ...prevUser,
             address: address,
           }));
-           toast({
-            title: "No Settings Found",
-            description: "Default options loaded. You can customize and save your profile settings.",
-            action: (
-              <div className="flex items-center gap-1 text-blue-600">
-                <Info className="w-4 h-4" />
-              </div>
-            ),
-          })
-
         }
       } catch (err) {
         console.error("Failed to load user settings:", err);
-          toast({
-          title: "Failed to Load Settings",
-          description: "There was an error loading your profile. Using default settings.",
-          variant: "destructive",
-          action: (
-            <div className="flex items-center gap-1">
-              <AlertCircle className="w-4 h-4" />
-            </div>
-          ),
-        })
       } finally {
         setIsLoading(false);
-        setIsInitialLoad(false);
       }
     };
 
@@ -488,10 +491,9 @@ export default function UserAccount() {
     getPersonalInfo,
     getSocialLinks,
     getSettings,
-    toast,
-    isInitialLoad,
   ]);
 
+       
   // Image Upload Handlers
   const handleImageUpload = useCallback(
     (event: ChangeEvent<HTMLInputElement>, type: ImageType): void => {
