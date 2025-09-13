@@ -35,21 +35,16 @@ import {
 import Link from "next/link"
 import { CollectionCard } from "@/components/collection-card"
 import NFTCard from "@/components/nft-card"
-import { getCreatorBySlug, getCollectionsByCreator, getAssetsByCreator, getRemixAssetsByCreator } from "@/lib/mock-data"
-import { fetchUserCollections } from "@/lib/starknet-user"
+import { getCreatorBySlug, getAssetsByCreator, getRemixAssetsByCreator } from "@/lib/mock-data";
 import {
   useGetCollections,
-  useIsCollectionOwner,
 } from "@/hooks/use-collection";
-import { useGetCollection } from "@/hooks/use-collection"
-import { Asset } from "@/types/asset"
-import { useAccount } from "@starknet-react/core"
-import { Collection } from "@/lib/types"
+
 
 interface CreatorPageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export default function CreatorPage({ params }: CreatorPageProps) {
@@ -60,47 +55,32 @@ export default function CreatorPage({ params }: CreatorPageProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [filterType, setFilterType] = useState<string>("all")
   const [slug, setSlug] = useState<string | undefined>();
-  const [collectionsError, setCollectionsError] = useState<string | null>(null);
-  const [collectionsData, setCollectionsData] = useState<Collection[]>([])
-    const { fetchCollection } = useGetCollection()
-      const { address: walletAddress } = useAccount();
+  const [resolvedAddress, setResolvedAddress] = useState<string>("")
 
-      const {
+  // Resolve address from params
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params
+      setResolvedAddress(resolvedParams.slug)
+      setSlug(resolvedParams.slug)
+    }
+    resolveParams()
+  }, [params])
+
+  const {
     collections,
     loading: collection_loading,
     error: collection_error,
     reload,
-  } = useGetCollections(walletAddress as `0x${string}`);
+  } = useGetCollections(resolvedAddress as `0x${string}`);
 
-  console.log('collection', collections)
 
-     useEffect(() => {
-  const loadCollections = async () => {
-    setLoading(true);
-    setCollectionsError(null);
-    try {
-      const data = await Promise.all(
-        collections.map((collection) => fetchCollection(collection?.id as string))
-      );
-      setCollectionsData(data as Collection[]);
-    } catch (err) {
-      setCollectionsError(err instanceof Error ? err.message : "Failed to fetch collections");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (collections && collections.length > 0) {
-    loadCollections();
-  }
-}, [collections]);
-
-useEffect(() => {
-  (async () => {
-    const p = await params;
-    setSlug(p.slug);
-  })();
-}, [params]);
+  useEffect(() => {
+    (async () => {
+      const p = await params;
+      setSlug(p.slug);
+    })();
+  }, [params]);
 
   const creator = slug ? getCreatorBySlug(slug) : undefined
 
@@ -109,11 +89,11 @@ useEffect(() => {
     return () => clearTimeout(timer)
   }, [])
 
-  if (!loading && !creator) {
-    notFound()
-  }
+  // if (!collection_loading) {
+  //   notFound()
+  // }
 
-  if (loading || !creator) {
+  if (collection_loading) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto p-4 py-6">
@@ -140,8 +120,29 @@ useEffect(() => {
   }
 
 
-  const creatorAssets = getAssetsByCreator(creator.name)
-  const remixAssets = getRemixAssetsByCreator(creator.name)
+  // Create fallback creator data for blockchain addresses
+  const fallbackCreator = {
+    name: creator?.name || `${resolvedAddress.slice(0, 6)}...${resolvedAddress.slice(-4)}`,
+    address: creator?.address || resolvedAddress,
+    avatar: creator?.avatar || "/placeholder.svg",
+    verified: creator?.verified || false,
+    bio: creator?.bio || "Blockchain user",
+    website: creator?.website || "",
+    twitter: creator?.twitter || "",
+    instagram: creator?.instagram || "",
+    discord: creator?.discord || "",
+    joinDate: creator?.joinDate || "Unknown",
+    totalAssets: creator?.totalAssets || 0,
+    totalValue: creator?.totalValue || "0 ETH",
+    totalSales: creator?.totalSales || 0,
+    followers: creator?.followers || 0,
+    following: creator?.following || 0,
+    specialties: creator?.specialties || [],
+    location: creator?.location || "",
+  }
+
+  const creatorAssets = getAssetsByCreator("Alex Chen")
+  const remixAssets = getRemixAssetsByCreator("Alex Chen")
 
   const filteredCollections = collections.filter(
     (collection) =>
@@ -149,21 +150,19 @@ useEffect(() => {
       collection.description.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
-  const filteredAssets = collectionsData.filter((asset) => {
+  const filteredAssets = creatorAssets.filter((collection) => {
     const matchesSearch =
-      asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.description.toLowerCase().includes(searchQuery.toLowerCase())
+      collection.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      collection.description.toLowerCase().includes(searchQuery.toLowerCase())
 
-    const matchesFilter = filterType === "all" || asset.type?.toLowerCase() === filterType.toLowerCase()
+    const matchesFilter = filterType === "all" || collection.type?.toLowerCase() === filterType.toLowerCase()
 
     return matchesSearch && matchesFilter
   })
 
-  //  console.log('filtered assets', filteredAssets)
-
   const handleCopyAddress = async () => {
     try {
-      await navigator.clipboard.writeText(creator.address)
+      await navigator.clipboard.writeText(fallbackCreator.address)
       setCopiedAddress(true)
       setTimeout(() => setCopiedAddress(false), 2000)
     } catch (error) {
@@ -202,9 +201,9 @@ useEffect(() => {
             {/* Avatar and Basic Info */}
             <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
               <Avatar className="h-32 w-32 md:h-40 md:w-40 border-4 border-white/20 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm">
-                <AvatarImage src={creator.avatar || "/placeholder.svg"} alt={creator.name} />
+                <AvatarImage src={fallbackCreator.avatar || "/placeholder.svg"} alt={fallbackCreator.name || resolvedAddress} />
                 <AvatarFallback className="text-white text-2xl md:text-3xl font-bold bg-gradient-to-br from-blue-500 to-purple-600">
-                  {creator.name
+                  {fallbackCreator.name
                     .split(" ")
                     .map((n: any) => n[0])
                     .join("")}
@@ -214,11 +213,11 @@ useEffect(() => {
               {/* Mobile-only basic info */}
               <div className="mt-4 lg:hidden">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <h1 className="text-2xl md:text-3xl font-bold text-white">{creator.name}</h1>
-                  {creator.verified && <CheckCircle className="h-6 w-6 text-blue-400" />}
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">{fallbackCreator.name || resolvedAddress}</h1>
+                  {fallbackCreator.verified && <CheckCircle className="h-6 w-6 text-blue-400" />}
                 </div>
                 <div className="flex flex-wrap justify-center gap-2">
-                  {creator.specialties.slice(0, 2).map((specialty: any) => (
+                  {fallbackCreator.specialties.slice(0, 2).map((specialty: any) => (
                     <Badge key={specialty} className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
                       {specialty}
                     </Badge>
@@ -230,31 +229,31 @@ useEffect(() => {
             {/* Main Info - Hidden on mobile, shown on larger screens */}
             <div className="hidden lg:block flex-1 text-white">
               <div className="flex items-center gap-3 mb-4">
-                <h1 className="text-4xl xl:text-5xl font-bold">{creator.name.slice(0, 5)}...{creator.name.slice(-5)}</h1>
-                {creator.verified && <CheckCircle className="h-8 w-8 text-blue-400" />}
+                <h1 className="text-4xl xl:text-5xl font-bold">{fallbackCreator.name.slice(0, 5) || resolvedAddress.slice(0, 5)}...{fallbackCreator.name.slice(-5) || resolvedAddress.slice(-5)}</h1>
+                {fallbackCreator.verified || true && <CheckCircle className="h-8 w-8 text-blue-400" />}
               </div>
 
-              <p className="text-xl text-white/90 mb-6 max-w-2xl leading-relaxed">{creator.bio}</p>
+              <p className="text-xl text-white/90 mb-6 max-w-2xl leading-relaxed">{fallbackCreator.bio || ""}</p>
 
               <div className="flex flex-wrap items-center gap-6 text-white/80 mb-6">
-                {creator.location && (
+                {fallbackCreator.location && (
                   <div className="flex items-center gap-2">
                     <MapPin className="h-5 w-5" />
-                    <span>{creator.location}</span>
+                    <span>{fallbackCreator.location || ""}</span>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
-                  <span>Joined {creator.joinDate}</span>
+                  <span>Joined {fallbackCreator.joinDate || ""}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-5 w-5" />
-                  <span>{creator.followers.toLocaleString()} followers</span>
+                  <span>{fallbackCreator.followers.toLocaleString() || "0"} followers</span>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2 mb-8">
-                {creator.specialties.map((specialty: any) => (
+                {fallbackCreator.specialties.map((specialty: any) => (
                   <Badge
                     key={specialty}
                     className="bg-white/20 text-white border-white/30 backdrop-blur-sm text-sm px-3 py-1"
@@ -277,13 +276,13 @@ useEffect(() => {
                   <Share2 className="h-4 w-4 mr-2" />
                   Share Profile
                 </Button>
-                {creator.website && (
+                {fallbackCreator.website && (
                   <Button
                     variant="outline"
                     className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm bg-transparent"
                     asChild
                   >
-                    <a href={creator.website} target="_blank" rel="noopener noreferrer">
+                    <a href={fallbackCreator.website} target="_blank" rel="noopener noreferrer">
                       <Globe className="h-4 w-4 mr-2" />
                       Website
                     </a>
@@ -302,7 +301,7 @@ useEffect(() => {
               </Card>
               <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold">{collectionsData.length}</div>
+                  <div className="text-2xl font-bold">{collections.length}</div>
                   <div className="text-sm text-white/80">Assets</div>
                 </CardContent>
               </Card>
@@ -314,7 +313,7 @@ useEffect(() => {
               </Card>
               <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white">
                 <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold">{creator.totalValue}</div>
+                  <div className="text-2xl font-bold">{fallbackCreator.totalValue}</div>
                   <div className="text-sm text-white/80">Total Value</div>
                 </CardContent>
               </Card>
@@ -326,18 +325,18 @@ useEffect(() => {
       {/* Mobile Info Section */}
       <div className="lg:hidden bg-background border-b">
         <div className="container mx-auto px-4 py-6">
-          <p className="text-muted-foreground mb-4 text-center">{creator.bio}</p>
+          <p className="text-muted-foreground mb-4 text-center">{fallbackCreator.bio}</p>
 
           <div className="flex justify-center items-center gap-4 text-sm text-muted-foreground mb-4">
-            {creator.location && (
+            {fallbackCreator.location && (
               <div className="flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
-                <span>{creator.location}</span>
+                <span>{fallbackCreator.location}</span>
               </div>
             )}
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              <span>Joined {creator.joinDate}</span>
+              <span>Joined {fallbackCreator.joinDate}</span>
             </div>
           </div>
 
@@ -369,7 +368,7 @@ useEffect(() => {
             <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
               <CardContent className="p-4 text-center">
                 <Palette className="h-6 w-6 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-900 dark:text-green-100">{collectionsData.length}</div>
+                <div className="text-2xl font-bold text-green-900 dark:text-green-100">{collections.length}</div>
                 <div className="text-sm text-green-700 dark:text-green-300">Assets</div>
               </CardContent>
             </Card>
@@ -385,7 +384,7 @@ useEffect(() => {
             <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
               <CardContent className="p-4 text-center">
                 <TrendingUp className="h-6 w-6 text-orange-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">{creator.totalSales}</div>
+                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">{fallbackCreator.totalSales}</div>
                 <div className="text-sm text-orange-700 dark:text-orange-300">Sales</div>
               </CardContent>
             </Card>
@@ -473,7 +472,7 @@ useEffect(() => {
                     <p className="text-muted-foreground">
                       {searchQuery
                         ? `No collections match "${searchQuery}"`
-                        : `${creator.name} hasn't created any collections yet.`}
+                        : `${fallbackCreator.name} hasn't created any collections yet.`}
                     </p>
                   </Card>
                 )}
@@ -497,7 +496,7 @@ useEffect(() => {
                     <p className="text-muted-foreground">
                       {searchQuery || filterType !== "all"
                         ? "No assets match your current filters"
-                        : `${creator.name} hasn't created any assets yet.`}
+                        : `${fallbackCreator.name} hasn't created any assets yet.`}
                     </p>
                   </Card>
                 )}
@@ -514,7 +513,7 @@ useEffect(() => {
                   <Card className="p-12 text-center">
                     <GitBranch className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">No remixes found</h3>
-                    <p className="text-muted-foreground">{`${creator.name} hasn't created any remixes yet.`}</p>
+                    <p className="text-muted-foreground">{`${fallbackCreator.name} hasn't created any remixes yet.`}</p>
                   </Card>
                 )}
               </TabsContent>
@@ -536,7 +535,7 @@ useEffect(() => {
                   <label className="text-sm font-medium text-muted-foreground">Wallet Address</label>
                   <div className="flex items-center gap-2 mt-1">
                     <code className="text-sm bg-muted px-2 py-1 rounded flex-1 font-mono">
-                      {formatAddress(creator.address)}
+                      {formatAddress(fallbackCreator.address)}
                     </code>
                     <Button variant="ghost" size="sm" onClick={handleCopyAddress} className="h-8 w-8 p-0">
                       {copiedAddress ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
@@ -548,11 +547,11 @@ useEffect(() => {
 
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
-                    <div className="text-2xl font-bold">{creator.followers.toLocaleString()}</div>
+                    <div className="text-2xl font-bold">{fallbackCreator.followers.toLocaleString()}</div>
                     <div className="text-sm text-muted-foreground">Followers</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold">{creator.following.toLocaleString()}</div>
+                    <div className="text-2xl font-bold">{fallbackCreator.following.toLocaleString()}</div>
                     <div className="text-sm text-muted-foreground">Following</div>
                   </div>
                 </div>
@@ -561,13 +560,13 @@ useEffect(() => {
 
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Total Portfolio Value</label>
-                  <div className="text-xl font-bold mt-1">{creator.totalValue}</div>
+                  <div className="text-xl font-bold mt-1">{fallbackCreator.totalValue}</div>
                 </div>
 
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Specialties</label>
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {creator.specialties.map((specialty) => (
+                    {fallbackCreator.specialties.map((specialty) => (
                       <Badge key={specialty} variant="outline" className="text-xs">
                         {specialty}
                       </Badge>
@@ -586,9 +585,9 @@ useEffect(() => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {creator.website && (
+                {fallbackCreator.website && (
                   <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
-                    <a href={creator.website} target="_blank" rel="noopener noreferrer">
+                    <a href={fallbackCreator.website} target="_blank" rel="noopener noreferrer">
                       <Globe className="h-4 w-4 mr-2" />
                       Website
                       <ExternalLink className="h-3 w-3 ml-auto" />
@@ -596,9 +595,9 @@ useEffect(() => {
                   </Button>
                 )}
 
-                {creator.twitter && (
+                {fallbackCreator.twitter && (
                   <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
-                    <a href={creator.twitter} target="_blank" rel="noopener noreferrer">
+                    <a href={fallbackCreator.twitter} target="_blank" rel="noopener noreferrer">
                       <Twitter className="h-4 w-4 mr-2" />
                       Twitter
                       <ExternalLink className="h-3 w-3 ml-auto" />
@@ -606,9 +605,9 @@ useEffect(() => {
                   </Button>
                 )}
 
-                {creator.instagram && (
+                {fallbackCreator.instagram && (
                   <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
-                    <a href={creator.instagram} target="_blank" rel="noopener noreferrer">
+                    <a href={fallbackCreator.instagram} target="_blank" rel="noopener noreferrer">
                       <Instagram className="h-4 w-4 mr-2" />
                       Instagram
                       <ExternalLink className="h-3 w-3 ml-auto" />
@@ -616,10 +615,10 @@ useEffect(() => {
                   </Button>
                 )}
 
-                {creator.discord && (
+                {fallbackCreator.discord && (
                   <Button variant="outline" className="w-full justify-start bg-transparent">
                     <MessageCircle className="h-4 w-4 mr-2" />
-                    {creator.discord}
+                    {fallbackCreator.discord}
                   </Button>
                 )}
               </CardContent>
