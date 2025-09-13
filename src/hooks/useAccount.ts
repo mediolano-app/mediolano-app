@@ -106,7 +106,12 @@ export const useAccountContract = () => {
     async (user: `0x${string}`) => {
       if (!contract) return null;
       try {
-        return await contract.get_settings(user);
+         if (typeof contract.get_settings === 'function') {
+            return contract.get_settings(user);
+      } else {
+        console.error(" Settings function not found on contract");
+        return null;
+      }
       } catch (err) {
         console.error("Error getting settings:", err);
         return null;
@@ -119,7 +124,12 @@ export const useAccountContract = () => {
     async (user: `0x${string}`) => {
       if (!contract) return false;
       try {
+          if (typeof contract.is_profile_registered === 'function') {
         return await contract.is_profile_registered(user);
+      } else {
+        console.error("[ Function not found on contract");
+        return false;
+      }
       } catch (err) {
         console.error("Error checking profile registration:", err);
         return false;
