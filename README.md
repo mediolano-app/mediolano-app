@@ -1,5 +1,3 @@
-<img width="1252" height="888" alt="image" src="https://github.com/user-attachments/assets/29a76a8b-9d05-489f-945b-eacca9b17996" />
-
 > [!IMPORTANT]
 > Mediolano dapp is in constant development. Use for testing purposes only. 
 
@@ -60,15 +58,15 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 - [X] MIP Collections Protocol @ Starknet Mainnet **25.08**
 
-- [ ] Mediolano Dapp @ Starknet Mainnet **25.09**
+- [ ] Mediolano Dapp @ Starknet Mainnet **25.10**
 
-- [ ] Medialane Protocol @ Starknet Sepolia **25.08**
+- [ ] Medialane Protocol @ Starknet Sepolia **25.11**
 
-- [ ] Medialane Dapp @ Starknet Sepolia **25.09**
+- [ ] Medialane Dapp @ Starknet Sepolia **25.11**
 
-- [ ] Medialane Protocol @ Starknet Mainnet **25.11**
+- [ ] Medialane Protocol @ Starknet Mainnet **25.12**
 
-- [ ] Medialane Dapp @ Starknet Mainnet **25.11**
+- [ ] Medialane Dapp @ Starknet Mainnet **25.12**
 
 
 ## Contributing
