@@ -8,7 +8,7 @@ import AnimatedBackground from "@/components/animated-bg";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "Mediolano",
+  title: "IP Creator | Mediolano",
   description: "Programmable IP for the Integrity Web",
 };
 
