@@ -1,3 +1,6 @@
+![mediolano-programmable-ip-integrity-web-feature-image](https://github.com/user-attachments/assets/3fd36f9c-a766-41ec-b217-08c5e2054b90)
+
+
 > [!IMPORTANT]
 > Mediolano dapp is in constant development. Use for testing purposes only. 
 
