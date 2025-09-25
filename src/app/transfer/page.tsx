@@ -32,6 +32,8 @@ import {
   Send,
   Copy,
   ExternalLink,
+  AlertCircle,
+  RefreshCw,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,11 +46,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { TransferAssetDialog } from "@/components/transfer-asset-dialog"
 import { useToast } from "@/hooks/use-toast"
-import { assets } from "@/lib/mock-data"
+import { UserAssetsList } from "@/components/assets/user-assets-list"
+import { AssetsSelectionHeader } from "@/components/assets/assets-selection-header"
+import { useUserAssets } from "@/hooks/use-user-assets"
+// Uncomment the line below and comment the line above to test with mock data
+// import { useUserAssetsMock as useUserAssets } from "@/hooks/use-user-assets-mock"
+import { useAccount } from "@starknet-react/core"
 import type { IPType } from "@/types/asset"
 
-// Current user's wallet address
-const CURRENT_USER_ADDRESS = "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+// We'll get the current user address from Starknet wallet
+// const CURRENT_USER_ADDRESS = "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
 
 const typeIcons: Record<IPType, any> = {
   Art: Palette,
@@ -78,6 +85,8 @@ export default function TransferPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
+  const { address } = useAccount()
+  const { assets: userAssets, loading: assetsLoading, error: assetsError, refetch } = useUserAssets()
 
   // State for asset selection and filtering
   const [selectedAssets, setSelectedAssets] = useState<string[]>([])
@@ -85,17 +94,16 @@ export default function TransferPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list") // Default to list view
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name" | "value">("newest")
   const [filterType, setFilterType] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [transferDialogOpen, setTransferDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("owned")
 
-  // Enhance assets with missing fields for transfer functionality
-  const enhancedAssets = assets.map((asset, index) => ({
+  // Use real user assets from blockchain
+  const enhancedAssets = userAssets.map((asset) => ({
     ...asset,
-    // Assign ownership - most assets to current user, some to Customs for "received" tab
-    owner: index === 1 || index === 5 ? "0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t" : CURRENT_USER_ADDRESS,
-    // Add creation dates
-    createdAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString(),
+    // Set owner to current connected address
+    owner: address || '',
+    // Add creation dates from asset registration
+    createdAt: asset.registrationDate,
     // Add numeric values for sorting
     numericValue: Number.parseFloat(asset.value.split(" ")[0]) * 1000, // Convert ETH to USD equivalent
   }))
@@ -109,8 +117,9 @@ export default function TransferPage() {
 
     const matchesFilter = filterType ? asset.type === filterType : true
 
-    const matchesTab =
-      activeTab === "owned" ? asset.owner === CURRENT_USER_ADDRESS : asset.owner !== CURRENT_USER_ADDRESS
+    // For now, all assets are "owned" since we're fetching user's assets
+    // In the future, could implement received assets logic
+    const matchesTab = activeTab === "owned" ? true : false
 
     return matchesSearch && matchesFilter && matchesTab
   })
@@ -148,15 +157,21 @@ export default function TransferPage() {
   // Handle transfer completion
   const handleTransferComplete = (recipientAddress: string, memo?: string) => {
     const transferredAssets = enhancedAssets.filter((asset) => selectedAssets.includes(asset.id))
-    const totalValue = transferredAssets.reduce((sum, asset) => sum + asset.numericValue, 0)
+    const totalValue = transferredAssets.reduce((sum, asset) => {
+      const value = Number.parseFloat(asset.value.split(" ")[0]) || 0
+      return sum + value
+    }, 0)
 
     toast({
       title: "Transfer Complete",
-      description: `${selectedAssets.length} asset${selectedAssets.length > 1 ? "s" : ""} (${(totalValue / 1000).toFixed(2)} ETH) transferred to ${recipientAddress.substring(0, 6)}...${recipientAddress.substring(recipientAddress.length - 4)}`,
+      description: `${selectedAssets.length} asset${selectedAssets.length > 1 ? "s" : ""} (${totalValue.toFixed(2)} ETH) transferred to ${recipientAddress.substring(0, 6)}...${recipientAddress.substring(recipientAddress.length - 4)}`,
     })
 
     // Reset selection after transfer
     setSelectedAssets([])
+    
+    // Refresh assets list to reflect ownership changes
+    refetch()
   }
 
   // Copy address to clipboard
@@ -172,22 +187,16 @@ export default function TransferPage() {
     }
   }
 
-  // Simulate loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [])
+  // Use loading state from useUserAssets hook
+  const isLoading = assetsLoading
 
   // Check if an asset was pre-selected via URL params
   useEffect(() => {
     const assetId = searchParams.get("assetId")
-    if (assetId && enhancedAssets.find((a) => a.id === assetId && a.owner === CURRENT_USER_ADDRESS)) {
+    if (assetId && enhancedAssets.find((a) => a.id === assetId)) {
       setSelectedAssets([assetId])
     }
-  }, [searchParams])
+  }, [searchParams, enhancedAssets])
 
   // Asset type filters based on actual data
   const assetTypes = [
@@ -204,15 +213,17 @@ export default function TransferPage() {
   // Calculate selection stats
   const selectedValue = enhancedAssets
     .filter((asset) => selectedAssets.includes(asset.id))
-    .reduce((sum, asset) => sum + asset.numericValue, 0)
+    .reduce((sum, asset) => {
+      const value = Number.parseFloat(asset.value.split(" ")[0]) || 0
+      return sum + value
+    }, 0)
 
-  const ownedAssets = enhancedAssets.filter((a) => a.owner === CURRENT_USER_ADDRESS)
-  const receivedAssets = enhancedAssets.filter((a) => a.owner !== CURRENT_USER_ADDRESS)
+  const ownedAssets = enhancedAssets // All assets are owned by the connected user
+  const receivedAssets: typeof enhancedAssets = [] // No received assets for now
 
   return (
-    <div className="flex flex-col min-h-screen bg-background mb-20">
-
-      <main className="flex-1 container p-6 space-y-6">
+    <div className="min-h-screen bg-background/70 text-foreground pb-20">
+      <main className="container mx-auto p-4 py-6 space-y-6">
         {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -220,9 +231,9 @@ export default function TransferPage() {
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold hidden md:block">Transfer Assets</h1>
-              <p className="text-muted-foreground hidden md:block">
-                Select assets to transfer ownership to anCustom wallet
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Transfer Assets</h1>
+              <p className="text-muted-foreground">
+                Select assets to transfer ownership to another wallet
               </p>
             </div>
           </div>
@@ -235,7 +246,7 @@ export default function TransferPage() {
                 <span>{selectedAssets.length} selected</span>
                 <Separator orientation="vertical" className="h-4" />
                 <Zap className="h-4 w-4 text-primary" />
-                <span className="font-medium">{(selectedValue / 1000).toFixed(2)} ETH</span>
+                <span className="font-medium">{selectedValue.toFixed(2)} ETH</span>
               </div>
             )}
             {selectedAssets.length > 0 && (
@@ -397,213 +408,39 @@ export default function TransferPage() {
                     </Card>
                   ))}
               </div>
+            ) : assetsError ? (
+              <div className="text-center py-12">
+                <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+                  <AlertCircle className="h-8 w-8 text-destructive" />
+                </div>
+                <h3 className="text-lg font-medium">Failed to Load Assets</h3>
+                <p className="text-muted-foreground mt-1 mb-6">{assetsError}</p>
+                <Button onClick={refetch} variant="outline">
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+              </div>
             ) : sortedAssets.length > 0 ? (
               <>
                 {/* Selection Header */}
-                <Card className="border-dashed border-2 border-primary/20 bg-primary/5">
-                  <CardContent className="p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          id="select-all"
-                          checked={selectedAssets.length === sortedAssets.length && sortedAssets.length > 0}
-                          onCheckedChange={toggleSelectAll}
-                        />
-                        <div>
-                          <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
-                            {selectedAssets.length > 0
-                              ? `${selectedAssets.length} of ${sortedAssets.length} assets selected`
-                              : `Select all ${sortedAssets.length} assets`}
-                          </label>
-                          {selectedAssets.length > 0 && (
-                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                              <Zap className="h-3 w-3 text-primary" />
-                              Total value: {(selectedValue / 1000).toFixed(2)} ETH
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {selectedAssets.length > 0 && (
-                          <Button variant="ghost" size="sm" onClick={() => setSelectedAssets([])}>
-                            Clear Selection
-                          </Button>
-                        )}
-                        <Button
-                          onClick={() => setTransferDialogOpen(true)}
-                          disabled={selectedAssets.length === 0}
-                          size="sm"
-                          className="gap-2"
-                        >
-                          <Send className="h-4 w-4" />
-                          Transfer Selected
-                          {selectedAssets.length > 0 && (
-                            <Badge variant="secondary" className="ml-1">
-                              {selectedAssets.length}
-                            </Badge>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <AssetsSelectionHeader
+                  selectedAssets={selectedAssets}
+                  allAssets={sortedAssets}
+                  onSelectAll={toggleSelectAll}
+                  onClearSelection={() => setSelectedAssets([])}
+                  onTransfer={() => setTransferDialogOpen(true)}
+                />
 
-                {/* Asset List */}
-                {viewMode === "list" ? (
-                  <div className="space-y-2">
-                    {sortedAssets.map((asset) => {
-                      const TypeIcon = typeIcons[asset.type] || Box
-                      const isSelected = selectedAssets.includes(asset.id)
-
-                      return (
-                        <Card
-                          key={asset.id}
-                          className={`transition-all duration-200 hover:shadow-md cursor-pointer ${
-                            isSelected ? "ring-2 ring-primary bg-primary/5 border-primary/20" : "hover:bg-muted/50"
-                          }`}
-                          onClick={() => toggleAssetSelection(asset.id)}
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-4">
-                              <Checkbox
-                                checked={isSelected}
-                                onCheckedChange={() => toggleAssetSelection(asset.id)}
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex-shrink-0"
-                              />
-
-                              {/* Asset Image */}
-                              <div className="relative h-16 w-16 bg-muted rounded-lg overflow-hidden flex-shrink-0">
-                                <Image
-                                  src={asset.image || "/placeholder.svg"}
-                                  alt={asset.name}
-                                  fill
-                                  className="object-cover"
-                                />
-                                <div className="absolute top-1 right-1">
-                                  <Badge className={`${typeColors[asset.type]} text-xs px-1 py-0`}>
-                                    <TypeIcon className="h-2.5 w-2.5" />
-                                  </Badge>
-                                </div>
-                              </div>
-
-                              {/* Asset Info */}
-                              <div className="flex-1 min-w-0 space-y-1">
-                                <div className="flex items-start justify-between gap-2">
-                                  <h3 className="font-semibold text-base truncate">{asset.name}</h3>
-                                  <div className="flex items-center gap-1 flex-shrink-0">
-                                    <Zap className="h-3 w-3 text-primary" />
-                                    <span className="font-semibold text-primary text-sm">{asset.value}</span>
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <Avatar className="h-4 w-4">
-                                    <AvatarFallback className="text-xs">{asset.creator.substring(0, 2)}</AvatarFallback>
-                                  </Avatar>
-                                  <span className="truncate">by {asset.creator}</span>
-                                  {asset.verified && <BadgeCheck className="h-3 w-3 text-blue-500 flex-shrink-0" />}
-                                </div>
-
-                                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                  <div className="flex items-center gap-1">
-                                    <Calendar className="h-3 w-3" />
-                                    <span>{asset.registrationDate}</span>
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                    <Shield className="h-3 w-3" />
-                                    <span>{asset.protectionLevel}% protected</span>
-                                  </div>
-                                  <Badge variant="outline" className="text-xs">
-                                    {asset.licenseType}
-                                  </Badge>
-                                </div>
-
-                                <p className="text-sm text-muted-foreground line-clamp-1">{asset.description}</p>
-                              </div>
-
-                              {/* Actions */}
-                              <div className="flex items-center gap-1 flex-shrink-0">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    copyAddress(asset.owner)
-                                  }}
-                                >
-                                  <Copy className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    window.open(`/assets/${asset.id}`, "_blank")
-                                  }}
-                                >
-                                  <ExternalLink className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )
-                    })}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                    {sortedAssets.map((asset) => {
-                      const TypeIcon = typeIcons[asset.type] || Box
-                      const isSelected = selectedAssets.includes(asset.id)
-
-                      return (
-                        <Card
-                          key={asset.id}
-                          className={`overflow-hidden transition-all hover:shadow-md cursor-pointer group ${
-                            isSelected ? "ring-2 ring-primary bg-primary/5" : ""
-                          }`}
-                          onClick={() => toggleAssetSelection(asset.id)}
-                        >
-                          <div className="relative">
-                            <div className="absolute top-2 left-2 z-10">
-                              <Checkbox
-                                checked={isSelected}
-                                onCheckedChange={() => toggleAssetSelection(asset.id)}
-                                className="bg-background/90 backdrop-blur-sm border-2"
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                            </div>
-                            <div className="aspect-square bg-muted">
-                              <Image
-                                src={asset.image || "/placeholder.svg"}
-                                alt={asset.name}
-                                width={200}
-                                height={200}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                              />
-                            </div>
-                          </div>
-                          <CardContent className="p-3">
-                            <h3 className="font-medium text-sm truncate" title={asset.name}>
-                              {asset.name}
-                            </h3>
-                            <div className="flex items-center justify-between mt-1">
-                              <Badge className={`${typeColors[asset.type]} text-xs px-1.5 py-0.5`}>
-                                <TypeIcon className="h-2.5 w-2.5 mr-1" />
-                                {asset.type}
-                              </Badge>
-                              <span className="text-xs font-medium">{asset.value}</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground truncate mt-1">{asset.creator}</p>
-                          </CardContent>
-                        </Card>
-                      )
-                    })}
-                  </div>
-                )}
+                {/* User Assets List */}
+                <UserAssetsList
+                  selectedAssets={selectedAssets}
+                  onAssetToggle={toggleAssetSelection}
+                  showSelection={true}
+                  viewMode={viewMode}
+                  searchQuery={searchQuery}
+                  filterType={filterType}
+                  sortBy={sortBy}
+                />
               </>
             ) : (
               <div className="text-center py-12">
@@ -614,7 +451,7 @@ export default function TransferPage() {
                 <p className="text-muted-foreground mt-1 mb-6">
                   {searchQuery || filterType
                     ? "Try adjusting your search or filters"
-                    : "You have no assets to transfer"}
+                    : "Connect your wallet and create your first MIP Collection asset"}
                 </p>
                 <div className="flex gap-2 justify-center">
                   {(searchQuery || filterType) && (
@@ -693,7 +530,7 @@ export default function TransferPage() {
               ? enhancedAssets.find((a) => a.id === selectedAssets[0])?.name || "Asset"
               : `${selectedAssets.length} Assets`
           }
-          currentOwner={CURRENT_USER_ADDRESS}
+          currentOwner={address || ""}
           isOpen={transferDialogOpen}
           onClose={() => setTransferDialogOpen(false)}
           onTransferComplete={handleTransferComplete}
@@ -725,7 +562,7 @@ export default function TransferPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <Zap className="h-3 w-3 text-primary" />
-                  <span className="font-medium">{(selectedValue / 1000).toFixed(2)} ETH</span>
+                  <span className="font-medium">{selectedValue.toFixed(2)} ETH</span>
                 </div>
               </div>
             </CardContent>
