@@ -58,7 +58,7 @@ export function MainNav() {
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-background/20 backdrop-blur">
               <Rocket className="mr-2 h-4 w-4" />
-              Create
+              Start
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -69,7 +69,7 @@ export function MainNav() {
                       href="/create"
                     >
                       <Box className="h-6 w-6 text-blue-600" />
-                      <div className="mb-2 mt-4 text-lg font-medium">Start</div>
+                      <div className="mb-2 mt-4 text-lg font-medium">Create</div>
                       <p className="text-sm leading-tight text-muted-foreground">
                         Tokenize your creative work and intellectual property
                       </p>
