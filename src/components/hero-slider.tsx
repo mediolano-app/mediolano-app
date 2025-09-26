@@ -104,7 +104,7 @@ export function HeroSlider() {
                 loading={currentSlide === 0 ? "eager" : "lazy"}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-background/10 via-background/0 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-background/0 to-transparent" />
             </div>
 
             {/* Content */}
@@ -116,7 +116,7 @@ export function HeroSlider() {
                   }`}
                 >
                   <Badge className="mb-4 bg-white/10 text-white border-white/20 backdrop-blur-sm">
-                    Featured Collection
+                    {currentCollection.type}
                   </Badge>
 
                   <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 text-white leading-tight">
@@ -133,10 +133,7 @@ export function HeroSlider() {
                       <TrendingUp className="w-5 h-5" />
                       <span className="text-sm font-medium">{currentCollection.stats.assets} Assets</span>
                     </div>
-                    <div className="flex items-center gap-2 text-white/80">
-                      <Star className="w-5 h-5 fill-current" />
-                      <span className="text-sm font-medium">{currentCollection.type}</span>
-                    </div>
+               
                   </div>
 
                   {/* Actions 
