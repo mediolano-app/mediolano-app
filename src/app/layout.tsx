@@ -8,8 +8,8 @@ import AnimatedBackground from "@/components/animated-bg";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "IP Creator | Mediolano",
-  description: "Programmable IP for the Integrity Web",
+  title: "IP Creator",
+  description: "Programmable IP for the Integrity Web. Powered on Starknet",
 };
 
 export default function RootLayout({
