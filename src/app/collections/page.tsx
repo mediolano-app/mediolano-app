@@ -6,6 +6,7 @@ import { CollectionsGrid, FeaturedCollectionCard } from "@/components/collection
 import { Skeleton } from "@/components/ui/skeleton"
 import { useGetAllCollections } from "@/hooks/use-collection"
 import { ReportAssetDialog } from "@/components/report-asset-dialog"
+import { HeroSlider } from "@/components/hero-slider"
 
 export default function CollectionsPage() {
   const router = useRouter();
@@ -45,6 +46,10 @@ export default function CollectionsPage() {
           
           return (
             <div className="mb-10">
+
+
+              <HeroSlider />
+
               <div onClick={() => router.push(`/collections/${featuredCollection.id}`)}>
                 <FeaturedCollectionCard
                   collection={featuredCollection}
@@ -56,6 +61,10 @@ export default function CollectionsPage() {
                   })}
                 />
               </div>
+              
+              
+              
+              
               {/* collections in grid */}
               {remainingCollections.length > 0 && (
                 <div className="mt-8">

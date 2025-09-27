@@ -39,6 +39,7 @@ import {
   X,
 } from "lucide-react"
 import { ReportAssetDialog } from "@/components/report-asset-dialog"
+import { HeroSlider } from "../hero-slider"
 
 type SortOption = "value-high" | "value-low" | "name-asc" | "name-desc" | "size-high" | "size-low"
 
@@ -104,6 +105,8 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
 
   return (
     <div className="space-y-8">
+      
+      {/*}
       {featuredCollection && (
         <div className="mb-10">
           <FeaturedCollectionCard
@@ -116,7 +119,9 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
             })}
           />
         </div>
-      )}
+      )}*/}
+
+      <HeroSlider />
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div className="relative w-full sm:w-[350px]">
