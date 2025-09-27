@@ -43,6 +43,7 @@ import {
   Building,
   FileBadge,
   Grid2X2,
+  Grid2X2Icon,
 } from "lucide-react"
 import { Logo } from "@/components/header/logo"
 
@@ -160,6 +161,52 @@ export function MainNav() {
                     </p>
                   </Link>
                 </NavigationMenuLink>
+              </div>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          
+
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
+              <Grid2X2Icon className="mr-2 h-4 w-4" />
+              Explore
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+              
+                
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/collections"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <FileBadge className="mr-2 h-4 w-4  text-blue-600" />
+                      Collections
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Explore IP collections of digital assets
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/discover"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <FileSignature className="mr-2 h-4 w-4  text-blue-600" />
+                      Learn More
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Discover how to tokenize and protect your IP onchain
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+               
+               
+                
+                
               </div>
             </NavigationMenuContent>
           </NavigationMenuItem>
