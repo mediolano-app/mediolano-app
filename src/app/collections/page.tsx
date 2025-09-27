@@ -19,15 +19,13 @@ export default function CollectionsPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8 mb-20">
+    <div className="container mx-auto mb-20">
 
 
 
 
-      <div className="container py-10 space-y-8">
-        <div className="space-y-2">
-          <p className="text-muted-foreground">Explore IP Collections</p>
-        </div>
+      <div className="container">
+        
 
         {/* Show loading state while data is being fetched */}
         {loading && <CollectionsSkeleton />}
@@ -52,6 +50,10 @@ export default function CollectionsPage() {
 
 
               <HeroSlider />
+
+              <div className="space-y-2">
+                <p className="text-muted-foreground">Explore IP Collections</p>
+              </div>
               
               {/* featured collection 
               <div onClick={() => router.push(`/collections/${featuredCollection.id}`)}>

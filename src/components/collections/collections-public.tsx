@@ -103,7 +103,7 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
   const featuredCollection = featuredCollections.length > 0 ? featuredCollections[0] : null
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-2">
       
       {/*}
       {featuredCollection && (
