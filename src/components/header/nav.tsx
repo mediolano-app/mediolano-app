@@ -44,6 +44,7 @@ import {
   FileBadge,
   Grid2X2,
   Grid2X2Icon,
+  Grid3X3,
 } from "lucide-react"
 import { Logo } from "@/components/header/logo"
 
@@ -55,11 +56,56 @@ export function MainNav() {
 
       <NavigationMenu>
         <NavigationMenuList>
+
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
+              <Grid2X2Icon className="mr-2 h-4 w-4" />
+              Discover
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+              
+                
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/collections"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Grid3X3 className="mr-2 h-4 w-4  text-blue-600" />
+                      Collections
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Explore IP collections of digital assets
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/discover"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <FileSignature className="mr-2 h-4 w-4  text-blue-600" />
+                      Programmable IP
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Discover how to tokenize and protect your creative work onchain
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+               
+               
+                
+                
+              </div>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
           
           <NavigationMenuItem>
             <NavigationMenuTrigger className="bg-background/20 backdrop-blur">
               <Rocket className="mr-2 h-4 w-4" />
-              Start
+              Create
             </NavigationMenuTrigger>
             <NavigationMenuContent>
               <div className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
@@ -70,7 +116,7 @@ export function MainNav() {
                       href="/create"
                     >
                       <Box className="h-6 w-6 text-blue-600" />
-                      <div className="mb-2 mt-4 text-lg font-medium">Create</div>
+                      <div className="mb-2 mt-4 text-lg font-medium">Start</div>
                       <p className="text-sm leading-tight text-muted-foreground">
                         Tokenize your creative work and intellectual property
                       </p>
@@ -166,50 +212,7 @@ export function MainNav() {
           </NavigationMenuItem>
           
 
-          <NavigationMenuItem>
-            <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
-              <Grid2X2Icon className="mr-2 h-4 w-4" />
-              Explore
-            </NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              
-                
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/collections"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <FileBadge className="mr-2 h-4 w-4  text-blue-600" />
-                      Collections
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Explore IP collections of digital assets
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
-                <NavigationMenuLink asChild>
-                  <Link
-                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/discover"
-                  >
-                    <div className="text-sm font-medium leading-none flex items-center">
-                      <FileSignature className="mr-2 h-4 w-4  text-blue-600" />
-                      Learn More
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Discover how to tokenize and protect your IP onchain
-                    </p>
-                  </Link>
-                </NavigationMenuLink>
-               
-               
-                
-                
-              </div>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
+          
          
          
          
