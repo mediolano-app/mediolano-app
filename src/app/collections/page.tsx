@@ -20,10 +20,13 @@ export default function CollectionsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 mb-20">
+
+
+
+
       <div className="container py-10 space-y-8">
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">Collections</h1>
-          <p className="text-muted-foreground">Discover IP Collections</p>
+          <p className="text-muted-foreground">Explore IP Collections</p>
         </div>
 
         {/* Show loading state while data is being fetched */}
@@ -49,7 +52,8 @@ export default function CollectionsPage() {
 
 
               <HeroSlider />
-
+              
+              {/* featured collection 
               <div onClick={() => router.push(`/collections/${featuredCollection.id}`)}>
                 <FeaturedCollectionCard
                   collection={featuredCollection}
@@ -60,7 +64,7 @@ export default function CollectionsPage() {
                     collectionName: featuredCollection.name
                   })}
                 />
-              </div>
+              </div>*/}
               
               
               
