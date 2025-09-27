@@ -35,20 +35,15 @@ const navigationItems = [
   {
     title: 'Manage',
     items: [
-      { title: 'Portfolio', href: '/portfolio', icon: FileText },
-      { title: 'Account', href: '/account', icon: User },
-    ],
+      { title: 'Portfolio', href: '/portfolio', icon: FileText },   
+      { title: 'Account Settings', href: '/account', icon: User },
+       ],
   },
+  
   {
-    title: 'Services',
+    title: 'Explore',
     items: [
-
-      { title: 'Proof of Ownership', href: '/', icon: FileBadge },
-      { title: 'Remix', href: '/', icon: FileCheck },
-      { title: 'Transfer', href: '/transfer', icon: ArrowRightLeft },
-      { title: 'Licensing', href: '/licensing', icon: FileText },
-      { title: 'Listings', href: '/listing', icon: Banknote },
-    ],
+      { title: 'Collections', href: '/collections', icon: Grid },    ],
   },
 ]
 
@@ -90,7 +85,7 @@ export function MobileSidebar() {
       <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
       <VisuallyHidden.Root>
         <SheetTitle>
-          Mediolano Dapp
+          IP Creator
         </SheetTitle>
       </VisuallyHidden.Root>
         <nav className="flex flex-col space-y-4 mt-4">
@@ -102,7 +97,8 @@ export function MobileSidebar() {
         </div>
 
 
-          <Accordion type="single" collapsible className="w-full">
+          
+        <Accordion type="single" collapsible className="w-full">
             {navigationItems.map((section, index) => (
               <AccordionItem value={`item-${index}`} key={section.title}>
                 <AccordionTrigger className="font-semibold">{section.title}</AccordionTrigger>
@@ -125,29 +121,10 @@ export function MobileSidebar() {
 
           
 
-          
-
-            
-
-          <div>
-          
-            {userMenuItems.map((item) => (
-              <Button
-                key={item.href}
-                variant="ghost"
-                className="w-full justify-start py-2 text-base"
-                onClick={() => handleNavigation(item.href)}
-              >
-                <item.icon className="mr-3 h-5 w-5" />
-                {item.title}
-              </Button>
-            ))}
-          </div>
-
           <Separator className="my-4" />
 
           <div>
-            <h3 className="mb-4">Dapp Features</h3>
+            <h3 className="mb-4">Features</h3>
             <div className="space-y-4">
               {appFeatures.map((feature, index) => (
                 <div key={index} className="bg-blue-100/40 dark:bg-blue-900/40 p-4 rounded-lg">
@@ -159,6 +136,24 @@ export function MobileSidebar() {
           </div>
 
           <Separator className="my-4" />
+
+
+          
+            
+            {/*}
+          <div>
+            {userMenuItems.map((item) => (
+              <Button
+                key={item.href}
+                variant="ghost"
+                className="w-full justify-start py-2 text-base"
+                onClick={() => handleNavigation(item.href)}
+              >
+                <item.icon className="mr-3 h-5 w-5" />
+                {item.title}
+              </Button>
+            ))}
+          </div>*/}
 
           <div className="space-y-4 mb-20">
             <h2 className="">Get Started</h2>
@@ -174,11 +169,13 @@ export function MobileSidebar() {
               variant="default"
               size="lg"
               className="w-full"
-              onClick={() => handleNavigation('/assets')}
+              onClick={() => handleNavigation('/collections')}
             >
               Explore
             </Button>
           </div>
+
+          
 
           <Separator className="my-4" />
 

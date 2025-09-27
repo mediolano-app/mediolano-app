@@ -98,13 +98,13 @@ export function HeroSlider() {
                 alt={currentCollection.title}
                 fill
                 className={`object-cover opacity-90 transition-all duration-500 ease-in-out ${
-                  isTransitioning ? "scale-105 opacity-80" : "scale-100 opacity-80"
+                  isTransitioning ? "scale-95 opacity-80" : "scale-100 opacity-80"
                 }`}
                 priority={currentSlide === 0}
                 loading={currentSlide === 0 ? "eager" : "lazy"}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-background/0 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent" />
             </div>
 
             {/* Content */}

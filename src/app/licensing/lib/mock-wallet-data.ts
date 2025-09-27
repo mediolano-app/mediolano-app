@@ -9,7 +9,7 @@ export const walletProviders: WalletProvider[] = [
   },
   {
     id: "argent-x",
-    name: "Argent X",
+    name: "Ready",
     icon: Shield,
   },
   {
