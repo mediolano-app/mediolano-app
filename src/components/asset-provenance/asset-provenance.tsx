@@ -353,7 +353,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            Provenance Timeline
+            Provenance
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Complete history of all events and transactions for this asset

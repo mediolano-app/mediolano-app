@@ -24,7 +24,7 @@ export default function CollectionsPage() {
 
 
 
-      <div className="container">
+      <div className="container py-8">
         
 
         {/* Show loading state while data is being fetched */}

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Users, PlusCircle, Globe } from "lucide-react"
@@ -110,6 +110,9 @@ export function OwnerTab({ asset}: OwnerTabProps) {
             </div>
           </div>
         </CardContent>
+        <CardFooter className="flex justify-end">
+          <Button variant="outline">View Provenance</Button>
+        </CardFooter>
       </Card>
     </div>
   )

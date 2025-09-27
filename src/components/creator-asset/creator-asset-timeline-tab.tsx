@@ -71,7 +71,7 @@ export function AssetTimelineTab({ tokenId }: { tokenId: string }) {
 
   return (
     <div className="space-y-4 pt-4">
-      <h3 className="text-xl font-semibold">Asset Timeline History</h3>
+      <h3 className="text-xl font-semibold">Asset Provenance</h3>
       <div className="relative">
         {/* Timeline line */}
         <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border" />
