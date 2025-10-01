@@ -9,14 +9,14 @@ export function Logo() {
       
         <Image
           className="hidden dark:block"
-          src="/mediolano-logo-dark.png"
+          src="/mediolano-ip-creator-white.png"
           alt="dark-mode-image"
           width={140}
           height={33}
         />
         <Image
           className="block dark:hidden"
-          src="/mediolano-logo-light.svg"
+          src="/mediolano-ip-creator-black.png"
           alt="light-mode-image"
           width={140}
           height={33}

@@ -103,7 +103,9 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
   const featuredCollection = featuredCollections.length > 0 ? featuredCollections[0] : null
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-2">
+      
+      {/*}
       {featuredCollection && (
         <div className="mb-10">
           <FeaturedCollectionCard
@@ -116,7 +118,9 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
             })}
           />
         </div>
-      )}
+      )}*/}
+
+      
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div className="relative w-full sm:w-[350px]">

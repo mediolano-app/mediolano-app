@@ -73,6 +73,8 @@ export function LicenseTab({ asset }: LicenseTabProps) {
         </CardContent>
       </Card>
 
+
+    {/* Will be replaced by REMIX component 
       <Card>
         <CardHeader>
           <CardTitle>Create New License</CardTitle>
@@ -186,6 +188,10 @@ export function LicenseTab({ asset }: LicenseTabProps) {
           <Button>Create License</Button>
         </CardFooter>
       </Card>
+      */}
+
+
+
     </div>
   )
 } 

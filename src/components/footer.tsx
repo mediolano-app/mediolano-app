@@ -46,7 +46,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "@/components/ui/use-toast"
 import Image from "next/image";
-import DappInfo from './dapp-info';
 
 const features = [
   { icon: <Brain className="h-6 w-6" />, title: "Learn", description: "IP for the Integrity Web", link: "/discover" },
@@ -145,9 +144,9 @@ export function Footer() {
             <div>
                 <h4 className="mb-6 text-sm font-semibold uppercase">Programmable IP</h4>
                 <ul className="space-y-4">
-                  <li><Link href="/create" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create</Link></li>
-                  <li><Link href="/create/asset" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create IP</Link></li>
+                  <li><Link href="/create" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create Panel </Link></li>
                   <li><Link href="/create/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
+                   <li><Link href="/create/asset" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create IP Asset</Link></li>
                   <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
                   <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Portfolio</Link></li>
                 </ul>

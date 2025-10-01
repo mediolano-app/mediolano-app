@@ -35,17 +35,17 @@ export default function DiscoverBenefitsCreators() {
       icon: <Shield className="h-12 w-12 text-white" />,
       title: "Protect Your Creations",
       description:
-        "Secure your intellectual property with blockchain-based proof of ownership that's recognized globally.",
+        "Secure your intellectual property with blockchain-based proof of ownership.",
     },
     {
       icon: <Coins className="h-12 w-12 text-white" />,
-      title: "Monetize Your Assets",
-      description: "Create new revenue streams by licensing your IP with flexible, programmable terms.",
+      title: "Censorship Resistance",
+      description: "Ensure your content remains accessible and immutable onchain.",
     },
     {
       icon: <FileText className="h-12 w-12 text-white" />,
       title: "Total Sovereignty",
-      description: "Maintain complete control over your intellectual property with customizable licensing options.",
+      description: "Maintain complete control over your intellectual property.",
     },
   ]
 
@@ -61,7 +61,7 @@ export default function DiscoverBenefitsCreators() {
           >
             <h2 className=" text-2xl md:text-4xl font-bold mb-8">More value to your content</h2>
             <p className="text-lg text-foreground/80 max-w-7xl mx-auto">
-              Mediolano empowers creators and property owners with tools to protect, manage, and monetize digital assets.
+              Mediolano empowers creators and property owners with tools to publish, protect and manage digital assets.
             </p>
           </motion.div>
         </div>
