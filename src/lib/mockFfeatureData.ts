@@ -14,7 +14,7 @@ export const appFeatures: Feature[] = [
     id: "1",
     title: "Easy Wallet Integration",
     description:
-      "Connect your preferred crypto wallet with just a few clicks. Support for MetaMask, WalletConnect, and more.",
+      "Connect your preferred crypto wallet with just a few clicks. Support for web3 wallets.",
     icon: Wallet,
   },
   {

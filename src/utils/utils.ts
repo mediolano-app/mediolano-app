@@ -48,7 +48,7 @@ export const ToShortAddress = (address: string) => {
 
 /**
  * Get friendly enum to manage chain with all extension wallet
- * @param chainId chain ID from extension wallet (SN_SEPOLIA from ArgentX, "0x0x534e5f5345504f4c4941" from Braavos/Metamask)
+ * @param chainId chain ID from extension wallet (SN_SEPOLIA from ArgentX, "0x0x534e5f5345504f4c4941" from web3 wallets)
  * @returns one simple enum
  */
 export const GetFriendlyChainName = (chainId: string) => {
