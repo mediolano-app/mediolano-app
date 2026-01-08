@@ -4,22 +4,24 @@
 
 
 .gradient-background {
-    background: linear-gradient(300deg,rgba(0, 0, 255, 0.1),rgba(0, 47, 255, 0.1),rgba(0, 81, 255, 0.1));
-    background-size: 180% 180%;
-    animation: gradient-animation 18s ease infinite;
+  background: linear-gradient(300deg, rgba(0, 0, 255, 0.1), rgba(0, 47, 255, 0.1), rgba(0, 81, 255, 0.1));
+  background-size: 180% 180%;
+  animation: gradient-animation 18s ease infinite;
 
-    @keyframes gradient-animation {
-      0% {
-        background-position: 20% 50%;
-      }
-      50% {
-        background-position: 70% 20%;
-      }
-      100% {
-        background-position: 50% 20%;
-      }
+  @keyframes gradient-animation {
+    0% {
+      background-position: 20% 50%;
+    }
+
+    50% {
+      background-position: 70% 20%;
+    }
+
+    100% {
+      background-position: 50% 20%;
     }
   }
+}
 
 
 .background-image {
@@ -41,6 +43,18 @@
 
 
 
+
+.gradient-teal-purple {
+  background: linear-gradient(135deg, #14b8a6, #a855f7);
+}
+
+.gradient-purple-orange {
+  background: linear-gradient(135deg, #a855f7, #f97316);
+}
+
+.gradient-teal-orange {
+  background: linear-gradient(135deg, #14b8a6, #f97316);
+}
 
 @layer base {
   :root {
@@ -118,8 +132,7 @@
     --chart-5: 27 87% 67%;
 
 
-    --radius: 0.5rem
-  ;
+    --radius: 0.5rem;
 
 
     --sidebar-background: 0 0% 98%;
@@ -143,7 +156,9 @@
     --sidebar-border: 220 13% 91%;
 
 
-    --sidebar-ring: 217.2 91.2% 59.8%}
+    --sidebar-ring: 217.2 91.2% 59.8%
+  }
+
   .dark {
 
 
@@ -216,8 +231,7 @@
     --chart-4: 280 65% 60%;
 
 
-    --chart-5: 340 75% 55%
-  ;
+    --chart-5: 340 75% 55%;
 
 
     --sidebar-background: 240 5.9% 10%;
@@ -241,7 +255,8 @@
     --sidebar-border: 240 3.7% 15.9%;
 
 
-    --sidebar-ring: 217.2 91.2% 59.8%}
+    --sidebar-ring: 217.2 91.2% 59.8%
+  }
 }
 
 
@@ -249,7 +264,172 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+
+
+/* Added gradient utilities for vivid UI elements */
+@layer utilities {
+  .gradient-teal-purple {
+    background: linear-gradient(135deg, #16a2f9 0%, #d7607b 100%);
+  }
+
+  .gradient-purple-orange {
+    background: linear-gradient(135deg, #6855f7 0%, #2916f9 100%);
+  }
+
+  .gradient-teal-orange {
+    background: linear-gradient(135deg, #2916f9 0%, #3b82f6 50%, #d7607b 100%);
+  }
+
+  .dark .gradient-teal-purple {
+    background: linear-gradient(135deg, #3e47fb 0%, #84cafc 100%);
+  }
+
+  .dark .gradient-purple-orange {
+    background: linear-gradient(135deg, #60abd7 0%, #285dfe 100%);
+  }
+
+  .dark .gradient-teal-orange {
+    background: linear-gradient(135deg, #f889c4 0%, #d7607b 50%, #285dfe 100%);
+  }
+
+  /* Added custom animations for bold, impressive UX */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes gradient {
+
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes pulse-slow {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+
+    100% {
+      transform: translateX(200%);
+    }
+  }
+
+  @keyframes shine {
+    0% {
+      box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+
+    50% {
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+
+    100% {
+      box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+    }
+  }
+
+  /* Added border gradient animation for cards */
+  @keyframes border-gradient {
+
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+  }
+
+  .animate-gradient-shift {
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  .animate-shine {
+    animation: shine 2s ease-in-out infinite;
+  }
+
+  /* Added animated border gradient utility */
+  .animate-border-gradient {
+    animation: border-gradient 3s ease infinite;
+  }
+
+  .delay-500 {
+    animation-delay: 0.5s;
+  }
+
+  .delay-1000 {
+    animation-delay: 1s;
   }
 }
