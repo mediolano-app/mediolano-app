@@ -78,7 +78,7 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
                 src={currentCollection.image || "/placeholder.svg"}
                 alt={currentCollection.name}
                 fill
-                className={`object-cover opacity-90 transition-all duration-500 ease-in-out ${isTransitioning ? "scale-95 opacity-80" : "scale-100 opacity-80"
+                className={`object-cover opacity-90 transition-all duration-500 ease-in-out ${isTransitioning ? "scale-105  opacity-80" : "scale-100 opacity-80"
                   }`}
                 priority={currentSlide === 0}
                 loading={currentSlide === 0 ? "eager" : "lazy"}
