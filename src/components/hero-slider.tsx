@@ -28,8 +28,7 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   // Filter out collections without images or other criteria if needed
-  // For now, we take up to 5 collections to show in the slider
-  const displayCollections = collections.slice(0, 5);
+  const displayCollections = collections.slice(0, 4);
 
   const nextSlide = useCallback(() => {
     if (isTransitioning || displayCollections.length === 0) return
