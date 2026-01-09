@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Grid3X3, BarChart3, TrendingUp, Star, Plus, Hash, ExternalLink } from "lucide-react"
+import { ArrowLeft, Grid3X3, BarChart3, TrendingUp, Star, Plus, Hash, ExternalLink, Flag } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useGetCollection } from "@/hooks/use-collection"
 import { useParams, useRouter } from "next/navigation"
@@ -15,6 +15,7 @@ import { shortenAddress, normalizeStarknetAddress, toHexString } from "@/lib/uti
 import { EXPLORER_URL } from "@/services/constants"
 import { useCollectionAssets } from "@/hooks/use-collection-assets"
 import { ProgressiveAssetGrid } from "@/components/collections/progressive-asset-grid"
+import { ReportCollectionDialog } from "@/components/report-collection-dialog"
 
 export default function CollectionDetailPage() {
   const params = useParams()
@@ -23,6 +24,7 @@ export default function CollectionDetailPage() {
   const [collection, setCollection] = useState<Collection | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isReportOpen, setIsReportOpen] = useState(false)
   const router = useRouter();
 
   useEffect(() => {
@@ -89,7 +91,7 @@ export default function CollectionDetailPage() {
   // Use collection image as cover - validate before displaying
   const coverImage = collection.image && collection.image !== '/placeholder.svg'
     ? collection.image
-    : "/placeholder.svg?height=400&width=600"
+    : "/placeholder.svg?height=600&width=600"
 
   // Check if this is a featured collection (collection with id "5")
   const isFeatured = collection.id.toString() === "5"
@@ -106,17 +108,24 @@ export default function CollectionDetailPage() {
     <main className="container px-4 py-10 mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2">
+
+          {/* Back Button 
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />
-          </Button>
+          </Button>*/}
+
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <span>{collection.name}</span>
+
+            {/* Collection Symbol 
             {collection.symbol && (
               <Badge variant="outline" className="text-xs mt-1
                px-2 py-0.5">
                 {collection.symbol}
               </Badge>
-            )}
+            )}*/}
+
+
           </h1>
           {isFeatured && (
             <Badge
@@ -129,6 +138,9 @@ export default function CollectionDetailPage() {
           )}
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="icon" onClick={() => setIsReportOpen(true)} title="Report Collection">
+            <Flag className="h-4 w-4" />
+          </Button>
           <Button variant="outline" className="gap-1" onClick={() => router.push("/create")}>
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Create Asset</span>
@@ -138,7 +150,7 @@ export default function CollectionDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2">
-          <div className="relative aspect-video rounded-lg overflow-hidden">
+          <div className="relative aspect-square rounded-lg overflow-hidden">
             <Image src={coverImage || "/placeholder.svg"} alt={collection.name} fill className="object-cover" />
           </div>
 
@@ -221,11 +233,15 @@ export default function CollectionDetailPage() {
         </div>
       </div>
 
+
+
       <Tabs defaultValue="nfts" className="mt-8">
+
+        {/* Header Tabs */}
         <TabsList className="mb-4">
           <TabsTrigger value="nfts">NFTs</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="activity" disabled>Activity</TabsTrigger>
+          <TabsTrigger value="analytics" disabled>Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="nfts" className="space-y-6">
@@ -313,6 +329,15 @@ export default function CollectionDetailPage() {
           </Card>
         </TabsContent>
       </Tabs>
+      {collection && (
+        <ReportCollectionDialog
+          open={isReportOpen}
+          onOpenChange={setIsReportOpen}
+          collectionId={collection.id.toString()}
+          collectionName={collection.name}
+          collectionOwner={collection.owner}
+        />
+      )}
     </main>
   )
 }

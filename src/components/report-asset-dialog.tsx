@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { shortenAddress } from "@/lib/utils"
 import {
   Dialog,
   DialogContent,
@@ -41,11 +42,11 @@ const reportReasons = [
   { value: "other", label: "Other" },
 ]
 
-export function ReportAssetDialog({ 
-  open, 
-  onOpenChange, 
-  contentId, 
-  contentName, 
+export function ReportAssetDialog({
+  open,
+  onOpenChange,
+  contentId,
+  contentName,
   contentCreator,
   contentType = "asset"
 }: ReportAssetDialogProps) {
@@ -68,7 +69,9 @@ export function ReportAssetDialog({
 
   const getReportDescription = () => {
     const contentTypeName = getContentTypeDisplayName()
-    const creatorText = contentCreator ? ` by ${contentCreator}` : ""
+    const creatorText = contentCreator
+      ? ` by ${contentCreator.length > 20 ? shortenAddress(contentCreator) : contentCreator}`
+      : ""
     return `Report "${contentName}"${creatorText} for policy violations or legal issues.`
   }
 
@@ -114,13 +117,13 @@ export function ReportAssetDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="max-h-[90vh] overflow-y-auto w-[90vw] sm:max-w-[500px] p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Flag className="h-5 w-5 text-red-500" />
             Report {getContentTypeDisplayName()}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="break-words">
             {getReportDescription()}
           </DialogDescription>
         </DialogHeader>

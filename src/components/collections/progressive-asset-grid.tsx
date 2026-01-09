@@ -17,11 +17,11 @@ interface ProgressiveAssetGridProps {
   error?: string | null;
 }
 
-export function ProgressiveAssetGrid({ 
-  assets, 
-  loading, 
-  totalCount, 
-  error 
+export function ProgressiveAssetGrid({
+  assets,
+  loading,
+  totalCount,
+  error
 }: ProgressiveAssetGridProps) {
   if (error) {
     return (
@@ -44,7 +44,7 @@ export function ProgressiveAssetGrid({
     <div className="space-y-4">
       {/* Header with progress */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">
+        <h3 className="text-sm font-semibold">
           Collection Assets ({assets.length})
           {loading && assets.length > 0 && (
             <span className="text-sm text-muted-foreground ml-2">Loading more…</span>
@@ -64,7 +64,7 @@ export function ProgressiveAssetGrid({
         {assets.map((asset) => (
           <AssetCard key={asset.id} asset={asset} />
         ))}
-        
+
         {/* Render loading skeletons for remaining items */}
         {loading && Array.from({ length: Math.max(0, totalCount - assets.length) }).map((_, index) => (
           <AssetSkeleton key={`loading-${index}`} />
@@ -84,11 +84,11 @@ function AssetCard({ asset }: { asset: CollectionAsset }) {
     <Link href={`/asset/${asset.id}`}>
       <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg hover:scale-[1.02] cursor-pointer group">
         <div className="relative aspect-square overflow-hidden">
-          <Image 
-            src={asset.image || "/placeholder.svg"} 
-            alt={asset.name} 
-            fill 
-            className="object-cover transition-transform duration-200 group-hover:scale-105" 
+          <Image
+            src={asset.image || "/placeholder.svg"}
+            alt={asset.name}
+            fill
+            className="object-cover transition-transform duration-200 group-hover:scale-105"
           />
         </div>
         <CardContent className="p-3">
