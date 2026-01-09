@@ -1,6 +1,7 @@
 'use client';
 
 import { HeroSlider, HeroSliderSkeleton } from "@/components/hero-slider"
+import { MediolanoFrontpage } from "@/components/mediolano-frontpage";
 import { useGetAllCollections } from "@/hooks/use-collection"
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
         ) : (
           <HeroSlider collections={collections} />
         )}
+        <MediolanoFrontpage />
       </main>
     </div>
   );

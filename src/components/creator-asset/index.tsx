@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useMemo } from "react";
+import { use, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -13,6 +13,7 @@ import { OverviewTab } from "@/components/asset/overview-tab";
 import { LicenseTab } from "@/components/asset/license-tab";
 import { OwnerTab } from "@/components/asset/owner-tab";
 import { AssetTimelineTab } from "./creator-asset-timeline-tab";
+import { ReportAssetDialog } from "@/components/report-asset-dialog";
 import { useAsset } from "@/hooks/use-asset";
 import { useGetAllCollections } from "@/hooks/use-collection";
 import { AssetLoadingState } from "@/components/asset/asset-loading-state";
@@ -54,6 +55,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
   const decodedSlug = decodeURIComponent(slug || "").replace(/%2D/g, "-");
   const [nftAddress, tokenIdStr] = decodedSlug.split("-");
   const router = useRouter();
+  const [isReportOpen, setIsReportOpen] = useState(false);
 
   const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online";
   const tokenId = Number(tokenIdStr);
@@ -74,12 +76,15 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
     <AssetErrorBoundary onRetry={reload}>
       <div className="min-h-screen bg-background/70 text-foreground pb-20">
         <main className="container mx-auto p-4 py-8 ">
-          <Link href="/portfolio">
+          
+          {/* 
+          <Link href="">
             <Button variant="ghost" size="sm" className="mb-6">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Portfolio
+              Back
             </Button>
           </Link>
+          */}
 
           {showSkeleton || uiState === 'loading' ? (
             <AssetLoadingState loadingState={loadingState} error={error} onRetry={reload} />
@@ -201,6 +206,13 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   <Button disabled variant="outline" className="flex-1">
                     Share
                   </Button>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setIsReportOpen(true)}
+                  >
+                    Report
+                  </Button>
                   <Link
                     className="flex-1"
                     target="_blank"
@@ -216,6 +228,14 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
             </div>
           ) : null}
         </main>
+
+        <ReportAssetDialog
+          contentId={nftAddress || ""}
+          contentName={asset?.name || ""}
+          contentType="asset"
+          open={isReportOpen}
+          onOpenChange={setIsReportOpen}
+        />
       </div>
     </AssetErrorBoundary>
   );
