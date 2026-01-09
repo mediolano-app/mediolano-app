@@ -19,6 +19,9 @@ import { useGetAllCollections } from "@/hooks/use-collection";
 import { AssetLoadingState } from "@/components/asset/asset-loading-state";
 import { AssetErrorBoundary } from "@/components/asset/asset-error-boundary";
 import { normalizeStarknetAddress } from "@/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { isAssetReported } from "@/lib/reported-content"
+import { AlertTriangle } from "lucide-react"
 
 interface AssetPageProps {
   params: Promise<{
@@ -76,7 +79,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
     <AssetErrorBoundary onRetry={reload}>
       <div className="min-h-screen bg-background/70 text-foreground pb-20">
         <main className="container mx-auto p-4 py-8 ">
-          
+
           {/* 
           <Link href="">
             <Button variant="ghost" size="sm" className="mb-6">
@@ -176,6 +179,16 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     </div>
                   </div>
                 </div>
+
+                {asset && isAssetReported(asset.id) && (
+                  <Alert variant="destructive" className="mb-6 border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/50">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Reported Content</AlertTitle>
+                    <AlertDescription>
+                      This asset has been flagged by the Mediolano Community. Proceed with caution.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
                 <Tabs defaultValue="overview" className="mt-8">
                   <TabsList className="grid w-full grid-cols-4">

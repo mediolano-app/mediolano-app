@@ -16,6 +16,9 @@ import { EXPLORER_URL } from "@/services/constants"
 import { useCollectionAssets } from "@/hooks/use-collection-assets"
 import { ProgressiveAssetGrid } from "@/components/collections/progressive-asset-grid"
 import { ReportCollectionDialog } from "@/components/report-collection-dialog"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { isCollectionReported } from "@/lib/reported-content"
+import { AlertTriangle } from "lucide-react"
 
 export default function CollectionDetailPage() {
   const params = useParams()
@@ -105,6 +108,7 @@ export default function CollectionDetailPage() {
     : "N/A";
 
   return (
+
     <main className="container px-4 py-10 mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-2">
@@ -147,6 +151,16 @@ export default function CollectionDetailPage() {
           </Button>
         </div>
       </div>
+
+      {collection && isCollectionReported(collection.id.toString()) && (
+        <Alert variant="destructive" className="mb-6 border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/50">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Reported Content</AlertTitle>
+          <AlertDescription>
+            This collection has been flagged by the Mediolano Community. Proceed with caution.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2">

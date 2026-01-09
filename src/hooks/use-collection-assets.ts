@@ -5,6 +5,7 @@ import { useContract } from "@starknet-react/core";
 import type { Abi } from "starknet";
 import { COLLECTION_NFT_ABI } from "@/abis/ip_nft";
 import { fetchIPFSMetadata, processIPFSHashToUrl } from "@/utils/ipfs";
+import { isAssetReported } from "@/lib/reported-content";
 
 export type CollectionAsset = {
   id: string;
@@ -164,7 +165,7 @@ export function useCollectionAssets(
           if (res !== undefined)
             supply = parseInt(
               (res as { toString?: () => string } | string)?.toString?.() ??
-                String(res),
+              String(res),
             );
         } catch {
           try {
@@ -174,7 +175,7 @@ export function useCollectionAssets(
             if (res2 !== undefined)
               supply = parseInt(
                 (res2 as { toString?: () => string } | string)?.toString?.() ??
-                  String(res2),
+                String(res2),
               );
           } catch {
             supply = 0;
@@ -187,7 +188,7 @@ export function useCollectionAssets(
 
       // Create array of token IDs to check
       const tokenIds = Array.from({ length: maxCount }, (_, i) => i);
-      
+
       // Process tokens in batches for better performance
       const batchSize = 5; // Load 5 assets at a time
       const batches = [];
@@ -200,12 +201,15 @@ export function useCollectionAssets(
         // Load all tokens in the batch in parallel
         const batchPromises = batch.map(tokenId => loadSingleAsset(tokenId));
         const batchResults = await Promise.allSettled(batchPromises);
-        
+
         // Process results and add valid assets
         const validAssets: CollectionAsset[] = [];
         batchResults.forEach((result) => {
           if (result.status === 'fulfilled' && result.value) {
-            validAssets.push(result.value);
+            // Check if asset is reported using its ID
+            if (!isAssetReported(result.value.id)) {
+              validAssets.push(result.value);
+            }
           }
         });
 
@@ -219,7 +223,7 @@ export function useCollectionAssets(
         }
 
         setLoadedCount(prev => prev + validAssets.length);
-        
+
         // Small delay between batches to prevent overwhelming the RPC
         if (batches.indexOf(batch) < batches.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 100));

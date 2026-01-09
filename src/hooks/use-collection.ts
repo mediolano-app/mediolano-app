@@ -8,6 +8,7 @@ import { Abi } from "starknet";
 import { ipCollectionAbi } from "@/abis/ip_collection";
 import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
 import { fetchOneByOne } from "@/lib/utils";
+import { isCollectionReported } from "@/lib/reported-content";
 
 import { fetchIPFSMetadata, processIPFSHashToUrl } from "@/utils/ipfs";
 import { Collection, CollectionValidator } from "@/lib/types";
@@ -58,13 +59,13 @@ const COLLECTION_CONTRACT_ABI = ipCollectionAbi as Abi;
 
 // function to process collection metadata with validation
 async function processCollectionMetadata(
-  id: string, 
+  id: string,
   metadata: CollectionMetadata
 ): Promise<Collection> {
   let baseUri = metadata.base_uri;
   const nftAddress = metadata.ip_nft;
   let isValidIPFS = false;
-  
+
   if (typeof baseUri === 'string') {
     // Process baseUri
     const processedBaseUri = processIPFSHashToUrl(baseUri, '/placeholder.svg');
@@ -74,7 +75,7 @@ async function processCollectionMetadata(
       isValidIPFS = true;
     }
   }
-  
+
   // Fetch IPFS metadata if available
   let ipfsMetadata = null;
   try {
@@ -91,16 +92,16 @@ async function processCollectionMetadata(
     console.warn(`Failed to fetch IPFS metadata for collection ${id}:`, error);
     ipfsMetadata = null;
   }
-  
+
   // Clean the name - remove null bytes and trim
   let cleanName = metadata.name;
   if (typeof cleanName === 'string') {
     cleanName = cleanName.replace(/\0/g, '').trim();
   }
-  
+
   // Use total_minted for total supply 
   const totalSupply = parseInt(metadata.total_minted) || 0;
-  
+
   // Process image with priority: IPFS metadata > valid IPFS URL > placeholder
   let image = '/placeholder.svg';
   if (ipfsMetadata?.coverImage) {
@@ -110,7 +111,7 @@ async function processCollectionMetadata(
   } else if (isValidIPFS && baseUri) {
     image = baseUri;
   }
-  
+
   // Additional check: if the IPFS metadata itself has "undefined/" prefix, handle it
   if (ipfsMetadata && typeof ipfsMetadata === 'object') {
     // Check if any field in the metadata has "undefined/" prefix
@@ -253,7 +254,7 @@ interface UseGetAllCollectionsReturn {
 
 export function useGetAllCollections(): UseGetAllCollectionsReturn {
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const { contract } = useContract({
@@ -269,29 +270,29 @@ export function useGetAllCollections(): UseGetAllCollectionsReturn {
     }
     setLoading(true);
     setError(null);
-    
+
 
     try {
       const collections: number[] = [];
       for (let i = 0; i < 12; i++) {
         const isValid = await contract.call("is_valid_collection", [i]);
-        if (isValid) {
+        if (isValid && !isCollectionReported(i.toString())) {
           collections.push(i);
         }
       }
-      
+
       const collectionsData = await Promise.all(
-         collections.map(async (id) => {
-           const collection = await contract.call("get_collection", [id.toString()]);
-           const collectionStat = await contract.call("get_collection_stats", [id.toString()]);
-           const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
-           
-           
-           return await processCollectionMetadata(id.toString(), metadata);
-         })
-       );
-       setCollections(collectionsData);
-       
+        collections.map(async (id) => {
+          const collection = await contract.call("get_collection", [id.toString()]);
+          const collectionStat = await contract.call("get_collection_stats", [id.toString()]);
+          const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
+
+
+          return await processCollectionMetadata(id.toString(), metadata);
+        })
+      );
+      setCollections(collectionsData);
+
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch collections");
     } finally {
@@ -319,15 +320,15 @@ export function useGetCollection(): UseGetCollectionReturn {
   const fetchCollection = useCallback(
     async (id: string): Promise<Collection> => {
       if (!contract) throw new Error("Contract not ready");
-      
+
       try {
         // Get collection data
         const collection = await contract.call("get_collection", [String(id)]);
         const collectionStat = await contract.call("get_collection_stats", [String(id)]);
         const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
-                
+
         return await processCollectionMetadata(id, metadata);
-        
+
       } catch (error) {
         console.error(`Error fetching collection ${id}:`, error);
         throw error;
@@ -373,8 +374,10 @@ export function useGetCollections(walletAddress?: `0x${string}`): UseGetCollecti
         }
       );
 
+      const filteredIds = ids.filter(id => !isCollectionReported(id));
+
       const results = await fetchOneByOne(
-        ids.map((id) => () => fetchCollection(id)),
+        filteredIds.map((id) => () => fetchCollection(id)),
         700
       );
 
