@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, TrendingUp } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import type { Collection } from "@/lib/types"
+import { Skeleton } from "@/components/ui/skeleton"
 
 // Deterministic gradients based on index
 const GRADIENTS = [
@@ -171,6 +172,42 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+
+export function HeroSliderSkeleton() {
+  return (
+    <div className="relative overflow-hidden rounded-2xl h-[600px] md:h-[640px] bg-muted">
+      <div className="absolute inset-0">
+        <Skeleton className="h-full w-full" />
+      </div>
+
+      <div className="relative h-full flex items-center p-12">
+        <div className="container mx-auto px-6 md:px-8">
+          <div className="max-w-2xl">
+            <Skeleton className="h-6 w-24 mb-4 rounded-full" />
+
+            <Skeleton className="h-12 w-3/4 mb-4" />
+            <Skeleton className="h-12 w-1/2 mb-4" />
+
+            <div className="space-y-2 mb-6">
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-5/6" />
+              <Skeleton className="h-6 w-4/6" />
+            </div>
+
+            <div className="flex items-center gap-6 mb-8">
+              <Skeleton className="h-6 w-32" />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Skeleton className="h-12 w-48 rounded-md" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

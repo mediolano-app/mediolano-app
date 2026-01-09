@@ -6,7 +6,7 @@ import { CollectionsGrid, FeaturedCollectionCard } from "@/components/collection
 import { Skeleton } from "@/components/ui/skeleton"
 import { useGetAllCollections } from "@/hooks/use-collection"
 import { ReportAssetDialog } from "@/components/report-asset-dialog"
-import { HeroSlider } from "@/components/hero-slider"
+import { HeroSlider, HeroSliderSkeleton } from "@/components/hero-slider"
 
 export default function CollectionsPage() {
   const router = useRouter();
@@ -28,7 +28,12 @@ export default function CollectionsPage() {
 
 
         {/* Show loading state while data is being fetched */}
-        {loading && <CollectionsSkeleton />}
+        {loading && (
+          <div className="space-y-10">
+            <HeroSliderSkeleton />
+            <CollectionsSkeleton />
+          </div>
+        )}
 
         {/* Show error state */}
         {error && (
@@ -52,7 +57,7 @@ export default function CollectionsPage() {
               <HeroSlider collections={collections} />
 
 
-            {/*
+              {/*
               <div onClick={() => router.push(`/collections/${featuredCollection.id}`)}>
                 <FeaturedCollectionCard
                   collection={featuredCollection}

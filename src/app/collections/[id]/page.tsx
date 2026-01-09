@@ -87,14 +87,14 @@ export default function CollectionDetailPage() {
   }
 
   // Use collection image as cover - validate before displaying
-  const coverImage = collection.image && collection.image !== '/placeholder.svg' 
-    ? collection.image 
+  const coverImage = collection.image && collection.image !== '/placeholder.svg'
+    ? collection.image
     : "/placeholder.svg?height=400&width=600"
 
   // Check if this is a featured collection (collection with id "5")
   const isFeatured = collection.id.toString() === "5"
 
-  
+
   const contractHex = collection.nftAddress
     ? normalizeStarknetAddress(String(collection.nftAddress))
     : "N/A";
@@ -129,10 +129,10 @@ export default function CollectionDetailPage() {
           )}
         </div>
         <div className="flex gap-2">
-            <Button variant="outline" className="gap-1" onClick={() => router.push("/create")}>
+          <Button variant="outline" className="gap-1" onClick={() => router.push("/create")}>
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Create Asset</span>
-            </Button>
+          </Button>
         </div>
       </div>
 
@@ -141,14 +141,11 @@ export default function CollectionDetailPage() {
           <div className="relative aspect-video rounded-lg overflow-hidden">
             <Image src={coverImage || "/placeholder.svg"} alt={collection.name} fill className="object-cover" />
           </div>
-    
+
         </div>
         <div className="space-y-4">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Collection Stats</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 mt-6">
               <div className="flex justify-between">
                 <div className="flex items-center gap-2">
                   <Grid3X3 className="h-4 w-4 text-muted-foreground" />
@@ -156,13 +153,13 @@ export default function CollectionDetailPage() {
                 </div>
                 <span className="font-medium">{collection.itemCount}</span>
               </div>
-                             <div className="flex justify-between">
-                 <div className="flex items-center gap-2">
-                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                   <span className="text-sm text-muted-foreground">Total Supply</span>
-                 </div>
-                 <span className="font-medium">{collection.totalSupply || 0}</span>
-               </div>
+              <div className="flex justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Total Supply</span>
+                </div>
+                <span className="font-medium">{collection.totalSupply || 0}</span>
+              </div>
               <div className="flex justify-between">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -170,52 +167,52 @@ export default function CollectionDetailPage() {
                 </div>
                 <span className="font-medium">{collection.totalMinted || 0}</span>
               </div>
-              
-               <div className="flex items-center justify-between gap-2">
-                 <div className="flex items-center gap-2">
-                   <Star className="h-4 w-4 text-muted-foreground" />
-                   <span className="text-sm text-muted-foreground">Owner</span>
-                 </div>
-                 <div className="flex items-center gap-2">
-                   <span className="font-medium text-xs font-mono" title={ownerHex}>
-                     {shortenAddress(ownerHex)}
-                   </span>
-                   <a
-                     className="inline-flex items-center justify-center h-7 px-2 rounded-md text-sm"
-                     href={`${EXPLORER_URL?.replace(/\/$/, "")}/contract/${ownerHex}`}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     title="Open in explorer"
-                   >
-                     <ExternalLink className="h-3.5 w-3.5" />
-                   </a>
-                 </div>
-               </div>
-               <div className="flex items-center justify-between gap-2">
-                 <div className="flex items-center gap-2">
-                   <Hash className="h-4 w-4 text-muted-foreground" />
-                   <span className="text-sm text-muted-foreground">Address</span>
-                 </div>
-                 <div className="flex items-center gap-2">
-                   <span className="font-medium text-xs font-mono" title={contractHex}>
-                     {shortenAddress(contractHex)}
-                 </span>
-                   <a
-                     className="inline-flex items-center justify-center h-7 px-2  rounded-md text-sm"
-                     href={`${EXPLORER_URL?.replace(/\/$/, "")}/contract/${contractHex}`}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                     title="Open in explorer"
-                   >
-                     <ExternalLink className="h-3.5 w-3.5" />
-                   </a>
-                 </div>
-               </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Owner</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-xs font-mono" title={ownerHex}>
+                    {shortenAddress(ownerHex)}
+                  </span>
+                  <a
+                    className="inline-flex items-center justify-center h-7 px-2 rounded-md text-sm"
+                    href={`${EXPLORER_URL?.replace(/\/$/, "")}/contract/${ownerHex}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Open in explorer"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Hash className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Address</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-xs font-mono" title={contractHex}>
+                    {shortenAddress(contractHex)}
+                  </span>
+                  <a
+                    className="inline-flex items-center justify-center h-7 px-2  rounded-md text-sm"
+                    href={`${EXPLORER_URL?.replace(/\/$/, "")}/contract/${contractHex}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Open in explorer"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg">About</CardTitle>
+              <CardTitle className="text-lg">{collection.name}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm">{collection.description || "No description available"}</p>
@@ -302,15 +299,15 @@ export default function CollectionDetailPage() {
                     <p className="text-sm text-muted-foreground">Total volume</p>
                   </CardContent>
                 </Card>
-                  <Card className="sm:col-span-2 md:col-span-1">
-                   <CardContent className="pt-6">
-                     <h3 className="font-medium mb-2">Unique Owners</h3>
-                     <p className="text-2xl font-bold font-mono" title={collection?.owner || "N/A"}>
-                       {shortenAddress(collection?.owner || "N/A")}
-                     </p>
-                     <p className="text-sm text-muted-foreground">Collection owner</p>
-                   </CardContent>
-                 </Card>
+                <Card className="sm:col-span-2 md:col-span-1">
+                  <CardContent className="pt-6">
+                    <h3 className="font-medium mb-2">Unique Owners</h3>
+                    <p className="text-2xl font-bold font-mono" title={collection?.owner || "N/A"}>
+                      {shortenAddress(collection?.owner || "N/A")}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Collection owner</p>
+                  </CardContent>
+                </Card>
               </div>
             </CardContent>
           </Card>
@@ -326,14 +323,14 @@ const CollectionNFTs = React.memo(({ nftAddress, totalSupply }: { nftAddress: st
     totalSupply,
     limit: Math.min(totalSupply || 10, 10),//limit is ten for now
   }), [totalSupply]);
-  
+
   const { assets, loading, error, loadedCount, totalCount } = useCollectionAssets(
-    toHexString(nftAddress) as `0x${string}`, 
+    toHexString(nftAddress) as `0x${string}`,
     hookParams
   );
 
   return (
-    <ProgressiveAssetGrid 
+    <ProgressiveAssetGrid
       assets={assets}
       loading={loading}
       loadedCount={loadedCount}
