@@ -5,6 +5,8 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { shortenAddress } from "@/lib/utils"
+import { sendReport } from "@/actions/send-report"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -75,6 +77,8 @@ export function ReportAssetDialog({
     return `Report "${contentName}"${creatorText} for policy violations or legal issues.`
   }
 
+  // ... component
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -84,22 +88,53 @@ export function ReportAssetDialog({
 
     setStep("submitting")
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    setStep("success")
-
-    // Auto close after success
-    setTimeout(() => {
-      onOpenChange(false)
-      setStep("form")
-      setFormData({
-        reason: "",
-        description: "",
-        email: "",
-        agreeToPolicy: false,
+    try {
+      const result = await sendReport({
+        reason: formData.reason,
+        description: formData.description,
+        email: formData.email,
+        contentId,
+        contentName,
+        contentCreator,
+        contentType,
       })
-    }, 3000)
+
+      if (result.success) {
+        setStep("success")
+        toast.success("Report submitted successfully")
+
+        // Auto close after success
+        setTimeout(() => {
+          onOpenChange(false)
+          setStep("form")
+          setFormData({
+            reason: "",
+            description: "",
+            email: "",
+            agreeToPolicy: false,
+          })
+        }, 3000)
+      } else {
+        setStep("form")
+        toast.error(
+          result.error || (
+            <div className="flex flex-col gap-1">
+              <span>Failed to submit report.</span>
+              <span>Please contact <a href="mailto:support@mediolano.app" className="underline">support@mediolano.app</a></span>
+            </div>
+          )
+        )
+      }
+    } catch (error) {
+      console.error("Error submitting report:", error)
+      setStep("form")
+      toast.error(
+        <div className="flex flex-col gap-1">
+          <span>An unexpected error occurred.</span>
+          <span>Please contact <a href="mailto:support@mediolano.app" className="underline">support@mediolano.app</a></span>
+        </div>
+      )
+    }
   }
 
   const handleClose = () => {
