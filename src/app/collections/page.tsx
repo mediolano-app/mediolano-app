@@ -25,7 +25,7 @@ export default function CollectionsPage() {
 
 
       <div className="container py-8">
-        
+
 
         {/* Show loading state while data is being fetched */}
         {loading && <CollectionsSkeleton />}
@@ -41,21 +41,18 @@ export default function CollectionsPage() {
         {!loading && !error && collections && collections.length > 0 && (() => {
           // Find featured collection otherwise use the first collection
           const featuredCollection = collections.find(c => c.id.toString() === featuredCollectionId) || collections[0];
-          const remainingCollections = collections.find(c => c.id.toString() === featuredCollectionId) 
+          const remainingCollections = collections.find(c => c.id.toString() === featuredCollectionId)
             ? collections.filter(c => c.id.toString() !== featuredCollectionId)
             : collections.slice(1);
-          
+
           return (
             <div className="mb-10">
 
 
-              <HeroSlider />
+              <HeroSlider collections={collections} />
 
-              <div className="space-y-2">
-                <p className="text-muted-foreground">Explore IP Collections</p>
-              </div>
-              
-              {/* featured collection 
+
+            {/*
               <div onClick={() => router.push(`/collections/${featuredCollection.id}`)}>
                 <FeaturedCollectionCard
                   collection={featuredCollection}
@@ -66,11 +63,11 @@ export default function CollectionsPage() {
                     collectionName: featuredCollection.name
                   })}
                 />
-              </div>*/}
-              
-              
-              
-              
+              </div>
+              */}
+
+
+
               {/* collections in grid */}
               {remainingCollections.length > 0 && (
                 <div className="mt-8">
@@ -88,7 +85,7 @@ export default function CollectionsPage() {
           </div>
         )}
       </div>
-      
+
       <ReportAssetDialog
         contentId={reportDialogState.collectionId}
         contentName={reportDialogState.collectionName}

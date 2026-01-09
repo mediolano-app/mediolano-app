@@ -2,19 +2,19 @@ import { PinataSDK } from "pinata-web3";
 
 export const pinataClient = new PinataSDK({
   pinataJwt: process.env.PINATA_JWT || "",
-  pinataGateway: process.env.PINATA_HOST || "ipfs.io" 
+  pinataGateway: process.env.NEXT_PUBLIC_PINATA_HOST || "ipfs.io"
 });
 
 
 export async function uploadMetadataToPinata(metadata: Record<string, any>): Promise<string> {
-  
+
   const combinedMetadata = {
     ...metadata,
     contractAddress: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS || "",
     timestamp: new Date().toISOString(),
   };
 
-  try {    
+  try {
     const uploadBuilder = pinataClient.upload.json(combinedMetadata, {
       metadata: { name: "collection-metadata.json" }
     });
