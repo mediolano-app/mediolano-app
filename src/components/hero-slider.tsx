@@ -119,7 +119,8 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
                     <Button
                       asChild
                       size="lg"
-                      className="bg-white text-black hover:bg-white/90 font-semibold transition-all duration-300"
+                      variant="outline"
+                      className="text-white bg-white/10 border-white/10 hover:bg-white/20 hover:border-white/20 font-semibold transition-all duration-300"
                     >
                       <Link href={`/collections/${currentCollection.id}`}>Explore Collection</Link>
                     </Button>
@@ -178,7 +179,7 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
 
 export function HeroSliderSkeleton() {
   return (
-    <div className="relative overflow-hidden rounded-2xl h-[600px] md:h-[640px] bg-muted">
+    <div className="container mx-auto relative overflow-hidden rounded-2xl h-[600px] md:h-[640px] bg-muted">
       <div className="absolute inset-0">
         <Skeleton className="h-full w-full" />
       </div>
