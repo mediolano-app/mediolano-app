@@ -20,7 +20,10 @@ import {
 import dynamic from 'next/dynamic';
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { ThemeToggle } from "@/components/header/theme-toggle"
-import { WalletConnect } from "@/components/header/wallet-connect"
+// import { WalletConnect } from "@/components/header/wallet-connect"
+const WalletConnect = dynamic(() => import("@/components/header/wallet-connect").then(mod => mod.WalletConnect), {
+  ssr: false,
+});
 
 const navigationItems = [
   {
@@ -35,15 +38,15 @@ const navigationItems = [
   {
     title: 'Manage',
     items: [
-      { title: 'Portfolio', href: '/portfolio', icon: FileText },   
+      { title: 'Portfolio', href: '/portfolio', icon: FileText },
       { title: 'Account Settings', href: '/account', icon: User },
-       ],
+    ],
   },
-  
+
   {
     title: 'Explore',
     items: [
-      { title: 'Collections', href: '/collections', icon: Grid },    ],
+      { title: 'Collections', href: '/collections', icon: Grid },],
   },
 ]
 
@@ -76,29 +79,29 @@ export function MobileSidebar() {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <div className='pr-4'>
-        <Button variant="outline" size="icon" className="md:hidden">
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle menu</span>
-        </Button>
+          <Button variant="outline" size="icon" className="md:hidden">
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle menu</span>
+          </Button>
         </div>
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:w-[400px] overflow-y-auto">
-      <VisuallyHidden.Root>
-        <SheetTitle>
-          IP Creator
-        </SheetTitle>
-      </VisuallyHidden.Root>
+        <VisuallyHidden.Root>
+          <SheetTitle>
+            IP Creator
+          </SheetTitle>
+        </VisuallyHidden.Root>
         <nav className="flex flex-col space-y-4 mt-4">
 
-        <ThemeToggle />
+          <ThemeToggle />
 
-        <div className='mt-2'>
-          <WalletConnect />
-        </div>
+          <div className='mt-2'>
+            <WalletConnect />
+          </div>
 
 
-          
-        <Accordion type="single" collapsible className="w-full">
+
+          <Accordion type="single" collapsible className="w-full">
             {navigationItems.map((section, index) => (
               <AccordionItem value={`item-${index}`} key={section.title}>
                 <AccordionTrigger className="font-semibold">{section.title}</AccordionTrigger>
@@ -119,7 +122,7 @@ export function MobileSidebar() {
             ))}
           </Accordion>
 
-          
+
 
           <Separator className="my-4" />
 
@@ -138,9 +141,9 @@ export function MobileSidebar() {
           <Separator className="my-4" />
 
 
-          
-            
-            {/*}
+
+
+          {/*}
           <div>
             {userMenuItems.map((item) => (
               <Button
@@ -175,11 +178,11 @@ export function MobileSidebar() {
             </Button>
           </div>
 
-          
+
 
           <Separator className="my-4" />
 
-          
+
         </nav>
 
       </SheetContent>

@@ -9,7 +9,7 @@ import {
   useInjectedConnectors,
   voyager,
 } from "@starknet-react/core";
-import { RpcProvider } from "starknet"; 
+import { RpcProvider } from "starknet";
 
 interface NetworkContextType {
   currentNetwork: 'mainnet' | 'sepolia';
@@ -51,12 +51,12 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
       explorerUrl: 'https://sepolia.starkscan.co'
     }
   };
-  
+
   // Switch network function
   const switchNetwork = (network: 'mainnet' | 'sepolia') => {
     setCurrentNetwork(network);
   };
-  
+
   // Get current network config
   const networkConfig = networkConfigs[currentNetwork];
 
@@ -72,7 +72,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
       networkConfig
     }}>
       <StarknetConfig
-        chains={[sepolia, mainnet ]}
+        chains={[sepolia, mainnet]}
         provider={providerFactory}
         connectors={connectors}
         explorer={voyager}
