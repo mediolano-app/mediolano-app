@@ -68,7 +68,7 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
   const gradient = GRADIENTS[currentSlide % GRADIENTS.length];
 
   return (
-    <div className="relative overflow-hidden rounded-2xl">
+    <div className="container mx-auto relative overflow-hidden rounded-2xl">
       <Card className="border-0">
         <CardContent className="p-0">
           <div className={`relative h-[600px] md:h-[640px] bg-gradient-to-br ${gradient}`}>

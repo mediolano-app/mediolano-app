@@ -77,7 +77,7 @@ export function MediolanoFrontpage() {
   return (
     <>
 
-      <section className="space-y-10 mt-12">
+      <section className="container mx-auto space-y-10 mt-12">
         <div className="text-center max-w-3xl mx-auto space-y-4">
 
           <h2 className="text-3xl md:text-5xl font-bold text-balance">Built for the Creator Economy</h2>
@@ -94,7 +94,7 @@ export function MediolanoFrontpage() {
       </section>
 
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-12 mb-20">
+      <section className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 mt-12 mb-20">
 
         <Link href="/create/collection" className="group">
           <div className="relative overflow-hidden p-8 rounded-2xl border bg-card hover:bg-card/80 hover:shadow-sm transition-all duration-300 h-full">

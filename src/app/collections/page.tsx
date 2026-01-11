@@ -21,9 +21,6 @@ export default function CollectionsPage() {
   return (
     <div className="container mx-auto mb-20">
 
-
-
-
       <div className="container py-8">
 
 
