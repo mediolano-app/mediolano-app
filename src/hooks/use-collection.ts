@@ -63,7 +63,19 @@ async function processCollectionMetadata(
   metadata: CollectionMetadata
 ): Promise<Collection> {
   let baseUri = metadata.base_uri;
-  const nftAddress = metadata.ip_nft;
+  let nftAddress = metadata.ip_nft;
+  if (nftAddress && nftAddress !== "0" && nftAddress !== "0x0") {
+    try {
+      // Convert decimal string to hex if needed
+      if (!String(nftAddress).startsWith("0x")) {
+        nftAddress = `0x${BigInt(nftAddress).toString(16)}`;
+      }
+    } catch (e) {
+      console.warn(`Error formatting address for collection ${id}:`, e);
+    }
+  } else {
+    nftAddress = "";
+  }
   let isValidIPFS = false;
 
   if (typeof baseUri === 'string') {

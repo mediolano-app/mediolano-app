@@ -227,7 +227,7 @@ export default function CreateCollectionPage() {
 
   return (
     <div className="min-h-screen">
-    
+
 
       <main className="container mx-auto px-4 py-6 md:py-8">
         <Link href="/create">
@@ -409,11 +409,10 @@ export default function CreateCollectionPage() {
 
                     <TabsContent value="upload" className="mt-4">
                       <div
-                        className={`border-2 border-dashed rounded-lg p-4 md:p-6 text-center transition-colors ${
-                          coverImage
+                        className={`border-2 border-dashed rounded-lg p-4 md:p-6 text-center transition-colors ${coverImage
                             ? "border-green-300 bg-green-50/50 dark:border-green-700 dark:bg-green-950/20"
                             : "border-muted-foreground/25 hover:border-primary/50"
-                        }`}
+                          }`}
                       >
                         {coverImage && mediaType === "upload" ? (
                           <div className="relative">
@@ -1148,7 +1147,7 @@ export default function CreateCollectionPage() {
             <Button
               variant="outline"
               onClick={() =>
-                createdCollection && copyToClipboard(`${window.location.origin}/collections/${createdCollection.id}`)
+                createdCollection && copyToClipboard(`${window.location.origin}/collections/${createdCollection.blockchain?.contractAddress || createdCollection.id}`)
               }
               className="flex-1"
             >
@@ -1158,7 +1157,7 @@ export default function CreateCollectionPage() {
             <Button
               onClick={() =>
                 createdCollection &&
-                window.open(`${window.location.origin}/collections/${createdCollection.id}`, "_blank")
+                window.open(`${window.location.origin}/collections/${createdCollection.blockchain?.contractAddress || createdCollection.id}`, "_blank")
               }
               className="flex-1"
             >

@@ -55,7 +55,7 @@ export default function CollectionsPage() {
 
 
               {/*
-              <div onClick={() => router.push(`/collections/${featuredCollection.id}`)}>
+              <div onClick={() => router.push(`/collections/${featuredCollection.nftAddress || featuredCollection.id}`)}>
                 <FeaturedCollectionCard
                   collection={featuredCollection}
                   nftCount={featuredCollection.itemCount}

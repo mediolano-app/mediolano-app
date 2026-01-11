@@ -122,7 +122,7 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
                       variant="outline"
                       className="text-white bg-white/10 border-white/10 hover:bg-white/20 hover:border-white/20 font-semibold transition-all duration-300"
                     >
-                      <Link href={`/collections/${currentCollection.id}`}>Explore Collection</Link>
+                      <Link href={`/collections/${currentCollection.nftAddress || currentCollection.id}`}>Explore Collection</Link>
                     </Button>
                   </div>
 

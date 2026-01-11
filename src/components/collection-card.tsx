@@ -22,12 +22,12 @@ export function CollectionCard({ collection, index }: CollectionCardProps) {
         <CardHeader className="p-0">
           <div className="relative aspect-video overflow-hidden">
             <Image
-                              src={collection.image || "/placeholder.svg"} 
-                              alt={`${collection.name} preview ${index + 1}`} 
-                              fill 
-                              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                            />
-         
+              src={collection.image || "/placeholder.svg"}
+              alt={`${collection.name} preview ${index + 1}`}
+              fill
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-3 left-3 flex items-center gap-2">
               <Badge variant="secondary" className="bg-white/20 text-white backdrop-blur-sm">
@@ -95,7 +95,7 @@ export function CollectionCard({ collection, index }: CollectionCardProps) {
         </CardContent>
 
         <CardFooter className="p-4 pt-0">
-          <Link href={`/collections/${collection.id}`} className="w-full">
+          <Link href={`/collections/${collection.nftAddress || collection.id}`} className="w-full">
             <Button className="w-full bg-transparent" variant="outline">
               View Collection
             </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,118 +18,55 @@ import {
   Shield,
   Star,
   Eye,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { isCollectionReported } from "@/lib/reported-content";
 import Link from "next/link";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import NFTCard from "@/components/nft-card";
 import { useParams } from "next/navigation";
 import {
-  getCollectionMetadata,
-  getCollectionAssets,
+  useCollectionMetadata,
+  useCollectionAssets,
 } from "@/hooks/use-collection-new";
-import { Collection, Asset } from "@/types/asset";
+import { Asset } from "@/types/asset";
 
-interface CollectionPageProps {
-  params: {
-    collectionAddress: string;
-  };
-}
-/*
-  Route by Collection Address
-  Get Collection Data from Smart Contract
-  Handle Error gracefully or Provide fallback data if collection not found
-  Retrieve Assets in a Collection
-  Display the Assets
-  Include Search and Pagination for Assets
-*/
 export default function CollectionPage() {
-  const params = useParams();
-  const collectionAddress = params.collectionAddress as string;
+  const { collectionAddress } = useParams<{ collectionAddress: string }>();
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [filterType, setFilterType] = useState("all");
   const [copied, setCopied] = useState<string | null>(null);
-  const [collection, setCollection] = useState<Collection | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [collectionAssets, setCollectionAssets] = useState<Asset[]>([]);
-  const [assetsLoading, setAssetsLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchCollection() {
-      if (collectionAddress) {
-        try {
-          const data = await getCollectionMetadata(collectionAddress);
-          setCollection(data);
-        } catch (err) {
-          setError("Failed to fetch collection.");
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      }
-    }
-    fetchCollection();
-  }, [collectionAddress]);
+  // Use new hooks for fetching data
+  const {
+    collection,
+    loading: collectionLoading,
+    error: collectionError,
+  } = useCollectionMetadata(collectionAddress);
 
-  useEffect(() => {
-    async function fetchAssets() {
-      if (collection?.contractAddress) {
-        setAssetsLoading(true);
-        try {
-          const data = await getCollectionAssets(collection.contractAddress);
-          setCollectionAssets(data);
-        } catch (err) {
-          console.error("Failed to fetch assets:", err);
-        } finally {
-          setAssetsLoading(false);
-        }
-      }
-    }
-    fetchAssets();
-  }, [collection]);
+  const {
+    assets: collectionAssets,
+    loading: assetsLoading,
+    error: assetsError,
+  } = useCollectionAssets(collectionAddress);
 
-  const creator = collection?.creator;
+  const isLoading = collectionLoading || assetsLoading;
+  const error = collectionError || assetsError;
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold">Loading Collection...</h1>
-        </div>
-      </div>
-    );
-  }
+  const filteredAssets = (collectionAssets || []).filter((asset) => {
+    const matchesSearch = asset.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesType =
+      filterType === "all" ||
+      asset.type.toLowerCase() === filterType.toLowerCase();
+    return matchesSearch && matchesType;
+  });
 
-  if (error || !collection) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold">Collection Not Found</h1>
-          <p className="text-muted-foreground">
-            The collection you're looking for doesn't exist.
-          </p>
-          <Link href="/collections">
-            <Button>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Collections
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const filteredAssets = collectionAssets.filter(
-    (asset) =>
-      asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const creator = collection?.creator; // Note: Collection type usually stores owner address, not full creator obj unless enriched. 
+  // If useCollectionMetadata doesn't enrich creator, this might be undefined.
+  // We'll handle refined UI later if needed.
 
   const handleCopy = async (text: string, type: string) => {
     try {
@@ -142,6 +79,7 @@ export default function CollectionPage() {
   };
 
   const handleShare = () => {
+    if (!collection) return;
     if (navigator.share) {
       navigator.share({
         title: collection.name,
@@ -152,6 +90,38 @@ export default function CollectionPage() {
       navigator.clipboard.writeText(window.location.href);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+        <div className="text-center">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+          <p className="mt-4 text-muted-foreground">Loading collection...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !collection) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-destructive">
+            Error Loading Collection
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            {error || "Collection not found"}
+          </p>
+          <Link href="/collections">
+            <Button variant="outline" className="mt-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Collections
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -164,12 +134,26 @@ export default function CollectionPage() {
           </Button>
         </Link>
 
+        {collection && isCollectionReported(collection.id.toString()) && (
+          <Alert
+            variant="destructive"
+            className="mb-6 border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/50"
+          >
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Reported Content</AlertTitle>
+            <AlertDescription>
+              This collection has been flagged by the Mediolano Community.
+              Proceed with caution.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Collection Header */}
         <div className="relative mb-8">
           {/* Cover Image */}
-          <div className="h-48 md:h-64 relative overflow-hidden rounded-xl mb-6">
+          <div className="aspect-video relative overflow-hidden rounded-xl mb-6">
             <img
-              src={collection.coverImage || "/placeholder.svg"}
+              src={collection.image || "/placeholder.svg"}
               alt={collection.name}
               className="h-full w-full object-cover"
             />
@@ -181,29 +165,24 @@ export default function CollectionPage() {
                     {collection.name}
                   </h1>
                   <div className="flex items-center gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="bg-white/20 text-white backdrop-blur-sm"
-                    >
-                      {collection.type}
-                    </Badge>
+                    {collection.type && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-white/20 text-white backdrop-blur-sm"
+                      >
+                        {collection.type}
+                      </Badge>
+                    )}
                     <Badge
                       variant="outline"
                       className="bg-white/20 text-white backdrop-blur-sm border-white/30"
                     >
-                      {collection.assets} assets
+                      {collection.itemCount || 0} assets
                     </Badge>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
-                  >
-                    <Star className="h-4 w-4 mr-2" />
-                    Favorite
-                  </Button>
+
                   <Button
                     variant="secondary"
                     size="sm"
@@ -224,12 +203,9 @@ export default function CollectionPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Description */}
             <Card>
-              <CardHeader>
-                <CardTitle>About this Collection</CardTitle>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="mt-4">
                 <p className="text-muted-foreground leading-relaxed">
-                  {collection.description}
+                  {collection.description || "No description available."}
                 </p>
               </CardContent>
             </Card>
@@ -243,7 +219,7 @@ export default function CollectionPage() {
                       <p className="text-sm text-muted-foreground">
                         Total Assets
                       </p>
-                      <p className="text-2xl font-bold">{collection.assets}</p>
+                      <p className="text-2xl font-bold">{collection.itemCount || 0}</p>
                     </div>
                     <Grid3X3 className="h-8 w-8 text-muted-foreground" />
                   </div>
@@ -255,10 +231,10 @@ export default function CollectionPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">
-                        Total Value
+                        Total Minted
                       </p>
                       <p className="text-2xl font-bold">
-                        {collection.totalValue}
+                        {collection.totalMinted || 0}
                       </p>
                     </div>
                     <BarChart3 className="h-8 w-8 text-muted-foreground" />
@@ -273,7 +249,7 @@ export default function CollectionPage() {
                       <p className="text-sm text-muted-foreground">
                         Floor Price
                       </p>
-                      <p className="text-2xl font-bold">0.3 ETH</p>
+                      <p className="text-2xl font-bold"></p>
                     </div>
                     <Eye className="h-8 w-8 text-muted-foreground" />
                   </div>
@@ -286,7 +262,7 @@ export default function CollectionPage() {
                     <div>
                       <p className="text-sm text-muted-foreground">Owners</p>
                       <p className="text-2xl font-bold">
-                        {Math.ceil(collection.assets * 0.7)}
+                        --
                       </p>
                     </div>
                     <Users className="h-8 w-8 text-muted-foreground" />
@@ -299,10 +275,7 @@ export default function CollectionPage() {
           <div className="space-y-6">
             {/* Collection Details */}
             <Card>
-              <CardHeader>
-                <CardTitle>Collection Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 mt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
                     Contract Address
@@ -311,23 +284,34 @@ export default function CollectionPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() =>
-                      handleCopy(collection.contractAddress, "address")
+                      handleCopy(collection.nftAddress, "address")
                     }
                     className="h-auto p-1 font-mono text-xs"
                   >
-                    {collection.contractAddress.substring(0, 6)}...
-                    {collection.contractAddress.substring(
-                      collection.contractAddress.length - 4,
+                    {collection.nftAddress.substring(0, 6)}...
+                    {collection.nftAddress.substring(
+                      collection.nftAddress.length - 4,
                     )}
                     <Copy className="h-3 w-3 ml-1" />
                   </Button>
                 </div>
 
+                {!creator && collection.owner && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      Owner
+                    </span>
+                    <span className="text-sm font-mono truncate max-w-[150px]">
+                      {collection.owner}
+                    </span>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
                     Blockchain
                   </span>
-                  <Badge variant="outline">{collection.blockchain}</Badge>
+                  <Badge variant="outline">Starknet</Badge>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -337,16 +321,9 @@ export default function CollectionPage() {
                   <Badge variant="outline">ERC-721</Badge>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Created</span>
-                  <span className="text-sm">
-                    {new Date(collection.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-
                 <div className="pt-2">
                   <a
-                    href={`https://starkscan.co/contract/${collection.contractAddress}`}
+                    href={`https://starkscan.co/contract/${collection.nftAddress}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full"
@@ -357,7 +334,7 @@ export default function CollectionPage() {
                       className="w-full bg-transparent"
                     >
                       <ExternalLink className="h-4 w-4 mr-2" />
-                      View on StarkScan
+                      View on Explorer
                     </Button>
                   </a>
                 </div>
@@ -375,32 +352,32 @@ export default function CollectionPage() {
                     <Avatar className="h-12 w-12">
                       <AvatarImage
                         src={
-                          creator?.avatar ||
+                          (creator as any).avatar ||
                           "/placeholder.svg?height=40&width=40"
                         }
-                        alt={creator.name}
+                        alt={(creator as any).name}
                       />
                       <AvatarFallback>
-                        {creator.name.substring(0, 2).toUpperCase()}
+                        {(creator as any).name?.substring(0, 2).toUpperCase() || "??"}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <Link href={`/creators/${creator.id}`}>
+                        <Link href={`/creators/${(creator as any).id}`}>
                           <h3 className="font-semibold hover:text-primary transition-colors cursor-pointer">
-                            {creator.name.length > 10
-                              ? creator.name.substring(0, 10) + "..."
-                              : creator.name}
+                            {(creator as any).name && (creator as any).name.length > 10
+                              ? (creator as any).name.substring(0, 10) + "..."
+                              : (creator as any).name || "Unknown"}
                           </h3>
                         </Link>
-                        {creator?.verified && (
+                        {(creator as any).verified && (
                           <Badge variant="secondary">
                             <Shield className="h-3 w-3 mr-1" />
                             Verified
                           </Badge>
                         )}
                       </div>
-                      <Link href={`/creators/${creator.id}`}>
+                      <Link href={`/creators/${(creator as any).id}`}>
                         <Button variant="outline" size="sm">
                           View Profile
                         </Button>
@@ -410,6 +387,9 @@ export default function CollectionPage() {
                 </CardContent>
               </Card>
             )}
+
+
+
           </div>
         </div>
 

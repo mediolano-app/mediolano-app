@@ -104,7 +104,7 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
 
   return (
     <div className="space-y-2">
-      
+
       {/*}
       {featuredCollection && (
         <div className="mb-10">
@@ -120,7 +120,7 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
         </div>
       )}*/}
 
-      
+
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div className="relative w-full sm:w-[350px]">
@@ -221,7 +221,7 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
           ))}
         </div>
       )}
-      
+
       <ReportAssetDialog
         contentId={reportDialogState.collectionId}
         contentName={reportDialogState.collectionName}
@@ -238,18 +238,18 @@ interface CollectionCardProps {
   nftCount: number
   onReportClick: () => void
 }
- 
+
 
 
 function CollectionCard({ collection, nftCount, onReportClick }: CollectionCardProps) {
   const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
-  if(isFeatured) {console.log("featured collection", collection.id)}
+  if (isFeatured) { console.log("featured collection", collection.id) }
   console.log("collection", collection.id)
   const coverImage = collection.image || "/background.jpg"
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group">
-      <Link href={`/collections/${String(collection.id)}`}>
+      <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
         <div className="relative h-64 w-full">
           <Image
             src={coverImage || "/background.jpg"}
@@ -276,7 +276,7 @@ function CollectionCard({ collection, nftCount, onReportClick }: CollectionCardP
         </div>
       </Link>
       <CardHeader className="pb-2 flex flex-row justify-between items-start">
-        <Link href={`/collections/${String(collection.id)}`}>
+        <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
           <h3 className="text-xl font-bold hover:text-primary transition-colors">{collection.name}</h3>
         </Link>
         <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
@@ -305,11 +305,11 @@ function CollectionCard({ collection, nftCount, onReportClick }: CollectionCardP
 function CollectionListItem({ collection, nftCount, onReportClick }: CollectionCardProps) {
   // Use the collection's image from IPFS metadata
   const coverImage = collection.image || "/placeholder.svg?height=400&width=600"
-   const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
+  const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
 
   return (
     <div className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-      <Link href={`/collections/${String(collection.id)}`} className="flex items-center gap-4 flex-grow cursor-pointer">
+      <Link href={`/collections/${collection.nftAddress || String(collection.id)}`} className="flex items-center gap-4 flex-grow cursor-pointer">
         <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
           <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
         </div>
@@ -342,25 +342,25 @@ function CollectionListItem({ collection, nftCount, onReportClick }: CollectionC
             <span>{nftCount} NFTs</span>
           </div>
           <div className="flex items-center gap-1 text-sm">
-             <BarChart3 className="h-4 w-4 text-muted-foreground" />
-             <span>-- STRK</span>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <span>-- STRK</span>
           </div>
         </div>
       </Link>
-      
+
       <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
     </div>
   )
 }
 
 export function FeaturedCollectionCard({ collection, nftCount, onReportClick }: CollectionCardProps) {
-  
+
   const coverImage = collection.image || "/background.jpg"
 
   return (
     <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-        <Link href={`/collections/${String(collection.id)}`}>
+        <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
           <div className="relative h-64 md:h-auto">
             <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover hover:brightness-90 transition-all duration-300" />
             <div className="absolute top-4 left-4">
@@ -377,10 +377,10 @@ export function FeaturedCollectionCard({ collection, nftCount, onReportClick }: 
         <div className="p-4 md:p-6 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start">
-               <Link href={`/collections/${String(collection.id)}`}>
-                 <h2 className="text-xl md:text-2xl font-bold mb-2 hover:text-primary transition-colors">{collection.name}</h2>
-               </Link>
-               <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
+              <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
+                <h2 className="text-xl md:text-2xl font-bold mb-2 hover:text-primary transition-colors">{collection.name}</h2>
+              </Link>
+              <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
             </div>
             <p className="text-sm text-muted-foreground mb-4 line-clamp-3 md:line-clamp-none">
               {collection.description}
@@ -391,10 +391,10 @@ export function FeaturedCollectionCard({ collection, nftCount, onReportClick }: 
                 <p className="text-xs md:text-sm text-muted-foreground">Total Assets</p>
                 <p className="text-lg md:text-xl font-bold">{nftCount}</p>
               </div>
-            <div className="space-y-1">
-                 <p className="text-xs md:text-sm text-muted-foreground">Total Value</p>
-                 <p className="text-lg md:text-xl font-bold">-- STRK</p>
-               </div>
+              <div className="space-y-1">
+                <p className="text-xs md:text-sm text-muted-foreground">Total Value</p>
+                <p className="text-lg md:text-xl font-bold">-- STRK</p>
+              </div>
               {collection.floorPrice && (
                 <div className="space-y-1">
                   <p className="text-xs md:text-sm text-muted-foreground">Floor Price</p>
@@ -403,48 +403,48 @@ export function FeaturedCollectionCard({ collection, nftCount, onReportClick }: 
               )}
             </div>
           </div>
-            <div className="hidden md:block">
-             <p className="text-sm font-medium mb-2">Preview</p>
-             <div className="flex gap-2">
-               {/* Show collection image in small preview sizes */}
-               <div className="relative h-12 w-12 rounded-md overflow-hidden">
-                 <Image
-                   src={collection.image}
-                   alt={`${collection.name} preview`}
-                   fill
-                   className="object-cover"
-                   sizes="48px"
-                 />
-               </div>
-               <div className="relative h-12 w-12 rounded-md overflow-hidden">
-                 <Image
-                   src={collection.image}
-                   alt={`${collection.name} preview`}
-                   fill
-                   className="object-cover"
-                   sizes="48px"
-                 />
-               </div>
-               <div className="relative h-12 w-12 rounded-md overflow-hidden">
-                 <Image
-                   src={collection.image}
-                   alt={`${collection.name} preview`}
-                   fill
-                   className="object-cover"
-                   sizes="48px"
-                 />
-               </div>
-               <div className="relative h-12 w-12 rounded-md overflow-hidden">
-                 <Image
-                   src={collection.image}
-                   alt={`${collection.name} preview`}
-                   fill
-                   className="object-cover"
-                   sizes="48px"
-                 />
-               </div>
-             </div>
-           </div>
+          <div className="hidden md:block">
+            <p className="text-sm font-medium mb-2">Preview</p>
+            <div className="flex gap-2">
+              {/* Show collection image in small preview sizes */}
+              <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                <Image
+                  src={collection.image}
+                  alt={`${collection.name} preview`}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                />
+              </div>
+              <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                <Image
+                  src={collection.image}
+                  alt={`${collection.name} preview`}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                />
+              </div>
+              <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                <Image
+                  src={collection.image}
+                  alt={`${collection.name} preview`}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                />
+              </div>
+              <div className="relative h-12 w-12 rounded-md overflow-hidden">
+                <Image
+                  src={collection.image}
+                  alt={`${collection.name} preview`}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

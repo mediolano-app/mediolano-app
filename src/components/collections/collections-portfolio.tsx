@@ -89,8 +89,8 @@ export function CollectionsPortfolioGrid({ collections }: { collections: Collect
 
   return (
     <div className="space-y-8">
-      
-      
+
+
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
         <div className="relative w-full sm:w-[350px]">
@@ -163,7 +163,7 @@ export function CollectionsPortfolioGrid({ collections }: { collections: Collect
       ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedCollections.map((collection) => (
-            <Link key={collection.id} href={`/collections/${collection.id}`}>
+            <Link key={collection.id} href={`/collections/${collection.nftAddress || collection.id}`}>
               <CollectionCard
                 collection={collection}
               />
@@ -173,7 +173,7 @@ export function CollectionsPortfolioGrid({ collections }: { collections: Collect
       ) : (
         <div className="space-y-4">
           {sortedCollections.map((collection) => (
-            <Link key={collection.id} href={`/collections/${collection.id}`}>
+            <Link key={collection.id} href={`/collections/${collection.nftAddress || collection.id}`}>
               <CollectionListItem
                 collection={collection}
               />
@@ -293,7 +293,7 @@ function CollectionListItem({ collection }: CollectionCardProps) {
 
 function FeaturedCollectionCard({ collection }: CollectionCardProps) {
   const isFeatured = isCollectionFeatured(collection.id);
-  
+
   return (
     <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
@@ -374,22 +374,22 @@ function CollectionActionDropdown({ collectionId }: { collectionId: string }) {
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation()
-            
+
             // Replace 'address' with the actual property name for the collection address
             const explorerUrl = process.env.NEXT_PUBLIC_EXPLORER_URL
             const collectionAddress = collectionId // or use collection.address if available
             if (explorerUrl && collectionAddress) {
               window.open(`${explorerUrl}/contract/${collectionAddress}`, "_blank")
             }
-            
+
           }}
         >
           <Edit className="mr-2 h-4 w-4" />
           View Collection on Explorer
         </DropdownMenuItem>
 
-        
-        
+
+
       </DropdownMenuContent>
     </DropdownMenu>
   )

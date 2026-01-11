@@ -206,9 +206,11 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
               <div className="absolute top-3 left-3">
+                {/* 
                 <Badge variant="secondary" className="bg-white/90 text-black">
-                  #{asset.id}
+                  {asset.type}
                 </Badge>
+                 */}
               </div>
               <div className="absolute top-3 right-3">
                 <DropdownMenu>
