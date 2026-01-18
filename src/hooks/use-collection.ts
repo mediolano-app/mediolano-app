@@ -217,17 +217,32 @@ export function useCollection(): UseCollectionReturn {
         throw new Error("Contract not available");
       }
 
+      // Validate required parameters
+      if (!formData.name || formData.name.trim() === "") {
+        throw new Error("Collection name is required");
+      }
+
+      if (!formData.base_uri || formData.base_uri.trim() === "") {
+        throw new Error("Base URI is required");
+      }
+
       setIsCreating(true);
       setError(null);
 
       try {
-        // Clean and uppercase the name (remove non-alphanumeric chars)
-        const cleanName = (formData.symbol || "")
+        // Clean and uppercase the symbol (remove non-alphanumeric chars)
+        const cleanSymbol = (formData.symbol || "")
           .replace(/[^a-zA-Z0-9]/g, "")
           .toUpperCase();
 
-        // Use up to 6 characters, or the full cleanName if it's shorter, fallback to 'COLL' if empty
-        const symbol = cleanName || "COLL";
+        // Use up to 31 characters, or the full cleanSymbol if it's shorter, fallback to 'COLL' if empty
+        const symbol = cleanSymbol || "COLL";
+
+        console.log("Creating collection with params:", {
+          name: formData.name,
+          symbol: symbol,
+          base_uri: formData.base_uri,
+        });
 
         // Prepare contract call - pass strings directly as ByteArray parameters
         const contractCall = contract.populate("create_collection", [
@@ -236,12 +251,15 @@ export function useCollection(): UseCollectionReturn {
           formData.base_uri, // base_uri as ByteArray
         ]);
 
+        console.log("Contract call prepared:", contractCall);
+
         // Execute the transaction
         await createCollectionSend([contractCall]);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to create collection";
         setError(errorMessage);
+        console.error("Create collection error:", err);
         throw err;
       } finally {
         setIsCreating(false);

@@ -103,10 +103,22 @@ export default function CreateCollectionView({
 
       console.log("Upload result:", result);
       console.log("Metadata URL:", result?.metadataUrl);
+
+      // Validate that we have a valid metadata URL
+      if (!result || !result.metadataUrl) {
+        toast({
+          title: "Upload Failed",
+          description: "Failed to upload metadata to IPFS. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create collection on-chain
       await createCollection({
-        base_uri: result?.metadataUrl,
-        name: formData?.name,
-        symbol: formData?.name,
+        base_uri: result.metadataUrl,
+        name: formData.name,
+        symbol: formData.name,
       });
 
       toast({
@@ -390,12 +402,12 @@ export default function CreateCollectionView({
                             Making the most of your collection page helps others
                             better understand your project.
                           </p>
-                            <ul className="list-disc list-inside text-xs space-y-1 text-muted-foreground">
-                             <li>Choose a collection name</li>
-                             <li>Fill in your collection details</li>
-                             <li>Add image (upload file or provide URL)</li>
-                             <li>Configure collection settings</li>
-                           </ul>
+                          <ul className="list-disc list-inside text-xs space-y-1 text-muted-foreground">
+                            <li>Choose a collection name</li>
+                            <li>Fill in your collection details</li>
+                            <li>Add image (upload file or provide URL)</li>
+                            <li>Configure collection settings</li>
+                          </ul>
                         </div>
                       </div>
                     </TabsContent>

@@ -10,13 +10,27 @@ export async function GET() {
     });
     return NextResponse.json({ url: url }, { status: 200 });
   } catch (error) {
-    console.error("Pinata API Error:", error);
+    // Log specialized error information for debugging
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Pinata API ERROR:", {
+      message: errorMessage,
+      timestamp: new Date().toISOString()
+    });
+
+    let status = 500;
+    let userMessage = "Error creating signed URL";
+
+    if (errorMessage.includes("plan limits") || errorMessage.includes("403")) {
+      status = 403;
+      userMessage = "Pinata account limits surpassed. Please check your storage at pinata.cloud";
+    }
+
     return NextResponse.json(
-      { 
-        text: "Error creating signed URL", 
-        error: error instanceof Error ? error.message : String(error) 
+      {
+        message: userMessage,
+        error: errorMessage
       },
-      { status: 500 }
+      { status: status }
     );
   }
 }

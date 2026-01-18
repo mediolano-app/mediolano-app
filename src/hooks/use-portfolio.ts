@@ -59,7 +59,7 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
     recentActivity: []
   });
 
-  
+
   const { collections, loading: collectionsLoading, error: collectionsError, reload: reloadCollections } = useGetCollections(address);
 
   const { contract } = useContract({
@@ -139,15 +139,27 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
                 collectionIdParam = numId.toString();
               }
             }
-            
-            const tokenIds: string[] = await contract.call(
-              "list_user_tokens_per_collection",
-              [collectionIdParam, address],
-              {
-                parseRequest: true,
-                parseResponse: true,
+
+            let tokenIds: string[] = [];
+            try {
+              tokenIds = await contract.call(
+                "list_user_tokens_per_collection",
+                [collectionIdParam, address],
+                {
+                  parseRequest: true,
+                  parseResponse: true,
+                }
+              );
+            } catch (err) {
+              const errorMessage = err instanceof Error ? err.message : String(err);
+              if (errorMessage.includes("ENTRYPOINT_NOT_FOUND")) {
+                console.warn(`Collection ${collection.id} (${collection.name}) does not support user token listing (ENTRYPOINT_NOT_FOUND).`);
+              } else {
+                console.error(`Error fetching tokens for collection ${collection.id}:`, err);
               }
-            );
+              // Continue to next collection
+              return;
+            }
 
             if (!tokenIds || tokenIds.length === 0) {
               return;
@@ -157,7 +169,7 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
             const tokenDetails = await Promise.all(
               tokenIds.map(async (tokenId) => {
                 const token = await contract.call("get_token", [tokenId]);
-                
+
                 const processedToken = await processTokenMetadata(
                   tokenId,
                   token.metadata_uri,
@@ -223,7 +235,7 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
         totalValue,
         totalNFTs,
         topCollection,
-        recentActivity: activities.sort((a, b) => 
+        recentActivity: activities.sort((a, b) =>
           new Date(b.date).getTime() - new Date(a.date).getTime()
         ).slice(0, 10)
       });
@@ -241,11 +253,11 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
     reloadCollections();
   }, [reloadCollections]);
 
-  return { 
-    collections, 
-    tokens, 
+  return {
+    collections,
+    tokens,
     stats,
-    loading: collectionsLoading, 
+    loading: collectionsLoading,
     error: collectionsError,
     refetch
   };

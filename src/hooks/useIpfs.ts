@@ -11,10 +11,30 @@ export interface IpfsMetadata {
 }
 
 const getSignedUrl = async (): Promise<string> => {
-  const res = await fetch("/api/pinata");
-  if (!res.ok) throw new Error("Failed to fetch signed URL");
-  const { url } = await res.json();
-  return url;
+  try {
+    const res = await fetch("/api/pinata");
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const errorMessage = data.error || data.message || "Failed to fetch signed URL";
+
+      // Specifically handle Pinata plan limits
+      if (errorMessage.includes("plan limits") || errorMessage.includes("403")) {
+        throw new Error("Pinata account limit reached. Please check your Pinata dashboard storage and plan limits.");
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    if (!data.url) {
+      throw new Error("No signed URL returned from server");
+    }
+
+    return data.url;
+  } catch (err) {
+    console.error("Error in getSignedUrl:", err);
+    throw err instanceof Error ? err : new Error("Failed to connect to Pinata service");
+  }
 };
 
 export function useIpfsUpload() {
@@ -47,8 +67,15 @@ export function useIpfsUpload() {
         cid: metadataUpload.cid,
       };
     } catch (err) {
+      console.error("Metadata upload error details:", err);
       const error =
-        err instanceof Error ? err : new Error("Metadata upload failed");
+        err instanceof Error ? err : new Error("Metadata check failed");
+
+      // Enhance error message for the user
+      if (error.message.includes("403") || error.message.includes("limit")) {
+        error.message = "Upload failed: Pinata account limit exceeded. Check your plan at pinata.cloud";
+      }
+
       setError(error);
       throw error;
     }
