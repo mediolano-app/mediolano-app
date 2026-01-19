@@ -28,6 +28,7 @@ import { TransferAssetDialog } from "@/components/transfer-asset-dialog";
 import { ReportAssetDialog } from "@/components/report-asset-dialog";
 import { RemixButton } from "@/components/remix/remix-button";
 import type { Asset } from "@/types/asset";
+import { useAccount } from "@starknet-react/core";
 
 interface NFTCardProps {
   asset: Asset;
@@ -37,6 +38,7 @@ interface NFTCardProps {
 function NFTCard({ asset, view = "grid" }: NFTCardProps) {
   const [isTransferOpen, setIsTransferOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const { address } = useAccount();
 
   const handleShare = async () => {
     const url = `${window.location.origin}/asset/${asset.id}`;
@@ -173,9 +175,15 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
         </Card>
 
         <TransferAssetDialog
-          asset={asset}
-          open={isTransferOpen}
-          onOpenChange={setIsTransferOpen}
+          assets={[{
+            id: asset.id,
+            name: asset.name,
+            nftAddress: typeof asset.collection === 'string' ? asset.collection : "", // Assuming collection field holds address or name. Might need improvement.
+            collectionName: typeof asset.collection === 'string' ? asset.collection : undefined
+          }]}
+          currentOwner={address || ""}
+          isOpen={isTransferOpen}
+          onClose={() => setIsTransferOpen(false)}
           onTransferComplete={() => setIsTransferOpen(false)}
         />
 
@@ -329,9 +337,15 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
       </Card>
 
       <TransferAssetDialog
-        asset={asset}
-        open={isTransferOpen}
-        onOpenChange={setIsTransferOpen}
+        assets={[{
+          id: asset.id,
+          name: asset.name,
+          nftAddress: typeof asset.collection === 'string' ? asset.collection : "",
+          collectionName: typeof asset.collection === 'string' ? asset.collection : undefined
+        }]}
+        currentOwner={address || ""}
+        isOpen={isTransferOpen}
+        onClose={() => setIsTransferOpen(false)}
         onTransferComplete={() => setIsTransferOpen(false)}
       />
 
