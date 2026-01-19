@@ -62,7 +62,7 @@ export function getAssetInfo() {
       "File Format": "PNG",
       "Creation Date": "2023-01-01",
       "Last Updated": "2023-06-15",
-      Blockchain: "Ethereum",
+      Blockchain: "Starknet",
       "Smart Contract": "0xContract...7890",
     }
   }

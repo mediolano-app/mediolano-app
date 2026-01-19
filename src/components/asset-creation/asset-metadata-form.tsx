@@ -161,7 +161,7 @@ export function AssetMetadataForm({ formState, updateFormField, template }: Asse
             key: "blockchain",
             label: "Blockchain",
             type: "select",
-            options: ["Ethereum", "Polygon", "Solana", "Binance Smart Chain", "Avalanche", "Other"],
+            options: ["Starknet"],
           },
           {
             key: "tokenStandard",

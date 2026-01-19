@@ -337,12 +337,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
             <SelectValue placeholder="Select blockchain" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ethereum">Ethereum</SelectItem>
-            <SelectItem value="polygon">Polygon</SelectItem>
-            <SelectItem value="solana">Solana</SelectItem>
-            <SelectItem value="binance">Binance Smart Chain</SelectItem>
-            <SelectItem value="avalanche">Avalanche</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
+            <SelectItem value="ethereum">Starknet</SelectItem>
           </SelectContent>
         </Select>
       </div>

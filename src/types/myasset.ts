@@ -33,14 +33,7 @@ export enum LicenseType {
 }
 
 export enum Blockchain {
-  ETHEREUM = 'ethereum',
   STARKNET = 'starknet',
-  POLYGON = 'polygon',
-  ARBITRUM = 'arbitrum',
-  OPTIMISM = 'optimism',
-  BASE = 'base',
-  AVALANCHE = 'avalanche',
-  BSC = 'bsc'
 }
 
 export enum TokenStandard {
@@ -788,7 +781,7 @@ export const createNFTAssetFromData = (data: RawNFTData): NFTAsset => {
     
     // Market data
     currentPrice: data.currentPrice,
-    currency: data.currency || 'ETH',
+    currency: data.currency || 'STRK',
     lastSalePrice: data.lastSalePrice,
     
     // Verification
