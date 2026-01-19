@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -22,10 +22,19 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent } from "@/components/ui/card"
+import { useSendTransaction } from "@starknet-react/core"
+import { COLLECTION_NFT_ABI } from "@/abis/ip_nft"
+import { shortenAddress } from "@/lib/utils"
+
+export interface TransferableAsset {
+  id: string
+  name: string
+  nftAddress: string
+  collectionName?: string
+}
 
 interface TransferAssetDialogProps {
-  assetId: string
-  assetName: string
+  assets: TransferableAsset[]
   currentOwner: string
   isOpen: boolean
   onClose: () => void
@@ -34,14 +43,11 @@ interface TransferAssetDialogProps {
 
 // Mock data for recent addresses
 const recentAddresses = [
-  { address: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e", name: "Main Wallet", lastUsed: "2 days ago" },
-  { address: "0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t", name: "Investment DAO", lastUsed: "1 week ago" },
-  { address: "0x9876543210abcdef0123456789abcdef01234567", name: "Gallery Wallet", lastUsed: "3 weeks ago" },
+  { address: "0x000000000000000000000000000000000000000000000000000000000000001", name: "Burn Address", lastUsed: "Never" },
 ]
 
 export function TransferAssetDialog({
-  assetId,
-  assetName,
+  assets,
   currentOwner,
   isOpen,
   onClose,
@@ -50,27 +56,49 @@ export function TransferAssetDialog({
   const [step, setStep] = useState<"details" | "confirm" | "processing" | "success">("details")
   const [recipientAddress, setRecipientAddress] = useState("")
   const [memo, setMemo] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  // Removed local isLoading state in favor of hook status if possible, 
+  // but we might want to keep it for UI steps.
+  // actually useContractWrite provides isPending
+
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
   const [selectedTab, setSelectedTab] = useState<"manual" | "recent">("manual")
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const { toast } = useToast()
 
+  // Derived Values
+  const assetName = assets.length === 1 ? assets[0].name : `${assets.length} Assets`
+  const assetIdDisplay = assets.length === 1 ? `#${assets[0].id}` : `Batch (${assets.length})`
+
+  // Build Calls
+  const calls = useMemo(() => {
+    if (!recipientAddress || !assets.length) return undefined
+
+    return assets.map(asset => ({
+      contractAddress: asset.nftAddress,
+      entrypoint: "transfer_from",
+      calldata: [currentOwner, recipientAddress, asset.id]
+    }))
+  }, [assets, currentOwner, recipientAddress])
+
+  const { sendAsync, isPending } = useSendTransaction({
+    calls
+  })
+
   // Mock recipient preview data
   const recipientPreview = recipientAddress
     ? {
-        name: recipientAddress.startsWith("0x742d") ? "Main Wallet" : `0x${recipientAddress.substring(2, 6)}...`,
-        verified: recipientAddress.startsWith("0x742d"),
-        transactions: recipientAddress.startsWith("0x742d") ? 27 : 0,
-      }
+      name: recipientAddress.startsWith("0x") ? shortenAddress(recipientAddress) : recipientAddress,
+      verified: false,
+      transactions: 0,
+    }
     : null
 
-  // Mock transaction fee
+  // Mock transaction fee (estimate)
   const transactionFee = {
-    amount: "0.005 ETH",
-    usdValue: "$12.50",
-    estimatedTime: "< 30 seconds",
+    amount: "0.0005 ETH", // Lower fee for L2
+    usdValue: "$1.50",
+    estimatedTime: "< 10 seconds",
   }
 
   const validateAddress = (address: string) => {
@@ -106,38 +134,33 @@ export function TransferAssetDialog({
 
   const handleTransfer = async () => {
     setStep("processing")
-    setIsLoading(true)
-    setProgress(0)
+    setProgress(10)
 
     try {
-      // Simulate API call to transfer the asset with progress updates
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          const newProgress = prev + 20
-          if (newProgress >= 100) {
-            clearInterval(interval)
-            return 100
-          }
-          return newProgress
-        })
-      }, 500)
+      if (!sendAsync) {
+        throw new Error("Wallet not connected or invalid parameters")
+      }
 
-      // Simulate completion after progress reaches 100%
-      setTimeout(() => {
-        clearInterval(interval)
-        setProgress(100)
-        setIsLoading(false)
-        setStep("success")
+      setProgress(30)
+      const tx = await sendAsync()
+      setProgress(80)
 
-        toast({
-          title: "Asset transferred successfully",
-          description: `${assetName} has been transferred to ${recipientAddress.substring(0, 6)}...${recipientAddress.substring(recipientAddress.length - 4)}`,
-        })
-      }, 3000)
+      // We could wait for transaction receipt here if we want to show strict success
+      // But typically we show success after submission hash is received
+
+      setProgress(100)
+      setStep("success")
+
+      toast({
+        title: "Transfer Submitted",
+        description: `Tx Hash: ${shortenAddress(tx.transaction_hash)}`,
+      })
     } catch (err) {
+      console.error(err)
       setError("Failed to transfer asset. Please try again.")
-      setIsLoading(false)
-      setStep("details")
+      setStep("details") // Go back on error? or stay on confirm?
+
+      // If user rejected, it's a specific error
 
       toast({
         variant: "destructive",
@@ -163,7 +186,7 @@ export function TransferAssetDialog({
   }
 
   const handleClose = () => {
-    if (step === "processing" && isLoading) {
+    if (step === "processing" && isPending) {
       return // Prevent closing during processing
     }
     handleReset()
@@ -333,20 +356,28 @@ export function TransferAssetDialog({
 
             <div className="py-4 space-y-4">
               <div className="rounded-lg border p-4 space-y-3">
-                {assetId.startsWith("batch-") ? (
+                {assets.length > 1 ? (
                   // Batch transfer view
                   <>
                     <div className="flex justify-between items-center">
                       <h3 className="font-medium">Batch Transfer</h3>
-                      <Badge variant="outline">{assetName}</Badge>
+                      <Badge variant="outline">{assets.length} Assets</Badge>
+                    </div>
+                    <div className="max-h-32 overflow-y-auto space-y-1 mb-2">
+                      {assets.map(a => (
+                        <div key={a.id} className="text-xs text-muted-foreground flex justify-between">
+                          <span>{a.name}</span>
+                          <span>#{a.id}</span>
+                        </div>
+                      ))}
                     </div>
                     <div className="flex justify-between items-center">
                       <h3 className="font-medium">From</h3>
-                      <p className="font-mono text-sm truncate max-w-[250px]">{currentOwner}</p>
+                      <p className="font-mono text-sm truncate max-w-[250px]">{shortenAddress(currentOwner)}</p>
                     </div>
                     <div className="flex justify-between items-center">
                       <h3 className="font-medium">To</h3>
-                      <p className="font-mono text-sm truncate max-w-[250px]">{recipientAddress}</p>
+                      <p className="font-mono text-sm truncate max-w-[250px]">{shortenAddress(recipientAddress)}</p>
                     </div>
                   </>
                 ) : (
@@ -354,19 +385,19 @@ export function TransferAssetDialog({
                   <>
                     <div className="flex justify-between items-center">
                       <h3 className="font-medium">Asset</h3>
-                      <p>{assetName}</p>
+                      <p>{assets[0]?.name}</p>
                     </div>
                     <div className="flex justify-between items-center">
                       <h3 className="font-medium">Asset ID</h3>
-                      <p>#{assetId}</p>
+                      <p>#{assets[0]?.id}</p>
                     </div>
                     <div className="flex justify-between items-center">
                       <h3 className="font-medium">From</h3>
-                      <p className="font-mono text-sm truncate max-w-[250px]">{currentOwner}</p>
+                      <p className="font-mono text-sm truncate max-w-[250px]">{shortenAddress(currentOwner)}</p>
                     </div>
                     <div className="flex justify-between items-center">
                       <h3 className="font-medium">To</h3>
-                      <p className="font-mono text-sm truncate max-w-[250px]">{recipientAddress}</p>
+                      <p className="font-mono text-sm truncate max-w-[250px]">{shortenAddress(recipientAddress)}</p>
                     </div>
                   </>
                 )}
@@ -382,7 +413,7 @@ export function TransferAssetDialog({
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Important</AlertTitle>
                 <AlertDescription>
-                  {assetId.startsWith("batch-")
+                  {assets.length > 1
                     ? "This batch transfer cannot be reversed once confirmed. All selected assets will be transferred."
                     : "Once confirmed, this transfer cannot be reversed. Please ensure all details are correct."}
                 </AlertDescription>
@@ -452,7 +483,7 @@ export function TransferAssetDialog({
             <DialogHeader>
               <DialogTitle>Transfer Complete</DialogTitle>
               <DialogDescription>
-                {assetId.startsWith("batch-")
+                {assets.length > 1
                   ? "Your assets have been successfully transferred."
                   : "Your asset has been successfully transferred."}
               </DialogDescription>
@@ -466,7 +497,7 @@ export function TransferAssetDialog({
               <div className="space-y-2 text-center">
                 <p className="text-lg font-medium">Transfer Successful!</p>
                 <p className="text-sm text-muted-foreground">
-                  {assetId.startsWith("batch-")
+                  {assets.length > 1
                     ? `${assetName} have been transferred to `
                     : `${assetName} has been transferred to `}
                   <span className="font-mono">
@@ -495,10 +526,10 @@ export function TransferAssetDialog({
                     <span className="text-muted-foreground">Fee Paid:</span>
                     <span>{transactionFee.amount}</span>
                   </div>
-                  {assetId.startsWith("batch-") && (
+                  {assets.length > 1 && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Assets Transferred:</span>
-                      <span>{assetName.split(" ")[0]}</span>
+                      <span>{assets.length}</span>
                     </div>
                   )}
                 </div>

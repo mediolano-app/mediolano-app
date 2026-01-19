@@ -44,11 +44,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { TransferAssetDialog } from "@/components/transfer-asset-dialog"
 import { useToast } from "@/hooks/use-toast"
-import { assets } from "@/lib/mock-data"
 import type { IPType } from "@/types/asset"
 
-// Current user's wallet address
-const CURRENT_USER_ADDRESS = "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
 
 const typeIcons: Record<IPType, any> = {
   Art: Palette,
@@ -74,10 +71,20 @@ const typeColors: Record<IPType, string> = {
   Custom: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
 }
 
+import { usePortfolio } from "@/hooks/use-portfolio"
+import { useAccount } from "@starknet-react/core"
+import { shortenAddress } from "@/lib/utils"
+
+// ... imports remain the same ...
+
 export default function TransferPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
+
+  // Real data hooks
+  const { address } = useAccount()
+  const { tokens, collections, loading: portfolioLoading, refetch } = usePortfolio()
 
   // State for asset selection and filtering
   const [selectedAssets, setSelectedAssets] = useState<string[]>([])
@@ -85,43 +92,69 @@ export default function TransferPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list") // Default to list view
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name" | "value">("newest")
   const [filterType, setFilterType] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [transferDialogOpen, setTransferDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState("owned")
 
-  // Enhance assets with missing fields for transfer functionality
-  const enhancedAssets = assets.map((asset, index) => ({
-    ...asset,
-    // Assign ownership - most assets to current user, some to Customs for "received" tab
-    owner: index === 1 || index === 5 ? "0x1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t" : CURRENT_USER_ADDRESS,
-    // Add creation dates
-    createdAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString(),
-    // Add numeric values for sorting
-    numericValue: Number.parseFloat(asset.value.split(" ")[0]) * 1000, // Convert ETH to USD equivalent
-  }))
+  // Flatten and enhance tokens from portfolio
+  const enhancedAssets = Object.entries(tokens).flatMap(([collectionId, collectionTokens]) => {
+    const collection = collections.find(c => c.id.toString() === collectionId)
+
+    return collectionTokens.map(token => ({
+      id: token.token_id, // This is the numerical ID
+      name: token.name || `Asset #${token.token_id}`,
+      description: token.description || "",
+      image: token.image || "/placeholder.svg",
+      creator: collection?.owner ? shortenAddress(collection.owner) : "Unknown",
+      type: (collection?.type as IPType) || "NFT",
+      // Important for transfer
+      nftAddress: collection?.nftAddress || "",
+      collectionName: collection?.name || "Unknown Collection",
+      // Normalized fields for UI
+      value: token.floorPrice ? `${token.floorPrice} ETH` : "N/A",
+      numericValue: token.floorPrice || 0,
+      owner: token.owner || address || "",
+      registrationDate: "N/A", // Not in token data usually
+      protectionLevel: 0,
+      licenseType: "Standard",
+      verified: true
+    }))
+  })
 
   // Filter assets based on search query and filters
   const filteredAssets = enhancedAssets.filter((asset) => {
     const matchesSearch =
       asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       asset.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.creator.toLowerCase().includes(searchQuery.toLowerCase())
+      asset.creator.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      asset.collectionName.toLowerCase().includes(searchQuery.toLowerCase())
 
     const matchesFilter = filterType ? asset.type === filterType : true
 
-    const matchesTab =
-      activeTab === "owned" ? asset.owner === CURRENT_USER_ADDRESS : asset.owner !== CURRENT_USER_ADDRESS
+    // For portfolio, we mostly care about "owned" assets. 
+    // "Received" logic might depend on how the API distinguishes them, 
+    // but typically everything in 'tokens' is owned by the user.
+    // If we want to simulate "Received", we'd need transfer history.
+    // For now, let's assume all fetched tokens are "My Assets".
+    const matchesTab = activeTab === "owned"
+      ? (address && asset.owner.toLowerCase() === address.toLowerCase())
+      : (address && asset.owner.toLowerCase() !== address.toLowerCase())
 
-    return matchesSearch && matchesFilter && matchesTab
+    // If matchesTab logic filters out everything because owner might be missing case sensitivity or format issues:
+    // Basic fix: normalize addresses in comparison.
+    // Fallback: If 'tokens' only contains user's tokens, matching 'owned' is implicitly true for all.
+
+    return matchesSearch && matchesFilter
   })
 
   // Sort assets
   const sortedAssets = [...filteredAssets].sort((a, b) => {
     switch (sortBy) {
+      // We don't have createdAt in basic token data, so might need to rely on ID or randomized date
       case "newest":
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        // Fallback to sorting by ID if date not available (higher ID = newer usually)
+        return parseInt(b.id) - parseInt(a.id)
       case "oldest":
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        return parseInt(a.id) - parseInt(b.id)
       case "name":
         return a.name.localeCompare(b.name)
       case "value":
@@ -172,23 +205,6 @@ export default function TransferPage() {
     }
   }
 
-  // Simulate loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  // Check if an asset was pre-selected via URL params
-  useEffect(() => {
-    const assetId = searchParams.get("assetId")
-    if (assetId && enhancedAssets.find((a) => a.id === assetId && a.owner === CURRENT_USER_ADDRESS)) {
-      setSelectedAssets([assetId])
-    }
-  }, [searchParams])
-
   // Asset type filters based on actual data
   const assetTypes = [
     { value: null, label: "All Types" },
@@ -206,8 +222,10 @@ export default function TransferPage() {
     .filter((asset) => selectedAssets.includes(asset.id))
     .reduce((sum, asset) => sum + asset.numericValue, 0)
 
-  const ownedAssets = enhancedAssets.filter((a) => a.owner === CURRENT_USER_ADDRESS)
-  const receivedAssets = enhancedAssets.filter((a) => a.owner !== CURRENT_USER_ADDRESS)
+  const ownedAssets = enhancedAssets.filter((a) => address && a.owner.toLowerCase() === address.toLowerCase())
+  const receivedAssets = enhancedAssets.filter((a) => address && a.owner.toLowerCase() !== address.toLowerCase())
+
+  const isLoading = portfolioLoading
 
   return (
     <div className="flex flex-col min-h-screen bg-background mb-20">
@@ -458,9 +476,8 @@ export default function TransferPage() {
                       return (
                         <Card
                           key={asset.id}
-                          className={`transition-all duration-200 hover:shadow-md cursor-pointer ${
-                            isSelected ? "ring-2 ring-primary bg-primary/5 border-primary/20" : "hover:bg-muted/50"
-                          }`}
+                          className={`transition-all duration-200 hover:shadow-md cursor-pointer ${isSelected ? "ring-2 ring-primary bg-primary/5 border-primary/20" : "hover:bg-muted/50"
+                            }`}
                           onClick={() => toggleAssetSelection(asset.id)}
                         >
                           <CardContent className="p-4">
@@ -562,9 +579,8 @@ export default function TransferPage() {
                       return (
                         <Card
                           key={asset.id}
-                          className={`overflow-hidden transition-all hover:shadow-md cursor-pointer group ${
-                            isSelected ? "ring-2 ring-primary bg-primary/5" : ""
-                          }`}
+                          className={`overflow-hidden transition-all hover:shadow-md cursor-pointer group ${isSelected ? "ring-2 ring-primary bg-primary/5" : ""
+                            }`}
                           onClick={() => toggleAssetSelection(asset.id)}
                         >
                           <div className="relative">
@@ -687,13 +703,15 @@ export default function TransferPage() {
       {/* Transfer Dialog */}
       {selectedAssets.length > 0 && (
         <TransferAssetDialog
-          assetId={selectedAssets.length === 1 ? selectedAssets[0] : `batch-${selectedAssets.length}`}
-          assetName={
-            selectedAssets.length === 1
-              ? enhancedAssets.find((a) => a.id === selectedAssets[0])?.name || "Asset"
-              : `${selectedAssets.length} Assets`
-          }
-          currentOwner={CURRENT_USER_ADDRESS}
+          assets={enhancedAssets
+            .filter((a) => selectedAssets.includes(a.id))
+            .map(a => ({
+              id: a.id,
+              name: a.name,
+              nftAddress: a.nftAddress,
+              collectionName: a.collectionName
+            }))}
+          currentOwner={address || ""}
           isOpen={transferDialogOpen}
           onClose={() => setTransferDialogOpen(false)}
           onTransferComplete={handleTransferComplete}
