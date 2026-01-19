@@ -65,16 +65,9 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 - [X] MIP Mobile @ iPhone iOS App Store **25.12**
 
-- [ ] Mediolano Dapp @ Starknet Mainnet **25.12**
+- [X] Mediolano Collections Protocol @ Starknet Mainnet **25.12**
 
-- [ ] Medialane Protocol @ Starknet Sepolia **25.12**
-
-- [ ] Medialane Dapp @ Starknet Sepolia **25.12**
-
-- [ ] Medialane Protocol @ Starknet Mainnet **26.02**
-
-- [ ] Medialane Dapp @ Starknet Mainnet **26.02**
-
+- [ ] Mediolano Dapp @ Starknet Mainnet **26.01**
 
 ## Contributing
 

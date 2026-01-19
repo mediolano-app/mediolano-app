@@ -219,8 +219,8 @@ export function useCollectionMetadata(collectionAddress: string) {
 
         setCollection({
           id: collectionId.toString(),
-          name: name || "Unknown Collection",
-          symbol: symbol || "UNK",
+          name: name || "IP Collection",
+          symbol: symbol || "MIP",
           description: description,
           image: image,
           nftAddress: collectionAddress,

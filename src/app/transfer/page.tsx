@@ -108,7 +108,7 @@ export default function TransferPage() {
       type: (collection?.type as IPType) || "NFT",
       // Important for transfer
       nftAddress: collection?.nftAddress || "",
-      collectionName: collection?.name || "Unknown Collection",
+      collectionName: collection?.name || "IP Collection",
       // Normalized fields for UI
       value: token.floorPrice ? `${token.floorPrice} ETH` : "N/A",
       numericValue: token.floorPrice || 0,

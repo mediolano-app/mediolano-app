@@ -40,12 +40,12 @@ import {
 } from "lucide-react"
 import { ReportAssetDialog } from "@/components/report-asset-dialog"
 
-type SortOption = "value-high" | "value-low" | "name-asc" | "name-desc" | "size-high" | "size-low"
+type SortOption = "date-new" | "date-old" | "name-asc" | "name-desc" | "assets-high" | "assets-low"
 
 export function CollectionsGrid({ collections }: { collections: Collection[] }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [sortOption, setSortOption] = useState<SortOption>("value-high")
+  const [sortOption, setSortOption] = useState<SortOption>("date-new")
   const [featuredOnly, setFeaturedOnly] = useState(false)
   const [reportDialogState, setReportDialogState] = useState<{ isOpen: boolean; collectionId: string; collectionName: string }>({
     isOpen: false,
@@ -61,31 +61,21 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
     return matchesSearch && matchesFeatured
   })
 
-  // Get NFT count for each collection
-  const getCollectionNFTCount = (collectionId: string) => {
-    return nfts.filter((nft) => nft.collection.id === collectionId).length
-  }
-
-  // Get total value for each collection
-  const getCollectionValue = (collectionId: string) => {
-    return nfts.filter((nft) => nft.collection.id === collectionId).reduce((sum, nft) => sum + nft.price, 0)
-  }
-
   // Sort collections based on selected sort option
   const sortedCollections = [...filteredCollections].sort((a, b) => {
     switch (sortOption) {
-      case "value-high":
-        return getCollectionValue(String(b.id)) - getCollectionValue(String(a.id))
-      case "value-low":
-        return getCollectionValue(String(a.id)) - getCollectionValue(String(b.id))
+      case "date-new":
+        return Number(b.lastMintTime || 0) - Number(a.lastMintTime || 0)
+      case "date-old":
+        return Number(a.lastMintTime || 0) - Number(b.lastMintTime || 0)
       case "name-asc":
         return a.name.localeCompare(b.name)
       case "name-desc":
         return b.name.localeCompare(a.name)
-      case "size-high":
-        return getCollectionNFTCount(String(b.id)) - getCollectionNFTCount(String(a.id))
-      case "size-low":
-        return getCollectionNFTCount(String(a.id)) - getCollectionNFTCount(String(b.id))
+      case "assets-high":
+        return (b.itemCount || 0) - (a.itemCount || 0)
+      case "assets-low":
+        return (a.itemCount || 0) - (b.itemCount || 0)
       default:
         return 0
     }
@@ -169,12 +159,12 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuRadioGroup value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
-                <DropdownMenuRadioItem value="value-high">Price: High to Low</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="value-low">Price: Low to High</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="date-new">Date: Newest</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="date-old">Date: Oldest</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="name-asc">Name: A to Z</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="name-desc">Name: Z to A</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="size-high">Size: Large to Small</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="size-low">Size: Small to Large</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="assets-high">Assets: High to Low</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="assets-low">Assets: Low to High</DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -292,9 +282,9 @@ function CollectionCard({ collection, nftCount, onReportClick }: CollectionCardP
             <Grid3X3 className="h-4 w-4 text-muted-foreground" />
             <span>{nftCount} Assets</span>
           </div>
-          <div className="flex items-center gap-1 text-sm">
+          <div className="flex items-center gap-1 text-sm bg-muted/50 px-2 py-1 rounded-md">
             <Box className="h-4 w-4 text-muted-foreground" />
-            <span>IP Type</span>
+            <span className="font-medium">{collection.type || "Art"}</span>
           </div>
         </div>
       </CardFooter>
@@ -337,13 +327,21 @@ function CollectionListItem({ collection, nftCount, onReportClick }: CollectionC
         </div>
 
         <div className="hidden sm:flex flex-col items-end">
-          <div className="flex items-center gap-1 text-sm">
-            <Grid3X3 className="h-4 w-4 text-muted-foreground" />
-            <span>{nftCount} NFTs</span>
-          </div>
-          <div className="flex items-center gap-1 text-sm">
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            <span>-- STRK</span>
+          <div className="flex items-center gap-3 text-sm">
+            <div className="flex items-center gap-1">
+              <Grid3X3 className="h-4 w-4 text-muted-foreground" />
+              <span>{nftCount} Assets</span>
+            </div>
+            {collection.floorPrice && (
+              <div className="flex items-center gap-1">
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                <span>{collection.floorPrice} STRK</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded text-xs font-medium">
+              <Box className="h-3 w-3 text-muted-foreground" />
+              <span>{collection.type || "Art"}</span>
+            </div>
           </div>
         </div>
       </Link>
@@ -392,8 +390,8 @@ export function FeaturedCollectionCard({ collection, nftCount, onReportClick }: 
                 <p className="text-lg md:text-xl font-bold">{nftCount}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs md:text-sm text-muted-foreground">Total Value</p>
-                <p className="text-lg md:text-xl font-bold">-- STRK</p>
+                <p className="text-xs md:text-sm text-muted-foreground">IP Type</p>
+                <p className="text-lg md:text-xl font-bold">{collection.type || "Art"}</p>
               </div>
               {collection.floorPrice && (
                 <div className="space-y-1">
@@ -460,24 +458,6 @@ function CollectionActionDropdown({ collectionId, collectionName, onReportClick 
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation()
-            console.log("Edit Collection:", collectionId)
-          }}
-        >
-          <Edit className="mr-2 h-4 w-4" />
-          Edit Collection
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation()
-            console.log("Add Programmable IP to Collection:", collectionId)
-          }}
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Create New Asset
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={(e) => {
@@ -488,16 +468,6 @@ function CollectionActionDropdown({ collectionId, collectionName, onReportClick 
         >
           <X className="mr-2 h-4 w-4" />
           Report Collection
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation()
-            console.log("Delete Collection:", collectionId)
-          }}
-          className="text-destructive focus:text-destructive"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete Collection
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

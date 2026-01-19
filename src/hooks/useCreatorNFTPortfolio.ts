@@ -65,7 +65,7 @@ export function useCreatorNFTPortfolio() {
                 parseRequest: true,
                 parseResponse: true,
               });
-              const collectionName = collectionData?.name?.toString() || "Unknown Collection";
+              const collectionName = collectionData?.name?.toString() || "IP Collection";
 
               let ipfsHash = tokenData.metadata_uri.toString();
               if (ipfsHash.startsWith('ipfs://')) {

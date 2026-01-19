@@ -541,7 +541,7 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
         asset.registrationDate ||
         asset.properties?.registration_date ||
         new Date().toLocaleDateString(),
-      collection: collection || "Unknown Collection",
+      collection: collection || "IP Collection",
       blockchain: "Starknet",
       tokenStandard: "ERC-721",
       licenseType: asset.licenseType || licenseAttributeType?.value || "",

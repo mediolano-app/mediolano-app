@@ -59,7 +59,7 @@ import { type Abi } from "starknet";
 type SortOption = "price-high" | "price-low" | "name-asc" | "name-desc" | "date-new" | "date-old"
 
 
-export interface IP{
+export interface IP {
   name: string,
   description: string,
   external_url: string,
@@ -78,7 +78,7 @@ export default function NFTPortfolio() {
   const [rarityFilter, setRarityFilter] = useState<string>("all")
   const [useBlockchainData, setUseBlockchainData] = useState(false)
 
-  const {address, balance, balanceError, tokenIds, tokenIdsError, isLoading} = useMIP();
+  const { address, balance, balanceError, tokenIds, tokenIdsError, isLoading } = useMIP();
 
   // const { 
   //   nfts: blockchainNFTs, 
@@ -107,14 +107,14 @@ export default function NFTPortfolio() {
       localStorage.setItem("sortOption", sortOption)
       localStorage.setItem("useBlockchainData", useBlockchainData.toString())
     }
-  }, [viewMode, sortOption, 
-  // useBlockchainData
+  }, [viewMode, sortOption,
+    // useBlockchainData
   ])
 
   const mockNFTs = getNFTs()
-  
+
   // const nfts = useBlockchainData ? blockchainNFTs : mockNFTs
-  
+
   // const collections = [
   //   { id: "all", name: "All Collections" },
   //   ...Array.from(
@@ -125,7 +125,7 @@ export default function NFTPortfolio() {
   //     const collection = nfts.find(nft => nft.collection.id === collectionId)?.collection
   //     return {
   //       id: collectionId,
-  //       name: collection?.name || "Unknown Collection"
+  //       name: collection?.name || "lection"
   //     }
   //   })
   // ]
@@ -171,7 +171,7 @@ export default function NFTPortfolio() {
 
   return (
     <div className="space-y-6">
-      
+
       {showStats && <PortfolioStats useBlockchainData={useBlockchainData} />}
 
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
@@ -201,7 +201,7 @@ export default function NFTPortfolio() {
           </Button>
 
           {/* Toggle button between mock & real data */}
-          
+
           {/* <Button
             variant="outline"
             size="icon"
@@ -240,7 +240,7 @@ export default function NFTPortfolio() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Filter</DropdownMenuLabel>
-               
+
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -262,7 +262,7 @@ export default function NFTPortfolio() {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-{/* 
+          {/* 
           <Select value={selectedCollection} onValueChange={setSelectedCollection}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Collection" />
@@ -323,12 +323,12 @@ export default function NFTPortfolio() {
           )} */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {tokenIds.map((tokenId, index) => (
-              <NFTCard 
-              key={index} 
-              tokenId={tokenId} 
-              status="Protected" 
+              <NFTCard
+                key={index}
+                tokenId={tokenId}
+                status="Protected"
               // onClick={() => router.push(`/assets/${tokenId}`)}
-  
+
               />
             ))}
           </div>
