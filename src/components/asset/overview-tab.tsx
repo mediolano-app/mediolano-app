@@ -48,7 +48,7 @@ export function OverviewTab({ asset }: OverviewTabProps) {
       author: { name: asset.owner || "Unknown" },
       licenseType: "Not specified",
       owner: asset.owner || "Unknown",
-      version: "1.0", 
+      version: "1.0",
     };
   };
 
@@ -142,37 +142,7 @@ export function OverviewTab({ asset }: OverviewTabProps) {
             </AccordionContent>
           </AccordionItem>
 
-          {/* TODO: Add proper history management */}
-          <AccordionItem value="history">
-            <AccordionTrigger className="py-4">
-              <div className="flex items-center">
-                <History className="mr-2 h-4 w-4" />
-                <span>History</span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-4 p-2">
-                <div className="flex items-start">
-                  <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <FileCheck className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium">License Updated</p>
-                    <p className="text-sm">{typeof displayValues.owner === 'string' ? displayValues.owner.slice(0,20) : displayValues.owner} updated</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="mr-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <PlusCircle className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Created</p>
-                    <p className="text-sm">{typeof displayValues.owner === 'string' ? displayValues.owner.slice(0,20) : displayValues.owner} minted this asset</p>
-                  </div>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+
         </Accordion>
       </div>
     </div>

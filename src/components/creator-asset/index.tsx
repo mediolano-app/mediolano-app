@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAccount } from "@starknet-react/core";
+import { TransferAssetDialog, TransferableAsset } from "@/components/transfer-asset-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IPTypeInfo } from "@/components/ip-type-info";
@@ -56,17 +59,33 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
   const resolvedParams = use(params);
   const { slug } = resolvedParams;
   const decodedSlug = decodeURIComponent(slug || "").replace(/%2D/g, "-");
-  const [nftAddress, tokenIdStr] = decodedSlug.split("-");
+  const [nftAddress, tokenIdStr] = (decodedSlug || "").split("-");
   const router = useRouter();
+  const { address } = useAccount();
+  const { toast } = useToast();
   const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
 
   const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online";
-  const tokenId = Number(tokenIdStr);
+  const tokenId = Number(tokenIdStr?.trim());
 
   const { displayAsset: asset, loading, loadingState, error, uiState, showSkeleton, notFound } = useAsset(
     nftAddress as `0x${string}`,
     Number.isFinite(tokenId) ? tokenId : undefined
   );
+
+  // Helper to safely compare addresses
+  const isOwner = useMemo(() => {
+    if (!address || !asset?.owner?.address) return false;
+    const addr1 = String(address).toLowerCase();
+    const addr2 = String(asset.owner.address).toLowerCase();
+    if (addr1 === addr2) return true;
+    try {
+      return normalizeStarknetAddress(addr1) === normalizeStarknetAddress(addr2);
+    } catch (e) {
+      return false;
+    }
+  }, [address, asset?.owner?.address]);
   const { collections } = useGetAllCollections();
   const matchedCollection = useMemo(() => {
     if (!collections || !nftAddress) return undefined;
@@ -151,7 +170,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {asset.tags && asset.tags.length > 0 && asset.tags.map((tag, index) => (
+                    {asset.tags && asset.tags.length > 0 && asset.tags.map((tag: string, index: number) => (
                       <Badge
                         key={index}
                         variant="outline"
@@ -216,6 +235,15 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                 </Tabs>
 
                 <div className="mt-6 flex flex-wrap gap-4">
+                  {isOwner && (
+                    <Button
+                      variant="default"
+                      className="flex-1"
+                      onClick={() => setIsTransferOpen(true)}
+                    >
+                      Transfer
+                    </Button>
+                  )}
                   <Button disabled variant="outline" className="flex-1">
                     Share
                   </Button>
@@ -249,6 +277,27 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
           open={isReportOpen}
           onOpenChange={setIsReportOpen}
         />
+
+        {asset && (
+          <TransferAssetDialog
+            assets={[{
+              id: String(tokenId),
+              name: asset.name,
+              nftAddress: nftAddress as string
+            }]}
+            currentOwner={asset.owner.address}
+            isOpen={isTransferOpen}
+            onClose={() => setIsTransferOpen(false)}
+            onTransferComplete={(newOwner) => {
+              setIsTransferOpen(false);
+              toast({
+                title: "Transfer Complete",
+                description: `Asset transferred to ${newOwner.slice(0, 6)}...${newOwner.slice(-4)}`,
+              });
+              reload();
+            }}
+          />
+        )}
       </div>
     </AssetErrorBoundary>
   );

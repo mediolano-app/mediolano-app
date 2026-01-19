@@ -250,7 +250,7 @@ const pickSoftware = (d: IPTypeDataType): SoftwareData => ({
 
 
 interface IPTypeInfoProps {
-  asset: AssetType; 
+  asset: AssetType;
 }
 
 export function IPTypeInfo({ asset }: IPTypeInfoProps) {
@@ -280,12 +280,12 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         if (cid) {
           fetchedMetadata = await fetchIPFSMetadata(cid)
         }
-        
+
         if (fetchedMetadata) {
           let detectedType: IPType = "Generic"
-      
+
           detectedType = determineIPType(asset, fetchedMetadata)
-          
+
           const finalData = combineData(fetchedMetadata, asset)
           setIpfsMetadata(fetchedMetadata)
           setMergedData(finalData)
@@ -299,7 +299,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
       } catch (error) {
         console.error("Error loading IPFS data:", error)
         setIpfsError(error as Error)
-        
+
         // On error, also default to Generic
         setIpfsMetadata(null)
         setMergedData(asset)
@@ -308,20 +308,20 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         setIsLoading(false)
       }
     }
-    
+
     loadIPFSData()
   }, [asset])
 
-  
+
 
   const getTypeData = (): IPTypeDataType => {
     if (!mergedData) {
       return mockIPTypeData[ipType] || mockIPTypeData.Generic;
     }
-    
+
     // Extract data from IPFS metadata attributes and properties
     const extractedData: IPTypeDataType = {}
-    
+
     if (ipfsMetadata?.attributes && Array.isArray(ipfsMetadata.attributes)) {
       ipfsMetadata.attributes.forEach(attr => {
         if (attr.trait_type && attr.value) {
@@ -329,20 +329,19 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         }
       })
     }
-    
+
     if (ipfsMetadata?.properties && typeof ipfsMetadata.properties === 'object') {
       Object.entries(ipfsMetadata.properties).forEach(([key, value]) => {
         extractedData[key] = value
       })
     }
-      
+
     return {
-      ...mockIPTypeData[ipType],
       ...extractedData,
       // Include basic metadata coerced to text
-      name: asText(ipfsMetadata?.name ?? mergedData.name),
-      description: asText(ipfsMetadata?.description ?? mergedData.description),
-      image: asText(ipfsMetadata?.image ?? mergedData.image),
+      name: asText(ipfsMetadata?.name ?? mergedData?.name),
+      description: asText(ipfsMetadata?.description ?? mergedData?.description),
+      image: asText(ipfsMetadata?.image ?? mergedData?.image),
     } as IPTypeDataType;
   }
 
@@ -573,7 +572,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               <h3 className="font-medium">Technical Information</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Sample Rate</p>
+                  <p className="text-sm text-muted-foreground">Sample Rate</p>
                   <p className="font-medium">{asText(typeData.sampleRate)}</p>
                 </div>
                 <div className="space-y-1">
@@ -1164,7 +1163,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             {ipfsError && (
               <Alert>
                 <Info className="h-4 w-4" />
@@ -1173,15 +1172,15 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             <div className="grid grid-cols-2 gap-4">
               {typeData && Object.entries(typeData as Record<string, unknown>)
                 .filter(([key]) => !['id', 'image', 'name', 'description'].includes(key))
                 .map(([key, value]) => {
                   if (typeof value === 'object' && value !== null) {
-                    return null 
+                    return null
                   }
-                  
+
                   return (
                     <div key={key} className="space-y-1">
                       <p className="text-sm text-muted-foreground capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
@@ -1209,7 +1208,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             #{Number(asset.tokenId)}
           </Badge>
         </div>
-        
+
         {ipfsMetadata && (
           <div className="mt-2 flex items-center text-xs text-muted-foreground">
             <Hexagon className="h-3 w-3 mr-1" />

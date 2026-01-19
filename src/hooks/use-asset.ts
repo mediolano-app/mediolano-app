@@ -209,21 +209,21 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
         lastLoadedIdRef.current = currentId;
         retryAttemptRef.current = 0;
         setLoading(false);
-      return;
-    }
+        return;
+      }
 
       // Proceed with fresh load
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
       setNotFound(false);
-    setLoadingState({
-      isInitializing: true,
-      isFetchingOnchainData: false,
-      isFetchingMetadata: false,
-      isComplete: false,
-      currentStep: "Loading asset...",
-      progress: 10,
-    });
+      setLoadingState({
+        isInitializing: true,
+        isFetchingOnchainData: false,
+        isFetchingMetadata: false,
+        isComplete: false,
+        currentStep: "Loading asset...",
+        progress: 10,
+      });
 
       // Step 1: Fetch onchain data
       setLoadingState((prev) => ({
@@ -302,10 +302,19 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
       let metadata: IPFSMetadata | null = null;
 
       if (onchainData.tokenURI) {
-        const match = onchainData.tokenURI.match(/ipfs:\/\/([a-zA-Z0-9]+)/);
-        if (match) {
-          ipfsCid = match[1];
+        let cid = "";
+        const uri = onchainData.tokenURI;
 
+        if (uri.startsWith("ipfs://")) {
+          cid = uri.replace("ipfs://", "");
+        } else if (uri.includes("/ipfs/")) {
+          cid = uri.split("/ipfs/")[1]?.split("?")[0] || "";
+        } else if (uri.match(/^[a-zA-Z0-9]{46,59}$/)) {
+          cid = uri;
+        }
+
+        if (cid) {
+          ipfsCid = cid;
           const metadataTimeout = new Promise<IPFSMetadata | null>(
             (_, reject) =>
               setTimeout(
@@ -321,7 +330,7 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
 
           try {
             metadata = await Promise.race([
-              fetchIPFSMetadata(ipfsCid),
+              fetchIPFSMetadata(cid),
               metadataTimeout,
             ]);
           } catch (metadataError) {
@@ -407,16 +416,16 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
           progress: 100,
         }));
       } else {
-      setError(errorMessage);
-      setLoadingState((prev) => ({
-        ...prev,
-        isInitializing: false,
-        isFetchingOnchainData: false,
-        isFetchingMetadata: false,
-        isComplete: false,
-        currentStep: "Error occurred",
-        progress: 0,
-      }));
+        setError(errorMessage);
+        setLoadingState((prev) => ({
+          ...prev,
+          isInitializing: false,
+          isFetchingOnchainData: false,
+          isFetchingMetadata: false,
+          isComplete: false,
+          currentStep: "Error occurred",
+          progress: 0,
+        }));
       }
     } finally {
       setLoading(false);
@@ -531,7 +540,7 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
       createdAt:
         asset.registrationDate ||
         asset.properties?.registration_date ||
-        "(Preview)",
+        new Date().toLocaleDateString(),
       collection: collection || "Unknown Collection",
       blockchain: "Starknet",
       tokenStandard: "ERC-721",
@@ -582,3 +591,5 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
     [asset, displayAsset, loading, loadingState, error, notFound, uiState, loadWithRetry]
   );
 }
+
+export type { DisplayAsset };

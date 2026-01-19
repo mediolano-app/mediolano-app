@@ -149,9 +149,11 @@ export function CollectionsPortfolioGrid({ collections }: { collections: Collect
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button className="gap-1 ml-auto sm:ml-0">
-            <Plus className="h-4 w-4" />
-            <span className="hidden xs:inline">New Collection</span>
+          <Button className="gap-1 ml-auto sm:ml-0" asChild>
+            <Link href="/create/collection">
+              <Plus className="h-4 w-4" />
+              <span className="hidden xs:inline">New Collection</span>
+            </Link>
           </Button>
         </div>
       </div>

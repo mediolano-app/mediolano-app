@@ -4,7 +4,7 @@ import { Abi, shortString, uint256 } from "starknet";
 import { ipCollectionAbi } from "@/abis/ip_collection";
 import { COLLECTION_NFT_ABI } from "@/abis/ip_nft";
 import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
-import { useGetAllCollections } from "./use-collection";
+import { useGetCollections } from "./use-collection";
 import type { Collection } from "@/lib/types";
 import { fetchIPFSMetadata, processIPFSHashToUrl } from "@/utils/ipfs";
 
@@ -119,7 +119,7 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
     recentActivity: []
   });
 
-  const { collections, loading: collectionsLoading, error: collectionsError, reload: reloadCollections } = useGetAllCollections();
+  const { collections, loading: collectionsLoading, error: collectionsError, reload: reloadCollections } = useGetCollections(address as `0x${string}`);
   const { provider } = useProvider();
 
   const { contract: managerContract } = useContract({
