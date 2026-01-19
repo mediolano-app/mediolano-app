@@ -304,10 +304,15 @@ export function useGetAllCollections(): UseGetAllCollectionsReturn {
 
     try {
       const collections: number[] = [];
-      for (let i = 0; i < 12; i++) {
-        const isValid = await contract.call("is_valid_collection", [i]);
-        if (isValid && !isCollectionReported(i.toString())) {
-          collections.push(i);
+      for (let i = 0; i < 50; i++) {
+        try {
+          const isValid = await contract.call("is_valid_collection", [i]);
+          if (isValid && !isCollectionReported(i.toString())) {
+            collections.push(i);
+          }
+        } catch (e) {
+          // If we hit an error, we might have hit the end of the collection IDs
+          break;
         }
       }
 

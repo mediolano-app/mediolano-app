@@ -38,7 +38,8 @@ const navigationItems = [
   {
     title: 'Manage',
     items: [
-      { title: 'Portfolio', href: '/portfolio', icon: FileText },
+      { title: 'IP Portfolio', href: '/portfolio', icon: FileText },
+      { title: 'Transfer Assets', href: '/transfer', icon: ArrowRightLeft },
       { title: 'Account Settings', href: '/account', icon: User },
     ],
   },

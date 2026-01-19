@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -25,6 +25,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useSendTransaction } from "@starknet-react/core"
 import { COLLECTION_NFT_ABI } from "@/abis/ip_nft"
 import { shortenAddress } from "@/lib/utils"
+import { EXPLORER_URL } from "@/services/constants"
 
 export interface TransferableAsset {
   id: string
@@ -41,10 +42,14 @@ interface TransferAssetDialogProps {
   onTransferComplete: (newOwnerAddress: string, memo?: string) => void
 }
 
-// Mock data for recent addresses
-const recentAddresses = [
-  { address: "0x000000000000000000000000000000000000000000000000000000000000001", name: "Burn Address", lastUsed: "Never" },
-]
+// Local storage key for recent addresses
+const RECENT_ADDRESSES_KEY = "mediolano_recent_transfer_addresses"
+
+interface RecentAddress {
+  address: string
+  name: string
+  lastUsed: string
+}
 
 export function TransferAssetDialog({
   assets,
@@ -56,15 +61,41 @@ export function TransferAssetDialog({
   const [step, setStep] = useState<"details" | "confirm" | "processing" | "success">("details")
   const [recipientAddress, setRecipientAddress] = useState("")
   const [memo, setMemo] = useState("")
-  // Removed local isLoading state in favor of hook status if possible, 
-  // but we might want to keep it for UI steps.
-  // actually useContractWrite provides isPending
+  const [recentAddresses, setRecentAddresses] = useState<RecentAddress[]>([])
 
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
   const [selectedTab, setSelectedTab] = useState<"manual" | "recent">("manual")
   const [agreeToTerms, setAgreeToTerms] = useState(false)
+  const [txHash, setTxHash] = useState<string | null>(null)
   const { toast } = useToast()
+
+  // Load recent addresses from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem(RECENT_ADDRESSES_KEY)
+    if (saved) {
+      try {
+        setRecentAddresses(JSON.parse(saved))
+      } catch (e) {
+        console.error("Failed to load recent addresses", e)
+      }
+    } else {
+      // Default burn address if empty
+      setRecentAddresses([
+        { address: "0x000000000000000000000000000000000000000000000000000000000000001", name: "Burn Address", lastUsed: "Never" }
+      ])
+    }
+  }, [isOpen])
+
+  const saveRecentAddress = (address: string) => {
+    const newRecent = [
+      { address, name: shortenAddress(address), lastUsed: new Date().toLocaleDateString() },
+      ...recentAddresses.filter(a => a.address.toLowerCase() !== address.toLowerCase())
+    ].slice(0, 5)
+
+    setRecentAddresses(newRecent)
+    localStorage.setItem(RECENT_ADDRESSES_KEY, JSON.stringify(newRecent))
+  }
 
   // Derived Values
   const assetName = assets.length === 1 ? assets[0].name : `${assets.length} Assets`
@@ -77,7 +108,7 @@ export function TransferAssetDialog({
     return assets.map(asset => ({
       contractAddress: asset.nftAddress,
       entrypoint: "transfer_from",
-      calldata: [currentOwner, recipientAddress, asset.id]
+      calldata: [currentOwner, recipientAddress, asset.id, "0"]
     }))
   }, [assets, currentOwner, recipientAddress])
 
@@ -85,20 +116,21 @@ export function TransferAssetDialog({
     calls
   })
 
-  // Mock recipient preview data
+  // Recipient preview data
+  const recipientItem = recentAddresses.find(a => a.address.toLowerCase() === recipientAddress.toLowerCase())
   const recipientPreview = recipientAddress
     ? {
-      name: recipientAddress.startsWith("0x") ? shortenAddress(recipientAddress) : recipientAddress,
-      verified: false,
-      transactions: 0,
+      name: recipientItem?.name || (recipientAddress.startsWith("0x") ? shortenAddress(recipientAddress) : recipientAddress),
+      address: recipientAddress,
+      isRecent: !!recipientItem
     }
     : null
 
-  // Mock transaction fee (estimate)
+  // estimated
   const transactionFee = {
-    amount: "0.0005 ETH", // Lower fee for L2
-    usdValue: "$1.50",
-    estimatedTime: "< 10 seconds",
+    amount: "< 0.001 STRK", // Lower fee for L2
+    usdValue: "< $0.001",
+    estimatedTime: "< 5 seconds",
   }
 
   const validateAddress = (address: string) => {
@@ -148,6 +180,8 @@ export function TransferAssetDialog({
       // We could wait for transaction receipt here if we want to show strict success
       // But typically we show success after submission hash is received
 
+      setTxHash(tx.transaction_hash)
+      saveRecentAddress(recipientAddress)
       setProgress(100)
       setStep("success")
 
@@ -236,26 +270,23 @@ export function TransferAssetDialog({
                     />
                   </div>
 
-                  {recipientPreview && recipientAddress.length > 10 && (
-                    <Card className="border-dashed">
+                  {recipientPreview && recipientAddress.length > 20 && (
+                    <Card className="border-dashed bg-muted/30">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8 bg-primary/10">
-                              <AvatarFallback>{recipientPreview.name.substring(0, 2)}</AvatarFallback>
+                              <AvatarFallback>
+                                {recipientPreview.name.substring(0, 2).toUpperCase()}
+                              </AvatarFallback>
                             </Avatar>
                             <div>
                               <p className="text-sm font-medium">{recipientPreview.name}</p>
                               <p className="text-xs text-muted-foreground">
-                                {recipientPreview.transactions} previous transactions
+                                {recipientPreview.isRecent ? "Recent recipient" : "External wallet address"}
                               </p>
                             </div>
                           </div>
-                          {recipientPreview.verified && (
-                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                              Verified
-                            </Badge>
-                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -515,15 +546,15 @@ export function TransferAssetDialog({
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Transaction ID:</span>
-                    <span className="font-mono">0x{Math.random().toString(16).substring(2, 10)}...</span>
+                    <span className="text-muted-foreground">Transaction Hash:</span>
+                    <span className="font-mono text-xs">{txHash ? shortenAddress(txHash) : "Pending..."}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Block:</span>
-                    <span>{Math.floor(Math.random() * 1000000) + 15000000}</span>
+                    <span className="text-muted-foreground">Network:</span>
+                    <span>Starknet</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Fee Paid:</span>
+                    <span className="text-muted-foreground">Estimated Fee:</span>
                     <span>{transactionFee.amount}</span>
                   </div>
                   {assets.length > 1 && (
@@ -541,10 +572,12 @@ export function TransferAssetDialog({
                 variant="outline"
                 className="w-full sm:w-auto"
                 onClick={() => {
-                  window.open(`https://etherscan.io/tx/0x${Math.random().toString(16).substring(2)}`, "_blank")
+                  if (txHash) {
+                    window.open(`${EXPLORER_URL}/tx/${txHash}`, "_blank")
+                  }
                 }}
               >
-                View on Explorer
+                View onchain
               </Button>
               <Button className="w-full sm:w-auto" onClick={handleComplete}>
                 Done
