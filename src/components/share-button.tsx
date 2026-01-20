@@ -1,12 +1,18 @@
 "use client"
 
+import { useState, useEffect } from "react"
+
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Share2, Twitter, Facebook, Linkedin, Instagram, MessageCircle, Video } from "lucide-react"
 import Link from "next/link"
 
 export function ShareButton() {
-  const shareUrl = typeof window !== "undefined" ? window.location.href : ""
+  const [shareUrl, setShareUrl] = useState("")
+
+  useEffect(() => {
+    setShareUrl(window.location.href)
+  }, [])
 
   const shareNetworks = [
     { name: "X", icon: Twitter, url: `https://twitter.com/intent/tweet?url=${shareUrl}` },

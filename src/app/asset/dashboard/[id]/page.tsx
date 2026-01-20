@@ -12,16 +12,16 @@ import { useNFTDetails } from "@/hooks/useNFTDetails"
 import { IPTypeInfo } from "@/components/ip-type-info"
 
 interface AssetPageProps {
-    params: Promise<{
-      id: string
-    }>
-  }
-  
+  params: Promise<{
+    id: string
+  }>
+}
 
-  export default function AssetPage({ params }: AssetPageProps) {
-    // Unwrap the params Promise using React.use()
-    const resolvedParams = use(params)
-    const { id } = resolvedParams
+
+export default function AssetPage({ params }: AssetPageProps) {
+  // Unwrap the params Promise using React.use()
+  const resolvedParams = use(params)
+  const { id } = resolvedParams
 
   const tokenId = id || 42;
   const { nftData } = useNFTDetails(Number(tokenId));
@@ -45,15 +45,15 @@ interface AssetPageProps {
     owner: { name: nftData.owner, address: "" },
     ipfsCid,
   };
-  
+
   return (
     <div className="container mx-auto px-4 py-4 space-y-4 overflow-x-hidden">
-        <h1 className="text-xl text-foreground/50">Programmable IP Dashboard</h1>
+      <h1 className="text-xl text-foreground/50">Programmable IP Dashboard</h1>
       <AssetInfo nftData={nftData} />
-      <ActionButtons />
+      <ActionButtons nftData={nftData} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <AssetMetadata nftData={nftData} />
-        <CreatorInfo nftData={nftData}/>
+        <CreatorInfo nftData={nftData} />
       </div>
       <IPTypeInfo asset={ipTemplateAsset as any} />
       <AssetActivity />

@@ -711,14 +711,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             </div>
 
             <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Download High-Res
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                View in AR
-              </Button>
+
             </div>
           </div>
         )

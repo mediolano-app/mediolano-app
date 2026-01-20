@@ -248,7 +248,7 @@ function CollectionListItem({ collection }: CollectionCardProps) {
   const isFeatured = isCollectionFeatured(collection.id);
   return (
     <div
-      className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors"
+      className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors mb-3"
     >
       <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
         <Image src={collection.image || "/placeholder.svg?height=400&width=600"} alt={collection.name} fill className="object-cover" />
@@ -281,10 +281,6 @@ function CollectionListItem({ collection }: CollectionCardProps) {
           <div className="flex items-center gap-1 text-sm">
             <Grid3X3 className="h-4 w-4 text-muted-foreground" />
             <span>{collection.itemCount} NFTs</span>
-          </div>
-          <div className="flex items-center gap-1 text-sm">
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            <span>{collection.floorPrice ? `${collection.floorPrice} STRK` : 'No floor price'}</span>
           </div>
         </div>
         <CollectionActionDropdown collectionId={collection.id.toString()} />

@@ -17,6 +17,7 @@ export interface TokenData {
   image?: string;
   description?: string;
   floorPrice?: number;
+  attributes?: { trait_type: string; value: string }[];
 }
 
 export interface UserActivity {
@@ -140,7 +141,8 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
       name: `IP Asset #${tokenId}`,
       image: "/placeholder.svg",
       description: "No description available",
-      floorPrice: 0
+      floorPrice: 0,
+      attributes: []
     };
 
     if (!metadata_uri || metadata_uri === "") return tokenData;
@@ -156,7 +158,8 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
             name: metadata.name || tokenData.name,
             description: metadata.description || tokenData.description,
             image: processIPFSHashToUrl(metadata.image as string, '/placeholder.svg'),
-            floorPrice: typeof metadata.floorPrice === 'number' ? metadata.floorPrice : 0
+            floorPrice: typeof metadata.floorPrice === 'number' ? metadata.floorPrice : 0,
+            attributes: Array.isArray(metadata.attributes) ? metadata.attributes : []
           };
           console.log(`[DEBUG] Metadata loaded for ${tokenData.name}`);
         }
@@ -171,7 +174,8 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
                 ...tokenData,
                 name: metadata.name || tokenData.name,
                 description: metadata.description || tokenData.description,
-                image: metadata.image ? (metadata.image.startsWith('ipfs') ? processIPFSHashToUrl(metadata.image, '/placeholder.svg') : metadata.image) : tokenData.image
+                image: metadata.image ? (metadata.image.startsWith('ipfs') ? processIPFSHashToUrl(metadata.image, '/placeholder.svg') : metadata.image) : tokenData.image,
+                attributes: Array.isArray(metadata.attributes) ? metadata.attributes : []
               };
             }
           } catch (e) { }
