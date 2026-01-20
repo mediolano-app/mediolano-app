@@ -2,6 +2,7 @@ export interface Asset {
   id: string;
   name: string;
   creator: string;
+  owner?: string;
   verified?: boolean;
   image: string;
   collection?: string;
@@ -403,14 +404,14 @@ export interface Collection {
 export interface Activity {
   id: string;
   type:
-    | "mint"
-    | "transfer_in"
-    | "transfer_out"
-    | "sale"
-    | "license"
-    | "update"
-    | "collection_create"
-    | "collection_add";
+  | "mint"
+  | "transfer_in"
+  | "transfer_out"
+  | "sale"
+  | "license"
+  | "update"
+  | "collection_create"
+  | "collection_add";
   title: string;
   description: string;
   timestamp: string;

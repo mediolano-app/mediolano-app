@@ -220,52 +220,7 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                 </Badge>
                  */}
               </div>
-              <div className="absolute top-3 right-3">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="h-8 w-8 p-0 bg-white/90 hover:bg-white text-black opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
-                      <Link href={`/asset/${asset.id}`}>
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        View Details
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href={`/create/remix?asset=${asset.id}`}>
-                        <GitBranch className="h-4 w-4 mr-2" />
-                        Create Remix
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href={`/proof-of-ownership/${asset.id}`}>
-                        <Shield className="h-4 w-4 mr-2" />
-                        Proof of Ownership
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShare}>
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setIsTransferOpen(true)}>
-                      <Send className="h-4 w-4 mr-2" />
-                      Transfer
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setIsReportOpen(true)}>
-                      <Flag className="h-4 w-4 mr-2" />
-                      Report
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+
             </div>
           </Link>
 
@@ -320,17 +275,61 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
             </div>
 
             <div className="flex gap-2 pt-2">
-              <RemixButton
-                asset={asset}
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              />
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/proof-of-ownership/${asset.id}`}>
-                  <Shield className="h-4 w-4" />
-                </Link>
-              </Button>
+              <Link href={`/asset/${asset.id}`} className="flex-1">
+                <Button variant="outline" size="sm" className="w-full">
+                  View
+                </Button>
+              </Link>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="px-3"
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href={`/asset/${asset.id}`}>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View Details
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    {/* Using direct link as requested to replace previous RemixButton component behavior */}
+                    <Link href={`/create/remix?asset=${asset.id}`}>
+                      <GitBranch className="h-4 w-4 mr-2" />
+                      Create Remix
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href={`/proof-of-ownership/${asset.id}`}>
+                      <Shield className="h-4 w-4 mr-2" />
+                      Proof of Ownership
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShare}>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share
+                  </DropdownMenuItem>
+
+                  {address && asset.owner && BigInt(address).toString() === BigInt(asset.owner).toString() && (
+                    <DropdownMenuItem onClick={() => setIsTransferOpen(true)}>
+                      <Send className="h-4 w-4 mr-2" />
+                      Transfer
+                    </DropdownMenuItem>
+                  )}
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setIsReportOpen(true)}>
+                    <Flag className="h-4 w-4 mr-2" />
+                    Report
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardContent>

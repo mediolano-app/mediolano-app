@@ -156,6 +156,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
     const [progress, setProgress] = useState(0)
     const [copied, setCopied] = useState(false)
     const [selectedCollectionId, setSelectedCollectionId] = useState<string>("")
+    const [createdTokenId, setCreatedTokenId] = useState<string>("")
 
     const [formData, setFormData] = useState({
         name: "",
@@ -358,6 +359,45 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
             // Wait for receipt
             if (provider) {
                 await provider.waitForTransaction(tx.transaction_hash);
+
+                const receipt = await provider.getTransactionReceipt(tx.transaction_hash);
+                let mintedId = "";
+                // Attempt to parse TokenMinted event
+                // @ts-ignore
+                if (receipt.events) {
+                    // @ts-ignore
+                    const event = receipt.events.find((e: any) =>
+                        e.keys?.[0] === "0x18e1d8b2def1e40ffa4a5ca6e6bfa43f3c0b5c4a4e0b24b3e6c5db55d7a7e7c" || // Transfer
+                        e.keys?.[0] === "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9" // TokenMinted
+                    );
+
+                    if (event && event.keys && event.keys.length > 2) {
+                        // Transfer: from, to, tokenId (u256 low, u256 high)
+                        // keys: [selector, from, to], data: [tokenId_low, tokenId_high] OR keys might have it.
+                        // Standard ERC721 Transfer(from, to, tokenId) -> keys: [selector, from, to, tokenId_low, tokenId_high] depending on indexing.
+                        // Starknet ERC721 Component events: Transfer(from, to, token_id) where all are indexed? No.
+                        // Usually: keys=[selector, from, to], data=[tokenId_low, tokenId_high]
+                        // BUT useCreateAsset used: event.keys[3] for rawTokenId?
+                        // "0x18..." is Transfer.
+                        // Let's try to extract from keys or data.
+                        // If it's Transfer event: keys[1]=from, keys[2]=to. TokenId in data usually.
+                        // If it's TokenMinted: depends on impl.
+                        // Let's assume standard Transfer from 0.
+                        // safest way: check data if keys len < 4.
+
+                        // Based on useCreateAsset logic provided in context:
+                        // if (tokenMintedEvent.keys?.[3]) ...
+
+                        if (event.keys[3]) {
+                            mintedId = parseInt(event.keys[3], 16).toString();
+                        } else if (event.data && event.data.length > 0) {
+                            mintedId = parseInt(event.data[0], 16).toString();
+                        }
+                    }
+                }
+
+                if (mintedId) setCreatedTokenId(mintedId);
+
                 setTransactionStatus("success");
                 setProgress(100);
                 toast({
@@ -391,7 +431,12 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
 
     const handleViewAsset = () => {
         if (selectedCollection) {
-            router.push(`/collections/${selectedCollection.nftAddress}`)
+            if (createdTokenId) {
+                // Redirect to specific asset
+                router.push(`/asset/${selectedCollection.nftAddress}-${createdTokenId}`)
+            } else {
+                router.push(`/collections/${selectedCollection.nftAddress}`)
+            }
         }
     }
 
@@ -865,7 +910,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                                                     {transactionStatus === "success" && (
                                                         <div className="flex w-full gap-2">
                                                             <Button onClick={handleViewAsset} className="flex-1">
-                                                                View Collection
+                                                                View Asset
                                                             </Button>
                                                             <DrawerClose asChild>
                                                                 <Button variant="outline" className="flex-1" onClick={handleCloseDrawer}>Close</Button>

@@ -24,7 +24,9 @@ export function RemixButton({ asset, variant = "default", size = "default", clas
       license.includes("cc-by") ||
       license.includes("mit") ||
       license.includes("apache") ||
-      license.includes("open source")
+      license.includes("open source") ||
+      license.includes("commercial") ||
+      license.includes("personal")
     )
   }
 
