@@ -32,26 +32,27 @@ interface CreationOption {
   href: string
   popular?: boolean
   trending?: boolean
-  category: "primary" | "templates" | "advanced"
+  category: string
   gradient: string
   iconColor: string
   process: string[]
   benefits: string[]
   requirements: string[]
   timeEstimate: string
-  complexity: "Beginner" | "Intermediate" | "Advanced"
+  complexity: string
   useCases: string[]
-  ownershipRate: number
-  popularity: string
+  ownershipRate?: number
+  popularity: number
 }
 
 interface CreationOptionCardProps {
   option: CreationOption
+  viewMode: "grid" | "list"
   isSelected: boolean
   onSelect: () => void
 }
 
-export function CreationOptionCard({ option, isSelected, onSelect }: CreationOptionCardProps) {
+export function CreationOptionCard({ option, viewMode, isSelected, onSelect }: CreationOptionCardProps) {
   const IconComponent = getIconComponent(option.icon)
 
   return (

@@ -168,13 +168,12 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="yearCreated">Year Created</Label>
+        <Label htmlFor="creationDate">Creation Date</Label>
         <Input
-          id="yearCreated"
-          type="number"
-          placeholder="e.g., 2024"
-          value={getMetadataValue("yearCreated")}
-          onChange={(e) => updateMetadataField("yearCreated", e.target.value)}
+          id="creationDate"
+          placeholder="e.g., 2024 or 2024-01-20"
+          value={getMetadataValue("creationDate")}
+          onChange={(e) => updateMetadataField("creationDate", e.target.value)}
         />
       </div>
       <div className="space-y-2 md:col-span-2">
@@ -193,12 +192,12 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
   const renderVideoFields = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="videoDuration">Duration</Label>
+        <Label htmlFor="duration">Duration</Label>
         <Input
-          id="videoDuration"
+          id="duration"
           placeholder="e.g., 5:30"
-          value={getMetadataValue("videoDuration")}
-          onChange={(e) => updateMetadataField("videoDuration", e.target.value)}
+          value={getMetadataValue("duration")}
+          onChange={(e) => updateMetadataField("duration", e.target.value)}
         />
       </div>
       <div className="space-y-2">
@@ -237,12 +236,12 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
         </Select>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="videoGenre">Genre</Label>
+        <Label htmlFor="genre">Genre</Label>
         <Input
-          id="videoGenre"
+          id="genre"
           placeholder="e.g., Documentary, Animation, Music Video"
-          value={getMetadataValue("videoGenre")}
-          onChange={(e) => updateMetadataField("videoGenre", e.target.value)}
+          value={getMetadataValue("genre")}
+          onChange={(e) => updateMetadataField("genre", e.target.value)}
         />
       </div>
       <div className="space-y-2 md:col-span-2">
@@ -294,10 +293,10 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
         </Select>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="softwareLicense">Software License</Label>
+        <Label htmlFor="license">Software License</Label>
         <Select
-          value={getMetadataValue("softwareLicense")}
-          onValueChange={(value) => updateMetadataField("softwareLicense", value)}
+          value={getMetadataValue("license")}
+          onValueChange={(value) => updateMetadataField("license", value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select license" />

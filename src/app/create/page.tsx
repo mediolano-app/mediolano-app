@@ -39,7 +39,7 @@ const creationOptions = [
     popular: true,
     estimatedTime: "1-5 min",
     estimatedFee: 0.001,
-    userCount: "55",
+    userCount: "75",
     benefits: [
       "Comprehensive IP protection",
       "Decentralized Authorship",
@@ -62,20 +62,20 @@ const creationOptions = [
     featured: true,
     complexity: "Intermediate",
     useCases: ["Custom IP registration", "Metadata management"],
-    popularity: 99,
+    popularity: 75,
   },
   {
     id: "templates",
-    title: "Create With IP Template",
-    description: "Choose from optimized templates designed for specific types of content.",
+    title: "Create With Template",
+    description: "Choose from optimized IP templates designed for specific types of content.",
     icon: "Grid3X3",
     color: "purple",
-    category: "core",
+    category: "advanced",
     trending: true,
     popular: false,
     estimatedTime: "1-5 min",
     estimatedFee: 0.001,
-    userCount: "28",
+    userCount: "25",
     benefits: [
       "Pre-configured for your asset type",
       "Industry-specific metadata fields",
@@ -98,7 +98,7 @@ const creationOptions = [
     featured: false,
     complexity: "Beginner",
     useCases: ["Music", "Publications", "Videos", "Software"],
-    popularity: 75,
+    popularity: 45,
   },
   {
     id: "collection",
@@ -106,12 +106,12 @@ const creationOptions = [
     description: "Group related assets together for better organization and batch management.",
     icon: "BookOpen",
     color: "green",
-    category: "organization",
+    category: "core",
     trending: false,
     popular: true,
     estimatedTime: "1-2 min",
     estimatedFee: 0.001,
-    userCount: "89",
+    userCount: "95",
     benefits: ["Manage assets", "Showcase IP", "Unified branding", "Powerful features"],
     process: [
       "Define collection details and theme",
@@ -125,11 +125,42 @@ const creationOptions = [
     iconColor: "text-green-500",
     requirements: ["Multiple assets"],
     timeEstimate: "1-2 min",
-    tags: ["Collection", "Batch", "Organization"],
+    tags: ["Collection", "Batch", "Creators"],
     featured: false,
     complexity: "Beginner",
     useCases: ["Showcase assets", "Portfolio organization"],
-    popularity: 92,
+    popularity: 95,
+  },
+  {
+    id: "Remix",
+    title: "Create Remix",
+    description: "Create a remix of an existing asset.",
+    icon: "RefreshCw",
+    color: "rose",
+    category: "advanced",
+    trending: false,
+    popular: true,
+    estimatedTime: "1-2 min",
+    estimatedFee: 0.001,
+    userCount: "55",
+    benefits: ["License assets", "Usecase IP", "Advanced trading", "New revenue streams"],
+    process: [
+      "Define remix details and theme",
+      "Set remix-wide licensing terms",
+      "Open and collaborative remix",
+      "Publish and manage your remix",
+    ],
+    href: "/create/remix",
+    useCase: "Great for creators with multiple related works or series of assets.",
+    gradient: "from-rose-500 to-rose-700",
+    iconColor: "text-rose-500",
+    requirements: ["Multiple assets"],
+    timeEstimate: "1-2 min",
+    tags: ["Remix", "Licensing", "Advanced"],
+    featured: false,
+    complexity: "Beginner",
+    useCases: ["Remix assets", "New revenue streams"],
+    popularity: 55,
   },
 ]
 
@@ -193,7 +224,6 @@ const templates = [
 const categories = [
   { id: "all", name: "All", count: 6 },
   { id: "core", name: "Core", count: 3 },
-  { id: "organization", name: "Organization", count: 1 },
   { id: "advanced", name: "Advanced", count: 2 },
 ]
 
@@ -234,13 +264,13 @@ export default function CreatePage() {
 
   return (
     <div className="min-h-screen bg-background/70 pb-20">
-    
+
 
       <main className="container mx-auto p-4 max-w-10xl">
-        
-        
-        
-        
+
+
+
+
         {/* Hero Section 
         <div className="text-center py-8 md:py-12">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
@@ -331,7 +361,7 @@ export default function CreatePage() {
                 <SelectContent>
                   <SelectItem value="popularity">Popular</SelectItem>
                   <SelectItem value="time">Fastest</SelectItem>
-                 
+
                   <SelectItem value="name">Name</SelectItem>
                 </SelectContent>
               </Select>

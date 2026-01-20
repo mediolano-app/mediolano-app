@@ -73,6 +73,8 @@ type AudioData = {
   composer?: string
   publisher?: string
   isrc?: string
+  instruments?: string
+  containsSamples?: boolean
 }
 
 type ArtData = {
@@ -86,6 +88,7 @@ type ArtData = {
   materials?: string[]
   technique?: string
   exhibition?: string
+  allowPrints?: boolean
 }
 
 type NFTData = {
@@ -113,6 +116,7 @@ type VideoData = {
   aspectRatio?: string
   language?: string
   subtitles?: string[]
+  allowClips?: boolean
 }
 
 type PostsData = {
@@ -141,12 +145,13 @@ type SoftwareData = {
   version?: string
   releaseDate?: string
   license?: string
-  platforms?: string[]
-  programmingLanguages?: string[]
+  platform?: string
+  programmingLanguage?: string
   dependencies?: string[]
   features?: string[]
   sourceCodeRepository?: string
   apiDocumentation?: string
+  allowModifications?: boolean
 }
 
 const toNumber = (v: unknown): number | undefined => {
@@ -156,6 +161,13 @@ const toNumber = (v: unknown): number | undefined => {
     return Number.isFinite(n) ? n : undefined
   }
   return undefined
+}
+
+const toBoolean = (v: unknown): boolean | undefined => {
+  if (typeof v === "boolean") return v;
+  if (v === "true") return true;
+  if (v === "false") return false;
+  return undefined;
 }
 
 // Pickers that coerce unknown data to typed shapes
@@ -171,6 +183,8 @@ const pickAudio = (d: IPTypeDataType): AudioData => ({
   composer: asText(d.composer),
   publisher: asText(d.publisher),
   isrc: asText(d.isrc),
+  instruments: asText(d.instruments),
+  containsSamples: toBoolean(d.containsSamples)
 })
 
 const pickArt = (d: IPTypeDataType): ArtData => ({
@@ -184,6 +198,7 @@ const pickArt = (d: IPTypeDataType): ArtData => ({
   materials: isStringArray(d.materials) ? d.materials : [],
   technique: asText(d.technique),
   exhibition: asText(d.exhibition),
+  allowPrints: toBoolean(d.allowPrints)
 })
 
 const pickNFT = (d: IPTypeDataType): NFTData => ({
@@ -211,6 +226,7 @@ const pickVideo = (d: IPTypeDataType): VideoData => ({
   aspectRatio: asText(d.aspectRatio),
   language: asText(d.language),
   subtitles: isStringArray(d.subtitles) ? d.subtitles : [],
+  allowClips: toBoolean(d.allowClips)
 })
 
 const pickPosts = (d: IPTypeDataType): PostsData => ({
@@ -239,12 +255,13 @@ const pickSoftware = (d: IPTypeDataType): SoftwareData => ({
   version: asText(d.version),
   releaseDate: asText(d.releaseDate),
   license: asText(d.license),
-  platforms: isStringArray(d.platforms) ? d.platforms : [],
-  programmingLanguages: isStringArray(d.programmingLanguages) ? d.programmingLanguages : [],
+  platform: asText(d.platform),
+  programmingLanguage: asText(d.programmingLanguage),
   dependencies: isStringArray(d.dependencies) ? d.dependencies : [],
   features: isStringArray(d.features) ? d.features : [],
   sourceCodeRepository: asText(d.sourceCodeRepository),
   apiDocumentation: asText(d.apiDocumentation),
+  allowModifications: toBoolean(d.allowModifications)
 })
 
 
