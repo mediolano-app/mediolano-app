@@ -2,20 +2,20 @@
  * AVNU Paymaster utility functions
  */
 
-import { 
-  fetchGasTokenPrices, 
+import {
+  fetchGasTokenPrices,
   fetchAccountCompatibility,
-  executeCalls 
+  executeCalls
 } from "@avnu/gasless-sdk";
 import axios from "axios";
 import { Account, Call } from "starknet";
-import { 
-  AVNU_PAYMASTER_CONFIG, 
-  GAS_SPONSORSHIP_CONFIG 
+import {
+  AVNU_PAYMASTER_CONFIG,
+  GAS_SPONSORSHIP_CONFIG
 } from "@/lib/constants";
-import { 
-  GasTokenPrice, 
-  PaymasterOptions, 
+import {
+  GasTokenPrice,
+  PaymasterOptions,
   AccountCompatibility,
   PaymasterResponse,
   SponsoredTransactionData,
@@ -34,8 +34,17 @@ export async function checkAccountCompatibility(
     const compatibility = await fetchAccountCompatibility(accountAddress);
     return compatibility;
   } catch (error) {
-    console.error("Error checking account compatibility:", error);
-    return { isCompatible: false, reason: "Failed to check compatibility" };
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    // Suppress "Account not deployed" error as it's a valid state for new wallets
+    if (!errorMessage.includes("Account not deployed")) {
+      console.error("Error checking account compatibility:", error);
+    }
+    return {
+      isCompatible: false,
+      reason: errorMessage.includes("Account not deployed")
+        ? "Account not deployed"
+        : "Failed to check compatibility"
+    };
   }
 }
 
@@ -93,7 +102,7 @@ export async function getPaymasterStatus(): Promise<PaymasterStatus> {
     const response = await axios.get(
       `${AVNU_PAYMASTER_CONFIG.GASLESS_API_URL}/paymaster/v1/status`
     );
-    
+
     return {
       isActive: response.data.isActive || true,
       supportedTokens: response.data.supportedTokens || [],
@@ -130,7 +139,7 @@ export async function buildSponsoredTypedData(
         calls,
       },
       {
-        headers: { 
+        headers: {
           "api-key": AVNU_PAYMASTER_CONFIG.API_KEY,
           "Content-Type": "application/json",
         },
@@ -163,7 +172,7 @@ export async function executeSponsoredTransaction(
         signature: data.signature,
       },
       {
-        headers: { 
+        headers: {
           "api-key": AVNU_PAYMASTER_CONFIG.API_KEY,
           "Content-Type": "application/json",
         },
@@ -230,6 +239,6 @@ export function calculateGasCostInToken(
 ): bigint {
   const price = BigInt(gasTokenPrice);
   const decimalsMultiplier = BigInt(Math.pow(10, tokenDecimals));
-  
+
   return (gasFees * price) / decimalsMultiplier;
 }

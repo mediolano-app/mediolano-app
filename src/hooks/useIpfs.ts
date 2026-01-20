@@ -223,6 +223,7 @@ export function useIpfsUpload() {
     uploadImageFromUrl,
     loading,
     error,
+    uploadMetadataToIpfs,
     progress,
   };
 }
