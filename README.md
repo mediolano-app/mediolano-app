@@ -6,11 +6,11 @@
 
 Quick links:
 <br>
-<a href="https://ip.mediolano.app">Mediolano Dapp</a>
+<a href="https://ip.mediolano.app">IP Creator Dapp</a>
 <br>
 <a href="https://mediolano.xyz">Website mediolano.xyz</a>
 <br>
-<a href="https://t.me/MediolanoStarknet">Telegram< Group</a>
+<a href="https://t.me/integrityweb">Telegram< Group</a>
 <br>
 <a href="https://x.com/mediolanoapp">X / Twitter</a>
 <br>
@@ -71,9 +71,6 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 ## Contributing
 
-We are building open-source Integrity Web with the amazing **OnlyDust** platform. Check https://app.onlydust.com/p/mediolano for more information.
-
-We also have a Telegram group focused to support development: https://t.me/mediolanoapp
 
 Ccontributions are **greatly appreciated**. If you have a feature or suggestion that would our plattform better, please fork the repo and create a pull request with the tag "enhancement".
 
