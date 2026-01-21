@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils";
 
 import type { AssetFormState } from "@/hooks/use-asset-form";
 
-interface CollectionSummary { id: string | number; name: string }
+interface CollectionSummary { id: string | number | bigint; name: string }
 interface TemplateSummary { id: string; name: string }
 
 interface AssetFormCoreProps {
@@ -200,7 +200,7 @@ export function AssetFormCore({
                 <div className="flex items-center gap-4 p-4 border rounded-lg bg-muted/30">
                   <div className="flex-shrink-0">
                     {formState.mediaPreviewUrl &&
-                    formState.mediaPreviewUrl !==
+                      formState.mediaPreviewUrl !==
                       "/placeholder.svg?height=600&width=600" ? (
                       <img
                         src={formState.mediaPreviewUrl || "/placeholder.svg"}
@@ -266,9 +266,8 @@ export function AssetFormCore({
             </Label>
             <Input
               id="title"
-              placeholder={`Give your ${
-                selectedTemplate?.name?.toLowerCase() || "asset"
-              } a compelling title`}
+              placeholder={`Give your ${selectedTemplate?.name?.toLowerCase() || "asset"
+                } a compelling title`}
               value={formState.title}
               onChange={(e) => updateFormField("title", e.target.value)}
               className="h-12 text-base"
@@ -283,9 +282,8 @@ export function AssetFormCore({
             </Label>
             <Textarea
               id="description"
-              placeholder={`Describe your ${
-                selectedTemplate?.name?.toLowerCase() || "asset"
-              } and what makes it unique...`}
+              placeholder={`Describe your ${selectedTemplate?.name?.toLowerCase() || "asset"
+                } and what makes it unique...`}
               value={formState.description}
               onChange={(e) => updateFormField("description", e.target.value)}
               rows={4}

@@ -21,7 +21,7 @@ import {
 } from "@/hooks/use-collection";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import CreateCollectionView from "@/components/collections/create-collection";
-import { MintSuccessDrawer } from "@/components/mint-success-drawer";
+import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer";
 import { IMintResult } from "@/hooks/use-create-asset";
 import { normalizeStarknetAddress } from "@/lib/utils";
 
@@ -30,7 +30,14 @@ export default function CreateAssetPage() {
   const [openCollection, setOpenCollection] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+
+  // Drawer State
   const [showSuccessDrawer, setShowSuccessDrawer] = useState(false);
+  const [mintStep, setMintStep] = useState<MintDrawerStep>("idle");
+  const [mintProgress, setMintProgress] = useState(0);
+  const [mintError, setMintError] = useState<string | null>(null);
+  const [drawerPreviewImage, setDrawerPreviewImage] = useState<string | null>(null);
+
   const [mintResult, setMintResult] = useState<IMintResult | null>(null);
   const [hasUserEditedCreator, setHasUserEditedCreator] = useState(false);
   const { address: walletAddress } = useAccount();
@@ -73,10 +80,36 @@ export default function CreateAssetPage() {
   const handleSubmit = async () => {
     // Only proceed if wallet is connected
     if (!walletAddress) {
+      toast({
+        title: "Wallet not connected",
+        description: "Please connect your wallet to create an asset.",
+        variant: "destructive",
+      });
       return;
     }
     if (!canSubmit()) return;
+
+    // Prepare Review State
+    setMintStep("idle");
+    setMintError(null);
+
+    // Create local preview URL
+    if (formState.mediaFile) {
+      setDrawerPreviewImage(URL.createObjectURL(formState.mediaFile));
+    } else {
+      setDrawerPreviewImage(null);
+    }
+
+    // Open Drawer for Review
+    setShowSuccessDrawer(true);
+  };
+
+  const handleConfirmMint = async () => {
     setLoading(true);
+
+    // START DRAWER PROCESS
+    setMintStep("uploading");
+    setMintProgress(0);
 
     // Create metadata object (in production, this would be uploaded to IPFS)
     const metadata = {
@@ -110,20 +143,29 @@ export default function CreateAssetPage() {
       if (!isOwner) {
         throw new Error("You are not the owner of this collection");
       }
-      //Upload media and metadata.
-      const result = await uploadToIpfs(formState?.mediaFile as File, metadata);
-      //Then make contract call.
 
-      const mintResult = await createAsset({
+      //Upload media and metadata.
+      setMintProgress(10);
+      const result = await uploadToIpfs(formState?.mediaFile as File, metadata);
+      setMintProgress(50);
+
+      //Then make contract call.
+      setMintStep("processing");
+      setMintProgress(60);
+
+      const mintResultData = await createAsset({
         collection_id: formState?.collection,
         recipient: walletAddress as string,
         token_uri: result?.metadataUrl,
         collection_nft_address: contractHex,
       });
 
+      setMintProgress(90);
+
       // Show success drawer with mint result
-      setMintResult(mintResult);
-      setShowSuccessDrawer(true);
+      setMintResult(mintResultData);
+      setMintStep("success");
+      setMintProgress(100);
 
       // Show success toast
       toast({
@@ -132,17 +174,20 @@ export default function CreateAssetPage() {
       });
     } catch (error) {
       console.error("Error minting asset:", error);
+      const errorMsg = error instanceof Error
+        ? error.message
+        : "Failed to mint Programmable IP";
+
+      setMintError(errorMsg);
+
       toast({
         title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Failed to mint Programmable IP",
+        description: errorMsg,
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -230,8 +275,8 @@ export default function CreateAssetPage() {
                   size="lg"
                   className="px-8"
                 >
-                  {loading && <Loader className="animate-spin h-5 w-" />}
-                  {loading ? isCreating ? "Creating Asset..." : "Performing Checks" : "Create Asset"}
+                  {loading && <Loader className="animate-spin h-5 w-5 mr-2" />}
+                  {loading ? (upload_loading ? "Uploading..." : isCreating ? "Minting..." : "Processing") : "Create Asset"}
                 </Button>
               </div>
             </div>
@@ -277,16 +322,24 @@ export default function CreateAssetPage() {
       </div>
 
       {/* Mint Success Drawer */}
-      {mintResult && (
-        <MintSuccessDrawer
-          isOpen={showSuccessDrawer}
-          onOpenChange={setShowSuccessDrawer}
-          mintResult={mintResult}
-          assetTitle={formState.title}
-          assetDescription={formState.description}
-          assetType={selectedTemplate?.name}
-        />
-      )}
+      <MintSuccessDrawer
+        isOpen={showSuccessDrawer}
+        onOpenChange={setShowSuccessDrawer}
+        step={mintStep}
+        progress={mintProgress}
+        mintResult={mintResult}
+        assetTitle={formState.title}
+        assetDescription={formState.description}
+        assetType={selectedTemplate?.name}
+        error={mintError}
+        onConfirm={handleConfirmMint}
+        cost="0.001 STRK" /* Estimate */
+        previewImage={drawerPreviewImage}
+        data={{
+          "License Type": formState.licenseType,
+          "Collection": collections.find(c => c.id.toString() === formState.collection)?.name || "Unknown",
+        }}
+      />
     </>
   );
 }

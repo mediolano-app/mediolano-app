@@ -19,7 +19,7 @@ import { useIpfsUpload } from "@/hooks/useIpfs"
 import { useCreateAsset, IMintResult } from "@/hooks/use-create-asset"
 import { useGetCollections, useIsCollectionOwner } from "@/hooks/use-collection"
 import { normalizeStarknetAddress } from "@/lib/utils"
-import { MintSuccessDrawer } from "@/components/mint-success-drawer"
+import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import CreateCollectionView from "@/components/collections/create-collection"
 import { Card, CardContent } from "@/components/ui/card"
@@ -48,8 +48,14 @@ export default function CreateAssetFromTemplate() {
   const [isComplete, setIsComplete] = useState(false)
   const [hasUserEditedCreator, setHasUserEditedCreator] = useState(false)
   const [openCollection, setOpenCollection] = useState(false)
+
+  // Drawer State
   const [showSuccessDrawer, setShowSuccessDrawer] = useState(false)
+  const [mintStep, setMintStep] = useState<MintDrawerStep>("idle")
+  const [mintProgress, setMintProgress] = useState(0)
   const [mintResult, setMintResult] = useState<IMintResult | null>(null)
+  const [mintError, setMintError] = useState<string | null>(null)
+  const [drawerPreviewImage, setDrawerPreviewImage] = useState<string | null>(null)
 
   // Find the template
   const template = getTemplateById(templateId)
@@ -99,9 +105,29 @@ export default function CreateAssetFromTemplate() {
       return
     }
 
-    if (!canSubmit()) return
+    if (!canSubmit()) return;
 
+    // Prepare Review State
+    setMintStep("idle")
+    setMintError(null)
+
+    // Create local preview URL for the review step
+    if (formState.mediaFile) {
+      setDrawerPreviewImage(URL.createObjectURL(formState.mediaFile));
+    } else {
+      setDrawerPreviewImage(null);
+    }
+
+    // Open Drawer for Review
+    setShowSuccessDrawer(true)
+  }
+
+  const handleConfirmMint = async () => {
     setLoading(true)
+
+    // START DRAWER PROCESS
+    setMintStep("uploading")
+    setMintProgress(0)
 
     try {
       // 1. Create metadata object
@@ -149,9 +175,14 @@ export default function CreateAssetFromTemplate() {
       }
 
       // 4. Upload media and metadata to IPFS
+      setMintProgress(10)
       const result = await uploadToIpfs(formState.mediaFile as File, metadata)
+      setMintProgress(50)
 
       // 5. Make contract call
+      setMintStep("processing")
+      setMintProgress(60)
+
       const mintTxApply = await createAsset({
         collection_id: formState.collection,
         recipient: walletAddress as string,
@@ -159,10 +190,13 @@ export default function CreateAssetFromTemplate() {
         collection_nft_address: contractHex,
       })
 
+      setMintProgress(90)
+
       // 6. Handle success
       setMintResult(mintTxApply)
-      setShowSuccessDrawer(true)
-      setIsComplete(true) // Optional: switch to confirmation view if preferred outside of drawer
+      setMintStep("success")
+      setMintProgress(100)
+      setIsComplete(true)
 
       toast({
         title: "IP Minted Successfully!",
@@ -171,23 +205,22 @@ export default function CreateAssetFromTemplate() {
 
     } catch (error) {
       console.error("Error minting from template:", error)
+      const errorMsg = error instanceof Error
+        ? error.message
+        : "Failed to mint asset"
+
+      setMintError(errorMsg)
+      // Keep drawer open but maybe set step to idle or just show error in drawer?
+      // Our drawer handles error prop, so we keep it open to show error
+
       toast({
         title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Failed to mint asset",
+        description: errorMsg,
         variant: "destructive",
       })
     } finally {
       setLoading(false)
     }
-  }
-
-  if (isComplete && !showSuccessDrawer) {
-    // If we want a full page success state, we can use this. 
-    // For now, using the Drawer + keeping form visible (or could reset).
-    // Let's rely on the Drawer for success feedback as per other pages.
   }
 
   return (
@@ -201,17 +234,25 @@ export default function CreateAssetFromTemplate() {
         </Dialog>
       )}
 
-      {/* Mint Success Drawer */}
-      {mintResult && (
-        <MintSuccessDrawer
-          isOpen={showSuccessDrawer}
-          onOpenChange={setShowSuccessDrawer}
-          mintResult={mintResult}
-          assetTitle={formState.title}
-          assetDescription={formState.description}
-          assetType={template.name}
-        />
-      )}
+      {/* Mint Success / Feedback Drawer */}
+      <MintSuccessDrawer
+        isOpen={showSuccessDrawer}
+        onOpenChange={setShowSuccessDrawer}
+        step={mintStep}
+        progress={mintProgress}
+        mintResult={mintResult}
+        assetTitle={formState.title}
+        assetDescription={formState.description}
+        assetType={template.name}
+        error={mintError}
+        onConfirm={handleConfirmMint}
+        cost="0.001 STRK" /* Estimate */
+        previewImage={drawerPreviewImage}
+        data={{
+          "License Type": formState.licenseType,
+          "Collection": collections.find(c => c.id.toString() === formState.collection)?.name || "Unknown",
+        }}
+      />
 
       {/* Mobile Preview Modal */}
       {showMobilePreview && (

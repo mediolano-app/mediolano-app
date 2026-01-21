@@ -14,177 +14,335 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { CheckCircle2, Sparkles, ExternalLink, FolderOpen, Share2, Trophy, ArrowRight } from "lucide-react"
+import { CheckCircle2, Sparkles, ExternalLink, FolderOpen, Share2, ArrowRight, Loader2, Library, Copy, Upload, XCircle } from "lucide-react"
+import { Progress } from "@/components/ui/progress"
 import type { IMintResult } from "@/hooks/use-create-asset"
+import { EXPLORER_URL } from "@/services/constants"
+import { shortenAddress } from "@/lib/utils"
+import Image from "next/image"
+
+export type MintDrawerStep = "idle" | "uploading" | "processing" | "success"
 
 interface MintSuccessDrawerProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
-  mintResult: IMintResult
+  step: MintDrawerStep
+  progress: number
+  mintResult: IMintResult | null
   assetTitle: string
   assetDescription?: string
   assetType?: string
+  error?: string | null
+  // New props for Review Flow
+  onConfirm?: () => void
+  cost?: string
+  previewImage?: string | null
+  data?: Record<string, string> // Additional data to review (e.g., specific traits)
 }
 
 export function MintSuccessDrawer({
   isOpen,
   onOpenChange,
+  step,
+  progress,
   mintResult,
   assetTitle,
   assetDescription,
   assetType,
+  error,
+  onConfirm,
+  cost = "0.001 STRK", // Default estimated cost
+  previewImage,
+  data
 }: MintSuccessDrawerProps) {
   const [showCelebration, setShowCelebration] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
 
-  // Trigger celebration animation when drawer opens
+  // Trigger celebration animation when valid success
   useEffect(() => {
-    if (isOpen) {
+    if (step === "success" && isOpen) {
       setShowCelebration(true)
-      // Auto-hide celebration after animation
       const timer = setTimeout(() => setShowCelebration(false), 3000)
-      return () => clearTimeout(timer)
+
+      // Add a slight delay for confetti effect if we had one (using sparkles for now)
+      setShowConfetti(true)
+      const timer2 = setTimeout(() => setShowConfetti(false), 4000)
+
+      return () => {
+        clearTimeout(timer)
+        clearTimeout(timer2)
+      }
+    } else {
+      setShowCelebration(false)
+      setShowConfetti(false)
     }
-  }, [isOpen])
+  }, [isOpen, step])
+
+  // Prevent closing during active processing
+  const handleOpenChange = (open: boolean) => {
+    if (!open && (step === "uploading" || step === "processing") && !error) {
+      return
+    }
+    onOpenChange(open)
+  }
 
   return (
-    <Drawer open={isOpen} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh] overflow-hidden">
-        <div className="mx-auto w-full max-w-lg">
-          <DrawerHeader className="text-center pb-4 px-6">
-            {/* Celebration Icon with Animation */}
-            <div className="mx-auto mb-3 relative">
-              <div
-                className={`
-                w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 
-                rounded-full flex items-center justify-center shadow-lg
-                transition-all duration-700 ease-out
-                ${showCelebration ? "animate-bounce scale-110" : "scale-100"}
-              `}
-              >
-                <CheckCircle2 className="h-4 w-4 text-white" />
+    <Drawer open={isOpen} onOpenChange={handleOpenChange}>
+      <DrawerContent className="w-full max-w-lg mx-auto rounded-t-xl mobile-padding max-h-[90vh]">
+        <DrawerHeader className="text-center">
+          <DrawerTitle className="text-xl flex items-center justify-center gap-2">
+            {step === "idle" && "Review Asset Details"}
+            {step === "uploading" && (
+              <>
+                <Upload className="h-5 w-5 animate-pulse text-primary" />
+                Uploading Assets
+              </>
+            )}
+            {step === "processing" && (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                Minting Asset
+              </>
+            )}
+            {step === "success" && (
+              <>
+                <CheckCircle2 className="h-5 w-5 text-green-500" />
+                Creation Successful
+              </>
+            )}
+            {error && "Error Creating Asset"}
+          </DrawerTitle>
+          <DrawerDescription className="text-sm mt-1">
+            {step === "idle" && "Please review the details below before confirming the transaction."}
+            {step === "uploading" && "Securely storing your metadata and assets on IPFS."}
+            {step === "processing" && "Please confirm the transaction in your wallet."}
+            {step === "success" && "Your intellectual property is now secured onchain."}
+            {error && "There was a problem creating your asset."}
+          </DrawerDescription>
+        </DrawerHeader>
+
+        <div className="p-4 sm:p-6 pb-2 overflow-y-auto">
+          {/* IDLE / REVIEW STATE */}
+          {step === "idle" && (
+            <div className="space-y-6">
+              {/* Preview Card */}
+              <div className="bg-muted/30 rounded-lg p-4 border space-y-4">
+                <div className="flex gap-4">
+                  {/* Image Preview */}
+                  <div className="relative w-20 h-20 rounded-md overflow-hidden bg-background border flex-shrink-0">
+                    {previewImage ? (
+                      <Image
+                        src={previewImage}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
+                        <FolderOpen className="h-8 w-8 opacity-50" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Summary */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold truncate text-base">{assetTitle}</h4>
+                    <p className="text-sm text-muted-foreground line-clamp-2">{assetDescription}</p>
+                    {assetType && <Badge variant="secondary" className="mt-2 text-xs">{assetType}</Badge>}
+                  </div>
+                </div>
+
+                {/* Additional Data Grid */}
+                {data && Object.keys(data).length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      {Object.entries(data).map(([key, value]) => (
+                        <div key={key}>
+                          <div className="text-muted-foreground text-xs uppercase tracking-wider">{key}</div>
+                          <div className="font-medium truncate">{value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* Sparkles Animation */}
-              {showCelebration && (
-                <>
-                  <Sparkles
-                    className={`
-                    absolute -top-2 -right-2 h-5 w-5 text-yellow-400
-                    animate-pulse transition-all duration-1000
-                  `}
-                  />
-                  <Sparkles
-                    className={`
-                    absolute -bottom-1 -left-2 h-4 w-4 text-yellow-400
-                    animate-pulse transition-all duration-1000 delay-300
-                  `}
-                  />
-                  <Sparkles
-                    className={`
-                    absolute top-1 -left-3 h-3 w-3 text-yellow-400
-                    animate-pulse transition-all duration-1000 delay-500
-                  `}
-                  />
-                </>
-              )}
+              {/* Cost Estimation */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 px-4 flex justify-between items-center text-sm">
+                <span className="text-blue-700 dark:text-blue-300">Estimated Cost</span>
+                <span className="font-bold text-blue-700 dark:text-blue-300 font-mono">{cost}</span>
+              </div>
             </div>
+          )}
 
+          {/* PROGRESS STATES */}
+          {(step === "uploading" || step === "processing") && !error && (
+            <div className="flex flex-col items-center justify-center space-y-8 py-4">
+              <div className="w-full space-y-2">
+                <div className="flex justify-between text-sm font-medium text-muted-foreground">
+                  <span>
+                    {step === "uploading" ? "Uploading to IPFS" : "Waiting for Confirmation"}
+                  </span>
+                  <span>{progress}%</span>
+                </div>
+                <Progress value={progress} className="h-2" />
+              </div>
 
-            <DrawerDescription className="text-sm text-muted-foreground px-2">
-              Your IP is now onchain with immutable proof of ownership.
-            </DrawerDescription>
-          </DrawerHeader>
+              <div className="space-y-4 text-center">
+                <div className="relative mx-auto w-16 h-16 flex items-center justify-center">
+                  <div className="absolute inset-0 border-4 border-muted rounded-full"></div>
+                  <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  {step === "uploading" ? <Upload className="h-6 w-6 text-primary" /> : <Loader2 className="h-6 w-6 text-primary" />}
+                </div>
 
-          <div className="px-6 pb-4 space-y-4 overflow-y-auto max-h-[50vh]">
-            {/* Asset Details Card */}
-            <div className="bg-muted/30 rounded-lg p-4 space-y-3">
-
-              <div className="space-y-2">
                 <div>
-                  <h4 className="font-medium text-base text-foreground">{assetTitle}</h4>
-                  {assetDescription && <p className="text-xs text-muted-foreground mt-1">{assetDescription}</p>}
+                  <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
+                    {step === "uploading"
+                      ? "Ensuring your metadata is decentralized and permanent."
+                      : "Please check your wallet to sign the transaction."}
+                  </p>
                 </div>
+              </div>
 
-                <div className="flex flex-wrap gap-1">
-                  {assetType && (
-                    <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
-                      {assetType}
-                    </Badge>
+              <div className="text-center text-xs text-muted-foreground/70 bg-muted/50 py-2 px-4 rounded-full">
+                <span className="animate-pulse">Do not close this window</span>
+              </div>
+            </div>
+          )}
+
+          {step === "success" && mintResult && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="text-center relative py-4">
+                {/* Asset Preview */}
+                <div className="mx-auto relative mb-6">
+                  {previewImage ? (
+                    <div className="relative w-48 h-48 mx-auto rounded-xl overflow-hidden shadow-2xl shadow-green-900/10 border-4 border-background ring-1 ring-border/50">
+                      <Image
+                        src={previewImage}
+                        alt="Minted Asset"
+                        fill
+                        className="object-cover"
+                      />
+                      {/* Success Badge Overlay */}
+                      <div className="absolute bottom-2 right-2 bg-green-500 text-white p-1 rounded-full shadow-lg animate-in zoom-in duration-500 delay-300">
+                        <CheckCircle2 className="h-5 w-5" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-32 h-32 mx-auto bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg shadow-green-500/20">
+                      <CheckCircle2 className="h-12 w-12 text-white" />
+                    </div>
                   )}
-                  <Badge variant="outline" className="bg-green-50 border-green-200 text-green-700 text-xs">
-                    Confirmed
-                  </Badge>
+
+                  {/* Sparkles */}
+                  {showConfetti && (
+                    <>
+                      <Sparkles className="absolute top-0 right-1/4 h-6 w-6 text-yellow-400 animate-pulse" style={{ animationDelay: '0.1s' }} />
+                      <Sparkles className="absolute bottom-0 left-1/4 h-4 w-4 text-yellow-400 animate-pulse" style={{ animationDelay: '0.3s' }} />
+                      <Sparkles className="absolute top-1/2 -left-2 h-3 w-3 text-green-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                      <Sparkles className="absolute top-1/2 -right-2 h-5 w-5 text-green-600 animate-pulse" style={{ animationDelay: '0.2s' }} />
+                    </>
+                  )}
                 </div>
+
+                <h3 className="text-2xl font-bold mb-2">
+                  {assetTitle}
+                </h3>
+                <p className="text-muted-foreground max-w-xs mx-auto text-sm">
+                  Successfully minted to your collection.
+                </p>
               </div>
 
-              <Separator />
+              {/* Asset Details Card */}
+              <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
+                {/* Blockchain Info */}
+                <div className="p-4 space-y-3 bg-muted/20">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Token ID</span>
+                    <span className="font-mono font-medium">#{mintResult.tokenId}</span>
+                  </div>
 
-              {/* Blockchain Info */}
-              <div className="space-y-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Token ID:</span>
-                  <span className="font-mono">#{mintResult.tokenId}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Collection:</span>
-                  <span className="font-mono text-xs">{mintResult.collectionId.slice(0, 8)}...</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Network:</span>
-                  <span className="font-medium text-blue-600">Starknet</span>
+                  <Separator />
+
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Transaction</span>
+                    <a
+                      href={`${EXPLORER_URL}/tx/${mintResult.transactionHash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-xs hover:underline flex items-center text-primary bg-primary/10 px-2 py-1 rounded hover:bg-primary/20 transition-colors"
+                    >
+                      {shortenAddress(mintResult.transactionHash)}
+                      <ExternalLink className="h-3 w-3 ml-1" />
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Action Buttons */}
-            <div className="grid grid-cols-1 gap-2">
-              <Button asChild size="sm" className="bg-primary hover:bg-primary/90">
-                <Link href={`/asset/${mintResult.assetSlug}`}>
-                  <ExternalLink className="h-3 w-3 mr-2" />
-                  View Your Asset
-                </Link>
-              </Button>
-
-              <Button asChild variant="outline" size="sm">
-                <Link href="/portfolio">
-                  <FolderOpen className="h-3 w-3 mr-2" />
-                  Go to Portfolio
-                </Link>
-              </Button>
-            </div>
-
-            {/* Additional Actions */}
-            <div className="flex justify-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  const url = `${window.location.origin}/asset/${mintResult.assetSlug}`
-                  navigator.clipboard.writeText(url)
-                }}
-              >
-                <Share2 className="h-3 w-3 mr-2" />
-                Copy Asset Link
+          {/* ERROR STATE */}
+          {error && (
+            <div className="flex flex-col items-center justify-center space-y-4 py-8">
+              <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center animate-in zoom-in duration-300">
+                <XCircle className="h-8 w-8 text-red-500" />
+              </div>
+              <div className="text-center space-y-2">
+                <h3 className="font-semibold text-lg text-foreground">Transaction Failed</h3>
+                <p className="text-sm text-muted-foreground max-w-xs mx-auto bg-muted p-2 rounded border">
+                  {error}
+                </p>
+              </div>
+              <Button variant="outline" onClick={() => onConfirm?.()} className="mt-4">
+                Retry Transaction
               </Button>
             </div>
-
-            {/* Success Message */}
-            <div className="text-center bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-              <p className="text-xs text-green-700 dark:text-green-400 font-medium">
-                IP is protected under The Berne Convention in 181+ countries
-              </p>
-            </div>
-          </div>
-
-          <DrawerFooter className="border-t pt-3 px-6">
-            <DrawerClose asChild>
-              <Button variant="outline" size="sm" className="w-full bg-transparent">
-                <ArrowRight className="h-3 w-3 mr-2" />
-                Continue Creating
-              </Button>
-            </DrawerClose>
-          </DrawerFooter>
+          )}
         </div>
+
+        <DrawerFooter className="flex-col sm:flex-row gap-3 px-4 sm:px-6 pb-8 pt-2">
+          {step === "idle" && (
+            <div className="flex w-full gap-3">
+              <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button className="flex-[2] btn-primary-gradient" onClick={onConfirm}>
+                Confirm & Mint
+              </Button>
+            </div>
+          )}
+
+          {(step === "uploading" || step === "processing") && !error && (
+            <Button variant="outline" className="w-full opacity-50 cursor-not-allowed" disabled>
+              Processing...
+            </Button>
+          )}
+
+          {step === "success" && mintResult && (
+            <div className="flex w-full gap-3">
+              <Button asChild size="default" variant="outline" className="flex-1">
+                <Link href="/portfolio">
+                  <FolderOpen className="mr-2 h-4 w-4" />
+                  Portfolio
+                </Link>
+              </Button>
+
+              <Button asChild size="default" className="flex-[2]">
+                <Link href={`/asset/${mintResult.assetSlug}`}>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  View Asset
+                </Link>
+              </Button>
+            </div>
+          )}
+
+          {error && (
+            <Button variant="ghost" className="w-full" onClick={() => onOpenChange(false)}>
+              Close
+            </Button>
+          )}
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   )

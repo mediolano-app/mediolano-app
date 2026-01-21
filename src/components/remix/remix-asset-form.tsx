@@ -15,16 +15,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Slider } from "@/components/ui/slider"
 import { Progress } from "@/components/ui/progress"
-import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from "@/components/ui/drawer"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
     ArrowLeft,
@@ -35,12 +25,7 @@ import {
     CheckCircle,
     Info,
     Sparkles,
-    Clock,
-    ExternalLink,
-    Copy,
     Loader2,
-    CheckCircle2,
-    XCircle,
     Plus,
 } from "lucide-react"
 import Image from "next/image"
@@ -51,6 +36,8 @@ import { useGetCollections } from "@/hooks/use-collection"
 import { useIpfsUpload } from "@/hooks/useIpfs"
 import { ipCollectionAbi } from "@/abis/ip_collection"
 import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants"
+import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer"
+import { IMintResult } from "@/hooks/use-create-asset"
 
 const remixTypes = [
     {
@@ -111,8 +98,6 @@ const licenseOptions = [
     },
 ]
 
-type TransactionStatus = "idle" | "uploading" | "preparing" | "signing" | "pending" | "success" | "error"
-
 interface RemixAssetFormProps {
     nftAddress: string
     tokenId: number
@@ -151,12 +136,16 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
 
     const [dragActive, setDragActive] = useState(false)
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-    const [transactionStatus, setTransactionStatus] = useState<TransactionStatus>("idle")
-    const [transactionHash, setTransactionHash] = useState("")
+    const [creationStep, setCreationStep] = useState<MintDrawerStep>("idle")
     const [progress, setProgress] = useState(0)
-    const [copied, setCopied] = useState(false)
+    const [transactionHash, setTransactionHash] = useState<string | null>(null)
+    const [mintError, setMintError] = useState<string | null>(null)
+    const [mintResult, setMintResult] = useState<IMintResult | null>(null)
+
+    // For Review Preview
+    const [drawerPreviewImage, setDrawerPreviewImage] = useState<string | null>(null)
+
     const [selectedCollectionId, setSelectedCollectionId] = useState<string>("")
-    const [createdTokenId, setCreatedTokenId] = useState<string>("")
 
     const [formData, setFormData] = useState({
         name: "",
@@ -170,7 +159,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
     })
 
     // Hooks
-    const { uploadToIpfs, progress: uploadProgress } = useIpfsUpload()
+    const { uploadToIpfs, uploadMetadataToIpfs, progress: uploadProgress } = useIpfsUpload()
 
     // Get selected collection
     const selectedCollection = useMemo(() =>
@@ -238,23 +227,24 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
         handleFileUpload(e.dataTransfer.files)
     }
 
-    const handleCopyHash = async () => {
-        if (transactionHash) {
-            try {
-                await navigator.clipboard.writeText(transactionHash)
-                setCopied(true)
-                toast({
-                    title: "Copied!",
-                    description: "Transaction hash copied to clipboard",
-                })
-                setTimeout(() => setCopied(false), 2000)
-            } catch (error) {
-                console.error("Failed to copy:", error)
-            }
-        }
-    }
-
     // Minting Logic
+    const handleSubmit = () => {
+        setMintError(null);
+        setMintResult(null);
+        setCreationStep("idle");
+
+        // Prepare preview for Review
+        if (uploadedFile) {
+            setDrawerPreviewImage(uploadedFile.previewUrl);
+        } else if (originalAsset?.image) {
+            setDrawerPreviewImage(originalAsset.image);
+        } else {
+            setDrawerPreviewImage(null);
+        }
+
+        setIsDrawerOpen(true);
+    };
+
     const handleConfirmTransaction = async () => {
         if (!selectedCollection || !address || !contract) {
             toast({
@@ -266,34 +256,11 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
         }
 
         try {
-            setTransactionStatus("uploading")
+            setCreationStep("uploading")
             setProgress(0)
 
-            // 1. Prepare Metadata
-            // If new file uploaded, upload it. If not, use original image.
-            let mediaUrl = originalAsset?.image || "";
-            let mediaType = originalAsset?.type || "image";
-
-            if (uploadedFile) {
-                // Upload logic handled inside uploadToIpfs wrapper usually, 
-                // but useIpfsUpload's 'uploadToIpfs' takes a file and returns { url, metadataUrl } 
-                // Wait, useIpfsUpload.uploadToIpfs does both file and metadata. 
-                // But if we have no file, useIpfsUpload might error or we need different logic.
-                // Let's check useIpfsUpload signature. 
-                // It takes (file: File, metadata: IpfsMetadata). 
-                // If we don't have a file, we can't use `uploadToIpfs`.
-                // We'll have to manually construct metadata and upload ONLY metadata if no file.
-                // However, `useIpfsUpload` helper might be coupled. 
-                // Assuming we can just call `uploadToIpfs` if file exists.
-                // If NO file, we need a way to upload just JSON. 
-                // For simplicity, let's assume we use `uploadToIpfs` if file exists, 
-                // and if not, we try to create a dummy file or just use a separate 'uploadMetadata' if the hook exposes it.
-                // Looking at previous view_file of `useIpfs`: `uploadMetadataToIpfs` IS exposed?
-                // Step 106 view: `const { uploadToIpfs, progress: uploadProgress } = useIpfsUpload()` -> destructuring only `uploadToIpfs`.
-                // I need to import `uploadMetadataToIpfs` too if it exists. Re-checking previous context...
-                // Step 84 view of `useIpfs`: `export function useIpfsUpload() { ... const uploadMetadataToIpfs = ... return { uploadToIpfs, uploadMetadataToIpfs, ... } }`.
-                // Yes, it exposes `uploadMetadataToIpfs`.
-            }
+            // 1. Prepare Metadata UI Logic (Reuse existing flow)
+            let finalMetadataUrl = "";
 
             const metadataBase = {
                 name: formData.name,
@@ -310,32 +277,19 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 licenseType: formData.license,
             }
 
-            let finalMetadataUrl = "";
-
             if (uploadedFile) {
                 const { metadataUrl } = await uploadToIpfs(uploadedFile.file, metadataBase)
                 finalMetadataUrl = metadataUrl;
             } else {
-                // We need to access uploadMetadataToIpfs from the hook
-                // But destructuring above only got `uploadToIpfs`.
-                // I'll fix hook destructuring below.
-                // For now, assuming we have access (I will fix imports).
-
-                // Construct metadata with original image
                 const metadataNoFile = {
                     ...metadataBase,
                     image: originalAsset?.image || "",
-                    // MIME type fallback?
                 };
-
-                // This call will fail if I don't update the hook destructuring in the component first.
-                // I will assume I fix it.
-                // @ts-ignore
                 const { metadataUrl } = await uploadMetadataToIpfs(metadataNoFile);
                 finalMetadataUrl = metadataUrl;
             }
 
-            setTransactionStatus("signing")
+            setCreationStep("processing")
             setProgress(50)
 
             console.log("Minting params:", {
@@ -354,15 +308,13 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
 
             const tx = await mintAsset([contractCall]);
             setTransactionHash(tx.transaction_hash);
-            setTransactionStatus("pending"); // Waiting for confirmation
+            // Wait logic is handled, but drawer stays in processing until we verify
 
-            // Wait for receipt
             if (provider) {
                 await provider.waitForTransaction(tx.transaction_hash);
 
                 const receipt = await provider.getTransactionReceipt(tx.transaction_hash);
                 let mintedId = "";
-                // Attempt to parse TokenMinted event
                 // @ts-ignore
                 if (receipt.events) {
                     // @ts-ignore
@@ -372,22 +324,6 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                     );
 
                     if (event && event.keys && event.keys.length > 2) {
-                        // Transfer: from, to, tokenId (u256 low, u256 high)
-                        // keys: [selector, from, to], data: [tokenId_low, tokenId_high] OR keys might have it.
-                        // Standard ERC721 Transfer(from, to, tokenId) -> keys: [selector, from, to, tokenId_low, tokenId_high] depending on indexing.
-                        // Starknet ERC721 Component events: Transfer(from, to, token_id) where all are indexed? No.
-                        // Usually: keys=[selector, from, to], data=[tokenId_low, tokenId_high]
-                        // BUT useCreateAsset used: event.keys[3] for rawTokenId?
-                        // "0x18..." is Transfer.
-                        // Let's try to extract from keys or data.
-                        // If it's Transfer event: keys[1]=from, keys[2]=to. TokenId in data usually.
-                        // If it's TokenMinted: depends on impl.
-                        // Let's assume standard Transfer from 0.
-                        // safest way: check data if keys len < 4.
-
-                        // Based on useCreateAsset logic provided in context:
-                        // if (tokenMintedEvent.keys?.[3]) ...
-
                         if (event.keys[3]) {
                             mintedId = parseInt(event.keys[3], 16).toString();
                         } else if (event.data && event.data.length > 0) {
@@ -396,23 +332,27 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                     }
                 }
 
-                if (mintedId) setCreatedTokenId(mintedId);
+                setMintResult({
+                    transactionHash: tx.transaction_hash,
+                    tokenId: mintedId || "Unknown",
+                    collectionId: selectedCollection.id.toString(),
+                    assetSlug: mintedId ? `${selectedCollection.nftAddress}-${mintedId}` : ""
+                });
 
-                setTransactionStatus("success");
+                setCreationStep("success");
                 setProgress(100);
                 toast({
                     title: "Remix Minted Successfully!",
                     description: "Your remix is now on the blockchain.",
                 });
             } else {
-                // Fallback if no provider to wait (shouldn't happen)
-                setTransactionStatus("success");
+                setCreationStep("success");
                 setProgress(100);
             }
 
         } catch (error) {
             console.error("Minting failed", error)
-            setTransactionStatus("error")
+            setMintError(error instanceof Error ? error.message : "Failed to create remix")
             toast({
                 title: "Transaction Failed",
                 description: error instanceof Error ? error.message : "Failed to create remix",
@@ -421,24 +361,13 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
         }
     }
 
-    const handleCloseDrawer = () => {
-        setIsDrawerOpen(false)
-        setTransactionStatus("idle")
-        setProgress(0)
-        setTransactionHash("")
-        setCopied(false)
-    }
-
-    const handleViewAsset = () => {
-        if (selectedCollection) {
-            if (createdTokenId) {
-                // Redirect to specific asset
-                router.push(`/asset/${selectedCollection.nftAddress}-${createdTokenId}`)
-            } else {
-                router.push(`/collections/${selectedCollection.nftAddress}`)
-            }
+    // Effect to sync generic progress with upload progress if uploading
+    useEffect(() => {
+        if (creationStep === "uploading") {
+            setProgress(uploadProgress)
         }
-    }
+    }, [uploadProgress, creationStep])
+
 
     const isFormValid = () => {
         // file is now optional
@@ -452,17 +381,6 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
     const getSelectedLicense = () => {
         return licenseOptions.find((license) => license.id === formData.license)
     }
-
-    // Need to get uploadMetadataToIpfs from hook
-    const { uploadMetadataToIpfs } = useIpfsUpload();
-
-    // Effect to sync generic progress with upload progress if uploading
-    useEffect(() => {
-        if (transactionStatus === "uploading") {
-            setProgress(uploadProgress)
-        }
-    }, [uploadProgress, transactionStatus])
-
 
     if (assetLoading) {
         return (
@@ -750,179 +668,35 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                                     <Link href={`/collections/${nftAddress}`}>Cancel</Link>
                                 </Button>
 
-                                <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                                    <DrawerTrigger asChild>
-                                        <Button onClick={() => setIsDrawerOpen(true)} disabled={!isFormValid()} className="min-w-[120px]">
-                                            <Sparkles className="h-4 w-4 mr-2" />
-                                            Create Remix
-                                        </Button>
-                                    </DrawerTrigger>
-                                    <DrawerContent className="max-h-[90vh]">
-                                        <div className="mx-auto w-full max-w-4xl">
-                                            <DrawerHeader>
-                                                <DrawerTitle className="flex items-center gap-2">
-                                                    {transactionStatus === "idle" && <GitBranch className="h-5 w-5" />}
-                                                    {transactionStatus === "uploading" && <Upload className="h-5 w-5 animate-pulse" />}
-                                                    {transactionStatus === "signing" && <Loader2 className="h-5 w-5 animate-spin" />}
-                                                    {transactionStatus === "pending" && <Loader2 className="h-5 w-5 animate-spin" />}
-                                                    {transactionStatus === "success" && <CheckCircle2 className="h-5 w-5 text-green-500" />}
-                                                    {transactionStatus === "error" && <XCircle className="h-5 w-5 text-red-500" />}
-
-                                                    {transactionStatus === "idle" && "Review Your Remix"}
-                                                    {transactionStatus === "uploading" && "Uploading Metadata..."}
-                                                    {transactionStatus === "signing" && "Please Sign Transaction"}
-                                                    {transactionStatus === "pending" && "Transaction Pending"}
-                                                    {transactionStatus === "success" && "Remix Created Successfully!"}
-                                                    {transactionStatus === "error" && "Transaction Failed"}
-                                                </DrawerTitle>
-                                                <DrawerDescription>
-                                                    {transactionStatus === "idle" &&
-                                                        "Review the details below and confirm to create your remix on the blockchain."}
-                                                    {transactionStatus === "uploading" && "Storing metadata on IPFS."}
-                                                    {transactionStatus === "signing" && "Please confirm the transaction in your wallet."}
-                                                    {transactionStatus === "pending" && "Your remix is being created on the blockchain."}
-                                                    {transactionStatus === "success" &&
-                                                        "Your remix has been successfully minted and is now available."}
-                                                </DrawerDescription>
-                                            </DrawerHeader>
-
-                                            <div className="p-4 pb-0 space-y-6">
-                                                {/* Progress Bar */}
-                                                {transactionStatus !== "idle" && (
-                                                    <div className="space-y-2">
-                                                        <div className="flex justify-between text-sm">
-                                                            <span>Progress</span>
-                                                            <span>{progress.toFixed(0)}%</span>
-                                                        </div>
-                                                        <Progress value={progress} className="w-full" />
-                                                    </div>
-                                                )}
-
-                                                {/* Transaction Hash */}
-                                                {transactionHash && (
-                                                    <div className="space-y-2">
-                                                        <Label>Transaction Hash</Label>
-                                                        <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-                                                            <code className="flex-1 text-sm font-mono truncate">{transactionHash}</code>
-                                                            <Button size="sm" variant="ghost" onClick={handleCopyHash} className="h-8 w-8 p-0">
-                                                                {copied ? <CheckCircle className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                                                            </Button>
-                                                            <Button size="sm" variant="ghost" asChild className="h-8 w-8 p-0">
-                                                                <a
-                                                                    href={`https://sepolia.voyager.online/tx/${transactionHash}`}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                >
-                                                                    <ExternalLink className="h-4 w-4" />
-                                                                </a>
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Review Content - Only show when idle */}
-                                                {transactionStatus === "idle" && (
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                        {/* Remix Preview */}
-                                                        <div className="space-y-4">
-                                                            <h3 className="font-semibold">Your Remix</h3>
-                                                            <Card>
-                                                                <CardContent className="p-4 space-y-3">
-                                                                    <div className="aspect-video bg-muted rounded-lg flex items-center justify-center relative overflow-hidden">
-                                                                        {uploadedFile ? (
-                                                                            uploadedFile.type.startsWith("image/") ? (
-                                                                                <img
-                                                                                    src={uploadedFile.previewUrl || "/placeholder.svg"}
-                                                                                    alt="Remix preview"
-                                                                                    className="max-w-full max-h-full object-contain"
-                                                                                />
-                                                                            ) : (
-                                                                                <div className="text-center">
-                                                                                    <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                                                                                    <p className="text-sm text-muted-foreground">{uploadedFile.name}</p>
-                                                                                </div>
-                                                                            )
-                                                                        ) : (
-                                                                            <Image
-                                                                                src={originalAsset.image || "/placeholder.svg"}
-                                                                                alt="Remix preview from original"
-                                                                                fill
-                                                                                className="object-cover opacity-80"
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                    <div>
-                                                                        <h4 className="font-medium">{formData.name}</h4>
-                                                                        <p className="text-sm text-muted-foreground line-clamp-2">
-                                                                            {formData.description}
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <Badge variant="outline">{getSelectedRemixType()?.name}</Badge>
-                                                                        <Badge variant="secondary">{getSelectedLicense()?.name}</Badge>
-                                                                    </div>
-                                                                </CardContent>
-                                                            </Card>
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Success Content */}
-                                                {transactionStatus === "success" && (
-                                                    <div className="text-center space-y-4">
-                                                        <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto">
-                                                            <CheckCircle2 className="h-8 w-8 text-green-600" />
-                                                        </div>
-                                                        <div>
-                                                            <h3 className="text-lg font-semibold mb-2">Remix Created Successfully!</h3>
-                                                            <p className="text-muted-foreground">
-                                                                Your remix "{formData.name}" has been minted and is now available on the blockchain.
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                <DrawerFooter className="px-0">
-                                                    {transactionStatus === "idle" && (
-                                                        <div className="flex w-full gap-2">
-                                                            <Button onClick={handleConfirmTransaction} className="flex-1">
-                                                                Confirm & Mint (0.001 STRK)
-                                                            </Button>
-                                                            <DrawerClose asChild>
-                                                                <Button variant="outline" className="flex-1" onClick={handleCloseDrawer}>Cancel</Button>
-                                                            </DrawerClose>
-                                                        </div>
-                                                    )}
-                                                    {transactionStatus === "success" && (
-                                                        <div className="flex w-full gap-2">
-                                                            <Button onClick={handleViewAsset} className="flex-1">
-                                                                View Asset
-                                                            </Button>
-                                                            <DrawerClose asChild>
-                                                                <Button variant="outline" className="flex-1" onClick={handleCloseDrawer}>Close</Button>
-                                                            </DrawerClose>
-                                                        </div>
-                                                    )}
-                                                    {transactionStatus === "error" && (
-                                                        <div className="flex w-full gap-2">
-                                                            <Button onClick={handleConfirmTransaction} className="flex-1">
-                                                                Try Again
-                                                            </Button>
-                                                            <DrawerClose asChild>
-                                                                <Button variant="outline" className="flex-1" onClick={handleCloseDrawer}>Close</Button>
-                                                            </DrawerClose>
-                                                        </div>
-                                                    )}
-                                                </DrawerFooter>
-                                            </div>
-                                        </div>
-                                    </DrawerContent>
-                                </Drawer>
+                                <Button onClick={handleSubmit} disabled={!isFormValid()} className="min-w-[120px]">
+                                    <Sparkles className="h-4 w-4 mr-2" />
+                                    Create Remix
+                                </Button>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
             </div>
+
+            <MintSuccessDrawer
+                isOpen={isDrawerOpen}
+                onOpenChange={setIsDrawerOpen}
+                step={creationStep}
+                progress={progress}
+                mintResult={mintResult}
+                assetTitle={formData.name}
+                assetDescription={formData.description}
+                assetType={`Remix of ${originalAsset.id}`}
+                error={mintError}
+                onConfirm={handleConfirmTransaction}
+                cost="0.001 STRK"
+                previewImage={drawerPreviewImage}
+                data={{
+                    "Remix Type": remixTypes.find(t => t.id === formData.remixType)?.name || "Unknown",
+                    "License": licenseOptions.find(l => l.id === formData.license)?.name || "Unknown",
+                    "Collection": selectedCollection?.name || "Unknown"
+                }}
+            />
         </div>
     )
 }
