@@ -1,4 +1,4 @@
-export const IPFS_URL = process.env.NEXT_PUBLIC_PINATA_HOST || "https://gateway.pinata.cloud";
+export const IPFS_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || "https://gateway.pinata.cloud";
 export const COLLECTION_CONTRACT_ADDRESS =
   process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS!;
 

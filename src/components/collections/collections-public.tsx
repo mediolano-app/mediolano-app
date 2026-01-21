@@ -3,7 +3,6 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { getNFTs } from "@/lib/mockupPortfolioData"
 import type { Collection } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
@@ -52,7 +51,6 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
     collectionId: "",
     collectionName: ""
   })
-  const nfts = getNFTs()
 
   // Filter collections based on search query and featured status
   const filteredCollections = collections.filter((collection) => {

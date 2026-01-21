@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { getNFTs } from "@/lib/mockupPortfolioData"
+
 import type { NFT } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -111,56 +111,7 @@ export default function NFTPortfolio() {
     // useBlockchainData
   ])
 
-  const mockNFTs = getNFTs()
 
-  // const nfts = useBlockchainData ? blockchainNFTs : mockNFTs
-
-  // const collections = [
-  //   { id: "all", name: "All Collections" },
-  //   ...Array.from(
-  //     new Set(
-  //       nfts.map((nft) => nft.collection.id)
-  //     )
-  //   ).map((collectionId) => {
-  //     const collection = nfts.find(nft => nft.collection.id === collectionId)?.collection
-  //     return {
-  //       id: collectionId,
-  //       name: collection?.name || "lection"
-  //     }
-  //   })
-  // ]
-
-
-  // Filter NFTs based on search, collection, visibility, and rarity
-  // const filteredNFTs = nfts.filter((nft) => {
-  //   const matchesSearch =
-  //     nft.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     nft.collection.name.toLowerCase().includes(searchQuery.toLowerCase())
-  //   const matchesCollection = selectedCollection === "all" || nft.collection.id === selectedCollection
-  //   const matchesRarity = rarityFilter === "all" || nft.rarity === rarityFilter
-
-  //   return matchesSearch && matchesCollection && matchesRarity
-  // })
-
-  // Sort NFTs based on selected sort option
-  // const sortedNFTs = [...filteredNFTs].sort((a, b) => {
-  //   switch (sortOption) {
-  //     case "price-high":
-  //       return b.price - a.price
-  //     case "price-low":
-  //       return a.price - b.price
-  //     case "name-asc":
-  //       return a.name.localeCompare(b.name)
-  //     case "name-desc":
-  //       return b.name.localeCompare(a.name)
-  //     case "date-new":
-  //       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  //     case "date-old":
-  //       return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  //     default:
-  //       return 0
-  //   }
-  // })
 
   const getSortIcon = () => {
     if (sortOption.includes("high") || sortOption.includes("desc")) {
