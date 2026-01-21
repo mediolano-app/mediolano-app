@@ -32,7 +32,7 @@ export function useCreatorNFTPortfolio() {
 
   const { contract } = useContract({
     abi: abi as Abi,
-    address: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`,
+    address: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
   });
   const { tokenIds } = useMIP();
 

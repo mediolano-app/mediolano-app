@@ -49,16 +49,16 @@ export interface Attribute {
 }
 
 
-export interface IP{
+export interface IP {
 	name: string,
 	description: string,
 	external_url: string,
 	image: string,
 	attributes: Attribute[],
-  }
+}
 
 const AssetCardList: React.FC<AssetCardListProps> = ({ tokenId, status }) => {
-	const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
+	const contract = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as `0x${string}`;
 	const [metadata, setMetadata] = useState<IP | null>(null);
 	const [isImage, setIsImage] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
@@ -87,7 +87,7 @@ const AssetCardList: React.FC<AssetCardListProps> = ({ tokenId, status }) => {
 
 			try {
 				setIsLoading(true);
-        		console.log(tokenURI);
+				console.log(tokenURI);
 				const response = await pinataClient.gateways.get(tokenURI);
 				console.log(response);
 				let parsedData: any;
@@ -105,7 +105,7 @@ const AssetCardList: React.FC<AssetCardListProps> = ({ tokenId, status }) => {
 				// }
 
 				setMetadata(parsedData);
-				if(parsedData.image.startsWith("https://")) {
+				if (parsedData.image.startsWith("https://")) {
 					setIsImage(true);
 				}
 				console.log(parsedData);
@@ -122,14 +122,14 @@ const AssetCardList: React.FC<AssetCardListProps> = ({ tokenId, status }) => {
 
 		fetchMetadata();
 	}, [tokenURI]);
-	
+
 	useEffect(() => {
 		if (metadata) {
 			console.log("Metadata:", metadata);
 			//console.log("Metadata IMAGE", metadata.image);
 		}
 	}
-	, [metadata]);
+		, [metadata]);
 
 
 	if (isLoading || isContractLoading) {
@@ -190,7 +190,7 @@ const AssetCardList: React.FC<AssetCardListProps> = ({ tokenId, status }) => {
 							View
 						</Button>
 					</Link>
-					
+
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline" size="sm" className="w-28">

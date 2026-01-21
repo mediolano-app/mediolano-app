@@ -264,7 +264,8 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
               ).ownerOf(tokenId);
               return owned;
             });
-          const owner = ownerRaw as `0x${string}`;
+          // Ensure owner is a hex string
+          const owner = ownerRaw ? `0x${BigInt(ownerRaw).toString(16)}` as `0x${string}` : undefined;
 
           // token URI
           const uriRaw = await (

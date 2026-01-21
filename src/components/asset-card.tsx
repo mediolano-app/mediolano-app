@@ -50,16 +50,16 @@ export interface Attribute {
 
 export type IPType = "" | "patent" | "trademark" | "copyright" | "trade_secret";
 
-export interface IP{
+export interface IP {
 	name: string,
 	description: string,
 	external_url: string,
 	image: string,
 	attributes: Attribute[],
-  }
+}
 
 const AssetCard: React.FC<AssetCardProps> = ({ tokenId, status }) => {
-	const contract = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
+	const contract = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as `0x${string}`;
 	const [metadata, setMetadata] = useState<IP | null>(null);
 	const [isImage, setIsImage] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
@@ -88,7 +88,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ tokenId, status }) => {
 
 			try {
 				setIsLoading(true);
-        		console.log(tokenURI);
+				console.log(tokenURI);
 				const response = await pinataClient.gateways.get(tokenURI);
 				console.log(response);
 				let parsedData: any;
@@ -106,7 +106,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ tokenId, status }) => {
 				// }
 
 				setMetadata(parsedData);
-				if(parsedData.image.startsWith("https://")) {
+				if (parsedData.image.startsWith("https://")) {
 					setIsImage(true);
 				}
 				console.log(parsedData);
@@ -123,14 +123,14 @@ const AssetCard: React.FC<AssetCardProps> = ({ tokenId, status }) => {
 
 		fetchMetadata();
 	}, [tokenURI]);
-	
+
 	useEffect(() => {
 		if (metadata) {
 			console.log("Metadata:", metadata);
 			//console.log("Metadata IMAGE", metadata.image);
 		}
 	}
-	, [metadata]);
+		, [metadata]);
 
 
 	if (isLoading || isContractLoading) {
@@ -159,40 +159,40 @@ const AssetCard: React.FC<AssetCardProps> = ({ tokenId, status }) => {
 	return (
 		<Card className="overflow-hidden">
 			<CardHeader className="p-0">
-			  {isImage ? (
-				<Image
-					src={metadata.image}
-					alt={metadata.name}
-					width={400}
-					height={400}
-					className="w-full h-48 object-cover"
-				/> ) : (
-				<Image
-					src={
-						"/background.jpg"
-					} // Add fallback image
-					alt={metadata.name}
-					width={400}
-					height={400}
-					className="w-full h-48 object-cover"
-				/>
-			  )}
+				{isImage ? (
+					<Image
+						src={metadata.image}
+						alt={metadata.name}
+						width={400}
+						height={400}
+						className="w-full h-48 object-cover"
+					/>) : (
+					<Image
+						src={
+							"/background.jpg"
+						} // Add fallback image
+						alt={metadata.name}
+						width={400}
+						height={400}
+						className="w-full h-48 object-cover"
+					/>
+				)}
 			</CardHeader>
 			<CardContent className="p-4">
 				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>
-				
+
 				<p className="text-sm text-muted-foreground mb-5 min-h-[40px]">
-					{ truncateString(metadata.description, 99 ) }</p>
-				
-				
+					{truncateString(metadata.description, 99)}</p>
+
+
 				<div className="flex justify-between items-center mb-2">
 
-				<Badge variant="default">
-					{metadata.attributes?.[2]?.value ?? "MIP"}
-				</Badge>
-				<Badge variant="secondary">
-					{metadata.attributes?.[0]?.value ?? "MIP"}
-				</Badge>
+					<Badge variant="default">
+						{metadata.attributes?.[2]?.value ?? "MIP"}
+					</Badge>
+					<Badge variant="secondary">
+						{metadata.attributes?.[0]?.value ?? "MIP"}
+					</Badge>
 				</div>
 				{/* <Badge className="text-sm"
 					variant={
@@ -207,18 +207,18 @@ const AssetCard: React.FC<AssetCardProps> = ({ tokenId, status }) => {
 				</Badge>*/}
 			</CardContent>
 			<CardFooter className="p-4 flex flex-wrap gap-2">
-				
+
 				<Link href={`/asset/${tokenId}`}>
-				<Button variant="outline" size="sm">
-					<Eye className="h-4 w-4 mr-2" />
-					View
-				</Button></Link>
-				
+					<Button variant="outline" size="sm">
+						<Eye className="h-4 w-4 mr-2" />
+						View
+					</Button></Link>
+
 				<Button variant="outline" size="sm" disabled>
 					<FileText className="h-4 w-4 mr-2" />
 					License
 				</Button>
-				
+
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="outline" size="sm">
@@ -229,15 +229,15 @@ const AssetCard: React.FC<AssetCardProps> = ({ tokenId, status }) => {
 						<DropdownMenuLabel>More</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<Link href={`/asset/dashboard/${tokenId}`}>
-						<DropdownMenuItem>
-							<Gauge className="h-4 w-4 mr-2" />
-							Asset Dashboard
-						</DropdownMenuItem>
+							<DropdownMenuItem>
+								<Gauge className="h-4 w-4 mr-2" />
+								Asset Dashboard
+							</DropdownMenuItem>
 						</Link>
-						
+
 					</DropdownMenuContent>
 				</DropdownMenu>
-				
+
 
 			</CardFooter>
 		</Card>

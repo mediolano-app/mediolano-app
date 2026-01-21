@@ -42,10 +42,6 @@ export default function RemixPage({ params }: RemixPageProps) {
         <div className="min-h-screen bg-background">
             <main className="container mx-auto px-4 py-8 max-w-7xl">
                 <div className="mb-8">
-                    <Link href={`/collections/${nftAddress}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors">
-                        <ArrowLeft className="h-4 w-4 mr-1" />
-                        Back to Collection
-                    </Link>
                     <h1 className="text-3xl font-bold mb-2">Create Remix</h1>
                     <p className="text-muted-foreground">
                         Create a new work based on the original asset.

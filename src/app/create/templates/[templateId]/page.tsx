@@ -165,7 +165,7 @@ export default function CreateAssetFromTemplate() {
       setIsComplete(true) // Optional: switch to confirmation view if preferred outside of drawer
 
       toast({
-        title: "🎉 Asset Minted Successfully!",
+        title: "IP Minted Successfully!",
         description: `Your ${template.name} asset has been registered on the blockchain.`,
       })
 

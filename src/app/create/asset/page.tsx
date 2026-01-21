@@ -127,8 +127,8 @@ export default function CreateAssetPage() {
 
       // Show success toast
       toast({
-        title: "🎉 Asset Minted Successfully!",
-        description: "Your Programmable IP has been registered on the blockchain.",
+        title: "🎉 IP Minted Successfully!",
+        description: "Your Programmable IP is now onchain.",
       });
     } catch (error) {
       console.error("Error minting asset:", error);

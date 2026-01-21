@@ -167,6 +167,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
   }
 
   const truncateAddress = (address: string) => {
+    if (!address) return "Unknown"
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
   }
 
@@ -213,10 +214,6 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                     >
                       <Share2 className="h-4 w-4 mr-2" />
                       Share
-                    </Button>
-                    <Button variant="outline" size="sm" className="w-full sm:w-auto bg-transparent">
-                      <Download className="h-4 w-4 mr-2" />
-                      Export
                     </Button>
                   </div>
                 )}
@@ -330,7 +327,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 rounded-lg bg-muted/30">
             <div className="flex items-center gap-2 flex-shrink-0">
               <Fingerprint className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Digital Fingerprint:</span>
+              <span className="text-sm font-medium">Decentralized data:</span>
             </div>
             <code className="text-xs bg-background px-3 py-2 rounded font-mono flex-1 break-all">
               {asset.fingerprint}
@@ -353,7 +350,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            Provenance
+            Provenance Timeline
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Complete history of all events and transactions for this asset

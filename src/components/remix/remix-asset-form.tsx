@@ -514,26 +514,12 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                             </div>
 
                             <div className="space-y-2">
-                                <h3 className="font-semibold line-clamp-1">{originalAsset.name}</h3>
-                                <div className="text-sm text-muted-foreground flex items-center gap-1 group">
-                                    <span>by</span>
-                                    {originalAsset.creator?.name ? (
-                                        <span className="font-medium text-foreground">{originalAsset.creator.name}</span>
-                                    ) : (
-                                        <span className="font-mono bg-muted px-1 rounded" title={originalAsset.creator?.address}>
-                                            {formatAddress(originalAsset.creator?.address)}
-                                        </span>
-                                    )}
-                                </div>
-                                <Badge variant="outline">{originalAsset.type || 'Asset'}</Badge>
+                                <h2 className="font-semibold line-clamp-1">{originalAsset.name}</h2>
                             </div>
 
                             <div className="space-y-2">
-                                <h4 className="font-medium text-sm">License</h4>
-                                <Badge variant="secondary">{originalAsset.licenseType || 'Unknown'}</Badge>
-                                <p className="text-xs text-muted-foreground">
-                                    This license allows remixing with proper attribution.
-                                </p>
+                                <h4 className="font-medium text-sm">License: {originalAsset.licenseType || 'Unknown'}</h4>
+                                <Badge variant="secondary">This license allows remixing with proper attribution.</Badge>
                             </div>
                         </CardContent>
                     </Card>
@@ -542,7 +528,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                     <Alert>
                         <Info className="h-4 w-4" />
                         <AlertDescription>
-                            Your remix will automatically include attribution to the original creator.
+                            Your remix will automatically include attribution to the original asset and creator.
                         </AlertDescription>
                     </Alert>
                 </div>

@@ -165,7 +165,7 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
               key={index}
               onClick={() => goToSlide(index)}
               disabled={isTransitioning}
-              className={`h-2 rounded-full transition-all duration-300 hover:scale-125 disabled:opacity-50 ${index === currentSlide ? "bg-primary w-8" : "bg-muted-foreground/30 w-2 hover:bg-muted-foreground/50"
+              className={`h-2 rounded-full transition-all duration-300 hover:scale-125 disabled:opacity-30 ${index === currentSlide ? "bg-primary w-8" : "bg-muted-foreground/20 w-2 hover:bg-muted-foreground/50"
                 }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -179,7 +179,7 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
 
 export function HeroSliderSkeleton() {
   return (
-    <div className="container mx-auto relative overflow-hidden rounded-2xl h-[600px] md:h-[640px] bg-muted">
+    <div className="container mx-auto relative overflow-hidden rounded-2xl h-[600px] md:h-[640px] bg-blue-500/10">
       <div className="absolute inset-0">
         <Skeleton className="h-full w-full" />
       </div>

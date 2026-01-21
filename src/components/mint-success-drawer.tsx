@@ -55,13 +55,13 @@ export function MintSuccessDrawer({
             <div className="mx-auto mb-3 relative">
               <div
                 className={`
-                w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 
+                w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 
                 rounded-full flex items-center justify-center shadow-lg
                 transition-all duration-700 ease-out
                 ${showCelebration ? "animate-bounce scale-110" : "scale-100"}
               `}
               >
-                <CheckCircle2 className="h-8 w-8 text-white" />
+                <CheckCircle2 className="h-4 w-4 text-white" />
               </div>
 
               {/* Sparkles Animation */}
@@ -89,21 +89,15 @@ export function MintSuccessDrawer({
               )}
             </div>
 
-            <DrawerTitle className="text-xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              🎉 Asset Minted Successfully!
-            </DrawerTitle>
+
             <DrawerDescription className="text-sm text-muted-foreground px-2">
-              Your Programmable IP has been registered on the blockchain with immutable proof of ownership.
+              Your IP is now onchain with immutable proof of ownership.
             </DrawerDescription>
           </DrawerHeader>
 
           <div className="px-6 pb-4 space-y-4 overflow-y-auto max-h-[50vh]">
             {/* Asset Details Card */}
             <div className="bg-muted/30 rounded-lg p-4 space-y-3">
-              <div className="flex items-center gap-2 mb-2">
-                <Trophy className="h-4 w-4 text-yellow-500" />
-                <h3 className="font-semibold text-base">Your New Asset</h3>
-              </div>
 
               <div className="space-y-2">
                 <div>
@@ -177,7 +171,7 @@ export function MintSuccessDrawer({
             {/* Success Message */}
             <div className="text-center bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
               <p className="text-xs text-green-700 dark:text-green-400 font-medium">
-                🛡️ Your intellectual property is now protected under The Berne Convention in 181 countries
+                IP is protected under The Berne Convention in 181+ countries
               </p>
             </div>
           </div>

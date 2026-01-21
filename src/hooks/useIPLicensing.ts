@@ -5,7 +5,7 @@ import IPLicensingABI from '../abis/ip_licensing';
 export const useIPLicensing = () => {
     // Initialize contract
     const { contract } = useContract({
-        address: process.env.NEXT_PUBLIC_LICENSING_CONTRACT_ADDRESS as `0x${string}`,
+        address: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
         abi: IPLicensingABI,
     });
 

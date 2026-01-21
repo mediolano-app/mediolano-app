@@ -3,8 +3,7 @@ import type { IPType } from "./types";
  * Application-wide constants
  */
 // Contract addresses
-export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
-export const IP_REVENUE_CONTRACT_ADDRESS="0x055f444b1ace8bec6d79ceb815a8733958e9ceaa598160af291a7429e0146a74";
+export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as `0x${string}`;
 
 // AVNU Paymaster Configuration
 export const AVNU_PAYMASTER_CONFIG = {
@@ -46,12 +45,9 @@ export const GAS_SPONSORSHIP_CONFIG = {
 
 /** List of featured collection IDs (string) */
 export const FEATURED_COLLECTION_IDS = [
-  "20", 
+  "20",
 ];
 
-
-// Contract addresses   
-//export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS_MIP as `0x${string}`;
 
 // Central list of allowed IP types used across detection and UI
 export const ALLOWED_IP_TYPES: IPType[] = [

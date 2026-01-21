@@ -50,10 +50,6 @@ export default function CollectionsPage() {
           return (
             <div className="mb-10">
 
-
-              <HeroSlider collections={collections} />
-
-
               {/*
               <div onClick={() => router.push(`/collections/${featuredCollection.nftAddress || featuredCollection.id}`)}>
                 <FeaturedCollectionCard

@@ -17,39 +17,41 @@ export function OverviewTab({ asset }: OverviewTabProps) {
     return 'licenseTerms' in asset;
   };
 
-  // Get display values based on asset type
   const getDisplayValues = () => {
+    // If it's a DisplayAsset, we have most fields
     if (isDisplayAsset(asset)) {
       return {
         name: asset.name,
-        description: asset.description,
+        // description: asset.description, // Moved to header
         image: asset.image,
         attributes: asset.attributes,
         id: asset.id,
-        licenseTerms: asset.licenseTerms,
-        collection: asset.collection,
-        blockchain: asset.blockchain,
-        tokenStandard: asset.tokenStandard,
-        contract: asset.contract,
-        author: asset.author,
-        licenseType: asset.licenseType,
+        licenseTerms: asset.licenseTerms || "Standard License",
+        collection: asset.collection || "Unknown Collection",
+        blockchain: asset.blockchain || "Starknet",
+        tokenStandard: asset.tokenStandard || "ERC-721",
+        contract: asset.contract || asset.nftAddress || "Unknown",
+        author: asset.author || { name: "Unknown" },
+        licenseType: asset.licenseType || "Rights Reserved",
         owner: asset.owner.address,
-        version: asset.version,
+        version: asset.version || "1.0",
       };
     }
+    // Fallback or AssetDetail
+    const anyAsset = asset as any;
     return {
       name: asset.name,
-      description: asset.description || "",
+      // description: asset.description || "",
       image: asset.image || "/placeholder.svg",
       attributes: asset.attributes || [],
       id: asset.id,
-      licenseTerms: "Not specified",
-      collection: asset.collectionName || "Not specified",
+      licenseTerms: anyAsset.licenseTerms || "Standard License",
+      collection: anyAsset.collectionName || anyAsset.collection || "Unknown Collection",
       blockchain: "Starknet",
       tokenStandard: "ERC-721",
-      contract: asset.nftAddress,
-      author: { name: asset.owner || "Unknown" },
-      licenseType: "Not specified",
+      contract: anyAsset.nftAddress || anyAsset.contract || "Unknown",
+      author: { name: anyAsset.creatorName || asset.owner || "Unknown" },
+      licenseType: anyAsset.licenseType || "Rights Reserved",
       owner: asset.owner || "Unknown",
       version: "1.0",
     };
@@ -65,15 +67,7 @@ export function OverviewTab({ asset }: OverviewTabProps) {
           const originalAssetAttr = displayValues.attributes?.find((a: any) => a.trait_type === "Original Asset" || a.trait_type === "Remixed From");
           if (originalAssetAttr) {
             const originalId = originalAssetAttr.value;
-            // Handle ID format if it's "address-tokenid" or just address
-            const linkHref = originalId.includes("0x") ? (originalId.includes("-") ? `/assets/${originalId.replace("-", "/")}` : `#`) : `#`;
-            // Note: Our routing seems to be /asset/[slug] usually if using ID. 
-            // The attribute stored in remix form is `${nftAddress}-${tokenId}` or `${nftAddress}`.
-            // If it is `${nftAddress}-${tokenId}`, simpler to link to /create/remix?asset=... or try to find the asset page.
-            // But we don't have a guaranteed route for checking "original" if it's just an address.
-            // Let's assume we link to the collection or do a search if we can't deep direct.
-            // Actually, best effort: link to /collections/[address] if we can parse address.
-
+            // Best effort: link to /asset/[contract-token]
             const address = originalId.split("-")[0];
 
             return (
@@ -94,8 +88,7 @@ export function OverviewTab({ asset }: OverviewTabProps) {
           return null;
         })()}
 
-        <h2 className="text-xl font-semibold mb-2">Description</h2>
-        <p className="text-muted-foreground">{displayValues.description}</p>
+        {/* Description removed from here as it is now in the header */}
       </div>
 
       <Separator />
@@ -148,7 +141,7 @@ export function OverviewTab({ asset }: OverviewTabProps) {
       </div>
 
       <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-4">Additional Details</h2>
+
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="metadata">
             <AccordionTrigger className="py-4">

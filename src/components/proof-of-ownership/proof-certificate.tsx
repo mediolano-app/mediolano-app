@@ -3,24 +3,12 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Shield,
-  Calendar,
-  User,
-  FileText,
-  Download,
-  ExternalLink,
-  CheckCircle,
-  Hash,
-  Globe,
-  Award,
-  Lock,
-  Zap,
-} from "lucide-react"
+import { Calendar, User, ExternalLink, CheckCircle, Copy, Link2, Building2 } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import type { Asset } from "@/types/asset"
+import { useState } from "react"
 
 interface ProofCertificateProps {
   asset: Asset & {
@@ -49,7 +37,6 @@ interface ProofCertificateProps {
       royaltyPercentage: number
     }
   }
-  showActions?: boolean
   ownershipHistory?: Array<{
     event: string
     from: string
@@ -62,498 +49,271 @@ interface ProofCertificateProps {
   }>
 }
 
-export function ProofCertificate({ asset, showActions = true, ownershipHistory = [] }: ProofCertificateProps) {
-  const currentDate = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
+export function ProofCertificate({ asset, ownershipHistory = [] }: ProofCertificateProps) {
+  const [copied, setCopied] = useState<string>("")
 
-  const handleDownloadCertificate = () => {
-    console.log("Downloading proof of ownership certificate...")
-  }
-
-  const handleViewOnBlockchain = () => {
-    console.log("Opening blockchain explorer...")
-  }
-
-  const getTypeColor = (type: string) => {
-    const colors = {
-      Art: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
-      Audio: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-      Video: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-      Document: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
-      Patent: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-      Software: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300",
-      NFT: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300",
+  const handleCopyAddress = async (address: string, type: string) => {
+    try {
+      await navigator.clipboard.writeText(address)
+      setCopied(type)
+      setTimeout(() => setCopied(""), 2000)
+    } catch (error) {
+      console.error("Error copying:", error)
     }
-    return colors[type as keyof typeof colors] || "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      {/* Enhanced Certificate Header */}
-      <Card className="overflow-hidden border-2 border-primary/20 shadow-xl">
-        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 p-8">
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center gap-3">
-              <div className="p-3 rounded-full bg-primary/20">
-                <Award className="h-8 w-8 text-primary" />
+    <div className="space-y-6">
+      <Card className="overflow-hidden">
+        <CardContent className="p-0">
+          <div className="p-6 sm:p-8 border-b bg-foreground/[0.02]">
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div>
+                <Badge variant="outline" className="mb-3">
+                  {asset.type}
+                </Badge>
+                <Link href={`/asset/${asset.id}`} className="group">
+                  <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight group-hover:text-primary transition-colors">
+                    {asset.name}
+                  </h3>
+                </Link>
               </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                Official Ownership Certificate
-              </h1>
+              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
+                <CheckCircle className="h-3 w-3 mr-1.5" />
+                Verified
+              </Badge>
             </div>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              This certificate serves as cryptographic proof of intellectual property ownership and is verifiable on the
-              blockchain
-            </p>
-            <div className="flex items-center justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-background/50">
-                <Calendar className="h-4 w-4 text-primary" />
-                <span>Generated {currentDate}</span>
+
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="relative w-full sm:w-48 aspect-square overflow-hidden rounded-lg bg-muted">
+                <Link href={`/asset/${asset.id}`}>
+                  <Image
+                    src={asset.image || "/placeholder.svg"}
+                    alt={asset.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, 192px"
+                    priority
+                  />
+                </Link>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-background/50">
-                <Hash className="h-4 w-4 text-primary" />
-                <span>Asset #{asset.id}</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                <CheckCircle className="h-4 w-4" />
-                <span>Verified</span>
+
+              <div className="flex-1 space-y-4">
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{asset.description}</p>
+
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="secondary" className="font-normal">
+                    <Calendar className="h-3 w-3 mr-1.5" />
+                    {asset.registrationDate}
+                  </Badge>
+                  <Link href={`/asset/${asset.id}`}>
+                    <Badge variant="secondary" className="font-normal">
+                      <Link2 className="h-3 w-3 mr-1.5" />
+                      {asset.id.substring(0, 6)}...{asset.id.slice(-4)}
+                    </Badge>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+
+          <div className="p-6 sm:p-8 space-y-6">
+            {/* Current Owner */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium text-muted-foreground">Current Owner</h4>
+                <Badge variant="outline" className="text-xs">
+                  Active
+                </Badge>
+              </div>
+              <div className="flex items-center gap-3 p-4 rounded-lg border bg-foreground/[0.02]">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={asset.owner.avatar || "/placeholder.svg"} alt={asset.owner.name} />
+                  <AvatarFallback>{asset.owner.name.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium">{asset.owner.name}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <code className="text-xs text-muted-foreground font-mono">
+                      {asset.owner.address.substring(0, 6)}...{asset.owner.address.slice(-4)}
+                    </code>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                      onClick={() => handleCopyAddress(asset.owner.address, "owner")}
+                    >
+                      {copied === "owner" ? (
+                        <CheckCircle className="h-3 w-3 text-green-600" />
+                      ) : (
+                        <Copy className="h-3 w-3" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Original Creator */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-muted-foreground">Original Creator</h4>
+              <div className="flex items-center gap-3 p-4 rounded-lg border bg-foreground/[0.02]">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={asset.creator.avatar || "/placeholder.svg"} alt={asset.creator.name} />
+                  <AvatarFallback>{asset.creator.name.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">{asset.creator.name}</p>
+                    {asset.creator.verified && <CheckCircle className="h-4 w-4 text-blue-600" />}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <code className="text-xs text-muted-foreground font-mono">
+                      {asset.creator.address.substring(0, 6)}...{asset.creator.address.slice(-4)}
+                    </code>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                      onClick={() => handleCopyAddress(asset.creator.address, "creator")}
+                    >
+                      {copied === "creator" ? (
+                        <CheckCircle className="h-3 w-3 text-green-600" />
+                      ) : (
+                        <Copy className="h-3 w-3" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4 pt-4 border-t">
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium">License</h4>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">{asset.licenseInfo.type}</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Commercial Use</span>
+                    <Badge variant={asset.licenseInfo.allowCommercial ? "default" : "secondary"} className="text-xs">
+                      {asset.licenseInfo.allowCommercial ? "Allowed" : "Not Allowed"}
+                    </Badge>
+                  </div>
+
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium">Blockchain</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Network</span>
+                    <Badge variant="outline" className="text-xs">
+                      {asset.blockchain}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Standard</span>
+                    <Badge variant="outline" className="text-xs">
+                      {asset.tokenStandard}
+                    </Badge>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-xs text-muted-foreground">Contract</span>
+                    <div className="flex items-center gap-2">
+                      <code className="text-xs font-mono bg-muted px-2 py-1 rounded flex-1 truncate">
+                        {asset.contract.substring(0, 8)}...{asset.contract.slice(-6)}
+                      </code>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={() => handleCopyAddress(asset.contract, "contract")}
+                      >
+                        {copied === "contract" ? (
+                          <CheckCircle className="h-3 w-3 text-green-600" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
       </Card>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Left Column - Asset Display */}
-        <div className="xl:col-span-1 space-y-6">
-          {/* Asset Image and Basic Info */}
-          <Card className="overflow-hidden shadow-lg">
-            <CardContent className="p-0">
-              <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-muted/50 to-muted">
-                <Image
-                  src={asset.image || "/placeholder.svg"}
-                  alt={asset.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  priority
-                />
-                <div className="absolute top-4 left-4">
-                  <Badge className={getTypeColor(asset.type)} variant="secondary">
-                    {asset.type}
-                  </Badge>
-                </div>
-                <div className="absolute top-4 right-4">
-                  <Badge variant="secondary" className="bg-background/90 backdrop-blur">
-                    #{asset.id}
-                  </Badge>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <h2 className="text-xl font-bold mb-1">{asset.name}</h2>
-                  <p className="text-sm opacity-90 line-clamp-2">{asset.description}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {ownershipHistory.length > 0 && (
+        <Card>
+          <CardContent className="p-6 sm:p-8">
+            <h3 className="font-medium mb-6">Ownership History</h3>
 
-          {/* Asset Metadata */}
-          <Card className="shadow-lg">
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
-                Asset Details
-              </h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Registration</span>
-                  <p className="font-medium">{asset.registrationDate}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Value</span>
-                  <p className="font-medium">{asset.value}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Collection</span>
-                  <p className="font-medium">{asset.collection || "Individual"}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Protection</span>
-                  <p className="font-medium text-green-600">{asset.protectionLevel || 90}%</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Blockchain Verification */}
-          <Card className="shadow-lg border-primary/20">
-            <CardContent className="p-6">
-              <h3 className="font-semibold mb-4 flex items-center gap-2">
-                <Globe className="h-5 w-5 text-primary" />
-                Blockchain Verification
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Network</span>
-                  <Badge variant="outline">{asset.blockchain}</Badge>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Standard</span>
-                  <Badge variant="outline">{asset.tokenStandard}</Badge>
-                </div>
-                <div>
-                  <span className="text-muted-foreground text-sm">Contract Address</span>
-                  <p className="font-mono text-xs bg-muted p-2 rounded mt-1 break-all">{asset.contract}</p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full mt-3 bg-transparent"
-                  onClick={handleViewOnBlockchain}
+            <div className="space-y-3">
+              {ownershipHistory.map((record, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-4 p-4 rounded-lg border hover:border-foreground/20 transition-colors"
                 >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  View on Explorer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center">
+                    <Building2 className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className="font-medium text-sm">{record.event}</p>
+                      <span className="text-xs text-muted-foreground">{record.date}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {record.from} → {record.to}
+                    </p>
+                  </div>
+                  {record.verified && <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />}
+                </div>
+              ))}
 
-        {/* Right Column - Ownership and License Info */}
-        <div className="xl:col-span-2 space-y-6">
-          {/* Ownership Information */}
-          <Card className="shadow-lg">
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <User className="h-6 w-6 text-primary" />
-                Ownership Information
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Current Owner */}
-                <div className="p-4 border-2 border-green-200 dark:border-green-800 rounded-lg bg-green-50/50 dark:bg-green-950/20">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-green-800 dark:text-green-300">Current Owner</h3>
-                    <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Active
+              {/* Genesis */}
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-foreground/[0.02] border">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-foreground flex items-center justify-center">
+                  <User className="h-4 w-4 text-background" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <p className="font-medium text-sm">Created</p>
+                    <Badge variant="outline" className="text-xs">
+                      Genesis
                     </Badge>
                   </div>
-
-                  <div className="flex items-center gap-3 mb-3">
-                    <Avatar className="h-12 w-12 border-2 border-green-200">
-                      <AvatarImage src={asset.owner.avatar || "/placeholder.svg"} alt={asset.owner.name} />
-                      <AvatarFallback className="bg-green-100 text-green-800">
-                        {asset.owner.name.substring(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold">{asset.owner.name}</p>
-                      <p className="text-sm text-muted-foreground font-mono">{asset.owner.address}</p>
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    Acquired on {asset.owner.acquired}
-                  </div>
-                </div>
-
-                {/* Original Creator */}
-                <div className="p-4 border-2 border-blue-200 dark:border-blue-800 rounded-lg bg-blue-50/50 dark:bg-blue-950/20">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold text-blue-800 dark:text-blue-300">Original Creator</h3>
-                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                      <Shield className="h-3 w-3 mr-1" />
-                      Verified
-                    </Badge>
-                  </div>
-
-                  <div className="flex items-center gap-3 mb-3">
-                    <Avatar className="h-12 w-12 border-2 border-blue-200">
-                      <AvatarImage src={asset.creator.avatar || "/placeholder.svg"} alt={asset.creator.name} />
-                      <AvatarFallback className="bg-blue-100 text-blue-800">
-                        {asset.creator.name.substring(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-semibold">{asset.creator.name}</p>
-                      <p className="text-sm text-muted-foreground font-mono">{asset.creator.address}</p>
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    Created on {asset.registrationDate}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* License Information */}
-          <Card className="shadow-lg">
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Lock className="h-6 w-6 text-primary" />
-                License & Usage Rights
-              </h2>
-
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="p-4 border rounded-lg bg-muted/30">
-                    <h3 className="font-semibold mb-2">{asset.licenseInfo.type}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">{asset.licenseInfo.terms}</p>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Commercial Use</span>
-                        <Badge variant={asset.licenseInfo.allowCommercial ? "default" : "destructive"}>
-                          {asset.licenseInfo.allowCommercial ? "Allowed" : "Restricted"}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Derivative Works</span>
-                        <Badge variant={asset.licenseInfo.allowDerivatives ? "default" : "destructive"}>
-                          {asset.licenseInfo.allowDerivatives ? "Allowed" : "Restricted"}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Attribution</span>
-                        <Badge variant={asset.licenseInfo.requireAttribution ? "default" : "secondary"}>
-                          {asset.licenseInfo.requireAttribution ? "Required" : "Optional"}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="p-4 border rounded-lg bg-muted/30">
-                    <h3 className="font-semibold mb-2 flex items-center gap-2">
-                      <Zap className="h-4 w-4" />
-                      Royalty Information
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Royalty Rate</span>
-                        <span className="font-bold text-lg text-primary">{asset.licenseInfo.royaltyPercentage}%</span>
-                      </div>
-                      <Separator />
-                      <p className="text-sm text-muted-foreground">
-                        Commercial licensing requires a {asset.licenseInfo.royaltyPercentage}% royalty payment to the
-                        original creator for each use.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Enhanced Ownership Provenance */}
-          {ownershipHistory.length > 0 && (
-            <Card className="shadow-lg">
-              <CardContent className="p-6">
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                  <Shield className="h-6 w-6 text-primary" />
-                  Ownership Provenance
-                </h2>
-
-                <div className="space-y-6">
-                  {/* Provenance Timeline */}
-                  <div className="relative">
-                    {ownershipHistory.map((record, index) => (
-                      <div key={index} className="relative flex items-start gap-4 pb-6">
-                        {/* Timeline line */}
-                        {index < ownershipHistory.length - 1 && (
-                          <div className="absolute left-6 top-12 w-0.5 h-16 bg-gradient-to-b from-primary to-primary/30" />
-                        )}
-
-                        {/* Event icon */}
-                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
-                          {record.type === "transfer" ? (
-                            <User className="h-5 w-5 text-primary" />
-                          ) : (
-                            <FileText className="h-5 w-5 text-primary" />
-                          )}
-                        </div>
-
-                        {/* Event content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="bg-muted/30 rounded-lg p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <h3 className="font-semibold">{record.event}</h3>
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="text-xs">
-                                  <Calendar className="h-3 w-3 mr-1" />
-                                  {record.date}
-                                </Badge>
-                                {record.verified && (
-                                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs">
-                                    <CheckCircle className="h-3 w-3 mr-1" />
-                                    Verified
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                              <div>
-                                <p className="text-xs text-muted-foreground mb-1">From</p>
-                                <div className="flex items-center gap-2">
-                                  <Avatar className="h-6 w-6">
-                                    <AvatarFallback className="text-xs">{record.from.substring(0, 2)}</AvatarFallback>
-                                  </Avatar>
-                                  <span className="text-sm font-medium">{record.from}</span>
-                                </div>
-                              </div>
-
-                              <div>
-                                <p className="text-xs text-muted-foreground mb-1">To</p>
-                                <div className="flex items-center gap-2">
-                                  <Avatar className="h-6 w-6">
-                                    <AvatarFallback className="text-xs">{record.to.substring(0, 2)}</AvatarFallback>
-                                  </Avatar>
-                                  <span className="text-sm font-medium">{record.to}</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {record.transactionHash && (
-                              <div className="text-xs text-muted-foreground mb-2">
-                                <span>Transaction: </span>
-                                <code className="bg-muted px-2 py-1 rounded font-mono">{record.transactionHash}</code>
-                              </div>
-                            )}
-
-                            {record.memo && (
-                              <div className="text-sm italic text-muted-foreground bg-muted/50 p-2 rounded">
-                                "{record.memo}"
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    {/* Genesis Event */}
-                    <div className="relative flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-                        <FileText className="h-5 w-5 text-white" />
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-4 border border-primary/20">
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-semibold">Asset Created</h3>
-                            <Badge className="bg-primary/20 text-primary border-primary/30">
-                              <Award className="h-3 w-3 mr-1" />
-                              Genesis
-                            </Badge>
-                          </div>
-
-                          <div className="flex items-center gap-3 mb-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={asset.creator.avatar || "/placeholder.svg"} alt={asset.creator.name} />
-                              <AvatarFallback>{asset.creator.name.substring(0, 2)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <span className="font-medium">{asset.creator.name}</span>
-                              <Badge variant="secondary" className="ml-2 text-xs">
-                                Original Creator
-                              </Badge>
-                            </div>
-                          </div>
-
-                          <div className="text-xs text-muted-foreground">
-                            <Calendar className="h-3 w-3 inline mr-1" />
-                            Created on {asset.registrationDate}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Provenance Summary */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-lg">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-primary">{ownershipHistory.length}</p>
-                      <p className="text-xs text-muted-foreground">Total Events</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-primary">
-                        {Math.floor(
-                          (new Date().getTime() - new Date(asset.registrationDate).getTime()) / (1000 * 60 * 60 * 24),
-                        )}
-                      </p>
-                      <p className="text-xs text-muted-foreground">Days Old</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">100%</p>
-                      <p className="text-xs text-muted-foreground">Verified</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-primary">1</p>
-                      <p className="text-xs text-muted-foreground">Current Owner</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Certificate Authenticity */}
-          <Card className="shadow-lg border-2 border-primary/20">
-            <CardContent className="p-6">
-              <div className="text-center space-y-4">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <div className="p-3 rounded-full bg-primary/10">
-                    <CheckCircle className="h-8 w-8 text-primary" />
-                  </div>
-                  <h2 className="text-2xl font-bold">Certificate Authenticity</h2>
-                </div>
-
-                <div className="max-w-2xl mx-auto">
-                  <p className="text-muted-foreground mb-6">
-                    This proof of ownership certificate is cryptographically signed and verifiable on the blockchain.
-                    Anyone can verify the authenticity of this certificate using the asset ID and contract address.
+                  <p className="text-xs text-muted-foreground">
+                    {asset.creator.name} • {asset.registrationDate}
                   </p>
-
-                  <div className="p-4 bg-muted/30 rounded-lg mb-6">
-                    <div className="flex items-center justify-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="font-mono">
-                        Certificate Hash: 0x{asset.id}...{asset.contract.slice(-8)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {showActions && (
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                      <Button onClick={handleDownloadCertificate} size="lg" className="min-w-[200px]">
-                        <Download className="mr-2 h-5 w-5" />
-                        Download Official Certificate
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={handleViewOnBlockchain}
-                        size="lg"
-                        className="min-w-[200px] bg-transparent"
-                      >
-                        <ExternalLink className="mr-2 h-5 w-5" />
-                        Verify on Blockchain
-                      </Button>
-                    </div>
-                  )}
                 </div>
+                <CheckCircle className="h-4 w-4 flex-shrink-0" />
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <div className="text-sm text-muted-foreground">
+              Immutable ID: <code className="text-xs font-mono ml-1">{asset.id}</code>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Link href={`/provenance/${asset.id}`}>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto bg-transparent">
+                  View Provenance
+                </Button>
+              </Link>
+              <Button size="sm" className="w-full sm:w-auto">
+                View on Explorer
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

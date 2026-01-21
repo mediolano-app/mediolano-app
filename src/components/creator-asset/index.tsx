@@ -24,7 +24,9 @@ import { AssetErrorBoundary } from "@/components/asset/asset-error-boundary";
 import { normalizeStarknetAddress } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { isAssetReported } from "@/lib/reported-content"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, ShieldCheck, History, Palette, Share2, ExternalLink } from "lucide-react"
+import { AssetProvenance } from "@/components/asset-provenance/asset-provenance";
+import { useAssetTransferEvents } from "@/hooks/useEvents";
 
 interface AssetPageProps {
   params: Promise<{
@@ -65,14 +67,104 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
   const { toast } = useToast();
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [copied, setCopied] = useState(false)
 
   const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online";
   const tokenId = Number(tokenIdStr?.trim());
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: asset?.name || "Asset",
+          text: `Check out ${asset?.name} on Mediolano`,
+          url: window.location.href,
+        })
+      } catch (error) {
+        console.error("Error sharing:", error)
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href)
+        setCopied(true)
+        toast({
+          title: "Link Copied",
+          description: "Asset link copied to clipboard",
+        })
+        setTimeout(() => setCopied(false), 2000)
+      } catch (error) {
+        console.error("Failed to copy URL:", error)
+        toast({
+          title: "Error",
+          description: "Failed to copy link",
+          variant: "destructive",
+        })
+      }
+    }
+  }
 
   const { displayAsset: asset, loading, loadingState, error, uiState, showSkeleton, notFound } = useAsset(
     nftAddress as `0x${string}`,
     Number.isFinite(tokenId) ? tokenId : undefined
   );
+
+  const { events: transferEvents } = useAssetTransferEvents(nftAddress || "", tokenIdStr || "");
+
+  const provenanceEvents = useMemo(() => {
+    if (!transferEvents) return [];
+
+    return transferEvents.map((event) => {
+      const from = event.keys?.[1] ? `0x${BigInt(event.keys[1]).toString(16)}` : "Unknown";
+      const to = event.keys?.[2] ? `0x${BigInt(event.keys[2]).toString(16)}` : "Unknown";
+      const isMint = BigInt(from) === 0n;
+
+      return {
+        id: event.transaction_hash,
+        type: isMint ? "creation" : "transfer",
+        title: isMint ? "Asset Minted" : "Ownership Transferred",
+        description: isMint
+          ? `Asset minted by ${to.substring(0, 6)}...`
+          : `Transferred from ${from.substring(0, 6)}... to ${to.substring(0, 6)}...`,
+        from,
+        to,
+        date: new Date(event.block_number * 1000).toLocaleDateString(),
+        timestamp: new Date().toISOString(),
+        transactionHash: event.transaction_hash,
+        blockNumber: event.block_number,
+        verified: true,
+      };
+    }).reverse() as any[];
+  }, [transferEvents]);
+
+  const enhancedAsset = useMemo(() => {
+    if (!asset) return null;
+    const rawAsset = asset as any; // Cast to access properties not in DisplayAsset
+    return {
+      id: asset.id,
+      name: asset.name,
+      type: asset.type || "Asset",
+      creator: {
+        name: rawAsset.collectionName || "Unknown Creator",
+        address: rawAsset.properties?.creator as string || "Unknown",
+        avatar: "/placeholder.svg?height=40&width=40",
+        verified: true,
+      },
+      currentOwner: {
+        name: asset.owner ? `${String(asset.owner).substring(0, 6)}...` : "Unknown",
+        address: asset.owner ? String(asset.owner) : "0x0",
+        avatar: "/placeholder.svg?height=40&width=40",
+        verified: true,
+      },
+      creationDate: rawAsset.registrationDate || new Date().toISOString(),
+      registrationDate: rawAsset.registrationDate || new Date().toISOString(),
+      blockchain: "Starknet",
+      contract: rawAsset.nftAddress,
+      tokenId: asset.tokenId.toString(),
+      image: asset.image || "/placeholder.svg",
+      description: asset.description || "",
+      fingerprint: asset.ipfsCid ? `ipfs://${asset.ipfsCid}` : `sha256:${Math.random().toString(16).substr(2, 64)}`,
+    } as any;
+  }, [asset]);
 
   // Helper to safely compare addresses
   const isOwner = useMemo(() => {
@@ -194,10 +286,62 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                 <div className="mb-6">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h1 className="text-3xl font-bold text-clip">{asset?.name}</h1>
+                      <h1 className="text-3xl font-bold text-clip mb-2">{asset?.name}</h1>
+                      <p className="text-muted-foreground">{asset?.description}</p>
                     </div>
                   </div>
                 </div>
+
+                <div className="mb-8 flex flex-wrap gap-3">
+                  {isOwner && (
+                    <Button
+                      variant="default"
+                      className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none shadow-sm transition-all hover:shadow-md"
+                      onClick={() => setIsTransferOpen(true)}
+                    >
+                      Transfer
+                    </Button>
+                  )}
+
+                  <Link href={`/create/remix/${decodedSlug}`} className="flex-1">
+                    <Button
+                      className="w-full gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-none shadow-sm transition-all hover:shadow-md"
+                    >
+                      <Palette className="h-4 w-4" />
+                      Remix
+                    </Button>
+                  </Link>
+
+                  <Link href={`/proof-of-ownership/${decodedSlug}`} className="flex-1">
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border-emerald-500/20 hover:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 transition-all"
+                    >
+                      <ShieldCheck className="h-4 w-4" />
+                      Ownership
+                    </Button>
+                  </Link>
+
+                  <Link href={`/provenance/${decodedSlug}`} className="flex-1">
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 hover:from-amber-500/20 hover:to-orange-500/20 border-amber-500/20 hover:border-amber-500/30 text-amber-700 dark:text-amber-400 transition-all"
+                    >
+                      <History className="h-4 w-4" />
+                      Provenance
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    className="flex-1 gap-2 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all"
+                    onClick={handleShare}
+                  >
+                    <Share2 className="h-4 w-4" />
+                    {copied ? "Copied!" : "Share"}
+                  </Button>
+                </div>
+
+
 
                 {asset && isAssetReported(asset.id) && (
                   <Alert variant="destructive" className="mb-6 border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/50">
@@ -210,49 +354,66 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                 )}
 
                 <Tabs defaultValue="overview" className="mt-8">
-                  <TabsList className="grid w-full grid-cols-4">
+                  <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                    <TabsTrigger value="license">License</TabsTrigger>
-                    <TabsTrigger value="owner">Owner</TabsTrigger>
+                    <TabsTrigger value="provenance">Provenance</TabsTrigger>
+                    <TabsTrigger value="license">License & Owner</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="overview" className="mt-6">
                     <OverviewTab asset={asset!} />
                   </TabsContent>
 
-                  <TabsContent value="timeline" className="space-y-4">
-                    <AssetTimelineTab tokenId={String(tokenId)} />
+                  <TabsContent value="provenance" className="space-y-4">
+                    {enhancedAsset && (
+                      <AssetProvenance
+                        asset={enhancedAsset}
+                        events={provenanceEvents}
+                        showActions={false}
+                        compact={true}
+                      />
+                    )}
                   </TabsContent>
 
-                  <TabsContent value="license" className="mt-6">
+                  <TabsContent value="license" className="mt-6 space-y-8">
                     <LicenseTab asset={asset!} />
-                  </TabsContent>
 
-                  <TabsContent value="owner" className="mt-6">
-                    <OwnerTab asset={asset!} />
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Current Owner</h3>
+                      <OwnerTab asset={asset!} />
+                    </div>
+
+                    <div className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 p-6 rounded-lg border border-purple-200 dark:border-purple-800">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="space-y-1">
+                          <h3 className="text-lg font-semibold flex items-center gap-2">
+                            Remix this Asset
+                            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 hover:bg-purple-200">Creative</Badge>
+                          </h3>
+                          <p className="text-sm text-muted-foreground max-w-md">
+                            Create a derivative work based on this asset's license terms.
+                          </p>
+                        </div>
+                        <Link href={`/create/remix/${decodedSlug}`}>
+                          <Button size="lg" className="w-full sm:w-auto gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none shadow-md">
+                            <Palette className="h-4 w-4" />
+                            Start Remix
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
                   </TabsContent>
                 </Tabs>
 
-                <div className="mt-6 flex flex-wrap gap-4">
-                  {isOwner && (
-                    <Button
-                      variant="default"
-                      className="flex-1"
-                      onClick={() => setIsTransferOpen(true)}
-                    >
-                      Transfer
-                    </Button>
-                  )}
-                  <Button disabled variant="outline" className="flex-1">
-                    Share
-                  </Button>
+                <div className="flex gap-3 mb-8 mt-8">
                   <Button
-                    variant="outline"
-                    className="flex-1"
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1 h-9 text-xs border border-destructive/50 hover:bg-destructive/70"
                     onClick={() => setIsReportOpen(true)}
                   >
-                    Report
+                    <AlertTriangle className="h-3 w-3 mr-2" />
+                    Report Asset
                   </Button>
                   <Link
                     className="flex-1"
@@ -260,11 +421,13 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     rel="noopener noreferrer"
                     href={`${EXPLORER_URL}/nft/${nftAddress}/${tokenId}`}
                   >
-                    <Button variant="outline" className="w-full">
-                      View on Explorer
+                    <Button variant="ghost" size="sm" className="w-full h-9 text-xs border border-input hover:bg-accent hover:text-accent-foreground">
+                      View on Explorer <ExternalLink className="ml-2 h-3 w-3" />
                     </Button>
                   </Link>
                 </div>
+
+                {/* Actions moved to top */}
               </div>
             </div>
           ) : null}

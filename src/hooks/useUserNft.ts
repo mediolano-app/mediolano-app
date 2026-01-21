@@ -24,42 +24,49 @@ export const useUserNFTs = () => {
 
             try {
                 setLoading(true);
-                // Fetch only NFTs from our IP Licensing contract
-                const response = await fetch(
-                    `https://api.starkscan.co/api/v0/nfts?owner_address=${address}&contract_address=${process.env.NEXT_PUBLIC_LICENSING_CONTRACT_ADDRESS}`,
-                    {
-                        headers: {
-                            'x-api-key': process.env.NEXT_PUBLIC_STARKSCAN_API_KEY as string
-                        }
-                    }
-                );
+                const apiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
+                const contractAddress = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS;
+
+                if (!apiKey || !contractAddress) {
+                    throw new Error("Missing request parameters");
+                }
+
+                // Fetch NFTs using Alchemy Starknet NFT API
+                const url = `https://starknet-sepolia.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner?owner=${address}&contractAddresses[]=${contractAddress}&withMetadata=true`;
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { accept: 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Alchemy API Error: ${response.statusText}`);
+                }
 
                 const data = await response.json();
 
                 // Transform the data to match our UI requirements
-                const transformedNFTs = await Promise.all(data.nfts.map(async (nft: any) => {
-                    // Fetch and parse token URI data
-                    let metadata: any = {};
-                    try {
-                        const metadataResponse = await fetch(nft.token_uri);
-                        metadata = await metadataResponse.json();
-                    } catch (e) {
-                        console.error('Error fetching metadata:', e);
-                    }
+                const transformedNFTs: NFT[] = data.ownedNfts.map((nft: any) => {
+                    const metadata = nft.rawMetadata || {};
+
+                    // Parse Token ID - Alchemy might return it as hex string or decimal string
+                    // We keep it as string for consistency unless we need number
+                    const tokenId = nft.tokenId;
 
                     return {
-                        id: nft.token_id,
-                        name: metadata.name || `IP License #${nft.token_id}`,
+                        id: tokenId,
+                        name: metadata.name || nft.name || `IP License #${tokenId}`,
                         type: metadata.type || 'License',
                         status: metadata.status || 'Listed',
                         price: metadata.price || 'N/A',
-                        image: metadata.image || '/background.jpg',
-                        token_uri: nft.token_uri
+                        image: metadata.image || nft.image?.originalUrl || '/background.jpg',
+                        token_uri: nft.tokenUri || ''
                     };
-                }));
+                });
 
                 setNfts(transformedNFTs);
             } catch (err) {
+                console.error("Error fetching NFTs:", err);
                 setError(err instanceof Error ? err.message : 'Failed to fetch NFTs');
             } finally {
                 setLoading(false);

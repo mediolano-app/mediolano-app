@@ -104,7 +104,7 @@ export default function CollectionPage() {
 
   if (error || !collection) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-destructive">
             Error Loading Collection
@@ -124,15 +124,8 @@ export default function CollectionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Back Button */}
-        <Link href="/collections" className="inline-block mb-8">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Collections
-          </Button>
-        </Link>
 
         {collection && isCollectionReported(collection.id.toString()) && (
           <Alert
