@@ -27,7 +27,6 @@ export default function CollectionsPage() {
         {/* Show loading state while data is being fetched */}
         {loading && (
           <div className="space-y-10">
-            <HeroSliderSkeleton />
             <CollectionsSkeleton />
           </div>
         )}

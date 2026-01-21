@@ -50,7 +50,7 @@ export interface CollectionMetadata {
 
 
 export interface UseCollectionReturn {
-  createCollection: (formData: ICreateCollection) => Promise<void>;
+  createCollection: (formData: ICreateCollection) => Promise<string>;
   isCreating: boolean;
   error: string | null;
 }
@@ -254,7 +254,8 @@ export function useCollection(): UseCollectionReturn {
         console.log("Contract call prepared:", contractCall);
 
         // Execute the transaction
-        await createCollectionSend([contractCall]);
+        const response = await createCollectionSend([contractCall]);
+        return response.transaction_hash;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to create collection";

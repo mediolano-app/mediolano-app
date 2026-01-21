@@ -56,10 +56,11 @@ The IP Creator Dapp is built as permissionless, decentralized application levera
 graph TD
     User((User)) -->|Connects| Wallet(Starknet Wallet)
     User -->|Interacts| DApp(IP Creator Dapp)
-    DApp -->|API Requests| Alchemy(Alchemy NFT API)
+    DApp -->|API Requests| Alchemy(Alchemy API)
     DApp -->|Contract Calls| Starknet(Starknet Network)
     DApp -->|Uploads| IPFS(IPFS / Pinata)
-    Protocol -->|Contract Calls| Starknet(Starknet Network)
+    DApp -->|Contract Calls| Protocol(Mediolano Protocols)
+    Starknet -->|Events| Protocol(Mediolano Protocols)
     Starknet -->|ZK Proofs| Ethereum(Ethereum L1)
     Alchemy -->|Indexes| Starknet
 ```
