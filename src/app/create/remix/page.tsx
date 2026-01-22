@@ -87,7 +87,7 @@ export default function RemixDiscoveryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background/60">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
 
         {/* Header */}
@@ -100,9 +100,9 @@ export default function RemixDiscoveryPage() {
               </Button>
             </Link>
           </div>
-          <h1 className="text-3xl font-bold mb-2">Remix Center</h1>
+          <h1 className="text-3xl font-bold mb-2">IP Remix</h1>
           <p className="text-muted-foreground">
-            Select an asset to create a remix. You can remix your own assets or explore collections.
+            Select an asset to create a remix. You can remix your own assets or explore IP collections.
           </p>
         </div>
 

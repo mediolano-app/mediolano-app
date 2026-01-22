@@ -23,7 +23,7 @@ export default function RemixPage({ params }: RemixPageProps) {
 
     if (!decodedSlug || !nftAddress || isNaN(tokenId)) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="min-h-screen bg-background/60 flex items-center justify-center">
                 <div className="text-center space-y-4">
                     <h1 className="text-3xl font-bold">Invalid Asset Link</h1>
                     <p className="text-muted-foreground">The asset link you are trying to access is invalid.</p>
@@ -39,7 +39,7 @@ export default function RemixPage({ params }: RemixPageProps) {
     }
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background/60">
             <main className="container mx-auto px-4 py-8 max-w-7xl">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold mb-2">Create Remix</h1>

@@ -236,7 +236,7 @@ function CollectionCard({ collection, nftCount, onReportClick }: CollectionCardP
   const coverImage = collection.image || "/background.jpg"
 
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group">
+    <Card className="bg-card/60 overflow-hidden transition-all hover:shadow-md cursor-pointer group">
       <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
         <div className="relative h-64 w-full">
           <Image

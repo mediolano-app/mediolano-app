@@ -212,10 +212,10 @@ export function Footer() {
               </Link>
 
               <p className="text-muted-foreground mr-5">
-                Mediolano is a decentralized innovation hub to empower creators, developers, business, AI agents and communities to assert ownership, exchange value, and unlock new revenue streams.
+                IP Creator empower creators, developers, business, AI agents and communities to assert ownership and share intellectual property.
               </p>
               <p className="text-muted-foreground mr-5">
-                By seamlessly integrating smart contracts with zero knowledge-proofs, Mediolano bridges the gap between intelligence and real-world application — turning code, content, and culture into programmable, sovereign assets.            </p><br></br>
+                Integrating smart contracts with zero knowledge-proofs, IP Creator turns code, content, and culture into programmable, sovereign assets.</p><br></br>
               <div className="flex space-x-4">
                 <div className="flex items-center space-x-2">
 

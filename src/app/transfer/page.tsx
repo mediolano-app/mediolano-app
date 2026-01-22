@@ -229,7 +229,7 @@ export default function TransferPage() {
   const isLoading = portfolioLoading
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8">
+    <div className="min-h-screen flex items-center justify-center p-8 bg-background/60">
 
       <main className="flex-1 container p-6 space-y-6">
         {/* Page Header */}

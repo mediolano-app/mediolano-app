@@ -188,18 +188,8 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
 
   return (
     <AssetErrorBoundary onRetry={reload}>
-      <div className="min-h-screen bg-background/70 text-foreground pb-20">
-        <main className="container mx-auto p-4 py-8 ">
-
-          {/* 
-          <Link href="">
-            <Button variant="ghost" size="sm" className="mb-6">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-          </Link>
-          */}
-
+      <div className="min-h-screen bg-background/60 text-foreground">
+        <main className="container mx-auto p-8 ">
           {showSkeleton || uiState === 'loading' ? (
             <AssetLoadingState loadingState={loadingState} error={error} onRetry={reload} />
           ) : uiState === 'not_found' || notFound ? (

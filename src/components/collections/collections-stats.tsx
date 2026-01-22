@@ -47,7 +47,7 @@ export function CollectionStats({
 
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-      <Card>
+      <Card className="bg-card/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Collections</CardTitle>
           <Grid3X3 className="h-4 w-4 text-muted-foreground" />
@@ -58,7 +58,7 @@ export function CollectionStats({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-card/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">IP Assets</CardTitle>
           <Wallet className="h-4 w-4 text-muted-foreground" />
@@ -71,7 +71,7 @@ export function CollectionStats({
 
       <RemixStatsWidget tokens={tokens} />
 
-      <Card>
+      <Card className="bg-card/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Average Collection</CardTitle>
           <BarChart3 className="h-4 w-4 text-muted-foreground" />

@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/drawer";
 
 // Icons
-import { 
+import {
   Upload,
   RefreshCw,
   Award,
@@ -197,7 +197,7 @@ const getStarknetExplorerUrl = (txHash: string, network: "mainnet" | "sepolia" =
 
 export default function UserAccount() {
   // Wallet connection
-  const { address, isConnected, account} = useAccount();
+  const { address, isConnected, account } = useAccount();
   const { toast } = useToast();
 
   // Account contract operations
@@ -208,7 +208,7 @@ export default function UserAccount() {
     getSettings,
     isProfileRegistered,
     registerProfile,
-   
+
     updateProfileMulticall,
     isUpdating: isContractUpdating,
     error: contractError,
@@ -393,7 +393,7 @@ export default function UserAccount() {
         const profileRegistered = await isProfileRegistered(address);
 
         if (profileRegistered) {
-           toast({
+          toast({
             title: "Profile Found",
             description: "Loading your settings from the blockchain...",
           })
@@ -406,7 +406,7 @@ export default function UserAccount() {
               getSocialLinks(address),
             ]);
 
-          if (personalInfo && socialLinks &&  profileData) {
+          if (personalInfo && socialLinks && profileData) {
             setUser((prevUser: UserProfile) => ({
               ...prevUser,
               address: address,
@@ -435,38 +435,38 @@ export default function UserAccount() {
                 marketProfile: profileData?.marketplace_profile || false,
               },
             }));
-              // Owner-bound settings read: call through connected wallet so contract sees caller
-          const contractAddress = process.env
-            .NEXT_PUBLIC_ACCOUNT_CONTRACT_ADDRESS as `0x${string}` | undefined;
-          if (account && contractAddress) {
-            try {
-              const ownerContract = new Contract(accountABI as any, contractAddress, account);
-              const ownerSettings = await (ownerContract as any).get_settings(address);
-              if (ownerSettings) {
-                setUser((prevUser: UserProfile) => ({
-                  ...prevUser,
-                  preferences: {
-                    ...prevUser.preferences,
-                    publicProfile: ownerSettings.display_public_profile || false,
-                    emailNotifications: ownerSettings.email_notifications || false,
-                    marketProfile: ownerSettings.marketplace_profile || false,
-                  },
-                }));
+            // Owner-bound settings read: call through connected wallet so contract sees caller
+            const contractAddress = process.env
+              .NEXT_PUBLIC_ACCOUNT_CONTRACT_ADDRESS as `0x${string}` | undefined;
+            if (account && contractAddress) {
+              try {
+                const ownerContract = new Contract(accountABI as any, contractAddress, account);
+                const ownerSettings = await (ownerContract as any).get_settings(address);
+                if (ownerSettings) {
+                  setUser((prevUser: UserProfile) => ({
+                    ...prevUser,
+                    preferences: {
+                      ...prevUser.preferences,
+                      publicProfile: ownerSettings.display_public_profile || false,
+                      emailNotifications: ownerSettings.email_notifications || false,
+                      marketProfile: ownerSettings.marketplace_profile || false,
+                    },
+                  }));
+                }
+              } catch (_) {
+
               }
-            } catch (_) {
-              
+
+              toast({
+                title: "Settings Loaded Successfully",
+                description: "Your profile settings have been loaded from the blockchain.",
+                action: (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <CheckCircle className="w-4 h-4" />
+                  </div>
+                ),
+              })
             }
-            
-             toast({
-              title: "Settings Loaded Successfully",
-              description: "Your profile settings have been loaded from the blockchain.",
-              action: (
-                <div className="flex items-center gap-1 text-green-600">
-                  <CheckCircle className="w-4 h-4" />
-                </div>
-              ),
-            })
-          }
           }
         } else {
           console.log("Profile not registered, using defaults");
@@ -474,7 +474,7 @@ export default function UserAccount() {
             ...prevUser,
             address: address,
           }));
-            toast({
+          toast({
             title: "No Settings Found",
             description: "Default options loaded. You can customize and save your profile settings.",
             action: (
@@ -487,7 +487,7 @@ export default function UserAccount() {
         }
       } catch (err) {
         console.error("Failed to load user settings:", err);
-          toast({
+        toast({
           title: "Failed to Load Settings",
           description: "There was an error loading your profile. Using default settings.",
           variant: "destructive",
@@ -513,7 +513,7 @@ export default function UserAccount() {
     getSettings,
   ]);
 
-       
+
   // Image Upload Handlers
   const handleImageUpload = useCallback(
     (event: ChangeEvent<HTMLInputElement>, type: ImageType): void => {
@@ -562,8 +562,7 @@ export default function UserAccount() {
     } catch (error) {
       console.error("IPFS upload failed:", error);
       throw new Error(
-        `Upload failed: ${
-          error instanceof Error ? error.message : "Unknown error"
+        `Upload failed: ${error instanceof Error ? error.message : "Unknown error"
         }`
       );
     }
@@ -606,7 +605,7 @@ export default function UserAccount() {
       }
 
       // Step 2: Validation
-       toast({
+      toast({
         title: "Processing Transaction",
         description: "Saving your settings to the blockchain...",
       })
@@ -691,7 +690,7 @@ export default function UserAccount() {
 
       console.log("Transaction completed successfully:", transactionResult);
 
-       const txHash = transactionResult?.transaction_hash;
+      const txHash = transactionResult?.transaction_hash;
       const explorerUrl = txHash ? getStarknetExplorerUrl(txHash) : null
 
       // Success handling
@@ -700,7 +699,7 @@ export default function UserAccount() {
         description: profileExists
           ? "Your profile has been updated on the blockchain!"
           : "Your profile has been registered on the blockchain!",
-           action: explorerUrl ? (
+        action: explorerUrl ? (
           <Button
             variant="outline"
             size="sm"
@@ -723,7 +722,7 @@ export default function UserAccount() {
       // Optional: Refresh profile data from contract
       console.log("Refreshing profile data from blockchain...");
     } catch (err) {
-    
+
       // Determine error type for better user feedback
       let errorTitle = "Transaction Failed";
       let errorDescription = "Failed to save settings";
@@ -751,7 +750,7 @@ export default function UserAccount() {
         title: errorTitle,
         description: errorDescription,
         variant: "destructive",
-         action: (
+        action: (
           <div className="flex items-center gap-1">
             <AlertCircle className="w-4 h-4" />
           </div>
@@ -772,7 +771,7 @@ export default function UserAccount() {
   ]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background/60">
       <div className="container mx-auto py-10">
         <div className="flex justify-between items-center mb-6">
           &nbsp;
@@ -821,7 +820,7 @@ export default function UserAccount() {
                 }
               />
 
-               <hr></hr>
+              <hr></hr>
 
               <AdditionalInfoSection
                 user={{
@@ -877,12 +876,12 @@ export default function UserAccount() {
               {!isConnected
                 ? "Connect Wallet to Save"
                 : isLoading
-                ? "Loading Settings..."
-                : isIpfsUploading
-                ? `Uploading to IPFS... ${uploadProgress}%`
-                : isContractUpdating
-                ? "Processing Transaction..."
-                : "Save Profile & Preferences"}
+                  ? "Loading Settings..."
+                  : isIpfsUploading
+                    ? `Uploading to IPFS... ${uploadProgress}%`
+                    : isContractUpdating
+                      ? "Processing Transaction..."
+                      : "Save Profile & Preferences"}
             </Button>
           </DrawerTrigger>
           <DrawerContent>
