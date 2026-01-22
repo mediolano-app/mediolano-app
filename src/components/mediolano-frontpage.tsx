@@ -27,7 +27,7 @@ import Link from "next/link"
 export function MediolanoFrontpage() {
 
   const FeatureCard = ({ icon: Icon, title, description }: any) => (
-    <div className="group p-6 rounded-2xl border bg-card backdrop-blur-sm hover:bg-card hover:shadow-sm transition-all duration-300">
+    <div className="group p-6 rounded-2xl border bg-card/20 backdrop-blur-sm hover:bg-card/40 hover:shadow-sm transition-all duration-300">
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-xl bg-primary/5 group-hover:bg-primary/10 transition-colors">
           <Icon className="w-6 h-6 text-blue-500" />
@@ -48,28 +48,28 @@ export function MediolanoFrontpage() {
     },
     {
       icon: Scroll,
-      title: "Proof of Ownership",
-      description: "Your copyright will be timestamped for proof of ownership, ensuring automatic protection.",
+      title: "Permissionless Platform",
+      description: "Create, license, share and remix without gatekeepers.",
     },
     {
       icon: Shield,
       title: "Protect Your Creations",
-      description: "Secure your intellectual property with blockchain-based proof of ownership.",
+      description: "Secure your intellectual property with proof of ownership.",
     },
     {
       icon: Users,
       title: "Global Network",
-      description: "Connect and monetize your content worldwide without intermediaries",
+      description: "Connect and share content worldwide without intermediaries",
     },
     {
       icon: Zap,
       title: "Total Sovereignty",
-      description: "You control your assets, no centralized authority can take them down",
+      description: "You control your assets, no centralized authority",
     },
     {
       icon: TrendingUp,
       title: "Censorship Resistance",
-      description: "Immutable proof of ownership secured by decentralized technology",
+      description: "Immutable proof of ownership secured by decentralized tech",
     },
   ]
 
@@ -80,7 +80,7 @@ export function MediolanoFrontpage() {
       <section className="container mx-auto space-y-10 mt-12">
         <div className="text-center max-w-3xl mx-auto space-y-4">
 
-          <h2 className="text-3xl md:text-5xl font-bold text-balance">Built for the Creator Economy</h2>
+          <h2 className="text-1xl md:text-3xl text-balance">Built for the Creator Economy</h2>
           <p className="text-lg text-muted-foreground text-pretty leading-relaxed">
             Free tokenization to protect, showcase, and monetize your intellectual property
           </p>
@@ -97,7 +97,7 @@ export function MediolanoFrontpage() {
       <section className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-5 mt-12 mb-20">
 
         <Link href="/create/collection" className="group">
-          <div className="relative overflow-hidden p-8 rounded-2xl border bg-card hover:bg-card/80 hover:shadow-sm transition-all duration-300 h-full">
+          <div className="relative overflow-hidden p-8 rounded-2xl border bg-card/20 hover:bg-card/40 hover:shadow-sm transition-all duration-300 h-full">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
             <Grid className="relative w-10 h-10 text-blue-500 mb-4 group-hover:scale-110 transition-transform" />
             <h3 className="relative text-xl font-semibold mb-2">Create Collection</h3>
@@ -112,7 +112,7 @@ export function MediolanoFrontpage() {
 
 
         <Link href="/create/asset" className="group">
-          <div className="relative overflow-hidden p-8 rounded-2xl border bg-card hover:bg-card/80 hover:shadow-sm transition-all duration-300 h-full">
+          <div className="relative overflow-hidden p-8 rounded-2xl border bg-card/20 hover:bg-card/40 hover:shadow-sm transition-all duration-300 h-full">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
             <PlusCircle className="relative w-10 h-10 text-blue-500 mb-4 group-hover:scale-110 transition-transform" />
             <h3 className="relative text-xl font-semibold mb-2">Create IP Asset</h3>
@@ -126,7 +126,7 @@ export function MediolanoFrontpage() {
         </Link>
 
         <Link href="/create/" className="group">
-          <div className="relative overflow-hidden p-8 rounded-2xl border bg-card hover:bg-card/80 hover:shadow-sm transition-all duration-300 h-full">
+          <div className="relative overflow-hidden p-8 rounded-2xl border bg-card/20 hover:bg-card/40 hover:shadow-sm transition-all duration-300 h-full">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
             <GitBranch className="relative w-10 h-10 text-blue-500 mb-4 group-hover:scale-110 transition-transform" />
             <h3 className="relative text-xl font-semibold mb-2">Remix & Collaborate</h3>

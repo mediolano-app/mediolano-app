@@ -64,7 +64,7 @@ export function FeaturedHero() {
         <div className="container mx-auto relative overflow-hidden rounded-2xl">
             <Card className="border-0">
                 <CardContent className="p-0">
-                    <div className="relative h-[600px] md:h-[640px] bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+                    <div className="relative h-[600px] md:h-[640px] bg-gradient-to-br from-gray-900/20 to-gray-800/20 flex items-center justify-center">
                         {/* Minimal abstract background */}
                         <div className="absolute inset-0 overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent opacity-50"></div>
@@ -79,7 +79,7 @@ export function FeaturedHero() {
                                 IP Creator
                             </h2>
                             <p className="text-lg md:text-xl text-white/70 mb-10 leading-relaxed max-w-2xl mx-auto">
-                                Permissionless IP tokenization platform. Create, collect, and remix onchain with true ownership.
+                                Create, share, and remix with permissionless ownership.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button
