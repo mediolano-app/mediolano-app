@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Users, PlusCircle, Globe } from "lucide-react"
 import { shortenAddress } from "@/lib/utils"
+import Link from "next/link"
 
 interface OwnerTabProps {
   asset: {
@@ -75,10 +76,10 @@ export function OwnerTab({ asset }: OwnerTabProps) {
               <div className="mt-4">
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="h-8" asChild>
-                    <a href={`/creator/${asset.author.address || asset.author.name}`} target="_blank" rel="noopener noreferrer">
+                    <Link href={`/creator/${asset.author.address || asset.author.name}`}>
                       <Globe className="mr-2 h-4 w-4" />
                       Profile
-                    </a>
+                    </Link>
                   </Button>
                 </div>
               </div>

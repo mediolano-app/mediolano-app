@@ -11,6 +11,8 @@ import { CollectionStats } from "@/components/collections/collections-stats";
 import { CollectionValidator } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PortfolioAssets } from "@/components/portfolio/portfolio-assets";
 
 export default function PortfolioPage() {
   const { address } = useAccount();
@@ -66,23 +68,42 @@ export default function PortfolioPage() {
               <CollectionsSkeleton />
             ) : error ? (
               <Alert variant="destructive">{error}</Alert>
-            ) : validCollections.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
-                <div className="bg-muted/30 p-6 rounded-full">
-                  <Grid3X3 className="h-10 w-10 text-muted-foreground/50" />
-                </div>
-                <div className="space-y-2 max-w-md">
-                  <h3 className="text-xl font-bold">No collections found</h3>
-                  <p className="text-muted-foreground">
-                    You don't have any collections yet. Create your first IP collection to start managing your assets.
-                  </p>
-                </div>
-                <Button asChild size="lg" className="mt-4">
-                  <Link href="/create/collection">Create Collection</Link>
-                </Button>
-              </div>
             ) : (
-              <CollectionsPortfolioGrid collections={validCollections} />
+              <Tabs defaultValue="collections" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-8 max-w-[400px]">
+                  <TabsTrigger value="collections">Collections</TabsTrigger>
+                  <TabsTrigger value="assets">My Assets</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="collections" className="space-y-6">
+                  {validCollections.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-16 text-center space-y-4">
+                      <div className="bg-muted/30 p-6 rounded-full">
+                        <Grid3X3 className="h-10 w-10 text-muted-foreground/50" />
+                      </div>
+                      <div className="space-y-2 max-w-md">
+                        <h3 className="text-xl font-bold">No collections found</h3>
+                        <p className="text-muted-foreground">
+                          You don't have any collections yet. Create your first IP collection to start managing your assets.
+                        </p>
+                      </div>
+                      <Button asChild size="lg" className="mt-4">
+                        <Link href="/create/collection">Create Collection</Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    <CollectionsPortfolioGrid collections={validCollections} />
+                  )}
+                </TabsContent>
+
+                <TabsContent value="assets">
+                  <PortfolioAssets
+                    tokens={tokens}
+                    loading={loading}
+                    collections={validCollections}
+                  />
+                </TabsContent>
+              </Tabs>
             )}
           </div>
         </Suspense>

@@ -288,9 +288,9 @@ export default function CollectionPage() {
                     <span className="text-sm text-muted-foreground">
                       Owner
                     </span>
-                    <span className="text-sm font-mono truncate max-w-[150px]">
+                    <Link href={`/creator/${collection.owner}`} className="text-sm font-mono truncate max-w-[150px] hover:text-primary transition-colors hover:underline">
                       {collection.owner}
-                    </span>
+                    </Link>
                   </div>
                 )}
 
@@ -350,7 +350,7 @@ export default function CollectionPage() {
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <Link href={`/creators/${(creator as any).id}`}>
+                        <Link href={`/creator/${(creator as any).id}`}>
                           <h3 className="font-semibold hover:text-primary transition-colors cursor-pointer">
                             {(creator as any).name && (creator as any).name.length > 10
                               ? (creator as any).name.substring(0, 10) + "..."
@@ -364,7 +364,7 @@ export default function CollectionPage() {
                           </Badge>
                         )}
                       </div>
-                      <Link href={`/creators/${(creator as any).id}`}>
+                      <Link href={`/creator/${(creator as any).id}`}>
                         <Button variant="outline" size="sm">
                           View Profile
                         </Button>

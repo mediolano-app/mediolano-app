@@ -73,10 +73,10 @@ export function FeaturedHero() {
 
                         <div className="text-center p-8 max-w-3xl relative z-10">
                             <Badge className="mb-6 bg-white/10 text-white border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors">
-                                Mediolano.app
+                                Mediolano IP Creator
                             </Badge>
                             <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white leading-tight tracking-tight">
-                                IP Creator
+                                Loading onchain...
                             </h2>
                             <p className="text-lg md:text-xl text-white/70 mb-10 leading-relaxed max-w-2xl mx-auto">
                                 Create, share, and remix with permissionless ownership.
@@ -87,7 +87,7 @@ export function FeaturedHero() {
                                     size="lg"
                                     className="bg-white text-black hover:bg-white/90 font-bold px-8 h-12 text-base transition-all hover:scale-105"
                                 >
-                                    <Link href="/create/collection">Start Creating</Link>
+                                    <Link href="/create/">Create</Link>
                                 </Button>
                                 <Button
                                     asChild
@@ -95,7 +95,7 @@ export function FeaturedHero() {
                                     variant="outline"
                                     className="text-white bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 font-semibold px-8 h-12 text-base backdrop-blur-sm transition-all hover:scale-105"
                                 >
-                                    <Link href="/collections">Explore Collections</Link>
+                                    <Link href="/collections">Explore</Link>
                                 </Button>
                             </div>
                         </div>
@@ -150,8 +150,8 @@ export function FeaturedHero() {
                                         }`}
                                 >
                                     <div className="flex items-center justify-center gap-3 mb-6">
-                                        <Badge className="bg-white/20 text-white border-white/20 backdrop-blur-md px-3 py-1">
-                                            Featured Collection
+                                        <Badge variant="outline" className="text-white border-white/30 backdrop-blur-md px-3 py-1">
+                                            IP
                                         </Badge>
                                         <Badge variant="outline" className="text-white border-white/30 backdrop-blur-md px-3 py-1">
                                             {currentCollection.type || "Mixed Media"}
@@ -183,18 +183,11 @@ export function FeaturedHero() {
                                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                         <Button
                                             asChild
-                                            size="lg"
-                                            className="bg-white text-black hover:bg-white/90 border-0 font-bold px-8 h-12 text-base transition-all hover:scale-105 hover:shadow-lg"
-                                        >
-                                            <Link href={`/collections/${currentCollection.nftAddress || currentCollection.id}`}>View Collection</Link>
-                                        </Button>
-                                        <Button
-                                            asChild
-                                            size="lg"
                                             variant="outline"
+                                            size="lg"
                                             className="text-white bg-white/5 border-white/20 hover:bg-white/10 hover:border-white/30 font-semibold px-8 h-12 text-base backdrop-blur-sm transition-all hover:scale-105"
                                         >
-                                            <Link href="/create/asset">Create Asset</Link>
+                                            <Link href={`/collections/${currentCollection.nftAddress || currentCollection.id}`}>View Collection</Link>
                                         </Button>
                                     </div>
 

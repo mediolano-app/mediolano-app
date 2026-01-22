@@ -100,9 +100,9 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                           {asset.creator.substring(0, 2)}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm text-muted-foreground">
+                      <Link href={`/creator/${asset.creator}`} className="text-sm text-muted-foreground hover:text-primary transition-colors hover:underline">
                         {asset.creator}
-                      </span>
+                      </Link>
                       {asset.verified && (
                         <CheckCircle className="h-4 w-4 text-blue-600" />
                       )}
@@ -243,9 +243,9 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex items-center gap-1 min-w-0">
-                  <span className="text-sm text-muted-foreground truncate">
+                  <Link href={`/creator/${asset.creator}`} className="text-sm text-muted-foreground truncate hover:text-primary transition-colors hover:underline">
                     {asset.creator}
-                  </span>
+                  </Link>
                   {asset.verified && (
                     <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />
                   )}
