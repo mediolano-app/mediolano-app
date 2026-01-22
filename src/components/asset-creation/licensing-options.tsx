@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Globe, FileText, CreativeCommons } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
 
 interface LicensingOptionsProps {
   formState: any
@@ -44,6 +46,7 @@ const licenseTypes = [
     name: "Custom License",
     description: "Define your own licensing terms and conditions.",
     icon: FileText,
+    recommended: false,
   },
 ]
 
@@ -146,6 +149,74 @@ export function LicensingOptions({ formState, updateFormField }: LicensingOption
           <p className="text-sm text-muted-foreground">
             Choose where your intellectual property rights will be protected and enforced.
           </p>
+
+          {/* Specific Territory (if restricted or custom) */}
+          {(formState.geographicScope === "other" || formState.geographicScope === "custom" || formState.geographicScope === "eu") && (
+            <div className="mt-2">
+              <Label htmlFor="territory" className="text-sm font-medium">Specific Territory</Label>
+              <Input
+                id="territory"
+                placeholder="e.g. Germany, France, Japan..."
+                value={formState.territory || ""}
+                onChange={(e) => updateFormField("territory", e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Field of Use */}
+        <div className="space-y-2">
+          <Label htmlFor="fieldOfUse" className="text-base font-medium">Field of Use</Label>
+          <Textarea
+            id="fieldOfUse"
+            placeholder="Specify industries or applications (e.g. Medical devices, Education, Non-profit use only)..."
+            value={formState.fieldOfUse || ""}
+            onChange={(e) => updateFormField("fieldOfUse", e.target.value)}
+            className="resize-none"
+          />
+        </div>
+
+        {/* Duration */}
+        <div className="space-y-2">
+          <Label htmlFor="licenseDuration" className="text-base font-medium">License Duration</Label>
+          <Input
+            id="licenseDuration"
+            placeholder="e.g. Perpetual, 5 years, until 2030..."
+            value={formState.licenseDuration || ""}
+            onChange={(e) => updateFormField("licenseDuration", e.target.value)}
+          />
+        </div>
+
+        {/* Advanced Clauses & AI */}
+        <div className="space-y-4 pt-4 border-t">
+          <h4 className="font-medium text-base">Advanced Clauses</h4>
+
+          <div className="space-y-2">
+            <Label htmlFor="grantBack" className="text-base font-medium">Grant-back Clause</Label>
+            <Input
+              id="grantBack"
+              placeholder="e.g. Licensee must grant back rights to improvements..."
+              value={formState.grantBack || ""}
+              onChange={(e) => updateFormField("grantBack", e.target.value)}
+            />
+            <p className="text-sm text-muted-foreground">
+              Specify conditions for improvements made to the IP.
+            </p>
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <Label htmlFor="aiRights" className="text-base font-medium">AI & Data Mining Policy</Label>
+            <Input
+              id="aiRights"
+              placeholder="e.g. No AI Training allowed, Zero Retention required..."
+              value={formState.aiRights || ""}
+              onChange={(e) => updateFormField("aiRights", e.target.value)}
+            />
+            <p className="text-sm text-muted-foreground">
+              Define rights regarding Artificial Intelligence training and data usage.
+            </p>
+          </div>
         </div>
 
         {/* License Summary */}

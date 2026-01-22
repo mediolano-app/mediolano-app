@@ -21,6 +21,13 @@ export interface AssetFormState {
   customLicense: string
   geographicScope: string
 
+  // Extended Licensing
+  territory: string
+  fieldOfUse: string
+  licenseDuration: string
+  grantBack: string // Changed to string for custom input
+  aiRights: string // Merged AI field
+
   // Template-specific metadata
   metadataFields: Record<string, unknown>
 }
@@ -38,6 +45,13 @@ const initialState: AssetFormState = {
   licenseType: "all-rights-reserved",
   customLicense: "",
   geographicScope: "worldwide",
+
+  // Extended Licensing Defaults
+  territory: "",
+  fieldOfUse: "",
+  licenseDuration: "perpetual",
+  grantBack: "",
+  aiRights: "",
   metadataFields: {},
 }
 

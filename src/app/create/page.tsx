@@ -263,70 +263,10 @@ export default function CreatePage() {
   const selectedOptionData = creationOptions.find((opt) => opt.id === selectedOption)
 
   return (
-    <div className="min-h-screen bg-background/70 pb-20">
+    <div className="min-h-screen bg-background/60 p-8">
 
 
-      <main className="container mx-auto p-4 max-w-10xl">
-
-
-
-
-        {/* Hero Section 
-        <div className="text-center py-8 md:py-12">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-4">
-            <Sparkles className="h-4 w-4" />
-            Programmable IP
-          </div>
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">
-            Protect Your{" "}
-            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Creative Work
-            </span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Register, protect, and monetize your intellectual property with our comprehensive platform. Zero fees, full
-            ownership, instant protection.
-          </p>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">Zero</div>
-              <div className="text-sm text-muted-foreground">Fees</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">Self</div>
-              <div className="text-sm text-muted-foreground"> Custody</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">Onchain</div>
-              <div className="text-sm text-muted-foreground">Authorship</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">Global</div>
-              <div className="text-sm text-muted-foreground">Protection</div>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
-            <Link href="/create/asset">
-              <Button size="lg" className="w-full sm:w-auto">
-                <Shield className="mr-2 h-5 w-5" />
-                Create IP Asset
-              </Button>
-            </Link>
-            <Link href="/create/templates">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent">
-                <Grid3X3 className="mr-2 h-5 w-5" />
-                Browse Templates
-              </Button>
-            </Link>
-          </div>
-        </div>
-          */}
-
-
-
-
+      <main className="container mx-auto max-w-10xl">
 
         {/* Search and Filters */}
         <div className="mb-8">

@@ -41,7 +41,7 @@ import { ReportAssetDialog } from "@/components/report-asset-dialog"
 
 type SortOption = "date-new" | "date-old" | "name-asc" | "name-desc" | "assets-high" | "assets-low"
 
-export function CollectionsGrid({ collections }: { collections: Collection[] }) {
+export function CollectionsGrid({ collections, onCollectionClick }: { collections: Collection[], onCollectionClick?: (collection: Collection) => void }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortOption, setSortOption] = useState<SortOption>("date-new")
@@ -190,6 +190,7 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
                 collectionId: String(collection.id),
                 collectionName: collection.name
               })}
+              onCollectionClick={onCollectionClick ? () => onCollectionClick(collection) : undefined}
             />
           ))}
         </div>
@@ -205,6 +206,7 @@ export function CollectionsGrid({ collections }: { collections: Collection[] }) 
                 collectionId: String(collection.id),
                 collectionName: collection.name
               })}
+              onCollectionClick={onCollectionClick ? () => onCollectionClick(collection) : undefined}
             />
           ))}
         </div>
@@ -225,48 +227,88 @@ interface CollectionCardProps {
   collection: Collection
   nftCount: number
   onReportClick: () => void
+  onCollectionClick?: () => void
 }
 
 
 
-function CollectionCard({ collection, nftCount, onReportClick }: CollectionCardProps) {
+function CollectionCard({ collection, nftCount, onReportClick, onCollectionClick }: CollectionCardProps) {
   const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
   if (isFeatured) { console.log("featured collection", collection.id) }
   console.log("collection", collection.id)
   const coverImage = collection.image || "/background.jpg"
 
   return (
-    <Card className="bg-card/60 overflow-hidden transition-all hover:shadow-md cursor-pointer group">
-      <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
-        <div className="relative h-64 w-full">
-          <Image
-            src={coverImage || "/background.jpg"}
-            alt={collection.name}
-            fill
-            className="object-cover transition-all duration-300 group-hover:brightness-90"
-          />
-          {collection.floorPrice && (
-            <div className="absolute bottom-2 right-2">
-              <Badge className="bg-blue/80 backdrop-blur-sm">Floor: {collection.floorPrice} STRK</Badge>
+    <Card
+      className={cn(
+        "bg-card/60 overflow-hidden transition-all hover:shadow-md cursor-pointer group hover:border-primary/50",
+        onCollectionClick && "hover:ring-2 hover:ring-primary"
+      )}
+      onClick={onCollectionClick}
+    >
+      <div className={cn("contents", !onCollectionClick && "cursor-default")}>
+        {!onCollectionClick ? (
+          <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
+            <div className="relative h-64 w-full">
+              <Image
+                src={coverImage || "/background.jpg"}
+                alt={collection.name}
+                fill
+                className="object-cover transition-all duration-300 group-hover:brightness-90 group-hover:scale-105"
+              />
+              {collection.floorPrice && (
+                <div className="absolute bottom-2 right-2">
+                  <Badge className="bg-blue/80 backdrop-blur-sm">Floor: {collection.floorPrice} STRK</Badge>
+                </div>
+              )}
+              {isFeatured && (
+                <div className="absolute top-2 left-2">
+                  <Badge
+                    variant="secondary"
+                    className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
+                  >
+                    <Star className="h-3 w-3 mr-1 fill-current" />
+                    Featured
+                  </Badge>
+                </div>
+              )}
             </div>
-          )}
-          {isFeatured && (
-            <div className="absolute top-2 left-2">
-              <Badge
-                variant="secondary"
-                className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
-              >
-                <Star className="h-3 w-3 mr-1 fill-current" />
-                Featured
-              </Badge>
-            </div>
-          )}
-        </div>
-      </Link>
+          </Link>
+        ) : (
+          <div className="relative h-64 w-full">
+            <Image
+              src={coverImage || "/background.jpg"}
+              alt={collection.name}
+              fill
+              className="object-cover transition-all duration-300 group-hover:brightness-90 group-hover:scale-105"
+            />
+            {collection.floorPrice && (
+              <div className="absolute bottom-2 right-2">
+                <Badge className="bg-blue/80 backdrop-blur-sm">Floor: {collection.floorPrice} STRK</Badge>
+              </div>
+            )}
+            {isFeatured && (
+              <div className="absolute top-2 left-2">
+                <Badge
+                  variant="secondary"
+                  className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
+                >
+                  <Star className="h-3 w-3 mr-1 fill-current" />
+                  Featured
+                </Badge>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       <CardHeader className="pb-2 flex flex-row justify-between items-start">
-        <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
+        {!onCollectionClick ? (
+          <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
+            <h3 className="text-xl font-bold hover:text-primary transition-colors">{collection.name}</h3>
+          </Link>
+        ) : (
           <h3 className="text-xl font-bold hover:text-primary transition-colors">{collection.name}</h3>
-        </Link>
+        )}
         <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
       </CardHeader>
       <CardContent className="pb-2">
@@ -290,59 +332,116 @@ function CollectionCard({ collection, nftCount, onReportClick }: CollectionCardP
   )
 }
 
-function CollectionListItem({ collection, nftCount, onReportClick }: CollectionCardProps) {
+function CollectionListItem({ collection, nftCount, onReportClick, onCollectionClick }: CollectionCardProps) {
   // Use the collection's image from IPFS metadata
   const coverImage = collection.image || "/placeholder.svg?height=400&width=600"
   const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
 
   return (
-    <div className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-      <Link href={`/collections/${collection.nftAddress || String(collection.id)}`} className="flex items-center gap-4 flex-grow cursor-pointer">
-        <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
-          <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
-        </div>
+    <div
+      className={cn(
+        "flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors",
+        onCollectionClick && "cursor-pointer hover:border-primary/50"
+      )}
+      onClick={onCollectionClick}
+    >
+      <div className={cn("contents", !onCollectionClick && "cursor-default")}>
+        {!onCollectionClick ? (
+          <Link href={`/collections/${collection.nftAddress || String(collection.id)}`} className="flex items-center gap-4 flex-grow cursor-pointer">
+            <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
+              <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
+            </div>
 
-        <div className="flex-grow min-w-0">
-          <div className="flex items-start">
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-medium hover:text-primary transition-colors">{collection.name}</h3>
-                {isFeatured && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
-                  >
-                    <Star className="h-3 w-3 mr-1 fill-current" />
-                    Featured
-                  </Badge>
+            <div className="flex-grow min-w-0">
+              <div className="flex items-start">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-medium hover:text-primary transition-colors">{collection.name}</h3>
+                    {isFeatured && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
+                      >
+                        <Star className="h-3 w-3 mr-1 fill-current" />
+                        Featured
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-1">
+                    {collection.description || "No description available"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="hidden sm:flex flex-col items-end">
+              <div className="flex items-center gap-3 text-sm">
+                <div className="flex items-center gap-1">
+                  <Grid3X3 className="h-4 w-4 text-muted-foreground" />
+                  <span>{nftCount} Assets</span>
+                </div>
+                {collection.floorPrice && (
+                  <div className="flex items-center gap-1">
+                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                    <span>{collection.floorPrice} STRK</span>
+                  </div>
                 )}
+                <div className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded text-xs font-medium">
+                  <Box className="h-3 w-3 text-muted-foreground" />
+                  <span>{collection.type || "Art"}</span>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground line-clamp-1">
-                {collection.description || "No description available"}
-              </p>
             </div>
-          </div>
-        </div>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-4 flex-grow">
+            <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
+              <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
+            </div>
 
-        <div className="hidden sm:flex flex-col items-end">
-          <div className="flex items-center gap-3 text-sm">
-            <div className="flex items-center gap-1">
-              <Grid3X3 className="h-4 w-4 text-muted-foreground" />
-              <span>{nftCount} Assets</span>
-            </div>
-            {collection.floorPrice && (
-              <div className="flex items-center gap-1">
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                <span>{collection.floorPrice} STRK</span>
+            <div className="flex-grow min-w-0">
+              <div className="flex items-start">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-medium hover:text-primary transition-colors">{collection.name}</h3>
+                    {isFeatured && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-yellow-500/90 hover:bg-yellow-500/80 dark:bg-yellow-500/80 dark:hover:bg-yellow-500/70 text-primary-foreground border-none"
+                      >
+                        <Star className="h-3 w-3 mr-1 fill-current" />
+                        Featured
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-1">
+                    {collection.description || "No description available"}
+                  </p>
+                </div>
               </div>
-            )}
-            <div className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded text-xs font-medium">
-              <Box className="h-3 w-3 text-muted-foreground" />
-              <span>{collection.type || "Art"}</span>
+            </div>
+
+            <div className="hidden sm:flex flex-col items-end">
+              <div className="flex items-center gap-3 text-sm">
+                <div className="flex items-center gap-1">
+                  <Grid3X3 className="h-4 w-4 text-muted-foreground" />
+                  <span>{nftCount} Assets</span>
+                </div>
+                {collection.floorPrice && (
+                  <div className="flex items-center gap-1">
+                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                    <span>{collection.floorPrice} STRK</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded text-xs font-medium">
+                  <Box className="h-3 w-3 text-muted-foreground" />
+                  <span>{collection.type || "Art"}</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </Link>
+        )}
+      </div>
 
       <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
     </div>

@@ -118,7 +118,7 @@ export default function CollectionPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background/60">
       <main className="container mx-auto px-4 py-8 max-w-7xl">
 
         {collection && isCollectionReported(collection.id.toString()) && (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
@@ -17,7 +17,9 @@ import {
   BarChart3,
   Loader2,
   Package,
-  ArrowUpRight
+  ArrowUpRight,
+  ArrowUpDown,
+  Filter
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -28,8 +30,9 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { usePortfolio } from "@/hooks/use-portfolio"
-import { useGetAllCollections } from "@/hooks/use-collection"
+import { usePaginatedCollections } from "@/hooks/use-collection"
 import { useCollectionAssets } from "@/hooks/use-collection-new"
+import { CollectionsGrid } from "@/components/collections/collections-public"
 import { Collection } from "@/lib/types"
 
 export default function RemixDiscoveryPage() {
@@ -39,16 +42,17 @@ export default function RemixDiscoveryPage() {
   const [activeTab, setActiveTab] = useState("my-assets")
   const [viewState, setViewState] = useState<"collections" | "assets">("collections")
   const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null)
+  const [visibleAssetsCount, setVisibleAssetsCount] = useState(12)
 
   // Data Hooks
   const { tokens: myTokens, collections: myCollections, loading: myAssetsLoading } = usePortfolio()
-  const { collections: allCollections, loading: collectionsLoading } = useGetAllCollections()
+  const { collections: allCollections, loading: collectionsLoading, hasMore, loadMore, loadingMore } = usePaginatedCollections(12)
 
   // Selected Collection Assets Hook (only active when collection selected)
   const {
     assets: collectionAssets,
     loading: collectionAssetsLoading
-  } = useCollectionAssets(selectedCollection?.nftAddress)
+  } = useCollectionAssets(selectedCollection?.nftAddress || "")
 
   // Derived Data
   const myAssets = Object.values(myTokens).flat()
@@ -59,11 +63,15 @@ export default function RemixDiscoveryPage() {
     asset.collection_id?.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  // Filter Collections
-  const filteredCollections = (allCollections || []).filter(c =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Reset pagination when search changes
+  useEffect(() => {
+    setVisibleAssetsCount(12)
+  }, [searchQuery])
+
+  const visibleMyAssets = filteredMyAssets.slice(0, visibleAssetsCount)
+  const hasMoreAssets = filteredMyAssets.length > visibleAssetsCount
+
+
 
   // Filter Collection Assets
   const filteredCollectionAssets = (collectionAssets || []).filter(asset =>
@@ -125,19 +133,17 @@ export default function RemixDiscoveryPage() {
               </TabsList>
             </Tabs>
 
-            <div className="relative w-full md:w-[300px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={
-                  activeTab === "my-assets" ? "Search your assets..." :
-                    viewState === "collections" ? "Search collections..." :
-                      "Search assets in collection..."
-                }
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-            </div>
+            {activeTab === "my-assets" && (
+              <div className="relative w-full md:w-[300px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search your assets..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            )}
           </div>
 
           {/* CONTENT AREA */}
@@ -150,22 +156,41 @@ export default function RemixDiscoveryPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {Array(8).fill(0).map((_, i) => <AssetCardSkeleton key={i} />)}
                   </div>
-                ) : filteredMyAssets.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredMyAssets.map((asset) => (
-                      <AssetCard
-                        key={`${asset.collection_id}-${asset.token_id}`}
-                        asset={asset}
-                        nftAddress={
-                          // Try to find nft address from myCollections
-                          myCollections.find(c => c.id.toString() === asset.collection_id)?.nftAddress || ""
-                        }
-                        onRemix={() => {
-                          const nftAddr = myCollections.find(c => c.id.toString() === asset.collection_id)?.nftAddress;
-                          if (nftAddr) handleRemixAsset(nftAddr, asset.token_id)
-                        }}
-                      />
-                    ))}
+                ) : visibleMyAssets.length > 0 ? (
+                  <div className="space-y-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {visibleMyAssets.map((asset) => (
+                        <AssetCard
+                          key={`${asset.collection_id}-${asset.token_id}`}
+                          asset={asset}
+                          nftAddress={
+                            // Try to find nft address from myCollections
+                            myCollections.find(c => c.id.toString() === asset.collection_id)?.nftAddress || ""
+                          }
+                          onRemix={() => {
+                            const nftAddr = myCollections.find(c => c.id.toString() === asset.collection_id)?.nftAddress;
+                            if (nftAddr) handleRemixAsset(nftAddr, asset.token_id)
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Load More Button */}
+                    {hasMoreAssets && (
+                      <div className="flex flex-col items-center justify-center gap-2 pt-4">
+                        <Button
+                          variant="secondary"
+                          size="lg"
+                          onClick={() => setVisibleAssetsCount(prev => prev + 12)}
+                          className="min-w-[150px]"
+                        >
+                          Load More Assets
+                        </Button>
+                        <p className="text-xs text-muted-foreground">
+                          Showing {visibleMyAssets.length} of {filteredMyAssets.length} assets
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <EmptyState
@@ -181,28 +206,42 @@ export default function RemixDiscoveryPage() {
               <>
                 {/* VIEW: LIST COLLECTIONS */}
                 {viewState === "collections" && (
-                  <>
-                    {collectionsLoading ? (
+                  <div className="space-y-8">
+                    {collectionsLoading && allCollections.length === 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {Array(6).fill(0).map((_, i) => <CollectionCardSkeleton key={i} />)}
                       </div>
-                    ) : filteredCollections.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredCollections.map((collection) => (
-                          <CollectionCard
-                            key={String(collection.id)}
-                            collection={collection}
-                            onClick={() => handleSelectCollection(collection)}
-                          />
-                        ))}
-                      </div>
+                    ) : allCollections && allCollections.length > 0 ? (
+                      <>
+                        <CollectionsGrid
+                          collections={allCollections}
+                          onCollectionClick={handleSelectCollection}
+                        />
+                        {hasMore && (
+                          <div className="flex justify-center pt-8">
+                            <Button
+                              onClick={() => loadMore()}
+                              disabled={loadingMore}
+                              variant="outline"
+                              size="lg"
+                            >
+                              {loadingMore ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Loading more...
+                                </>
+                              ) : "Load More Collections"}
+                            </Button>
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <EmptyState
                         title="No Collections Found"
-                        description="No collections match your search."
+                        description="No collections available at the moment."
                       />
                     )}
-                  </>
+                  </div>
                 )}
 
                 {/* VIEW: INSIDE COLLECTION (ASSETS) */}
@@ -253,6 +292,8 @@ export default function RemixDiscoveryPage() {
                                 token_id: tokenId,
                                 collection_id: selectedCollection.id.toString(), // or nftAddress
                                 owner: "Unknown",
+                                collectionName: selectedCollection.name,
+                                type: selectedCollection.type || "Art",
                                 metadata_uri: ""
                               }}
                               nftAddress={selectedCollection.nftAddress}
@@ -284,72 +325,45 @@ export default function RemixDiscoveryPage() {
 
 function AssetCard({ asset, nftAddress, onRemix }: { asset: any, nftAddress: string, onRemix: () => void }) {
   return (
-    <Card className="overflow-hidden group hover:shadow-md transition-all duration-300">
-      <div className="aspect-square relative bg-muted">
+    <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 border-muted-foreground/20">
+      <div className="aspect-square relative bg-muted/50 overflow-hidden">
         <Image
           src={asset.image || "/placeholder.svg"}
           alt={asset.name || "Asset"}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <Button onClick={onRemix} className="gap-2">
-            <Sparkles className="h-4 w-4" />
-            Remix This
+        {/* Removed overlay - keeping image clean */}
+      </div>
+      <CardContent className="p-4 space-y-3">
+        <div className="space-y-1">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-semibold truncate flex-1 text-base" title={asset.name}>{asset.name}</h3>
+            <span className="text-[10px] font-mono font-medium text-muted-foreground bg-secondary/50 px-1.5 py-0.5 rounded border">
+              #{asset.token_id}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span className="truncate max-w-[60%] font-medium text-foreground/80">{asset.collectionName || "Collection"}</span>
+            <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal">
+              {asset.type || "Asset"}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="pt-1">
+          <Button onClick={onRemix} className="w-full gap-2 h-9 text-sm font-medium shadow-sm" size="sm">
+            <Sparkles className="h-3.5 w-3.5" />
+            Remix Asset
           </Button>
         </div>
-      </div>
-      <CardContent className="p-3">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-medium truncate flex-1" title={asset.name}>{asset.name}</h3>
-          <span className="text-xs font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-            #{asset.token_id}
-          </span>
-        </div>
-        <p className="text-xs text-muted-foreground truncate mt-1">
-          {nftAddress ? `${nftAddress.slice(0, 6)}...${nftAddress.slice(-4)}` : "Unknown Contract"}
-        </p>
       </CardContent>
     </Card>
   )
 }
 
-function CollectionCard({ collection, onClick }: { collection: Collection, onClick: () => void }) {
-  return (
-    <Card
-      className="cursor-pointer group hover:shadow-md hover:border-primary/50 transition-all overflow-hidden"
-      onClick={onClick}
-    >
-      <div className="relative h-48 w-full bg-muted">
-        <Image
-          src={collection.image || "/placeholder.svg"}
-          alt={collection.name}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-12">
-          <h3 className="text-white font-bold text-lg truncate">{collection.name}</h3>
-          <p className="text-white/80 text-xs truncate max-w-[90%]">{collection.description || "No description"}</p>
-        </div>
-      </div>
-      <CardFooter className="p-3 flex justify-between items-center text-sm text-muted-foreground bg-card">
-        <div className="flex items-center gap-1">
-          <Grid3X3 className="h-3 w-3" />
-          <span>{collection.itemCount || 0} Assets</span>
-        </div>
-        {collection.floorPrice && (
-          <div className="flex items-center gap-1 text-foreground font-medium">
-            <BarChart3 className="h-3 w-3" />
-            <span>{collection.floorPrice} STRK</span>
-          </div>
-        )}
-        <div className="group-hover:translate-x-1 transition-transform">
-          <ArrowRight className="h-4 w-4" />
-        </div>
-      </CardFooter>
-    </Card>
-  )
-}
+
 
 function AssetCardSkeleton() {
   return (

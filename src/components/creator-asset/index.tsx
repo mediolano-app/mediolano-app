@@ -349,7 +349,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="provenance">Provenance</TabsTrigger>
-                    <TabsTrigger value="license">License & Owner</TabsTrigger>
+                    <TabsTrigger value="license">License</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="overview" className="mt-6">

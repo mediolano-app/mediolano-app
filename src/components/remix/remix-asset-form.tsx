@@ -27,6 +27,7 @@ import {
     Sparkles,
     Loader2,
     Plus,
+    ExternalLink,
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -156,6 +157,12 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
         allowCommercial: true,
         requireAttribution: true,
         tags: "",
+        // Extended License
+        territory: "",
+        fieldOfUse: "",
+        licenseDuration: "perpetual",
+        grantBack: "",
+        aiRights: "",
     })
 
     // Hooks
@@ -269,9 +276,19 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                     ...(originalAsset?.attributes || []),
                     { trait_type: "Remix Type", value: remixTypes.find(t => t.id === formData.remixType)?.name || "Remix" },
                     { trait_type: "Original Asset", value: `${nftAddress}-${tokenId}` },
+                    { trait_type: "Original Creator", value: originalAsset?.creator?.name || originalAsset?.creator?.address || "Unknown" },
+                    { trait_type: "Original Asset Address", value: nftAddress },
                     { trait_type: "License", value: licenseOptions.find(l => l.id === formData.license)?.name || "Unknown" },
                     { trait_type: "Commercial Use", value: formData.allowCommercial ? "True" : "False" },
-                    { trait_type: "Remixed From", value: `${nftAddress}` }
+                    { trait_type: "Remixed From", value: `${nftAddress}` },
+                    {
+                        trait_type: "Geographic Scope",
+                        value: formData.territory ? `Restricted - ${formData.territory}` : "Worldwide"
+                    },
+                    { trait_type: "License Duration", value: formData.licenseDuration || "Perpetual" },
+                    { trait_type: "Field of Use", value: formData.fieldOfUse || "Unrestricted" },
+                    { trait_type: "Grant-back Clause", value: formData.grantBack || "None" },
+                    { trait_type: "AI & Data Mining Policy", value: formData.aiRights || "Unspecified" }
                 ],
                 tags: formData.tags.split(",").map(t => t.trim()).filter(Boolean),
                 licenseType: formData.license,
@@ -415,9 +432,17 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                     {/* Original Asset Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <GitBranch className="h-5 w-5" />
-                                Original Asset
+                            <CardTitle className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                    <GitBranch className="h-5 w-5" />
+                                    Original Asset
+                                </div>
+                                <Link href={`/asset/${nftAddress}-${tokenId}`} target="_blank">
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                        <ExternalLink className="h-4 w-4" />
+                                        <span className="sr-only">View Original</span>
+                                    </Button>
+                                </Link>
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -649,6 +674,71 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        {/* Specific Territory */}
+                        <div className="space-y-2">
+                            <Label htmlFor="territory" className="text-sm font-medium">Specific Territory (Optional)</Label>
+                            <Input
+                                id="territory"
+                                placeholder="Worldwide if left empty, or e.g. Germany, France..."
+                                value={formData.territory}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, territory: e.target.value }))}
+                            />
+                        </div>
+
+                        {/* Field of Use */}
+                        <div className="space-y-2">
+                            <Label htmlFor="fieldOfUse" className="text-base font-medium">Field of Use</Label>
+                            <Textarea
+                                id="fieldOfUse"
+                                placeholder="Specify industries or applications (e.g. Medical devices)..."
+                                value={formData.fieldOfUse}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, fieldOfUse: e.target.value }))}
+                                className="resize-none"
+                            />
+                        </div>
+
+                        {/* Duration */}
+                        <div className="space-y-2">
+                            <Label htmlFor="licenseDuration" className="text-base font-medium">License Duration</Label>
+                            <Input
+                                id="licenseDuration"
+                                placeholder="e.g. Perpetual, 5 years, until 2030..."
+                                value={formData.licenseDuration}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, licenseDuration: e.target.value }))}
+                            />
+                        </div>
+
+                        {/* Advanced Clauses & AI */}
+                        <div className="space-y-4 pt-4 border-t">
+                            <h4 className="font-medium text-base">Advanced Clauses</h4>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="grantBack" className="text-base font-medium">Grant-back Clause</Label>
+                                <Input
+                                    id="grantBack"
+                                    placeholder="e.g. Licensee must grant back rights to improvements..."
+                                    value={formData.grantBack}
+                                    onChange={(e) => setFormData((prev) => ({ ...prev, grantBack: e.target.value }))}
+                                />
+                                <p className="text-sm text-muted-foreground">
+                                    Specify conditions for improvements made to the IP.
+                                </p>
+                            </div>
+
+                            <div className="space-y-2 pt-2">
+                                <Label htmlFor="aiRights" className="text-base font-medium">AI & Data Mining Policy</Label>
+                                <Input
+                                    id="aiRights"
+                                    placeholder="e.g. No AI Training allowed, Zero Retention required..."
+                                    value={formData.aiRights}
+                                    onChange={(e) => setFormData((prev) => ({ ...prev, aiRights: e.target.value }))}
+                                />
+                                <p className="text-sm text-muted-foreground">
+                                    Define rights regarding Artificial Intelligence training and data usage.
+                                </p>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -660,7 +750,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                                 <p>
                                     Estimated cost: <span className="font-medium">0.001 STRK</span>
                                 </p>
-                                <p>Includes minting fees</p>
+                                <p>Zero fees</p>
                             </div>
 
                             <div className="flex gap-2">

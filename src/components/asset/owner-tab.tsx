@@ -45,7 +45,7 @@ export function OwnerTab({ asset }: OwnerTabProps) {
 
               <div className="mt-4 flex gap-2">
                 <Button variant="outline" size="sm" className="h-8" asChild>
-                  <a href={`/account/${asset?.owner?.address || asset?.owner?.name}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`/creator/${asset?.owner?.address || asset?.owner?.name}`} target="_blank" rel="noopener noreferrer">
                     <Globe className="mr-2 h-4 w-4" />
                     Profile
                   </a>
@@ -75,7 +75,7 @@ export function OwnerTab({ asset }: OwnerTabProps) {
               <div className="mt-4">
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="h-8" asChild>
-                    <a href={`/account/${asset.author.address || asset.author.name}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`/creator/${asset.author.address || asset.author.name}`} target="_blank" rel="noopener noreferrer">
                       <Globe className="mr-2 h-4 w-4" />
                       Profile
                     </a>

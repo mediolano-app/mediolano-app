@@ -122,8 +122,14 @@ export default function CreateAssetPage() {
         { trait_type: "License", value: formState.licenseType },
         {
           trait_type: "Geographic Scope",
-          value: formState.geographicScope,
+          value: formState.geographicScope === "custom" || formState.geographicScope === "other" || formState.geographicScope === "eu"
+            ? `${formState.geographicScope} - ${formState.territory}`
+            : formState.geographicScope,
         },
+        { trait_type: "License Duration", value: formState.licenseDuration || "Perpetual" },
+        { trait_type: "Field of Use", value: formState.fieldOfUse || "Unrestricted" },
+        { trait_type: "Grant-back Clause", value: formState.grantBack || "None" },
+        { trait_type: "AI & Data Mining Policy", value: formState.aiRights || "Unspecified" },
         { trait_type: "Tags", value: formState.tags.join(", ") },
       ],
     };
