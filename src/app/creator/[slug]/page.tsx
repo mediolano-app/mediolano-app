@@ -2,46 +2,28 @@
 
 import { useState, useEffect } from "react"
 import { notFound } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Search,
-  ExternalLink,
-  MapPin,
-  Calendar,
-  Copy,
-  Check,
-  Palette,
-  FolderOpen,
-  GitBranch,
-  TrendingUp,
   CheckCircle,
   Globe,
-  Twitter,
-  Instagram,
-  MessageCircle,
-  Users,
-  Heart,
   Share2,
-  ArrowLeft,
-  Grid3X3,
-  List,
+  Palette,
+  FolderOpen,
 } from "lucide-react"
-import Link from "next/link"
 import { CollectionCard } from "@/components/collection-card";
-import NFTCard from "@/components/nft-card";
 import { CreatorPageSkeleton } from "@/components/creator-page-skeleton";
 import { getCreatorBySlug } from "@/lib/mock-data";
-import {
-  useGetCollections,
-} from "@/hooks/use-collection";
-import { useCreatorAssets } from "@/hooks/use-creator-assets";
-
+import { useGetCollections } from "@/hooks/use-collection";
+import { useOwnerAssets } from "@/hooks/use-owner-assets";
+import { PortfolioAssets } from "@/components/portfolio/portfolio-assets";
+import type { TokenData } from "@/hooks/use-portfolio";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CreatorPageProps {
   params: Promise<{
@@ -52,10 +34,7 @@ interface CreatorPageProps {
 export default function CreatorPage({ params }: CreatorPageProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [copiedAddress, setCopiedAddress] = useState(false)
-  const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("collections")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [filterType, setFilterType] = useState<string>("all")
   const [slug, setSlug] = useState<string | undefined>();
   const [resolvedAddress, setResolvedAddress] = useState<string>("")
 
@@ -76,47 +55,54 @@ export default function CreatorPage({ params }: CreatorPageProps) {
   const {
     collections,
     loading: collection_loading,
-    error: collection_error,
-    reload,
   } = useGetCollections(walletAddress as `0x${string}`);
+
+  // Fetch assets using the owner assets hook (reliable on-chain scanning)
   const {
-    assets: creatorAssets,
-    remixAssets,
+    tokens: ownerTokens,
     loading: assetsLoading,
-    loadingMore: assetsLoadingMore,
-    hasMore: assetsHasMore,
-    loadMore: loadMoreAssets
-  } = useCreatorAssets(walletAddress);
+  } = useOwnerAssets(walletAddress, collections);
 
+  // Flatten and filter tokens
+  const allTokens = Object.values(ownerTokens).flat().filter(asset => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (asset.name && asset.name.toLowerCase().includes(q)) ||
+      (asset.collection_id && asset.collection_id.toLowerCase().includes(q)) ||
+      (asset.token_id && asset.token_id.includes(q))
+    );
+  });
 
+  // Filter out Remixes (we are hiding them now)
+  const standardTokens = allTokens.filter(t =>
+    !(t.metadata?.templateType === "Remix Art" ||
+      t.metadata?.originalAsset ||
+      (t.attributes && t.attributes.some(a => a.trait_type === "Type" && a.value === "Remix")))
+  );
 
-  useEffect(() => {
-    (async () => {
-      const p = await params;
-      setSlug(p.slug);
-    })();
-  }, [params]);
+  // Determine dynamic header image
+  const firstAsset = standardTokens[0];
+  const dynamicImage = firstAsset ? firstAsset.image : (collections.length > 0 ? collections[0].image : null);
+
+  // Helper to group tokens back into a map for PortfolioAssets
+  const groupTokens = (tokens: TokenData[]) => {
+    const map: Record<string, TokenData[]> = {};
+    tokens.forEach(t => {
+      if (!map[t.collection_id]) map[t.collection_id] = [];
+      map[t.collection_id].push(t);
+    });
+    return map;
+  };
+
+  const standardTokensMap = groupTokens(standardTokens);
 
   const creator = slug ? getCreatorBySlug(slug) : undefined
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800)
-    return () => clearTimeout(timer)
-  }, [])
-
-  // if (!collection_loading) {
-  //   notFound()
-  // }
-
-  // Use a combined loading state for initial load
-  // We can let the UI render skeletons if strictly necessary, but sticking to existing pattern:
-  // (We'll use isPageLoading derived later, so we can remove this block or update it to use isPageLoading if defined before)
-  // Actually, let's keep the hook loading states separate but render skeletons if either is true initially.
-
-  if (collection_loading && assetsLoading) {
+  // Initial loading state
+  if (collection_loading && assetsLoading && !resolvedAddress) {
     return <CreatorPageSkeleton />
   }
-
 
   // Create fallback creator data for blockchain addresses
   const fallbackCreator = {
@@ -124,14 +110,14 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     address: creator?.address || resolvedAddress,
     avatar: creator?.avatar || "/placeholder.svg",
     verified: creator?.verified || false,
-    bio: creator?.bio || "Blockchain user",
+    bio: creator?.bio || "Starknet 8",
     website: creator?.website || "",
     twitter: creator?.twitter || "",
     instagram: creator?.instagram || "",
     discord: creator?.discord || "",
-    joinDate: creator?.joinDate || "Unknown",
+    joinDate: creator?.joinDate || "",
     totalAssets: creator?.totalAssets || 0,
-    totalValue: creator?.totalValue || "0 STRK",
+    totalValue: creator?.totalValue || "",
     totalSales: creator?.totalSales || 0,
     followers: creator?.followers || 0,
     following: creator?.following || 0,
@@ -139,31 +125,14 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     location: creator?.location || "",
   }
 
-
-
-  // Determine dynamic header image and avatar from portfolio
-  const dynamicImage = creatorAssets.length > 0 ? creatorAssets[0].image : (collections.length > 0 ? collections[0].image : null);
   const headerBackground = dynamicImage || "/placeholder.svg?height=600&width=1200&text=Creator+Background";
   const avatarImage = dynamicImage || fallbackCreator.avatar || "/placeholder.svg";
-
-  // Determine loading state
-  const isPageLoading = collection_loading || assetsLoading;
 
   const filteredCollections = collections.filter(
     (collection) =>
       collection.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       collection.description.toLowerCase().includes(searchQuery.toLowerCase()),
   )
-
-  const filteredAssets = creatorAssets.filter((asset) => {
-    const matchesSearch =
-      asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.description.toLowerCase().includes(searchQuery.toLowerCase())
-
-    const matchesFilter = filterType === "all" || asset.type?.toLowerCase() === filterType.toLowerCase()
-
-    return matchesSearch && matchesFilter
-  })
 
   const handleCopyAddress = async () => {
     try {
@@ -174,12 +143,6 @@ export default function CreatorPage({ params }: CreatorPageProps) {
       console.error("Failed to copy address:", error)
     }
   }
-
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
-  }
-
-  const assetTypes = ["all", ...new Set(creatorAssets.map((asset) => asset.type))]
 
   return (
     <div className="min-h-screen bg-background/60">
@@ -194,8 +157,6 @@ export default function CreatorPage({ params }: CreatorPageProps) {
           />
         </div>
 
-
-
         {/* Hero Content */}
         <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
           <div className="flex flex-col lg:flex-row items-start gap-8">
@@ -204,10 +165,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
               <Avatar className="h-32 w-32 md:h-40 md:w-40 border-4 border-white/20 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm">
                 <AvatarImage src={avatarImage} alt={fallbackCreator.name || resolvedAddress} className="object-cover" />
                 <AvatarFallback className="text-white text-2xl md:text-3xl font-bold bg-gradient-to-br from-blue-500 to-purple-600">
-                  {fallbackCreator.name
-                    .split(" ")
-                    .map((n: any) => n[0])
-                    .join("")}
+                  {fallbackCreator.name.split(" ").map((n: any) => n[0]).join("")}
                 </AvatarFallback>
               </Avatar>
 
@@ -236,24 +194,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
 
               <p className="text-xl text-white/90 mb-6 max-w-2xl leading-relaxed">{fallbackCreator.bio || ""}</p>
 
-              <div className="flex flex-wrap items-center gap-6 text-white/80 mb-6">
-                {fallbackCreator.location && (
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5" />
-                    <span>{fallbackCreator.location || ""}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  <span>Joined {fallbackCreator.joinDate || ""}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  <span>{fallbackCreator.followers.toLocaleString() || "0"} followers</span>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-8">
+              <div className="flex flex-wrap gap-2">
                 {fallbackCreator.specialties.map((specialty: any) => (
                   <Badge
                     key={specialty}
@@ -289,7 +230,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-2 md:gap-4 w-full xl:w-auto xl:min-w-[280px] mt-6 lg:mt-0">
+            <div className="grid grid-cols-2 gap-2 md:gap-4 w-full xl:w-auto xl:min-w-[280px] mt-6 lg:mt-0">
               <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white flex-1">
                 <CardContent className="p-2 md:p-4 text-center">
                   <div className="text-lg md:text-2xl font-bold">{collections.length}</div>
@@ -298,14 +239,14 @@ export default function CreatorPage({ params }: CreatorPageProps) {
               </Card>
               <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white flex-1">
                 <CardContent className="p-2 md:p-4 text-center">
-                  <div className="text-lg md:text-2xl font-bold">{creatorAssets.length}</div>
+                  {assetsLoading && standardTokens.length === 0 ? (
+                    <div className="flex justify-center items-center h-8">
+                      <Skeleton className="h-6 w-12 bg-white/20" />
+                    </div>
+                  ) : (
+                    <div className="text-lg md:text-2xl font-bold">{standardTokens.length}</div>
+                  )}
                   <div className="text-xs md:text-sm text-white/80">Assets</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white flex-1">
-                <CardContent className="p-2 md:p-4 text-center">
-                  <div className="text-lg md:text-2xl font-bold">{remixAssets.length}</div>
-                  <div className="text-xs md:text-sm text-white/80">Remixes</div>
                 </CardContent>
               </Card>
             </div>
@@ -318,8 +259,6 @@ export default function CreatorPage({ params }: CreatorPageProps) {
         <div className="container mx-auto px-4 py-6">
           <p className="text-muted-foreground mb-4 text-center">{fallbackCreator.bio}</p>
 
-
-
           <div className="flex justify-center gap-2 mb-6">
             <Button variant="outline" size="sm" className="flex-1 max-w-[120px] bg-transparent">
               <Share2 className="h-4 w-4 mr-2" />
@@ -329,8 +268,6 @@ export default function CreatorPage({ params }: CreatorPageProps) {
         </div>
       </div>
 
-
-
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
@@ -339,7 +276,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             {/* Tabs Navigation */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <TabsList className="grid w-full sm:w-auto grid-cols-3 lg:grid-cols-3">
+                <TabsList className="grid w-full sm:w-auto grid-cols-2 lg:grid-cols-2">
                   <TabsTrigger value="collections" className="flex items-center gap-2">
                     <FolderOpen className="h-4 w-4" />
                     <span className="hidden sm:inline">Collections</span>
@@ -349,11 +286,6 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                     <Palette className="h-4 w-4" />
                     <span className="hidden sm:inline">Assets</span>
                     <span className="sm:hidden">Assets</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="remixes" className="flex items-center gap-2">
-                    <GitBranch className="h-4 w-4" />
-                    <span className="hidden sm:inline">Remixes</span>
-                    <span className="sm:hidden">Remixes</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -368,31 +300,6 @@ export default function CreatorPage({ params }: CreatorPageProps) {
                       className="pl-10"
                     />
                   </div>
-
-                  {activeTab === "assets" && (
-                    <>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-                        className="shrink-0"
-                      >
-                        {viewMode === "grid" ? <List className="h-4 w-4" /> : <Grid3X3 className="h-4 w-4" />}
-                      </Button>
-
-                      <select
-                        value={filterType}
-                        onChange={(e) => setFilterType(e.target.value)}
-                        className="px-3 py-2 border rounded-md text-sm bg-background"
-                      >
-                        {assetTypes.map((type) => (
-                          <option key={type} value={type}>
-                            {type === "all" ? "All Types" : type}
-                          </option>
-                        ))}
-                      </select>
-                    </>
-                  )}
                 </div>
               </div>
 
@@ -424,69 +331,14 @@ export default function CreatorPage({ params }: CreatorPageProps) {
               </TabsContent>
 
               <TabsContent value="assets" className="mt-0">
-                {assetsLoading && !assetsHasMore ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {Array(6).fill(0).map((_, i) => (
-                      // Reusing NFTCard skeleton logic or just generic cards if we imported NFTSkeleton
-                      <div key={i} className="h-[400px] w-full bg-muted rounded-xl animate-pulse" />
-                    ))}
-                  </div>
-                ) : filteredAssets.length > 0 ? (
-                  <>
-                    <div
-                      className={
-                        viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"
-                      }
-                    >
-                      {filteredAssets.map((asset) => (
-                        <NFTCard key={asset.id} asset={asset} view={viewMode} />
-                      ))}
-                    </div>
-                    {assetsHasMore && (
-                      <div className="mt-8 flex justify-center">
-                        <Button
-                          variant="outline"
-                          onClick={() => loadMoreAssets()}
-                          disabled={assetsLoadingMore}
-                          className="min-w-[150px]"
-                        >
-                          {assetsLoadingMore ? "Loading..." : "Load More"}
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <Card className="p-12 text-center">
-                    <Palette className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No assets found</h3>
-                    <p className="text-muted-foreground">
-                      {searchQuery || filterType !== "all"
-                        ? "No assets match your current filters"
-                        : `${fallbackCreator.name} hasn't created any assets yet.`}
-                    </p>
-                  </Card>
-                )}
-              </TabsContent>
-
-              <TabsContent value="remixes" className="mt-0">
-                {remixAssets.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {remixAssets.map((asset) => (
-                      <NFTCard key={asset.id} asset={asset} />
-                    ))}
-                  </div>
-                ) : (
-                  <Card className="p-12 text-center">
-                    <GitBranch className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No remixes found</h3>
-                    <p className="text-muted-foreground">{`${fallbackCreator.name} hasn't created any remixes yet.`}</p>
-                  </Card>
-                )}
+                <PortfolioAssets
+                  tokens={standardTokensMap}
+                  loading={assetsLoading}
+                  collections={collections}
+                />
               </TabsContent>
             </Tabs>
           </div>
-
-
         </div>
       </div>
     </div>

@@ -150,7 +150,7 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
 
     return (
         <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 border-muted-foreground/20">
-            <Link href={`/collections/${nftAddress}/${asset.token_id}`}>
+            <Link href={`/asset/${nftAddress}-${asset.token_id}`}>
                 <div className="aspect-square relative bg-muted/50 overflow-hidden cursor-pointer">
                     <Image
                         src={asset.image || "/placeholder.svg"}
@@ -163,7 +163,7 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
             <CardContent className="p-4 space-y-3">
                 <div className="space-y-1">
                     <div className="flex items-start justify-between gap-2">
-                        <Link href={`/collections/${nftAddress}/${asset.token_id}`} className="flex-1 min-w-0">
+                        <Link href={`/asset/${nftAddress}-${asset.token_id}`} className="flex-1 min-w-0">
                             <h3 className="font-semibold truncate text-base hover:text-primary transition-colors" title={asset.name}>
                                 {asset.name}
                             </h3>
@@ -182,7 +182,7 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
 
                 <div className="pt-2 flex gap-2">
                     <Button asChild variant="default" size="sm" className="flex-1 h-8 text-xs gap-1">
-                        <Link href={`/collections/${nftAddress}/${asset.token_id}`}>
+                        <Link href={`/asset/${nftAddress}-${asset.token_id}`}>
                             <Eye className="h-3 w-3" />
                             View Asset
                         </Link>

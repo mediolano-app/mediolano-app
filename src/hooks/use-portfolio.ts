@@ -18,6 +18,7 @@ export interface TokenData {
   description?: string;
   floorPrice?: number;
   attributes?: { trait_type: string; value: string }[];
+  metadata?: any;
 }
 
 export interface UserActivity {
@@ -159,7 +160,8 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
             description: metadata.description || tokenData.description,
             image: processIPFSHashToUrl(metadata.image as string, '/placeholder.svg'),
             floorPrice: typeof metadata.floorPrice === 'number' ? metadata.floorPrice : 0,
-            attributes: Array.isArray(metadata.attributes) ? metadata.attributes : []
+            attributes: Array.isArray(metadata.attributes) ? metadata.attributes : [],
+            metadata: metadata
           };
           console.log(`[DEBUG] Metadata loaded for ${tokenData.name}`);
         }
@@ -175,7 +177,8 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
                 name: metadata.name || tokenData.name,
                 description: metadata.description || tokenData.description,
                 image: metadata.image ? (metadata.image.startsWith('ipfs') ? processIPFSHashToUrl(metadata.image, '/placeholder.svg') : metadata.image) : tokenData.image,
-                attributes: Array.isArray(metadata.attributes) ? metadata.attributes : []
+                attributes: Array.isArray(metadata.attributes) ? metadata.attributes : [],
+                metadata: metadata
               };
             }
           } catch (e) { }
