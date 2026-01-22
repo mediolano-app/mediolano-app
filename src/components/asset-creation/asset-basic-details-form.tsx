@@ -85,7 +85,7 @@ export function AssetBasicDetailsForm({ formState, updateFormField, handleFileCh
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center md:text-left">
-        <h2 className="text-2xl md:text-3xl font-bold mb-2">Asset Information</h2>
+        <h2 className="text-lg mb-2">Asset Information</h2>
         <p className="text-muted-foreground">
           Provide essential details about your intellectual property to ensure proper identification and protection.
         </p>
@@ -101,11 +101,10 @@ export function AssetBasicDetailsForm({ formState, updateFormField, handleFileCh
         </CardHeader>
         <CardContent>
           <div
-            className={`border-2 border-dashed rounded-xl p-6 transition-all duration-200 ${
-              dragActive
+            className={`border-2 border-dashed rounded-xl p-6 transition-all duration-200 ${dragActive
                 ? "border-primary bg-primary/5 scale-[1.02]"
                 : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/30"
-            }`}
+              }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}

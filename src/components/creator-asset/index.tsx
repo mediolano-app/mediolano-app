@@ -3,7 +3,7 @@
 import { use, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRightLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAccount } from "@starknet-react/core";
@@ -254,8 +254,8 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     />
                     <div className="absolute top-3 left-3">
                       {(matchedCollection?.name || asset.collection) &&
-                        <Badge className="bg-primary/90 text-primary-foreground">
-                          {matchedCollection?.name ? `${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}` : asset.collection}
+                        <Badge className="bg-primary/10 text-xs text-primary-foreground">
+                          {matchedCollection?.name ? `${matchedCollection.symbol ? ` ${matchedCollection.symbol}` : ''}` : asset.collection}
                         </Badge>
                       }
                     </div>
@@ -292,20 +292,22 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   </div>
                 </div>
 
-                <div className="mb-8 flex flex-wrap gap-3">
+                <div className="mb-8 flex flex-wrap gap-2">
                   {isOwner && (
                     <Button
-                      variant="default"
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none shadow-sm transition-all hover:shadow-md"
+                      variant="outline"
+                      className="flex-1 gap-2 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 hover:from-blue-700/20 hover:to-indigo-700/20 text-blue-600 hover:text-blue-700 border-blue-600/20 hover:border-blue-700/20 shadow-sm transition-all hover:shadow-md"
                       onClick={() => setIsTransferOpen(true)}
                     >
+                      <ArrowRightLeft className="h-4 w-4" />
                       Transfer
                     </Button>
                   )}
 
                   <Link href={`/create/remix/${decodedSlug}`} className="flex-1">
                     <Button
-                      className="w-full gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-none shadow-sm transition-all hover:shadow-md"
+                      variant="outline"
+                      className="w-full gap-2 bg-gradient-to-r from-purple-600/10 to-pink-600/10 hover:from-purple-700/20 hover:to-pink-700/20 text-purple-600 hover:text-purple-700 border-purple-600/20 hover:border-purple-700/20 shadow-sm transition-all hover:shadow-md"
                     >
                       <Palette className="h-4 w-4" />
                       Remix
@@ -333,7 +335,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   </Link>
                   <Button
                     variant="outline"
-                    className="flex-1 gap-2 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all"
+                    className="w-full gap-2 bg-gradient-to-r from-gray-100/10 to-gray-200/10 dark:from-gray-800/10 dark:to-gray-900/10 border-gray-200/20 dark:border-gray-700/20 hover:border-gray-300/20 dark:hover:border-gray-600/20 transition-all"
                     onClick={handleShare}
                   >
                     <Share2 className="h-4 w-4" />
@@ -361,7 +363,13 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   </TabsList>
 
                   <TabsContent value="overview" className="mt-6">
-                    <OverviewTab asset={asset!} />
+                    <OverviewTab asset={{
+                      ...asset!,
+                      collection: matchedCollection?.name
+                        ? `${matchedCollection.name}${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}`
+                        : asset!.collection,
+                      contract: asset!.contract || nftAddress
+                    }} />
                   </TabsContent>
 
                   <TabsContent value="provenance" className="space-y-4">
