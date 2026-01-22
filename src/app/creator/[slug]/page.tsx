@@ -33,12 +33,14 @@ import {
   List,
 } from "lucide-react"
 import Link from "next/link"
-import { CollectionCard } from "@/components/collection-card"
-import NFTCard from "@/components/nft-card"
-import { getCreatorBySlug, getAssetsByCreator, getRemixAssetsByCreator } from "@/lib/mock-data";
+import { CollectionCard } from "@/components/collection-card";
+import NFTCard from "@/components/nft-card";
+import { CreatorPageSkeleton } from "@/components/creator-page-skeleton";
+import { getCreatorBySlug } from "@/lib/mock-data";
 import {
   useGetCollections,
 } from "@/hooks/use-collection";
+import { useCreatorAssets } from "@/hooks/use-creator-assets";
 
 
 interface CreatorPageProps {
@@ -67,12 +69,25 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     resolveParams()
   }, [params])
 
+  // Derive wallet address for hooks (handle mock slugs)
+  const mockCreator = resolvedAddress ? getCreatorBySlug(resolvedAddress) : undefined;
+  const walletAddress = mockCreator?.address || resolvedAddress;
+
   const {
     collections,
     loading: collection_loading,
     error: collection_error,
     reload,
-  } = useGetCollections(resolvedAddress as `0x${string}`);
+  } = useGetCollections(walletAddress as `0x${string}`);
+  const {
+    assets: creatorAssets,
+    remixAssets,
+    loading: assetsLoading,
+    loadingMore: assetsLoadingMore,
+    hasMore: assetsHasMore,
+    loadMore: loadMoreAssets
+  } = useCreatorAssets(walletAddress);
+
 
 
   useEffect(() => {
@@ -93,30 +108,13 @@ export default function CreatorPage({ params }: CreatorPageProps) {
   //   notFound()
   // }
 
-  if (collection_loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto p-4 py-6">
-          <div className="animate-pulse space-y-6">
-            <div className="h-80 bg-muted rounded-2xl" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {Array(4)
-                .fill(0)
-                .map((_, i) => (
-                  <div key={i} className="h-32 bg-muted rounded-xl" />
-                ))}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array(6)
-                .fill(0)
-                .map((_, i) => (
-                  <div key={i} className="h-64 bg-muted rounded-xl" />
-                ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+  // Use a combined loading state for initial load
+  // We can let the UI render skeletons if strictly necessary, but sticking to existing pattern:
+  // (We'll use isPageLoading derived later, so we can remove this block or update it to use isPageLoading if defined before)
+  // Actually, let's keep the hook loading states separate but render skeletons if either is true initially.
+
+  if (collection_loading && assetsLoading) {
+    return <CreatorPageSkeleton />
   }
 
 
@@ -133,7 +131,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     discord: creator?.discord || "",
     joinDate: creator?.joinDate || "Unknown",
     totalAssets: creator?.totalAssets || 0,
-    totalValue: creator?.totalValue || "0 ETH",
+    totalValue: creator?.totalValue || "0 STRK",
     totalSales: creator?.totalSales || 0,
     followers: creator?.followers || 0,
     following: creator?.following || 0,
@@ -141,8 +139,15 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     location: creator?.location || "",
   }
 
-  const creatorAssets = getAssetsByCreator("Alex Chen")
-  const remixAssets = getRemixAssetsByCreator("Alex Chen")
+
+
+  // Determine dynamic header image and avatar from portfolio
+  const dynamicImage = creatorAssets.length > 0 ? creatorAssets[0].image : (collections.length > 0 ? collections[0].image : null);
+  const headerBackground = dynamicImage || "/placeholder.svg?height=600&width=1200&text=Creator+Background";
+  const avatarImage = dynamicImage || fallbackCreator.avatar || "/placeholder.svg";
+
+  // Determine loading state
+  const isPageLoading = collection_loading || assetsLoading;
 
   const filteredCollections = collections.filter(
     (collection) =>
@@ -150,12 +155,12 @@ export default function CreatorPage({ params }: CreatorPageProps) {
       collection.description.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
-  const filteredAssets = creatorAssets.filter((collection) => {
+  const filteredAssets = creatorAssets.filter((asset) => {
     const matchesSearch =
-      collection.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      collection.description.toLowerCase().includes(searchQuery.toLowerCase())
+      asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      asset.description.toLowerCase().includes(searchQuery.toLowerCase())
 
-    const matchesFilter = filterType === "all" || collection.type?.toLowerCase() === filterType.toLowerCase()
+    const matchesFilter = filterType === "all" || asset.type?.toLowerCase() === filterType.toLowerCase()
 
     return matchesSearch && matchesFilter
   })
@@ -177,23 +182,19 @@ export default function CreatorPage({ params }: CreatorPageProps) {
   const assetTypes = ["all", ...new Set(creatorAssets.map((asset) => asset.type))]
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background/60">
       {/* Enhanced Hero Section */}
       <div className="relative overflow-hidden">
-        {/* Background with gradient overlay */}
+        {/* Background with gradient overlay and blur effect */}
         <div className="absolute inset-0">
-          <div className="h-full w-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-          <div className="absolute inset-0 bg-[url('/placeholder.svg?height=600&width=1200&text=Creator+Background')] bg-cover bg-center opacity-20" />
+          <div className="h-full w-full bg-black/40" />
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-50 blur-xl scale-110"
+            style={{ backgroundImage: `url('${headerBackground}')` }}
+          />
         </div>
 
-        {/* Navigation */}
-        <div className="relative z-10 container mx-auto px-4 pt-6">
-          <Link href="/" className="inline-flex items-center text-white/80 hover:text-white transition-colors">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Explore
-          </Link>
-        </div>
+
 
         {/* Hero Content */}
         <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
@@ -201,7 +202,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             {/* Avatar and Basic Info */}
             <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
               <Avatar className="h-32 w-32 md:h-40 md:w-40 border-4 border-white/20 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm">
-                <AvatarImage src={fallbackCreator.avatar || "/placeholder.svg"} alt={fallbackCreator.name || resolvedAddress} />
+                <AvatarImage src={avatarImage} alt={fallbackCreator.name || resolvedAddress} className="object-cover" />
                 <AvatarFallback className="text-white text-2xl md:text-3xl font-bold bg-gradient-to-br from-blue-500 to-purple-600">
                   {fallbackCreator.name
                     .split(" ")
@@ -265,16 +266,12 @@ export default function CreatorPage({ params }: CreatorPageProps) {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3">
-                <Button className="bg-white text-black hover:bg-white/90 font-semibold">
-                  <Heart className="h-4 w-4 mr-2" />
-                  Follow
-                </Button>
                 <Button
                   variant="outline"
                   className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm bg-transparent"
                 >
                   <Share2 className="h-4 w-4 mr-2" />
-                  Share Profile
+                  Share
                 </Button>
                 {fallbackCreator.website && (
                   <Button
@@ -291,30 +288,24 @@ export default function CreatorPage({ params }: CreatorPageProps) {
               </div>
             </div>
 
-            {/* Stats Cards - Desktop */}
-            <div className="hidden xl:grid grid-cols-2 gap-4 min-w-[280px]">
-              <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold">{collections.length}</div>
-                  <div className="text-sm text-white/80">Collections</div>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-3 gap-2 md:gap-4 w-full xl:w-auto xl:min-w-[280px] mt-6 lg:mt-0">
+              <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white flex-1">
+                <CardContent className="p-2 md:p-4 text-center">
+                  <div className="text-lg md:text-2xl font-bold">{collections.length}</div>
+                  <div className="text-xs md:text-sm text-white/80">Collections</div>
                 </CardContent>
               </Card>
-              <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold">{collections.length}</div>
-                  <div className="text-sm text-white/80">Assets</div>
+              <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white flex-1">
+                <CardContent className="p-2 md:p-4 text-center">
+                  <div className="text-lg md:text-2xl font-bold">{creatorAssets.length}</div>
+                  <div className="text-xs md:text-sm text-white/80">Assets</div>
                 </CardContent>
               </Card>
-              <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold">{remixAssets.length}</div>
-                  <div className="text-sm text-white/80">Remixes</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold">{fallbackCreator.totalValue}</div>
-                  <div className="text-sm text-white/80">Total Value</div>
+              <Card className="bg-white/10 border-white/20 backdrop-blur-sm text-white flex-1">
+                <CardContent className="p-2 md:p-4 text-center">
+                  <div className="text-lg md:text-2xl font-bold">{remixAssets.length}</div>
+                  <div className="text-xs md:text-sm text-white/80">Remixes</div>
                 </CardContent>
               </Card>
             </div>
@@ -327,24 +318,9 @@ export default function CreatorPage({ params }: CreatorPageProps) {
         <div className="container mx-auto px-4 py-6">
           <p className="text-muted-foreground mb-4 text-center">{fallbackCreator.bio}</p>
 
-          <div className="flex justify-center items-center gap-4 text-sm text-muted-foreground mb-4">
-            {fallbackCreator.location && (
-              <div className="flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                <span>{fallbackCreator.location}</span>
-              </div>
-            )}
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              <span>Joined {fallbackCreator.joinDate}</span>
-            </div>
-          </div>
+
 
           <div className="flex justify-center gap-2 mb-6">
-            <Button size="sm" className="flex-1 max-w-[120px]">
-              <Heart className="h-4 w-4 mr-2" />
-              Follow
-            </Button>
             <Button variant="outline" size="sm" className="flex-1 max-w-[120px] bg-transparent">
               <Share2 className="h-4 w-4 mr-2" />
               Share
@@ -353,50 +329,13 @@ export default function CreatorPage({ params }: CreatorPageProps) {
         </div>
       </div>
 
-      {/* Stats Cards - Mobile & Tablet */}
-      <div className="xl:hidden bg-background border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 border-blue-200 dark:border-blue-800">
-              <CardContent className="p-4 text-center">
-                <FolderOpen className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">{collections.length}</div>
-                <div className="text-sm text-blue-700 dark:text-blue-300">Collections</div>
-              </CardContent>
-            </Card>
 
-            <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950 dark:to-green-900 border-green-200 dark:border-green-800">
-              <CardContent className="p-4 text-center">
-                <Palette className="h-6 w-6 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-900 dark:text-green-100">{collections.length}</div>
-                <div className="text-sm text-green-700 dark:text-green-300">Assets</div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950 dark:to-purple-900 border-purple-200 dark:border-purple-800">
-              <CardContent className="p-4 text-center">
-                <GitBranch className="h-6 w-6 text-purple-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">{remixAssets.length}</div>
-                <div className="text-sm text-purple-700 dark:text-purple-300">Remixes</div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950 dark:to-orange-900 border-orange-200 dark:border-orange-800">
-              <CardContent className="p-4 text-center">
-                <TrendingUp className="h-6 w-6 text-orange-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">{fallbackCreator.totalSales}</div>
-                <div className="text-sm text-orange-700 dark:text-orange-300">Sales</div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Main Content Area */}
-          <div className="xl:col-span-3">
+          <div className="xl:col-span-4">
             {/* Tabs Navigation */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -459,7 +398,13 @@ export default function CreatorPage({ params }: CreatorPageProps) {
 
               {/* Tab Contents */}
               <TabsContent value="collections" className="mt-0">
-                {filteredCollections.length > 0 ? (
+                {collection_loading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {Array(6).fill(0).map((_, i) => (
+                      <div key={i} className="h-[300px] w-full bg-muted rounded-xl animate-pulse" />
+                    ))}
+                  </div>
+                ) : filteredCollections.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {filteredCollections.map((collection, index) => (
                       <CollectionCard key={collection.id} collection={collection} index={index} />
@@ -479,16 +424,37 @@ export default function CreatorPage({ params }: CreatorPageProps) {
               </TabsContent>
 
               <TabsContent value="assets" className="mt-0">
-                {filteredAssets.length > 0 ? (
-                  <div
-                    className={
-                      viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"
-                    }
-                  >
-                    {filteredAssets.map((asset) => (
-                      <NFTCard key={asset.id} asset={asset} view={viewMode} />
+                {assetsLoading && !assetsHasMore ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {Array(6).fill(0).map((_, i) => (
+                      // Reusing NFTCard skeleton logic or just generic cards if we imported NFTSkeleton
+                      <div key={i} className="h-[400px] w-full bg-muted rounded-xl animate-pulse" />
                     ))}
                   </div>
+                ) : filteredAssets.length > 0 ? (
+                  <>
+                    <div
+                      className={
+                        viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"
+                      }
+                    >
+                      {filteredAssets.map((asset) => (
+                        <NFTCard key={asset.id} asset={asset} view={viewMode} />
+                      ))}
+                    </div>
+                    {assetsHasMore && (
+                      <div className="mt-8 flex justify-center">
+                        <Button
+                          variant="outline"
+                          onClick={() => loadMoreAssets()}
+                          disabled={assetsLoadingMore}
+                          className="min-w-[150px]"
+                        >
+                          {assetsLoadingMore ? "Loading..." : "Load More"}
+                        </Button>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <Card className="p-12 text-center">
                     <Palette className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -520,139 +486,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
             </Tabs>
           </div>
 
-          {/* Sidebar */}
-          <div className="xl:col-span-1 space-y-6">
-            {/* Creator Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Creator Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Wallet Address</label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <code className="text-sm bg-muted px-2 py-1 rounded flex-1 font-mono">
-                      {formatAddress(fallbackCreator.address)}
-                    </code>
-                    <Button variant="ghost" size="sm" onClick={handleCopyAddress} className="h-8 w-8 p-0">
-                      {copiedAddress ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </div>
 
-                <Separator />
-
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <div className="text-2xl font-bold">{fallbackCreator.followers.toLocaleString()}</div>
-                    <div className="text-sm text-muted-foreground">Followers</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">{fallbackCreator.following.toLocaleString()}</div>
-                    <div className="text-sm text-muted-foreground">Following</div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Total Portfolio Value</label>
-                  <div className="text-xl font-bold mt-1">{fallbackCreator.totalValue}</div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Specialties</label>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {fallbackCreator.specialties.map((specialty) => (
-                      <Badge key={specialty} variant="outline" className="text-xs">
-                        {specialty}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Social Links */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Share2 className="h-5 w-5" />
-                  Connect
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {fallbackCreator.website && (
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
-                    <a href={fallbackCreator.website} target="_blank" rel="noopener noreferrer">
-                      <Globe className="h-4 w-4 mr-2" />
-                      Website
-                      <ExternalLink className="h-3 w-3 ml-auto" />
-                    </a>
-                  </Button>
-                )}
-
-                {fallbackCreator.twitter && (
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
-                    <a href={fallbackCreator.twitter} target="_blank" rel="noopener noreferrer">
-                      <Twitter className="h-4 w-4 mr-2" />
-                      Twitter
-                      <ExternalLink className="h-3 w-3 ml-auto" />
-                    </a>
-                  </Button>
-                )}
-
-                {fallbackCreator.instagram && (
-                  <Button variant="outline" className="w-full justify-start bg-transparent" asChild>
-                    <a href={fallbackCreator.instagram} target="_blank" rel="noopener noreferrer">
-                      <Instagram className="h-4 w-4 mr-2" />
-                      Instagram
-                      <ExternalLink className="h-3 w-3 ml-auto" />
-                    </a>
-                  </Button>
-                )}
-
-                {fallbackCreator.discord && (
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    {fallbackCreator.discord}
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Activity Feed */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Recent Activity
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="h-2 w-2 bg-green-500 rounded-full" />
-                    <span className="text-muted-foreground">Created new collection</span>
-                    <span className="text-xs text-muted-foreground ml-auto">2h ago</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="h-2 w-2 bg-blue-500 rounded-full" />
-                    <span className="text-muted-foreground">Asset sold</span>
-                    <span className="text-xs text-muted-foreground ml-auto">1d ago</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="h-2 w-2 bg-purple-500 rounded-full" />
-                    <span className="text-muted-foreground">New remix created</span>
-                    <span className="text-xs text-muted-foreground ml-auto">3d ago</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </div>
