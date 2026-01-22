@@ -22,6 +22,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { isCollectionReported } from "@/lib/reported-content";
 import Link from "next/link";
 import NFTCard from "@/components/nft-card";
@@ -64,7 +65,7 @@ export default function CollectionPage() {
     return matchesSearch && matchesType;
   });
 
-  const creator = collection?.creator; // Note: Collection type usually stores owner address, not full creator obj unless enriched. 
+  const creator = (collection as any)?.creator; // Note: Collection type usually stores owner address, not full creator obj unless enriched. 
   // If useCollectionMetadata doesn't enrich creator, this might be undefined.
   // We'll handle refined UI later if needed.
 
@@ -91,15 +92,8 @@ export default function CollectionPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-4 text-muted-foreground">Loading collection...</p>
-        </div>
-      </div>
-    );
+  if (collectionLoading) {
+    return <CollectionPageSkeleton />;
   }
 
   if (error || !collection) {
@@ -409,7 +403,7 @@ export default function CollectionPage() {
           </div>
 
           {assetsLoading ? (
-            <div className="text-center py-12">Loading assets...</div>
+            <AssetsSkeleton />
           ) : filteredAssets.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredAssets.map((asset) => (
@@ -417,7 +411,10 @@ export default function CollectionPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
+            <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+              <div className="bg-muted/30 p-6 rounded-full">
+                <Grid3X3 className="h-10 w-10 text-muted-foreground/50" />
+              </div>
               <div className="text-muted-foreground mb-4">
                 {searchQuery
                   ? "No assets found matching your search."
@@ -434,4 +431,50 @@ export default function CollectionPage() {
       </main>
     </div>
   );
+}
+
+function CollectionPageSkeleton() {
+  return (
+    <div className="min-h-screen">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        <Skeleton className="w-full aspect-video rounded-xl mb-8" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          <div className="lg:col-span-2 space-y-6">
+            <Skeleton className="h-32 w-full" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {Array(4).fill(null).map((_, i) => (
+                <Skeleton key={i} className="h-32 w-full" />
+              ))}
+            </div>
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-32 w-full" />
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-48" />
+          <AssetsSkeleton />
+        </div>
+      </main>
+    </div>
+  )
+}
+
+function AssetsSkeleton() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {Array(8).fill(null).map((_, i) => (
+        <div key={i} className="rounded-xl overflow-hidden border">
+          <Skeleton className="aspect-square w-full" />
+          <div className="p-4 space-y-2">
+            <Skeleton className="h-6 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 }

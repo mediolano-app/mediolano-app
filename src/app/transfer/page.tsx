@@ -100,7 +100,8 @@ export default function TransferPage() {
     const collection = collections.find(c => c.id.toString() === collectionId)
 
     return collectionTokens.map(token => ({
-      id: token.token_id, // This is the numerical ID
+      id: `${collectionId}-${token.token_id}`,
+      tokenId: token.token_id,
       name: token.name || `Asset #${token.token_id}`,
       description: token.description || "",
       image: token.image || "/placeholder.svg",
@@ -152,9 +153,9 @@ export default function TransferPage() {
       // We don't have createdAt in basic token data, so might need to rely on ID or randomized date
       case "newest":
         // Fallback to sorting by ID if date not available (higher ID = newer usually)
-        return parseInt(b.id) - parseInt(a.id)
+        return parseInt(b.tokenId) - parseInt(a.tokenId)
       case "oldest":
-        return parseInt(a.id) - parseInt(b.id)
+        return parseInt(a.tokenId) - parseInt(b.tokenId)
       case "name":
         return a.name.localeCompare(b.name)
       case "value":
@@ -228,15 +229,12 @@ export default function TransferPage() {
   const isLoading = portfolioLoading
 
   return (
-    <div className="flex flex-col min-h-screen bg-background mb-20">
+    <div className="min-h-screen flex items-center justify-center p-8">
 
       <main className="flex-1 container p-6 space-y-6">
         {/* Page Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={() => router.back()} className="hidden md:flex">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
             <div>
               <h1 className="text-3xl font-bold hidden md:block">Transfer Assets</h1>
               <p className="text-muted-foreground hidden md:block">
@@ -706,7 +704,7 @@ export default function TransferPage() {
           assets={enhancedAssets
             .filter((a) => selectedAssets.includes(a.id))
             .map(a => ({
-              id: a.id,
+              id: a.tokenId,
               name: a.name,
               nftAddress: a.nftAddress,
               collectionName: a.collectionName

@@ -188,12 +188,16 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
     return tokenData;
   }, [address]);
 
+  const [loadingTokens, setLoadingTokens] = useState(true);
+
   const loadTokens = useCallback(async () => {
     if (!managerContract || !address || !collections.length || !provider) {
+      if (collections.length === 0 && !collectionsLoading) setLoadingTokens(false);
       return;
     }
 
     console.log(`[DEBUG] loadTokens for address: ${address}`);
+    setLoadingTokens(true);
 
     try {
       const tokensMap: Record<string, TokenData[]> = {};
@@ -374,16 +378,25 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
       console.log(`[DEBUG] Final stats: totalNFTs=${totalNFTs}`);
     } catch (err) {
       console.error("Error loading portfolio:", err);
+    } finally {
+      setLoadingTokens(false);
     }
-  }, [managerContract, address, collections, processTokenMetadata, provider]);
+  }, [managerContract, address, collections, processTokenMetadata, provider, collectionsLoading]);
 
-  useEffect(() => { loadTokens(); }, [loadTokens]);
+  // Effect to trigger loadTokens when collections are ready
+  useEffect(() => {
+    if (!collectionsLoading && collections.length > 0) {
+      loadTokens();
+    } else if (!collectionsLoading && collections.length === 0) {
+      setLoadingTokens(false);
+    }
+  }, [loadTokens, collectionsLoading, collections.length]);
 
   return {
     collections,
     tokens,
     stats,
-    loading: collectionsLoading,
+    loading: collectionsLoading || loadingTokens,
     error: collectionsError,
     refetch: reloadCollections
   };

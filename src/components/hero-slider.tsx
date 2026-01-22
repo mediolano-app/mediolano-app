@@ -28,7 +28,7 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   // Filter out collections without images or other criteria if needed
-  const displayCollections = collections.slice(0, 4);
+  const displayCollections = collections.slice(9, 11);
 
   const nextSlide = useCallback(() => {
     if (isTransitioning || displayCollections.length === 0) return
@@ -61,7 +61,32 @@ export function HeroSlider({ collections = [] }: HeroSliderProps) {
   }, [nextSlide, displayCollections.length])
 
   if (displayCollections.length === 0) {
-    return null; // Or return a skeleton/placeholder
+    return (
+      <div className="container mx-auto relative overflow-hidden rounded-2xl">
+        <Card className="border-0">
+          <CardContent className="p-0">
+            <div className="relative h-[600px] md:h-[640px] bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center">
+              <div className="text-center p-8 max-w-2xl">
+                <h2 className="text-3xl md:text-5xl font-bold mb-4 text-white leading-tight">
+                  Welcome to Mediolano
+                </h2>
+                <p className="text-lg md:text-xl text-white/70 mb-8 leading-relaxed">
+                  The permissionless IP tokenization platform. Create, collect, and remix intellectual property assets.
+                </p>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="text-white bg-white/10 border-white/10 hover:bg-white/20 hover:border-white/20 font-semibold transition-all duration-300"
+                >
+                  <Link href="/create/collection">Create Your First Collection</Link>
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   const currentCollection = displayCollections[currentSlide]

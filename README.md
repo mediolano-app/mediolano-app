@@ -5,7 +5,8 @@
 
 Quick links:
 - [IP Creator Dapp](https://ip.mediolano.app)
-- [Website](https://mediolano.xyz)
+- [Discover Mediolano](https://mediolano.xyz)
+- [MIP Mobile for Android](https://play.google.com/store/apps/details?id=com.mip.mediolano.app)
 - [Telegram Group](https://t.me/integrityweb)
 - [X / Twitter](https://x.com/mediolanoapp)
 
