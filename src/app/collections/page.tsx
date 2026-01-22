@@ -5,15 +5,15 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { CollectionsGrid, FeaturedCollectionCard } from "@/components/collections/collections-public"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useGetAllCollections } from "@/hooks/use-collection"
+import { usePaginatedCollections } from "@/hooks/use-collection"
 import { ReportAssetDialog } from "@/components/report-asset-dialog"
 import { HeroSlider, HeroSliderSkeleton } from "@/components/hero-slider"
-import { Grid3X3 } from "lucide-react"
+import { Grid3X3, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function CollectionsPage() {
   const router = useRouter();
-  const { collections, loading, error } = useGetAllCollections();
+  const { collections, loading, loadingMore, error, hasMore, loadMore } = usePaginatedCollections(12);
   const featuredCollectionId = "5";
   const [reportDialogState, setReportDialogState] = useState<{ isOpen: boolean; collectionId: string; collectionName: string }>({
     isOpen: false,
@@ -22,7 +22,7 @@ export default function CollectionsPage() {
   });
 
   return (
-    <div className="container mx-auto mb-20">
+    <div className="container mx-auto pb-20">
 
       <div className="container py-8">
 
@@ -52,26 +52,40 @@ export default function CollectionsPage() {
           return (
             <div className="mb-10">
 
-              {/*
-              <div onClick={() => router.push(`/collections/${featuredCollection.nftAddress || featuredCollection.id}`)}>
-                <FeaturedCollectionCard
-                  collection={featuredCollection}
-                  nftCount={featuredCollection.itemCount}
-                  onReportClick={() => setReportDialogState({
-                    isOpen: true,
-                    collectionId: String(featuredCollection.id),
-                    collectionName: featuredCollection.name
-                  })}
-                />
-              </div>
-              */}
-
-
-
               {/* collections in grid */}
               {remainingCollections.length > 0 && (
                 <div className="mt-8">
                   <CollectionsGrid collections={remainingCollections} />
+
+                  {!hasMore && remainingCollections.length > 0 && (
+                    <div className="mt-16 text-center text-muted-foreground pb-10">
+                      <p>You have reached the end of the list</p>
+                    </div>
+                  )}
+
+                  {hasMore && (
+                    <div className="mt-12 mb-10 text-center">
+                      <Button
+                        variant="secondary"
+                        size="lg"
+                        onClick={() => loadMore()}
+                        disabled={loadingMore}
+                        className="min-w-[200px] h-12 text-md font-medium shadow-sm transition-all hover:shadow-md"
+                      >
+                        {loadingMore ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin text-primary" />
+                            Loading more...
+                          </>
+                        ) : (
+                          "Load More Collections"
+                        )}
+                      </Button>
+                      <p className="mt-4 text-xs text-muted-foreground">
+                        Displaying {remainingCollections.length} collections
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

@@ -451,3 +451,235 @@ export function useIsCollectionOwner() {
 
   return { checkOwnership };
 }
+
+export interface UsePaginatedCollectionsReturn {
+  collections: Collection[];
+  loading: boolean;
+  loadingMore: boolean;
+  error: string | null;
+  hasMore: boolean;
+  loadMore: () => Promise<void>;
+  reload: () => void;
+}
+
+export function usePaginatedCollections(pageSize: number = 12): UsePaginatedCollectionsReturn {
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [nextId, setNextId] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  const { contract } = useContract({
+    abi: COLLECTION_CONTRACT_ABI as Abi,
+    address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
+  });
+
+  const fetchBatch = useCallback(async (startId: number, count: number) => {
+    if (!contract) return { data: [], nextStartId: startId, foundEnd: false };
+
+    const newCollections: Collection[] = [];
+    let currentId = startId;
+    let foundEnd = false;
+
+    // Strategy: Scan ahead to find 'count' valid collections.
+    const MAX_SCAN_AHEAD = 50; // Scan at most 50 IDs to find candidates
+
+    // We will scan in chunks until we find enough items or confirm no more
+    // But for a single batch call, let's limit to one chunk of scanning to keep response fast
+
+    const promises = [];
+    for (let i = 0; i < MAX_SCAN_AHEAD; i++) {
+      promises.push(contract.call("is_valid_collection", [(currentId + i).toString()]));
+    }
+
+    try {
+      const validityResults = await Promise.all(promises);
+
+      const validIds: number[] = [];
+      for (let i = 0; i < validityResults.length; i++) {
+        if (validityResults[i] && !isCollectionReported((currentId + i).toString())) {
+          validIds.push(currentId + i);
+        }
+      }
+
+      if (validIds.length === 0) {
+        // Found nothing in this range, so next time start after this range
+        currentId = currentId + MAX_SCAN_AHEAD;
+        // If we found nothing in a large scan, we might assume end, 
+        // but let's be careful. If the user clicks 'Load More' again, we continue scanning from new currentId.
+        // If we want to auto-stop, we can return foundEnd=true. 
+        // Let's assume for now that 50 empty slots means end of list.
+        foundEnd = true;
+      } else {
+        // Take only up to 'count' valid IDs
+        const idsToFetch = validIds.slice(0, count);
+
+        const collectionsData = await Promise.all(
+          idsToFetch.map(async (id) => {
+            try {
+              const collection = await contract.call("get_collection", [id.toString()]);
+              const collectionStat = await contract.call("get_collection_stats", [id.toString()]);
+              // Process metadata safely
+              const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
+              return await processCollectionMetadata(id.toString(), metadata);
+            } catch (e) {
+              console.warn(`Failed to fetch details for collection ${id}`, e);
+              return null;
+            }
+          })
+        );
+
+        // Filter out any nulls from failed individual fetches
+        const validData = collectionsData.filter(c => c !== null) as Collection[];
+        newCollections.push(...validData);
+
+        // CRITICAL FIX: Set next start ID to be the one AFTER the last one we actually used.
+        // This ensures we catch the remaining valid IDs in the scan range on the NEXT call.
+        const lastUsedId = idsToFetch[idsToFetch.length - 1];
+        currentId = lastUsedId + 1;
+
+        // If we found fewer valid items than the scan range, AND we exhausted the scan range, 
+        // foundEnd might be true, OR we just need to scan further next time.
+        // We don't set foundEnd=true here unless we are sure. 
+        foundEnd = false;
+      }
+
+    } catch (e) {
+      console.warn("Error scanning collections:", e);
+      foundEnd = true;
+    }
+
+    return { data: newCollections, nextStartId: currentId, foundEnd };
+
+  }, [contract]);
+
+  const loadMore = useCallback(async () => {
+    if (!contract || !hasMore || loadingMore) return;
+    setLoadingMore(true);
+
+    try {
+      const { data, nextStartId, foundEnd } = await fetchBatch(nextId, pageSize);
+
+      if (data.length > 0) {
+        setCollections(prev => [...prev, ...data]);
+        setNextId(nextStartId);
+
+        // If we got *some* data but less than page size, it implies 
+        // we either hit the end OR the scan range wasn't big enough to fill the page.
+        if (foundEnd) setHasMore(false);
+
+        // NOTE: We do NOT set hasMore=false just because data.length < pageSize, 
+        // because there might be more valid items just beyond our 50-item scan window.
+      } else {
+        // If we got NO data, and foundEnd is true (50 empty slots), stop.
+        if (foundEnd) {
+          setHasMore(false);
+        } else {
+          // We scanned 50 items and found 0 valid, but didn't error. 
+          // We updated nextId used in fetchBatch to skip them.
+          // We must update state nextId so next click continues from there.
+          setNextId(nextStartId);
+        }
+      }
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load more collections");
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [contract, nextId, pageSize, hasMore, loadingMore, fetchBatch]);
+
+  // Initial load
+  useEffect(() => {
+    let mounted = true;
+
+    if (contract && loading) {
+      fetchBatch(0, pageSize).then(({ data, nextStartId, foundEnd }) => {
+        if (mounted) {
+          setCollections(data);
+          setNextId(nextStartId);
+          setLoading(false);
+          if (foundEnd || data.length < pageSize) setHasMore(false);
+        }
+      }).catch(err => {
+        if (mounted) {
+          setError(err instanceof Error ? err.message : "Failed to load collections");
+          setLoading(false);
+        }
+      });
+    }
+
+    return () => { mounted = false; };
+  }, [contract, loading, fetchBatch, pageSize]);
+
+  const reload = useCallback(() => {
+    setCollections([]);
+    setNextId(0);
+    setHasMore(true);
+    setLoading(true);
+    setError(null);
+  }, []);
+
+  return { collections, loading, loadingMore, error, hasMore, loadMore, reload };
+}
+
+
+export function useFeaturedCollections(featuredIds: number[] = []): UseGetAllCollectionsReturn {
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const { contract } = useContract({
+    abi: COLLECTION_CONTRACT_ABI as Abi,
+    address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
+  });
+
+  // Create a stable key for the dependency array
+  const idsKey = featuredIds.join(',');
+
+  const loadCollections = useCallback(async () => {
+    if (!contract) {
+      setLoading(false);
+      setError("Contract not ready");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
+      const promises = featuredIds.map(async (id) => {
+        try {
+          const isValid = await contract.call("is_valid_collection", [id.toString()]);
+          if (isValid && !isCollectionReported(id.toString())) {
+            const collection = await contract.call("get_collection", [id.toString()]);
+            const collectionStat = await contract.call("get_collection_stats", [id.toString()]);
+            const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
+
+            return await processCollectionMetadata(id.toString(), metadata);
+          }
+        } catch (e) {
+          console.warn(`Error fetching featured collection ${id}`, e);
+        }
+        return null;
+      });
+
+      const results = await Promise.all(promises);
+      const validCollections = results.filter((c): c is Collection => c !== null);
+
+      setCollections(validCollections);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch featured collections");
+    } finally {
+      setLoading(false);
+    }
+  }, [contract, idsKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    loadCollections();
+  }, [loadCollections]);
+
+  return { collections, loading, error, reload: loadCollections };
+}
+
+
