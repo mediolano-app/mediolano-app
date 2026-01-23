@@ -259,6 +259,7 @@ export default function RemixDiscoveryPage() {
                             alt={selectedCollection.name}
                             fill
                             className="object-cover"
+                            sizes="48px"
                           />
                         </div>
                         <div>
@@ -332,6 +333,7 @@ function AssetCard({ asset, nftAddress, onRemix }: { asset: any, nftAddress: str
           alt={asset.name || "Asset"}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
         />
         {/* Removed overlay - keeping image clean */}
       </div>

@@ -139,6 +139,21 @@ export function FeaturedHero() {
                                 loading="eager"
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
                             />
+
+                            {/* Preload next image */}
+                            {collections.length > 1 && (
+                                <div className="hidden">
+                                    <Image
+                                        src={collections[(currentSlide + 1) % collections.length].image || "/placeholder.svg"}
+                                        alt="preload"
+                                        width={100}
+                                        height={100}
+                                        priority={false}
+                                        loading="lazy"
+                                    />
+                                </div>
+                            )}
+
                             <div className={`absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent transition-all duration-500`} />
                         </div>
 

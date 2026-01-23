@@ -25,6 +25,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isCollectionReported } from "@/lib/reported-content";
 import Link from "next/link";
+import Image from "next/image";
 import NFTCard from "@/components/nft-card";
 import { useParams } from "next/navigation";
 import {
@@ -139,10 +140,13 @@ export default function CollectionPage() {
         <div className="relative mb-8">
           {/* Cover Image */}
           <div className="aspect-video relative overflow-hidden rounded-xl mb-6">
-            <img
+            <Image
               src={collection.image || "/placeholder.svg"}
               alt={collection.name}
-              className="h-full w-full object-cover"
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 1280px) 100vw, 1280px"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">

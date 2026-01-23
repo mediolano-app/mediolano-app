@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -151,9 +152,12 @@ export default function CreatorPage({ params }: CreatorPageProps) {
         {/* Background with gradient overlay and blur effect */}
         <div className="absolute inset-0">
           <div className="h-full w-full bg-black/40" />
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-50 blur-xl scale-110"
-            style={{ backgroundImage: `url('${headerBackground}')` }}
+          <Image
+            src={headerBackground}
+            alt="Creator Background"
+            fill
+            className="object-cover opacity-50 blur-xl scale-110"
+            priority
           />
         </div>
 

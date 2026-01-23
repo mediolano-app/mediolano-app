@@ -255,6 +255,7 @@ function CollectionCard({ collection, nftCount, onReportClick, onCollectionClick
                 alt={collection.name}
                 fill
                 className="object-cover transition-all duration-300 group-hover:brightness-90 group-hover:scale-105"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
               {collection.floorPrice && (
                 <div className="absolute bottom-2 right-2">
@@ -281,6 +282,7 @@ function CollectionCard({ collection, nftCount, onReportClick, onCollectionClick
               alt={collection.name}
               fill
               className="object-cover transition-all duration-300 group-hover:brightness-90 group-hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
             {collection.floorPrice && (
               <div className="absolute bottom-2 right-2">
@@ -349,7 +351,7 @@ function CollectionListItem({ collection, nftCount, onReportClick, onCollectionC
         {!onCollectionClick ? (
           <Link href={`/collections/${collection.nftAddress || String(collection.id)}`} className="flex items-center gap-4 flex-grow cursor-pointer">
             <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
-              <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
+              <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" sizes="(max-width: 640px) 25vw, 100px" />
             </div>
 
             <div className="flex-grow min-w-0">
@@ -396,7 +398,7 @@ function CollectionListItem({ collection, nftCount, onReportClick, onCollectionC
         ) : (
           <div className="flex items-center gap-4 flex-grow">
             <div className="relative h-16 w-16 sm:w-24 rounded-md overflow-hidden flex-shrink-0">
-              <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" />
+              <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover" sizes="(max-width: 640px) 25vw, 100px" />
             </div>
 
             <div className="flex-grow min-w-0">
@@ -457,7 +459,7 @@ export function FeaturedCollectionCard({ collection, nftCount, onReportClick }: 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
         <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
           <div className="relative h-64 md:h-auto">
-            <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover hover:brightness-90 transition-all duration-300" />
+            <Image src={coverImage || "/background.jpg"} alt={collection.name} fill className="object-cover hover:brightness-90 transition-all duration-300" sizes="(max-width: 768px) 100vw, 50vw" />
             <div className="absolute top-4 left-4">
               <Badge
                 variant="secondary"

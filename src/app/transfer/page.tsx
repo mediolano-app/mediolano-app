@@ -494,6 +494,7 @@ export default function TransferPage() {
                                   alt={asset.name}
                                   fill
                                   className="object-cover"
+                                  sizes="64px"
                                 />
                                 <div className="absolute top-1 right-1">
                                   <Badge className={`${typeColors[asset.type]} text-xs px-1 py-0`}>
@@ -659,7 +660,7 @@ export default function TransferPage() {
                   return (
                     <Card key={asset.id} className="overflow-hidden hover:shadow-md transition-shadow">
                       <div className="aspect-square bg-muted relative">
-                        <Image src={asset.image || "/placeholder.svg"} alt={asset.name} fill className="object-cover" />
+                        <Image src={asset.image || "/placeholder.svg"} alt={asset.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         <div className="absolute top-3 left-3">
                           <Badge className={typeColors[asset.type]}>
                             <TypeIcon className="h-3 w-3 mr-1" />
