@@ -236,10 +236,11 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     <Image
                       src={(asset?.image as string) || "/background.jpg"}
                       alt={asset?.name as string}
-                      width={600}
-                      height={600}
+                      width={0}
+                      height={0}
                       className="w-full h-auto object-contain"
                       sizes="(max-width: 768px) 100vw, 40vw"
+                      style={{ width: '100%', height: 'auto' }}
                       priority
                     />
                     <div className="absolute top-3 left-3">
