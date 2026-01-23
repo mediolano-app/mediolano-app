@@ -126,6 +126,15 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           <Label htmlFor="containsSamples">Contains samples from other works</Label>
         </div>
       </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="externalUrl">External Audio URL</Label>
+        <Input
+          id="externalUrl"
+          placeholder="e.g., https://soundcloud.com/..."
+          value={getMetadataValue("externalUrl")}
+          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
+        />
+      </div>
     </div>
   )
 
@@ -185,6 +194,15 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           />
           <Label htmlFor="allowPrints">Allow commercial printing and reproduction</Label>
         </div>
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="externalUrl">Portfolio / High-Res URL</Label>
+        <Input
+          id="externalUrl"
+          placeholder="e.g., https://artstation.com/..."
+          value={getMetadataValue("externalUrl")}
+          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
+        />
       </div>
     </div>
   )
@@ -253,6 +271,15 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           />
           <Label htmlFor="allowClips">Allow short clips for promotional use</Label>
         </div>
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="externalUrl">Video URL</Label>
+        <Input
+          id="externalUrl"
+          placeholder="e.g., https://youtube.com/..."
+          value={getMetadataValue("externalUrl")}
+          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
+        />
       </div>
     </div>
   )
@@ -460,6 +487,15 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           <Label htmlFor="allowTranslations">Allow translations to other languages</Label>
         </div>
       </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="externalUrl">Document URL</Label>
+        <Input
+          id="externalUrl"
+          placeholder="e.g., https://example.com/doc.pdf"
+          value={getMetadataValue("externalUrl")}
+          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
+        />
+      </div>
     </div>
   )
 
@@ -491,6 +527,15 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           value={getMetadataValue("additionalNotes")}
           onChange={(e) => updateMetadataField("additionalNotes", e.target.value)}
           rows={3}
+        />
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="externalUrl">External Link</Label>
+        <Input
+          id="externalUrl"
+          placeholder="e.g., https://example.com"
+          value={getMetadataValue("externalUrl")}
+          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
         />
       </div>
     </div>

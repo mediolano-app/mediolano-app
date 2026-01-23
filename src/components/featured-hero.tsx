@@ -76,7 +76,7 @@ export function FeaturedHero() {
                                 Mediolano IP Creator
                             </Badge>
                             <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white leading-tight tracking-tight">
-                                Loading onchain...
+                                Loading...
                             </h2>
                             <p className="text-lg md:text-xl text-white/70 mb-10 leading-relaxed max-w-2xl mx-auto">
                                 Create, share, and remix with permissionless ownership.

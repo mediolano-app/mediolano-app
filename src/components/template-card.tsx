@@ -2,8 +2,11 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import {
   CheckCircle2,
+  ArrowRight,
   Music,
   Palette,
   FileText,
@@ -108,6 +111,15 @@ export function TemplateCard({ template, isSelected, onSelect }: TemplateCardPro
                 </Badge>
               )}
             </div>
+          </div>
+
+          <div className="mt-4 pt-2 relative z-10">
+            <Link href={`/create/templates/${template.id}`} onClick={(e) => e.stopPropagation()} className="block w-full">
+              <Button className="w-full gap-2 transition-transform active:scale-[0.98]" size="sm">
+                Use Template
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
           </div>
         </div>
 

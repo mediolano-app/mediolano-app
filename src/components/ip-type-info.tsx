@@ -3,11 +3,8 @@
 import { useState, useEffect, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   Music,
   Palette,
@@ -20,19 +17,12 @@ import {
   Building,
   Code,
   Settings,
-  Info,
-  Download,
   ExternalLink,
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
   Clock,
   Calendar,
   Hash,
   FileCode,
   Database,
-  Cpu,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { fetchIPFSMetadata, getKnownCids, combineData, AssetType, IPFSMetadata } from "@/utils/ipfs"
@@ -271,14 +261,11 @@ interface IPTypeInfoProps {
 }
 
 export function IPTypeInfo({ asset }: IPTypeInfoProps) {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isMuted, setIsMuted] = useState(false)
   const [activeTab, setActiveTab] = useState("details")
   const [isLoading, setIsLoading] = useState(true)
   const [ipfsMetadata, setIpfsMetadata] = useState<IPFSMetadata | null>(null)
   const [mergedData, setMergedData] = useState<AssetType | null>(null)
   const [ipType, setIpType] = useState<IPType>("Generic")
-  const [ipfsError, setIpfsError] = useState<Error | null>(null)
 
   useEffect(() => {
     async function loadIPFSData() {
@@ -315,7 +302,6 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         }
       } catch (error) {
         console.error("Error loading IPFS data:", error)
-        setIpfsError(error as Error)
 
         // On error, also default to Generic
         setIpfsMetadata(null)
@@ -514,205 +500,163 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
     )
   }
 
+
+
+  const RenderField = ({ label, value, icon: Icon, children }: { label: string, value?: string | number | null | React.ReactNode, icon?: any, children?: React.ReactNode }) => {
+    // If it's a simple value, check if it's empty
+    if ((value === undefined || value === null || value === "") && !children) return null;
+
+    // If children are provided, we should ideally check if they result in null/empty,
+    // but we'll rely on the parent to only pass children if data exists.
+    if (!children && (value === undefined || value === null || value === "")) return null;
+
+    return (
+      <div className="space-y-1">
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <div className="font-medium flex items-center gap-2">
+          {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+          <span className="break-all">{children || value}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const RenderSection = ({ label, children }: { label: string, children: React.ReactNode }) => {
+    if (!children) return null;
+    return (
+      <RenderField label={label} value="">
+        {children}
+      </RenderField>
+    )
+  }
+
+  const renderExternalLinkButton = () => {
+    const externalUrl = asText((typeData as Record<string, unknown>).externalUrl);
+    if (!externalUrl) return null;
+
+    let buttonLabel = "View External Resource";
+    if (ipType === "Video") buttonLabel = "Watch Video";
+    if (ipType === "Audio") buttonLabel = "Listen to Audio";
+    if (ipType === "Documents") buttonLabel = "View Document";
+
+    return (
+      <Button variant="outline" className="w-full flex items-center gap-2 mt-4" onClick={() => window.open(externalUrl, "_blank")}>
+        <ExternalLink className="h-4 w-4" />
+        {buttonLabel}
+      </Button>
+    );
+  };
+
+  // Helper to truncate long strings like addresses
+  const formatTraitValue = (val: string) => {
+    if (val.length > 20 && (val.startsWith("0x") || !val.includes(" "))) {
+      return val.substring(0, 6) + "..." + val.substring(val.length - 4);
+    }
+    return val;
+  }
+
   const renderIPTypeContent = () => {
     switch (ipType) {
       case "Audio":
         return (
           <div className="space-y-4">
             <div className={cn("rounded-lg p-4", colorClasses.bgLight)}>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Music className={colorClasses.text} />
-                  <h3 className="font-medium">Audio Preview</h3>
+                  <h3 className="font-medium">Audio</h3>
                 </div>
                 <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
                   {asText(typeData.audioFormat)}
                 </Badge>
               </div>
-
-              <div className="space-y-2">
-                <div className="h-12 bg-muted rounded-md flex items-center justify-between px-4">
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsPlaying(!isPlaying)}>
-                      {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                    </Button>
-                    <div className="text-sm">
-                      <span className="font-medium">00:00</span>
-                      <span className="mx-1">/</span>
-                      <span>{asText(typeData.duration)}</span>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsMuted(!isMuted)}>
-                    {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                  </Button>
-                </div>
-                <Progress value={0} className="h-1" />
-              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Duration</p>
-                <p className="font-medium flex items-center gap-1">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  {asText(typeData.duration)}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Genre</p>
-                <p className="font-medium">{asText(typeData.genre)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">BPM</p>
-                <p className="font-medium">{asText(typeData.bpm)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Key</p>
-                <p className="font-medium">{asText(typeData.key)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Release Date</p>
-                <p className="font-medium flex items-center gap-1">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  {asText(typeData.releaseDate)}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">ISRC</p>
-                <p className="font-medium">{asText(typeData.isrc)}</p>
-              </div>
+            <div className="grid grid-cols-1 gap-4">
+              <RenderField label="Duration" value={asText(typeData.duration)} icon={Clock} />
+              <RenderField label="Genre" value={asText(typeData.genre)} />
+              <RenderField label="BPM" value={asText(typeData.bpm)} />
+              <RenderField label="Key" value={asText(typeData.key)} />
+              <RenderField label="Release Date" value={asText(typeData.releaseDate)} icon={Calendar} />
+              <RenderField label="ISRC" value={asText(typeData.isrc)} />
             </div>
 
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Technical Information</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Sample Rate</p>
-                  <p className="font-medium">{asText(typeData.sampleRate)}</p>
+            {(asText(typeData.sampleRate) || asText(typeData.channels)) && (
+              <RenderSection label="Technical Information">
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  <RenderField label="Sample Rate" value={asText(typeData.sampleRate)} />
+                  <RenderField label="Channels" value={asText(typeData.channels)} />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Channels</p>
-                  <p className="font-medium">{asText(typeData.channels)}</p>
-                </div>
-              </div>
-            </div>
+              </RenderSection>
+            )}
 
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Credits</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Composer</p>
-                  <p className="font-medium">{asText(typeData.composer)}</p>
+            {(asText(typeData.composer) || asText(typeData.publisher)) && (
+              <RenderSection label="Credits">
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  <RenderField label="Composer" value={asText(typeData.composer)} />
+                  <RenderField label="Publisher" value={asText(typeData.publisher)} />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Publisher</p>
-                  <p className="font-medium">{asText(typeData.publisher)}</p>
-                </div>
-              </div>
-            </div>
+              </RenderSection>
+            )}
 
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Download Audio
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                View Lyrics
-              </Button>
-            </div>
+            {renderExternalLinkButton()}
           </div>
         )
 
       case "Art":
         return (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Medium</p>
-                <p className="font-medium">{asText(typeData.medium)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Dimensions</p>
-                <p className="font-medium">{asText(typeData.dimensions)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Style</p>
-                <p className="font-medium">{asText(typeData.style)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Creation Date</p>
-                <p className="font-medium flex items-center gap-1">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  {asText(typeData.creationDate)}
-                </p>
-              </div>
+            <div className="grid grid-cols-1 gap-4">
+              <RenderField label="Medium" value={asText(typeData.medium)} />
+              <RenderField label="Dimensions" value={asText(typeData.dimensions)} />
+              <RenderField label="Style" value={asText(typeData.style)} />
+              <RenderField label="Creation Date" value={asText(typeData.creationDate)} icon={Calendar} />
             </div>
 
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Color Palette</h3>
-              <div className="flex gap-2">
-                {isStringArray(typeData.colorPalette) && typeData.colorPalette.map((color, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <div className="h-8 w-8 rounded-full border" style={{ backgroundColor: color }}></div>
-                    <span className="text-xs mt-1">{color}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Technical Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Software Used</p>
-                  <p className="font-medium">{asText(typeData.software)}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Print Editions</p>
-                  <p className="font-medium">{asText(typeData.printEditions)}</p>
+            {isStringArray(typeData.colorPalette) && typeData.colorPalette.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="font-medium text-sm">Color Palette</h3>
+                <div className="flex gap-2 flex-wrap">
+                  {typeData.colorPalette.map((color, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                      <div className="h-8 w-8 rounded-full border shadow-sm" style={{ backgroundColor: color }}></div>
+                      <span className="text-[10px] mt-1 text-muted-foreground">{color}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Materials & Technique</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Materials</p>
-                  <div className="flex flex-wrap gap-1">
-                    {isStringArray(typeData.materials) && typeData.materials.map((material, index) => (
-                      <Badge key={index} variant="outline">
-                        {material}
-                      </Badge>
-                    ))}
-                  </div>
+            {(asText(typeData.software) || asText(typeData.printEditions)) && (
+              <RenderSection label="Technical Details">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  <RenderField label="Software Used" value={asText(typeData.software)} />
+                  <RenderField label="Print Editions" value={asText(typeData.printEditions)} />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Technique</p>
-                  <p className="font-medium">{asText(typeData.technique)}</p>
+              </RenderSection>
+            )}
+
+            {((isStringArray(typeData.materials) && typeData.materials.length > 0) || asText(typeData.technique)) && (
+              <RenderSection label="Materials & Technique">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  {isStringArray(typeData.materials) && typeData.materials.length > 0 && (
+                    <RenderField label="Materials" value="">
+                      <div className="flex flex-wrap gap-1">
+                        {typeData.materials.map((material, index) => (
+                          <Badge key={index} variant="outline">
+                            {material}
+                          </Badge>
+                        ))}
+                      </div>
+                    </RenderField>
+                  )}
+                  <RenderField label="Technique" value={asText(typeData.technique)} />
                 </div>
-              </div>
-            </div>
+              </RenderSection>
+            )}
 
-            <div className="space-y-1">
-              <p className="text-sm text-muted-foreground">Exhibition History</p>
-              <p className="font-medium">{asText(typeData.exhibition)}</p>
-            </div>
-
-            <div className="flex justify-end gap-2">
-
-            </div>
+            <RenderField label="Exhibition History" value={asText(typeData.exhibition)} />
+            {renderExternalLinkButton()}
           </div>
         )
 
@@ -730,77 +674,40 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 </Badge>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Blockchain</p>
-                  <p className="font-medium">{asText(typeData.blockchain)}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Token ID</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Hash className="h-4 w-4 text-muted-foreground" />
-                    {asText(asset.tokenId)}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Contract Address</p>
-                  <p className="font-mono text-xs truncate">{asText(asset.contractAddress)}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Mint Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {asText(typeData.mintDate)}
-                  </p>
-                </div>
+              <div className="grid grid-cols-1 gap-4">
+                <RenderField label="Blockchain" value={asText(typeData.blockchain)} />
+                <RenderField label="Token ID" value={asText(asset.tokenId)} icon={Hash} />
+                <RenderField label="Contract Address" value={
+                  asset.contractAddress ? (
+                    <span className="font-mono text-xs">{formatTraitValue(asText(asset.contractAddress))}</span>
+                  ) : null
+                } />
+                <RenderField label="Mint Date" value={asText(typeData.mintDate)} icon={Calendar} />
               </div>
             </div>
 
-            <Separator />
+            <RenderField label="Traits" value={
+              isTraitArray(asset.attributes) && asset.attributes.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full">
+                  {asset.attributes.map((trait, index) => (
+                    <div key={index} className="rounded-lg border p-2 text-center bg-card">
+                      <p className="text-[10px] text-muted-foreground capitalize">{trait.trait_type}</p>
+                      <p className="font-medium capitalize truncate text-sm" title={trait.value}>{formatTraitValue(trait.value)}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : null
+            } />
 
-            <div className="space-y-2">
-              <h3 className="font-medium">Traits</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {isTraitArray(asset.attributes) && asset.attributes.map((trait, index) => (
-                  <div key={index} className="rounded-lg border p-2 text-center">
-                    <p className="text-xs text-muted-foreground capitalize">{trait.trait_type}</p>
-                    <p className="font-medium capitalize truncate">{trait.value}</p>
-                  </div>
-                ))}
-              </div>
+            <div className="grid grid-cols-1 gap-4">
+              <RenderField label="Editions" value={asText(typeData.editions)} />
+              <RenderField label="Rarity" value={asText(typeData.rarity)} />
+              <RenderField label="Marketplace" value={asText(typeData.marketplace)} />
+              <RenderField label="Previous Owners" value={asText(typeData.previousOwners)} />
             </div>
 
-            <Separator />
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Editions</p>
-                <p className="font-medium">{asText(typeData.editions)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Rarity</p>
-                <p className="font-medium">{asText(typeData.rarity)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Marketplace</p>
-                <p className="font-medium">{asText(typeData.marketplace)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Previous Owners</p>
-                <p className="font-medium">{asText(typeData.previousOwners)}</p>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                View on {asText(typeData.marketplace) || "Marketplace"}
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                View on Etherscan
-              </Button>
-            </div>
+            {renderExternalLinkButton()}
           </div>
         )
 
@@ -808,103 +715,64 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         return (
           <div className="space-y-4">
             <div className={cn("rounded-lg p-4", colorClasses.bgLight)}>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Video className={colorClasses.text} />
-                  <h3 className="font-medium">Video Preview</h3>
+                  <h3 className="font-medium">Video</h3>
                 </div>
                 <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
                   {asText(typeData.resolution)}
                 </Badge>
               </div>
-
-              <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
-                <Button variant="ghost" size="icon" className="h-12 w-12 rounded-full bg-background/80">
-                  <Play className="h-6 w-6" />
-                </Button>
-              </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Duration</p>
-                <p className="font-medium flex items-center gap-1">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  {asText(typeData.duration)}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Frame Rate</p>
-                <p className="font-medium">{asText(typeData.frameRate)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Codec</p>
-                <p className="font-medium">{asText(typeData.codec)}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Aspect Ratio</p>
-                <p className="font-medium">{asText(typeData.aspectRatio)}</p>
-              </div>
+            <div className="grid grid-cols-1 gap-4">
+              <RenderField label="Duration" value={asText(typeData.duration)} icon={Clock} />
+              <RenderField label="Frame Rate" value={asText(typeData.frameRate)} />
+              <RenderField label="Codec" value={asText(typeData.codec)} />
+              <RenderField label="Aspect Ratio" value={asText(typeData.aspectRatio)} />
             </div>
 
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Production Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Director</p>
-                  <p className="font-medium">{asText(typeData.director)}</p>
+            {(asText(typeData.director) || asText(typeData.releaseDate)) && (
+              <RenderSection label="Production Details">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  <RenderField label="Director" value={asText(typeData.director)} />
+                  <RenderField label="Release Date" value={asText(typeData.releaseDate)} icon={Calendar} />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Release Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {asText(typeData.releaseDate)}
-                  </p>
-                </div>
-              </div>
-            </div>
+              </RenderSection>
+            )}
 
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Cast & Language</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Cast</p>
-                  <div className="flex flex-wrap gap-1">
-                    {isStringArray(typeData.cast) && typeData.cast.map((actor, index) => (
-                      <Badge key={index} variant="outline">
-                        {actor}
-                      </Badge>
-                    ))}
-                  </div>
+            {((isStringArray(typeData.cast) && typeData.cast.length > 0) || asText(typeData.language) || (isStringArray(typeData.subtitles) && typeData.subtitles.length > 0)) && (
+              <RenderSection label="Cast & Language">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  {isStringArray(typeData.cast) && typeData.cast.length > 0 && (
+                    <RenderField label="Cast" value="">
+                      <div className="flex flex-wrap gap-1">
+                        {typeData.cast.map((actor, index) => (
+                          <Badge key={index} variant="outline">
+                            {actor}
+                          </Badge>
+                        ))}
+                      </div>
+                    </RenderField>
+                  )}
+                  <RenderField label="Language" value={asText(typeData.language)} />
+                  {isStringArray(typeData.subtitles) && typeData.subtitles.length > 0 && (
+                    <RenderField label="Subtitles" value="">
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {typeData.subtitles.map((language, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {language}
+                          </Badge>
+                        ))}
+                      </div>
+                    </RenderField>
+                  )}
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Language & Subtitles</p>
-                  <p className="font-medium">{asText(typeData.language)}</p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {isStringArray(typeData.subtitles) && typeData.subtitles.map((language, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {language}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+              </RenderSection>
+            )}
 
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Download Preview
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                View Full Video
-              </Button>
-            </div>
+            {renderExternalLinkButton()}
           </div>
         )
 
@@ -922,114 +790,49 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 </Badge>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Publication Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {asText((typeData as Record<string, unknown>).publicationDate) || getField(typeData as Record<string, unknown>, "registration_date") || "Not specified"}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Word Count</p>
-                  <p className="font-medium">{asText(typeData.wordCount) || "Not specified"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Read Time</p>
-                  <p className="font-medium">{asText(typeData.readTime) || "Not specified"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Category</p>
-                  <p className="font-medium">{asText(typeData.category) || "Not specified"}</p>
-                </div>
+              <div className="grid grid-cols-1 gap-4">
+                <RenderField label="Publication Date" value={asText((typeData as Record<string, unknown>).publicationDate) || getField(typeData as Record<string, unknown>, "registration_date")} icon={Calendar} />
+                <RenderField label="Word Count" value={asText(typeData.wordCount)} />
+                <RenderField label="Read Time" value={asText(typeData.readTime)} />
+                <RenderField label="Category" value={asText(typeData.category)} />
               </div>
             </div>
 
-            <Separator />
+            {(getField(typeData as Record<string, unknown>, "License") || getField(typeData as Record<string, unknown>, "license") || getField(typeData as Record<string, unknown>, "Commercial Use") || getField(typeData as Record<string, unknown>, "Modifications") || getField(typeData as Record<string, unknown>, "Attribution")) && (
+              <RenderSection label="License & Rights">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  <RenderField label="License Type" value={getField(typeData as Record<string, unknown>, "License") || getField(typeData as Record<string, unknown>, "license")} />
+                  <RenderField label="Commercial Use" value={getField(typeData as Record<string, unknown>, "Commercial Use") ? (getField(typeData as Record<string, unknown>, "Commercial Use") === "true" ? "Allowed" : "Not Allowed") : null} />
+                  <RenderField label="Modifications" value={getField(typeData as Record<string, unknown>, "Modifications") ? (getField(typeData as Record<string, unknown>, "Modifications") === "true" ? "Allowed" : "Not Allowed") : null} />
+                  <RenderField label="Attribution Required" value={getField(typeData as Record<string, unknown>, "Attribution") ? (getField(typeData as Record<string, unknown>, "Attribution") === "true" ? "Yes" : "No") : null} />
+                </div>
+              </RenderSection>
+            )}
 
-            <div className="space-y-2">
-              <h3 className="font-medium">License & Rights</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">License Type</p>
-                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "License") || getField(typeData as Record<string, unknown>, "license") || "Not specified"}</p>
+            {(getField(typeData as Record<string, unknown>, "Protection Status") || getField(typeData as Record<string, unknown>, "Protection Scope") || getField(typeData as Record<string, unknown>, "IP Version") || getField(typeData as Record<string, unknown>, "protection_duration")) && (
+              <RenderSection label="Protection Details">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  <RenderField label="Protection Status" value={getField(typeData as Record<string, unknown>, "Protection Status")} />
+                  <RenderField label="Protection Scope" value={getField(typeData as Record<string, unknown>, "Protection Scope")} />
+                  <RenderField label="IP Version" value={getField(typeData as Record<string, unknown>, "IP Version")} />
+                  <RenderField label="Protection Duration" value={getField(typeData as Record<string, unknown>, "protection_duration")} />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Commercial Use</p>
-                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Commercial Use") === "true" ? "Allowed" : "Not Allowed"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Modifications</p>
-                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Modifications") === "true" ? "Allowed" : "Not Allowed"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Attribution Required</p>
-                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Attribution") === "true" ? "Yes" : "No"}</p>
-                </div>
-              </div>
-            </div>
+              </RenderSection>
+            )}
 
-            <Separator />
+            {(asText(typeData.collection) || asText(typeData.creator) || getField(typeData as Record<string, unknown>, "registration_date") || getField(typeData as Record<string, unknown>, "Tags")) && (
+              <RenderSection label="Collection Information">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  <RenderField label="Collection" value={asText(typeData.collection)} />
+                  <RenderField label="Creator" value={asText(typeData.creator)} />
+                  <RenderField label="Registration Date" value={getField(typeData as Record<string, unknown>, "registration_date")} icon={Calendar} />
+                  <RenderField label="Tags" value={getField(typeData as Record<string, unknown>, "Tags")} />
+                </div>
+              </RenderSection>
+            )}
 
-            <div className="space-y-2">
-              <h3 className="font-medium">Protection Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Protection Status</p>
-                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Protection Status") || "Not specified"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Protection Scope</p>
-                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Protection Scope") || "Not specified"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">IP Version</p>
-                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "IP Version") || "Not specified"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Protection Duration</p>
-                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "protection_duration") || "Not specified"}</p>
-                </div>
-              </div>
-            </div>
 
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Collection Information</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Collection</p>
-                  <p className="font-medium">{asText(typeData.collection) || "Not specified"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Creator</p>
-                  <p className="font-medium">{asText(typeData.creator) || "Not specified"}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Registration Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {getField(typeData as Record<string, unknown>, "registration_date") || "Not specified"}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Tags</p>
-                  <p className="font-medium">{getField(typeData as Record<string, unknown>, "Tags") || "No tags"}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                View Original Post
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Download Content
-              </Button>
-            </div>
+            {renderExternalLinkButton()}
           </div>
         )
 
@@ -1047,158 +850,125 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 </Badge>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Version</p>
-                  <p className="font-medium">{asText(typeData.version)}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Release Date</p>
-                  <p className="font-medium flex items-center gap-1">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    {asText(typeData.releaseDate)}
-                  </p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">License</p>
-                  <p className="font-medium">{asText(typeData.license)}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Platforms</p>
-                  <div className="flex flex-wrap gap-1">
-                    {isStringArray(typeData.platforms) && typeData.platforms.map((platform, index) => (
-                      <Badge key={index} variant="outline">
-                        {platform}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Technical Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Programming Languages</p>
-                  <div className="flex flex-wrap gap-1">
-                    {isStringArray(typeData.programmingLanguages) && typeData.programmingLanguages.map((lang, index) => (
-                      <Badge key={index} variant="outline">
-                        {lang}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Dependencies</p>
-                  <div className="flex flex-wrap gap-1">
-                    {isStringArray(typeData.dependencies) && typeData.dependencies.map((dep, index) => (
-                      <Badge key={index} variant="outline">
-                        {dep}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Features</h3>
-              <div className="flex flex-wrap gap-1">
-                {isStringArray(typeData.features) && typeData.features.map((feature, index) => (
-                  <Badge key={index} variant="outline">
-                    {feature}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <h3 className="font-medium">Resources</h3>
-              <div className="grid grid-cols-1 gap-2">
-                {sourceCodeRepository && (
-                  <div className="flex items-center justify-between rounded-md border p-2">
-                    <div className="flex items-center gap-2">
-                      <FileCode className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Source Code Repository</span>
+              <div className="grid grid-cols-1 gap-4">
+                <RenderField label="Version" value={asText(typeData.version)} />
+                <RenderField label="Release Date" value={asText(typeData.releaseDate)} icon={Calendar} />
+                <RenderField label="License" value={asText(typeData.license)} />
+                <RenderField label="Platforms" value={
+                  isStringArray(typeData.platforms) && typeData.platforms.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {typeData.platforms.map((platform, index) => (
+                        <Badge key={index} variant="outline">
+                          {platform}
+                        </Badge>
+                      ))}
                     </div>
-                    <Button variant="ghost" size="sm" className="h-8 gap-1">
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      <span className="text-xs">GitHub</span>
-                    </Button>
-                  </div>
-                )}
-                {apiDocumentation && (
-                  <div className="flex items-center justify-between rounded-md border p-2">
-                    <div className="flex items-center gap-2">
-                      <Database className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">API Documentation</span>
-                    </div>
-                    <Button variant="ghost" size="sm" className="h-8 gap-1">
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      <span className="text-xs">View Docs</span>
-                    </Button>
-                  </div>
-                )}
+                  ) : null
+                } />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Download
-              </Button>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Cpu className="h-4 w-4" />
-                Technical Specs
-              </Button>
-            </div>
+            {((isStringArray(typeData.programmingLanguages) && typeData.programmingLanguages.length > 0) || (isStringArray(typeData.dependencies) && typeData.dependencies.length > 0)) && (
+              <RenderSection label="Technical Details">
+                <div className="grid grid-cols-1 gap-4 w-full">
+                  {isStringArray(typeData.programmingLanguages) && typeData.programmingLanguages.length > 0 && (
+                    <RenderField label="Programming Languages" value="">
+                      <div className="flex flex-wrap gap-1">
+                        {typeData.programmingLanguages.map((lang, index) => (
+                          <Badge key={index} variant="outline">
+                            {lang}
+                          </Badge>
+                        ))}
+                      </div>
+                    </RenderField>
+                  )}
+                  {isStringArray(typeData.dependencies) && typeData.dependencies.length > 0 && (
+                    <RenderField label="Dependencies" value="">
+                      <div className="flex flex-wrap gap-1">
+                        {typeData.dependencies.map((dep, index) => (
+                          <Badge key={index} variant="outline">
+                            {dep}
+                          </Badge>
+                        ))}
+                      </div>
+                    </RenderField>
+                  )}
+                </div>
+              </RenderSection>
+            )}
+
+            {isStringArray(typeData.features) && typeData.features.length > 0 && (
+              <RenderField label="Features" value="">
+                <div className="flex flex-wrap gap-1">
+                  {typeData.features.map((feature, index) => (
+                    <Badge key={index} variant="outline">
+                      {feature}
+                    </Badge>
+                  ))}
+                </div>
+              </RenderField>
+            )}
+
+            {(sourceCodeRepository || apiDocumentation) && (
+              <div className="space-y-2">
+                <h3 className="font-medium text-sm">Resources</h3>
+                <div className="grid grid-cols-1 gap-2">
+                  {sourceCodeRepository && (
+                    <div className="flex items-center justify-between rounded-md border p-2">
+                      <div className="flex items-center gap-2">
+                        <FileCode className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">Source Code Repository</span>
+                      </div>
+                      <Button variant="ghost" size="sm" className="h-8 gap-1" onClick={() => window.open(sourceCodeRepository, "_blank")}>
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        <span className="text-xs">GitHub</span>
+                      </Button>
+                    </div>
+                  )}
+                  {apiDocumentation && (
+                    <div className="flex items-center justify-between rounded-md border p-2">
+                      <div className="flex items-center gap-2">
+                        <Database className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">API Documentation</span>
+                      </div>
+                      <Button variant="ghost" size="sm" className="h-8 gap-1" onClick={() => window.open(apiDocumentation, "_blank")}>
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        <span className="text-xs">View Docs</span>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {renderExternalLinkButton()}
           </div>
         )
 
       default:
         return (
           <div className="space-y-4">
-            {ipfsMetadata && (
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  This asset&apos;s metadata was retrieved from IPFS {asset.ipfsCid ? "(" + asset.ipfsCid.substring(0, 8) + "...)" : ""}.
-                </AlertDescription>
-              </Alert>
-            )}
 
-            {ipfsError && (
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  Using fallback metadata. Could not retrieve data from IPFS.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {typeData && Object.entries(typeData as Record<string, unknown>)
-                .filter(([key]) => !['id', 'image', 'name', 'description'].includes(key))
+                .filter(([key]) => !['id', 'image', 'name', 'description', 'externalUrl', 'attributes', 'properties'].includes(key))
                 .map(([key, value]) => {
                   if (typeof value === 'object' && value !== null) {
                     return null
                   }
 
+                  // Filter out empty values
+                  if (value === undefined || value === null || value === "") return null;
+
                   return (
                     <div key={key} className="space-y-1">
                       <p className="text-sm text-muted-foreground capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</p>
-                      <p className="font-medium">{String((value as string | number | boolean | null | undefined) ?? '')}</p>
+                      <p className="font-medium break-all">{String((value as string | number | boolean) ?? '')}</p>
                     </div>
                   )
                 })}
             </div>
+            {renderExternalLinkButton()}
           </div>
         )
     }
@@ -1219,27 +989,32 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
           </Badge>
         </div>
 
-        {ipfsMetadata && (
-          <div className="mt-2 flex items-center text-xs text-muted-foreground">
-            <Hexagon className="h-3 w-3 mr-1" />
-            <span>IPFS Metadata Available</span>
-          </div>
-        )}
+
       </CardHeader>
       <CardContent className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="details">Template Details</TabsTrigger>
-            <TabsTrigger value="metadata">Raw Metadata</TabsTrigger>
+            <TabsTrigger value="traits">Traits</TabsTrigger>
           </TabsList>
           <TabsContent value="details" className="mt-4">
             {renderIPTypeContent()}
           </TabsContent>
-          <TabsContent value="metadata" className="mt-4">
-            <div className="rounded-lg border bg-muted/20 p-4 font-mono text-sm overflow-auto max-h-[400px]">
-              {/* Mostrar metadatos de IPFS si están disponibles, o metadata combinados */}
-              <pre>{JSON.stringify(ipfsMetadata || typeData, null, 2)}</pre>
-            </div>
+          <TabsContent value="traits" className="mt-4">
+            {asset.attributes && asset.attributes.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4">
+                {asset.attributes.map((attr, i) => (
+                  <div key={i} className="flex flex-col p-3 rounded-lg border bg-muted/20">
+                    <span className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{attr.trait_type}</span>
+                    <span className="font-semibold break-all" title={attr.value}>{formatTraitValue(attr.value)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                No traits available for this asset.
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </CardContent>
