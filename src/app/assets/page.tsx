@@ -1,1030 +1,424 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { CardContent } from "@/components/ui/card"
-import { Card } from "@/components/ui/card"
-import NFTCard from "@/components/assets/nft-card"
-import NFTSkeleton from "@/components/assets/nft-skeleton"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import {
-  PlusCircle,
-  Filter,
-  Search,
-  Send,
-  FileText,
-  LayoutGrid,
-  LayoutList,
-  ChevronDown,
-  Clock,
-  TrendingUp,
-  Zap,
-  BarChart3,
-  Wallet,
-  Shield,
-  Sparkles,
-  Layers,
-  Palette,
-  Music,
-  Code,
-  Hexagon,
-  Video,
-  Lightbulb,
-  BadgeCheck,
-  Box,
-  DollarSign,
-  ExternalLink,
-  Verified,
-  CircleHelp,
-  Globe,
-} from "lucide-react"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuCheckboxItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Progress } from "@/components/ui/progress"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import Image from "next/image"
-import type { IPType } from "@/types/asset"
+import { Header } from "@/components/header"
+import { Footer } from "@/components/footer"
+import NFTCard from "@/components/nft-card"
+import NFTSkeleton from "@/components/nft-skeleton"
+import { AssetFilterDrawer } from "@/components/asset-filter-drawer"
+import { Search, X, ChevronLeft, ChevronRight, Globe, TrendingUp, Users, Zap } from "lucide-react"
+import { assets } from "@/lib/mock-data"
 
-// temporary data - would be mixed with IPFS data if is necessary
-import { assets as mockAssets, recentActivity, collections, templates, calculatePortfolioStats } from "@/app/assets/lib/mock-data"
-
-interface EnhancedAsset {
-  id: string;
-  name: string;
-  creator: string;
-  verified?: boolean;
-  image: string;
-  collection?: string;
-  licenseType?: string;
-  description: string;
-  registrationDate: string;
-  type: IPType;
-  templateType?: string;
-  protectionLevel?: number;
-  value?: string;
-  ipfsCid?: string; 
+interface FilterState {
+  assetTypes: string[]
+  collections: string[]
+  sortBy: string
+  verified: boolean
 }
+
+const ASSETS_PER_PAGE = 12
 
 export default function AssetsPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "name" | "value">("newest")
-  const [filterType, setFilterType] = useState<string>("all")
-  const [filterCollection, setFilterCollection] = useState<string>("all")
-  const [filterLicense, setFilterLicense] = useState<string>("all")
-  const [filterTemplate, setFilterTemplate] = useState<string>("all")
-  const [assets, setAssets] = useState<EnhancedAsset[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [filters, setFilters] = useState<FilterState>({
+    assetTypes: [],
+    collections: [],
+    sortBy: "newest",
+    verified: false,
+  })
 
-  // Use mock assets until real implementation is ready
   useEffect(() => {
-    setLoading(true);
-    const transformed: EnhancedAsset[] = mockAssets.map((a) => ({
-      id: a.id,
-      name: a.name,
-      creator: a.creator,
-      verified: a.verified,
-      image: a.image,
-      collection: a.collection,
-      licenseType: a.licenseType,
-      description: a.description,
-      registrationDate: a.registrationDate,
-      type: a.type as IPType,
-      templateType: a.templateType,
-      protectionLevel: a.protectionLevel,
-      value: a.value,
-      ipfsCid: undefined,
-    }));
-    setAssets(transformed);
-    setLoading(false);
-  }, []);
+    const timer = setTimeout(() => setLoading(false), 1000)
+    return () => clearTimeout(timer)
+  }, [])
 
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters)
+    setCurrentPage(1)
+  }
 
+  const handleClearFilter = (filterType: string, value?: string) => {
+    const newFilters = { ...filters }
 
-  // Get unique collections, types, licenses, and templates for filters
-  const uniqueCollections = Array.from(new Set(assets.map((asset) => asset.collection)))
-  const uniqueTypes = Array.from(new Set(assets.map((asset) => asset.type)))
-  const uniqueLicenses = Array.from(new Set(assets.map((asset) => asset.licenseType)))
-  const uniqueTemplates = Array.from(new Set(assets.map((asset) => asset.templateType).filter(Boolean)))
-
-
-
-  // Calculate portfolio statistics
-  const portfolioStats = calculatePortfolioStats(assets)
-
-
-
-
-
-
-  // Filter assets based on search query and filters
-  const filteredAssets = assets.filter((asset) => {
-    const matchesSearch =
-      searchQuery === "" ||
-      asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      asset.creator.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (asset.collection && asset.collection.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      asset.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (asset.templateType && asset.templateType.toLowerCase().includes(searchQuery.toLowerCase()))
-
-    const matchesType = filterType === "all" || asset.type === filterType
-    const matchesCollection = filterCollection === "all" || asset.collection === filterCollection
-    const matchesLicense = filterLicense === "all" || asset.licenseType === filterLicense
-    const matchesTemplate = filterTemplate === "all" || asset.templateType === filterTemplate
-
-    return matchesSearch && matchesType && matchesCollection && matchesLicense && matchesTemplate
-  })
-
-
-
-  // Sort assets
-  const sortedAssets = [...filteredAssets].sort((a, b) => {
-    switch (sortBy) {
-      case "newest":
-        return new Date(b.registrationDate).getTime() - new Date(a.registrationDate).getTime()
-      case "oldest":
-        return new Date(a.registrationDate).getTime() - new Date(b.registrationDate).getTime()
-      case "name":
-        return a.name.localeCompare(b.name)
-      case "value":
-        return Number.parseFloat(b.value?.split(" ")[0] || "0") - Number.parseFloat(a.value?.split(" ")[0] || "0")
-      default:
-        return 0
+    if (filterType === "assetTypes" && value) {
+      newFilters.assetTypes = newFilters.assetTypes.filter((type) => type !== value)
+    } else if (filterType === "collections" && value) {
+      newFilters.collections = newFilters.collections.filter((collection) => collection !== value)
+    } else if (filterType === "verified") {
+      newFilters.verified = false
+    } else if (filterType === "all") {
+      newFilters.assetTypes = []
+      newFilters.collections = []
+      newFilters.verified = false
+      newFilters.sortBy = "newest"
     }
-  })
 
+    setFilters(newFilters)
+    setCurrentPage(1)
+  }
 
+  // Apply filters and search with memoization for performance
+  const filteredAssets = useMemo(() => {
+    return assets
+      .filter((asset) => {
+        // Search filter
+        const searchLower = searchQuery.toLowerCase()
+        const matchesSearch =
+          asset.name.toLowerCase().includes(searchLower) ||
+          asset.creator.toLowerCase().includes(searchLower) ||
+          asset.description.toLowerCase().includes(searchLower) ||
+          (asset.collection && asset.collection.toLowerCase().includes(searchLower))
 
+        // Asset type filter
+        const matchesType = filters.assetTypes.length === 0 || filters.assetTypes.includes(asset.type)
 
-  const renderActivityIcon = (type: string) => {
-    switch (type) {
-      case "view":
-        return <Eye className="h-4 w-4 text-blue-500" />
-      case "license":
-        return <FileCheck className="h-4 w-4 text-green-500" />
-      case "transfer":
-        return <Send className="h-4 w-4 text-purple-500" />
-      case "creation":
-        return <PlusCircle className="h-4 w-4 text-amber-500" />
-      default:
-        return <Clock className="h-4 w-4 text-gray-500" />
+        // Collection filter
+        const matchesCollection =
+          filters.collections.length === 0 || (asset.collection && filters.collections.includes(asset.collection))
+
+        // Verified filter
+        const matchesVerified = !filters.verified || asset.verified
+
+        return matchesSearch && matchesType && matchesCollection && matchesVerified
+      })
+      .sort((a, b) => {
+        switch (filters.sortBy) {
+          case "oldest":
+            return new Date(a.registrationDate).getTime() - new Date(b.registrationDate).getTime()
+          case "name":
+            return a.name.localeCompare(b.name)
+          case "creator":
+            return a.creator.localeCompare(b.creator)
+          case "value-high":
+            return (b.numericValue || 0) - (a.numericValue || 0)
+          case "value-low":
+            return (a.numericValue || 0) - (b.numericValue || 0)
+          case "newest":
+          default:
+            return new Date(b.registrationDate).getTime() - new Date(a.registrationDate).getTime()
+        }
+      })
+  }, [assets, searchQuery, filters])
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredAssets.length / ASSETS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ASSETS_PER_PAGE
+  const endIndex = startIndex + ASSETS_PER_PAGE
+  const currentAssets = filteredAssets.slice(startIndex, endIndex)
+
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [])
+
+  const renderPaginationButtons = useMemo(() => {
+    const buttons = []
+    const maxVisiblePages = 5
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        buttons.push(
+          <Button
+            key={i}
+            variant={currentPage === i ? "default" : "outline"}
+            size="sm"
+            onClick={() => handlePageChange(i)}
+            className="rounded-full min-w-10"
+          >
+            {i}
+          </Button>,
+        )
+      }
+    } else {
+      buttons.push(
+        <Button
+          key={1}
+          variant={currentPage === 1 ? "default" : "outline"}
+          size="sm"
+          onClick={() => handlePageChange(1)}
+          className="rounded-full min-w-10"
+        >
+          1
+        </Button>,
+      )
+
+      if (currentPage > 3) {
+        buttons.push(
+          <span key="ellipsis1" className="px-2 text-muted-foreground">
+            ...
+          </span>,
+        )
+      }
+
+      const start = Math.max(2, currentPage - 1)
+      const end = Math.min(totalPages - 1, currentPage + 1)
+
+      for (let i = start; i <= end; i++) {
+        if (i !== 1 && i !== totalPages) {
+          buttons.push(
+            <Button
+              key={i}
+              variant={currentPage === i ? "default" : "outline"}
+              size="sm"
+              onClick={() => handlePageChange(i)}
+              className="rounded-full min-w-10"
+            >
+              {i}
+            </Button>,
+          )
+        }
+      }
+
+      if (currentPage < totalPages - 2) {
+        buttons.push(
+          <span key="ellipsis2" className="px-2 text-muted-foreground">
+            ...
+          </span>,
+        )
+      }
+
+      if (totalPages > 1) {
+        buttons.push(
+          <Button
+            key={totalPages}
+            variant={currentPage === totalPages ? "default" : "outline"}
+            size="sm"
+            onClick={() => handlePageChange(totalPages)}
+            className="rounded-full min-w-10"
+          >
+            {totalPages}
+          </Button>,
+        )
+      }
     }
-  }
 
+    return buttons
+  }, [totalPages, currentPage, handlePageChange])
 
+  // Get active filter count
+  const activeFilterCount = filters.assetTypes.length + filters.collections.length + (filters.verified ? 1 : 0)
 
-  const renderTypeIcon = (type: IPType) => {
-    switch (type) {
-      case "Art":
-        return <Palette className="h-4 w-4 text-purple-500" />
-      case "Audio":
-        return <Music className="h-4 w-4 text-blue-500" />
-      case "Video":
-        return <Video className="h-4 w-4 text-red-500" />
-      case "Document":
-        return <FileText className="h-4 w-4 text-yellow-500" />
-      case "Software":
-        return <Code className="h-4 w-4 text-violet-500" />
-      case "NFT":
-        return <Hexagon className="h-4 w-4 text-teal-500" />
-      case "Patent":
-        return <Lightbulb className="h-4 w-4 text-amber-500" />
-      case "RWA":
-        return <Globe className="h-4 w-4 text-green-500" />
-      case "Trademark":
-        return <BadgeCheck className="h-4 w-4 text-green-500" />
-      default:
-        return <Box className="h-4 w-4 text-gray-500" />
+  // Calculate stats
+  const stats = useMemo(() => {
+    const totalAssets = assets.length
+    const totalValue = assets.reduce((sum, asset) => sum + (asset.numericValue || 0), 0)
+    const uniqueCreators = new Set(assets.map((asset) => asset.creator)).size
+    const verifiedAssets = assets.filter((asset) => asset.verified).length
+
+    return {
+      totalAssets,
+      totalValue: totalValue.toFixed(1),
+      uniqueCreators,
+      verifiedAssets,
     }
-  }
-
-  const renderNFTCard = (asset: EnhancedAsset, index: number) => {
-    return (
-      <motion.div
-        key={asset.id}
-        className="masonry-item mb-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: index * 0.05 }}
-      >
-        <div className="relative">
-          {/* NFT Card estándar */}
-          <NFTCard
-            id={asset.id}
-            name={asset.name}
-            creator={asset.creator}
-            verified={asset.verified}
-            image={asset.image}
-            collection={asset.collection}
-            licenseType={asset.licenseType}
-            description={asset.description}
-            registrationDate={asset.registrationDate}
-            type={asset.type as IPType}
-            templateType={asset.templateType}
-            protectionLevel={asset.protectionLevel}
-          />
-          
-            {/* IPFS flag(if available) */}
-          {asset.ipfsCid && (
-            <div className="absolute top-3 right-3">
-              <Badge variant="outline" className="bg-background/80 border-teal-500 text-teal-500">
-                <Hexagon className="mr-1 h-3 w-3" />
-                IPFS
-              </Badge>
-            </div>
-          )}
-        </div>
-      </motion.div>
-    )
-  }
-
-  const renderNFTCardList = (asset: EnhancedAsset, index: number) => {
-    return (
-      <motion.div
-        key={asset.id}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2, delay: index * 0.03 }}
-      >
-        <Card className="overflow-hidden">
-          <div className="flex flex-col sm:flex-row">
-            <div className="w-full sm:w-48 h-48 sm:h-auto relative">
-              <Image
-                src={asset.image || "/placeholder.svg"}
-                alt={asset.name}
-                fill
-                className="object-cover"
-              />
-              {asset.ipfsCid && (
-                <div className="absolute top-3 right-3">
-                  <Badge variant="outline" className="bg-background/80 border-teal-500 text-teal-500">
-                    <Hexagon className="mr-1 h-3 w-3" />
-                    IPFS
-                  </Badge>
-                </div>
-              )}
-            </div>
-            <div className="p-4 flex-1 flex flex-col">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-semibold text-lg">{asset.name}</h3>
-                  <p className="text-sm text-muted-foreground flex items-center gap-1">
-                    by {asset.creator}{" "}
-                    {asset.verified && <Verified className="h-3.5 w-3.5 text-blue-400" />}
-                  </p>
-                </div>
-                <Badge variant="outline">{asset.value}</Badge>
-              </div>
-
-              {/* Template Type - Highlighted */}
-              <div className="flex items-center gap-2 p-2 rounded-md border bg-muted/30 mb-3 max-w-xs">
-                <div
-                  className={`rounded-md p-1.5 ${
-                    asset.type === "Art"
-                      ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800/30"
-                      : asset.type === "Audio"
-                        ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/30"
-                        : asset.type === "Software"
-                          ? "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400 border-violet-200 dark:border-violet-800/30"
-                          : asset.type === "NFT"
-                            ? "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400 border-teal-200 dark:border-teal-800/30"
-                            : asset.type === "Patent"
-                              ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/30"
-                              : "bg-gray-100 text-gray-600 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-800/30"
-                  }`}
-                >
-                  {renderTypeIcon(asset.type as IPType)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-muted-foreground">Template</div>
-                  <div className="text-sm font-medium truncate" title={asset.templateType}>
-                    {asset.templateType}
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{asset.description}</p>
-
-              <div className="grid grid-cols-3 gap-x-4 gap-y-2 text-sm mb-4">
-                <div>
-                  <span className="text-muted-foreground">Collection:</span>{" "}
-                  <span className="font-medium">{asset.collection}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">License:</span>{" "}
-                  <span className="font-medium">{asset.licenseType}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Registered:</span>{" "}
-                  <span className="font-medium">{asset.registrationDate}</span>
-                </div>
-              </div>
-
-              <div className="mt-auto flex justify-end gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      Actions
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>Asset Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Shield className="mr-2 h-4 w-4" />
-                      <span>Proof of Ownership</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <Send className="mr-2 h-4 w-4" />
-                      <span>Transfer Asset</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <FileCheck className="mr-2 h-4 w-4" />
-                      <span>Licensing Options</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <BarChart3 className="mr-2 h-4 w-4" />
-                      <span>Asset Dashboard</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <DollarSign className="mr-2 h-4 w-4" />
-                      <span>Monetize</span>
-                    </DropdownMenuItem>
-                    {asset.ipfsCid && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">
-                          <Hexagon className="mr-2 h-4 w-4" />
-                          <a
-                            href={`https://gateway.pinata.cloud/ipfs/${asset.ipfsCid}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full"
-                          >
-                            View on IPFS
-                          </a>
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <Link href={`/asset/${asset.id}`}>
-                  <Button size="sm">
-                    View IP
-                    <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </Card>
-      </motion.div>
-    )
-  }
+  }, [])
 
   return (
-    <div className="min-h-screen bg-background/70 text-foreground pb-20">
-     
-      
-      <main className="container mx-auto p-4 py-6">
-        
-        
-        
-        
-        
-        
-        {/* Dashboard Overview 
-        <div className="mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-3xl font-bold">Welcome back</h2>
-                <p className="text-muted-foreground">Manage your intellectual property portfolio</p>
-              </div>
+    <div className="min-h-screen bg-background">
+      <Header />
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <Card className="bg-blue/5 border-primary/20">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Assets</h3>
-                      <Box className="h-4 w-4 text-primary" />
-                    </div>
-                    <p className="text-2xl font-bold">{portfolioStats.totalAssets}</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-green-500/5 border-green-500/20">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Collections</h3>
-                      <Layers className="h-4 w-4 text-primary" />
-                    </div>
-                    <p className="text-2xl font-bold">1</p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-purple-500/5 border-purple-500/20">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-sm font-medium text-muted-foreground">Licensings</h3>
-                      <FileCheck className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-2xl font-bold">45</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-
-              <Card className="bg-gradient-to-br from-blue/5 to-purple/10 border-primary/20">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-full bg-blue/20 p-3">
-                      <Shield className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Intellectual Property Protection Onchain</h3>
-                      <p className="text-sm text-muted-foreground">Your portfolio is well-protected with Mediolano Proof of Ownership</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 space-y-2">
-                    <div className="flex justify-between items-center text-sm">
-                      <span>Permissionless Protection</span>
-                      <span className="font-medium">{portfolioStats.protectionLevel}%</span>
-                    </div>
-                    <Progress value={portfolioStats.protectionLevel} className="h-2" />
-                    <p className="text-xs text-muted-foreground">
-                      Protection under The Bernie Sanders Act and The Copyright Act of 1976, valid in 181 countries for 50 to 70 years, according to jurisdiction.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium">Recent Activity</h3>
-                    <Badge variant="outline" className="text-xs">
-                     Preview
-                    </Badge>
-                  </div>
-                  <ScrollArea className="h-[180px]">
-                    <div className="space-y-3">
-                      {recentActivity.map((activity, index) => (
-                        <div key={index} className="flex items-start gap-3">
-                          <div className="mt-0.5">{renderActivityIcon(activity.type)}</div>
-                          <div>
-                            <p className="text-sm font-medium">
-                              {activity.type === "creation"
-                                ? "Created"
-                                : activity.type === "view"
-                                  ? "Viewed by"
-                                  : activity.type === "license"
-                                    ? "Licensed by"
-                                    : "Transferred to"}{" "}
-                              {activity.user !== "You" && activity.user}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {activity.assetName} • {activity.timestamp}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="space-y-4">
-              
-              <div className="grid grid-cols-2 gap-3">
-                
-                <Link href="/create">
-                  <Card className="hover:bg-blue/5 transition-colors cursor-pointer h-full">
-                    <CardContent className="p-4 flex flex-col h-full">
-                      <div className="rounded-full bg-blue/10 w-10 h-10 flex items-center justify-center mb-3">
-                        <PlusCircle className="h-5 w-5 text-primary" />
-                      </div>
-                      <h3 className="font-medium">Create New IP</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Register and protect your intellectual property
-                      </p>
-                      <div className="mt-auto pt-2">
-                        <Badge variant="outline" className="text-xs">
-                          {templates.length} templates
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-
-                <Link href="/portfolio">
-                  <Card className="hover:bg-blue/5 transition-colors cursor-pointer h-full">
-                    <CardContent className="p-4 flex flex-col h-full">
-                      <div className="rounded-full bg-blue/10 w-10 h-10 flex items-center justify-center mb-3">
-                        <Send className="h-5 w-5 text-primary" />
-                      </div>
-                      <h3 className="font-medium">My Portfolio</h3>
-                      <p className="text-sm text-muted-foreground mt-1">View and manage your assets;</p>
-                      <div className="mt-auto pt-2">
-                        <Badge variant="outline" className="text-xs">
-                          Open Portfolio
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-
-
-
-                <Link href="/lisensing">
-                  <Card className="hover:bg-blue/5 transition-colors cursor-pointer h-full">
-                    <CardContent className="p-4 flex flex-col h-full">
-                      <div className="rounded-full bg-blue/10 w-10 h-10 flex items-center justify-center mb-3">
-                        <PlusCircle className="h-5 w-5 text-primary" />
-                      </div>
-                      <h3 className="font-medium">Create Licensing</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Create a licensing agreement for your IP
-                      </p>
-                      <div className="mt-auto pt-2">
-                        <Badge variant="outline" className="text-xs">
-                          New licensing
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-
-                <Link href="/transfer">
-                  <Card className="hover:bg-blue/5 transition-colors cursor-pointer h-full">
-                    <CardContent className="p-4 flex flex-col h-full">
-                      <div className="rounded-full bg-blue/10 w-10 h-10 flex items-center justify-center mb-3">
-                        <Send className="h-5 w-5 text-primary" />
-                      </div>
-                      <h3 className="font-medium">Transfer Assets</h3>
-                      <p className="text-sm text-muted-foreground mt-1">Transfer ownership of your IP assets</p>
-                      <div className="mt-auto pt-2">
-                        <Badge variant="outline" className="text-xs">
-                          Secure transfer
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-
-                
-
-                
-              </div>
-
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4 text-primary" />
-                      Trending Templates
-                    </h3>
-                    <Link href="/create/templates">
-                      <Button variant="ghost" size="sm" className="h-8 gap-1">
-                        View all
-                        <ChevronDown className="h-3.5 w-3.5" />
-                      </Button>
-                    </Link>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {templates.slice(0, 4).map((template) => (
-                      <div
-                        key={template.id}
-                        className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors cursor-pointer"
-                      >
-                        <div
-                          className={`rounded-md p-2 ${
-                            template.type === "Art"
-                              ? "bg-purple-100 dark:bg-purple-900/30"
-                              : template.type === "Audio"
-                                ? "bg-blue-100 dark:bg-blue-900/30"
-                                : template.type === "Software"
-                                  ? "bg-violet-100 dark:bg-violet-900/30"
-                                  : template.type === "NFT"
-                                    ? "bg-teal-100 dark:bg-teal-900/30"
-                                    : template.type === "Patent"
-                                      ? "bg-amber-100 dark:bg-amber-900/30"
-                                      : "bg-gray-100 dark:bg-gray-900/30"
-                          }`}
-                        >
-                          {renderTypeIcon(template.type)}
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">{template.name}</p>
-                          <p className="text-xs text-muted-foreground">{template.type}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              
-            </div>
-          </motion.div>
-        </div>
-        */}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        {/* Mobile Quick Actions 
-        <div className="md:hidden flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-          <Link href="/create/templates">
-            <Button size="sm" className="flex items-center gap-2 whitespace-nowrap">
-              <PlusCircle className="h-4 w-4" />
-              Create New IP
-            </Button>
-          </Link>
-          <Link href="/transfer">
-            <Button variant="outline" size="sm" className="flex items-center gap-2 whitespace-nowrap">
-              <Send className="h-4 w-4" />
-              Transfer
-            </Button>
-          </Link>
-          <Button variant="outline" size="sm" className="flex items-center gap-2 whitespace-nowrap">
-            <FileText className="h-4 w-4" />
-            Templates
-          </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-2 whitespace-nowrap">
-            <Zap className="h-4 w-4" />
-            Quick Protect
-          </Button>
-        </div>*/}
-
-
-
-        {/* Asset Management Section */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }}>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-2xl font-bold">Programmable IP</h2>
-              <p className="text-muted-foreground">Explore intellectual property onchain</p>
-            </div>
-
-            <div className="flex gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-9">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filters
-                    <Badge className="ml-2" variant="secondary">
-                      {(filterType !== "all" ? 1 : 0) +
-                        (filterCollection !== "all" ? 1 : 0) +
-                        (filterLicense !== "all" ? 1 : 0) +
-                        (filterTemplate !== "all" ? 1 : 0)}
-                    </Badge>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Filter Assets</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuLabel>Asset Type</DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem checked={filterType === "all"} onCheckedChange={() => setFilterType("all")}>
-                    All Types
-                  </DropdownMenuCheckboxItem>
-                  {uniqueTypes.map((type) => (
-                    <DropdownMenuCheckboxItem
-                      key={type}
-                      checked={filterType === type}
-                      onCheckedChange={() => setFilterType(type)}
-                    >
-                      <span className="flex items-center gap-1.5">
-                        {renderTypeIcon(type as IPType)}
-                        {type}
-                      </span>
-                    </DropdownMenuCheckboxItem>
-                  ))}
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuLabel>Template</DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={filterTemplate === "all"}
-                    onCheckedChange={() => setFilterTemplate("all")}
-                  >
-                    All Templates
-                  </DropdownMenuCheckboxItem>
-                  {uniqueTemplates.map((template) => (
-                    <DropdownMenuCheckboxItem
-                      key={template}
-                      checked={filterTemplate === template}
-                      onCheckedChange={() => template && setFilterTemplate(template)}
-                    >
-                      {template}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuLabel>Collection</DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={filterCollection === "all"}
-                    onCheckedChange={() => setFilterCollection("all")}
-                  >
-                    All Collections
-                  </DropdownMenuCheckboxItem>
-                  {uniqueCollections.map((collection) => (
-                    <DropdownMenuCheckboxItem
-                      key={collection}
-                      checked={filterCollection === collection}
-                      onCheckedChange={() => setFilterCollection(collection)}
-                    >
-                      {collection}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuLabel>License Type</DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={filterLicense === "all"}
-                    onCheckedChange={() => setFilterLicense("all")}
-                  >
-                    All Licenses
-                  </DropdownMenuCheckboxItem>
-                  {uniqueLicenses.map((license) => (
-                    <DropdownMenuCheckboxItem
-                      key={license}
-                      checked={filterLicense === license}
-                      onCheckedChange={() => setFilterLicense(license)}
-                    >
-                      {license}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <Link href="/create/templates">
-                <Button className="h-9">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Create New IP
-                </Button>
-              </Link>
-            </div>
+      <main className="container mx-auto px-4 py-8 space-y-8">
+        {/* Page Header */}
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Globe className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              Explore IP Assets
+            </h1>
           </div>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Discover and explore intellectual property assets from creators around the world. From digital art to
+            patents, find the perfect IP for your next project.
+          </p>
+        </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-6 text-center">
+            <TrendingUp className="h-8 w-8 text-blue-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold">{stats.totalAssets}</div>
+            <div className="text-sm text-muted-foreground">Total Assets</div>
+          </div>
+          <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl p-6 text-center">
+            <Zap className="h-8 w-8 text-green-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold">{stats.totalValue} ETH</div>
+            <div className="text-sm text-muted-foreground">Total Value</div>
+          </div>
+          <div className="bg-gradient-to-br from-orange-500/10 to-pink-500/10 rounded-xl p-6 text-center">
+            <Users className="h-8 w-8 text-orange-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold">{stats.uniqueCreators}</div>
+            <div className="text-sm text-muted-foreground">Creators</div>
+          </div>
+          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl p-6 text-center">
+            <Globe className="h-8 w-8 text-purple-500 mx-auto mb-2" />
+            <div className="text-2xl font-bold">{stats.verifiedAssets}</div>
+            <div className="text-sm text-muted-foreground">Verified</div>
+          </div>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search assets by name, creator, or collection..."
-                className="pl-10"
+                placeholder="Search assets, creators, collections..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setCurrentPage(1)
+                }}
+                className="pl-10"
               />
             </div>
-
             <div className="flex gap-2">
-              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                <SelectTrigger className="w-[160px]">
+              <Select
+                value={filters.sortBy}
+                onValueChange={(value) => {
+                  setFilters({ ...filters, sortBy: value })
+                  setCurrentPage(1)
+                }}
+              >
+                <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="newest">Newest First</SelectItem>
                   <SelectItem value="oldest">Oldest First</SelectItem>
-                  <SelectItem value="name">Name (A-Z)</SelectItem>
-                  <SelectItem value="value">Value (High-Low)</SelectItem>
+                  <SelectItem value="name">Name A-Z</SelectItem>
+                  <SelectItem value="creator">Creator A-Z</SelectItem>
+                  <SelectItem value="value-high">Value High-Low</SelectItem>
+                  <SelectItem value="value-low">Value Low-High</SelectItem>
                 </SelectContent>
               </Select>
-
-              <div className="flex border rounded-md overflow-hidden">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="icon"
-                  className="rounded-none h-10 w-10"
-                  onClick={() => setViewMode("grid")}
-                >
-                  <LayoutGrid className="h-4 w-4" />
-                </Button>
-                <Separator orientation="vertical" />
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="icon"
-                  className="rounded-none h-10 w-10"
-                  onClick={() => setViewMode("list")}
-                >
-                  <LayoutList className="h-4 w-4" />
-                </Button>
-              </div>
+              <AssetFilterDrawer onFiltersChange={handleFiltersChange} />
             </div>
           </div>
 
-          <Tabs defaultValue="all" className="mb-8">
-            <TabsList>
-              <TabsTrigger value="all">All Assets</TabsTrigger>
-              <TabsTrigger value="licensed">Licensed</TabsTrigger>
-              <TabsTrigger value="created">Created</TabsTrigger>
-              <TabsTrigger value="collections">Collections</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="all">
-              {loading ? (
-                <div className="grid grid-cols-3 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {Array(8)
-                    .fill(0)
-                    .map((_, i) => (
-                      <NFTSkeleton key={i} />
-                    ))}
-                </div>
-              ) : sortedAssets.length === 0 ? (
-                <div className="text-center py-12 border rounded-lg">
-                  <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No assets found</h3>
-                  <p className="text-muted-foreground max-w-md mx-auto mb-6">
-                    We couldn't find any assets matching your search criteria. Try adjusting your filters or search
-                    query.
-                  </p>
-                  <Button
-                    onClick={() => {
-                      setSearchQuery("")
-                      setFilterType("all")
-                      setFilterCollection("all")
-                      setFilterLicense("all")
-                      setFilterTemplate("all")
-                    }}
-                  >
-                    Clear Filters
-                  </Button>
-                </div>
-              ) : viewMode === "grid" ? (
-                <div className="masonry-grid grid grid-cols-3 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {sortedAssets.map((asset, index) => renderNFTCard(asset, index))}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {sortedAssets.map((asset, index) => renderNFTCardList(asset, index))}
-                </div>
+          {/* Active Filters */}
+          {activeFilterCount > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-muted-foreground">Active filters:</span>
+              {filters.assetTypes.map((type) => (
+                <Badge key={type} variant="secondary" className="gap-1">
+                  {type}
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-destructive"
+                    onClick={() => handleClearFilter("assetTypes", type)}
+                  />
+                </Badge>
+              ))}
+              {filters.collections.map((collection) => (
+                <Badge key={collection} variant="secondary" className="gap-1">
+                  {collection}
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-destructive"
+                    onClick={() => handleClearFilter("collections", collection)}
+                  />
+                </Badge>
+              ))}
+              {filters.verified && (
+                <Badge variant="secondary" className="gap-1">
+                  Verified Only
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-destructive"
+                    onClick={() => handleClearFilter("verified")}
+                  />
+                </Badge>
               )}
-            </TabsContent>
+              <Button variant="ghost" size="sm" onClick={() => handleClearFilter("all")} className="h-6 px-2 text-xs">
+                Clear all
+              </Button>
+            </div>
+          )}
+        </div>
 
-            <TabsContent value="licensed">
-              <div className="rounded-lg border p-8 text-center">
-                <h3 className="text-xl font-medium mb-2">No Licensed Assets</h3>
-                <p className="text-muted-foreground mb-4">You haven't licensed any IP assets yet.</p>
-                <Button>Browse Marketplace</Button>
+        {/* Results Summary */}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            {loading
+              ? "Loading assets..."
+              : filteredAssets.length === 0
+                ? "No assets found"
+                : `Showing ${startIndex + 1}-${Math.min(endIndex, filteredAssets.length)} of ${filteredAssets.length} assets`}
+          </p>
+        </div>
+
+        {/* Assets Grid */}
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {Array(ASSETS_PER_PAGE)
+              .fill(0)
+              .map((_, i) => (
+                <NFTSkeleton key={i} />
+              ))}
+          </div>
+        ) : filteredAssets.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-muted-foreground mb-4">
+              <Search className="h-16 w-16 mx-auto mb-4 opacity-50" />
+              <p className="text-xl font-medium">No IP assets found</p>
+              <p className="text-sm">Try adjusting your search terms or filters</p>
+            </div>
+            {activeFilterCount > 0 && (
+              <Button variant="outline" onClick={() => handleClearFilter("all")}>
+                Clear all filters
+              </Button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {currentAssets.map((asset) => (
+                <NFTCard key={asset.id} asset={asset} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="rounded-full"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="hidden sm:inline ml-1">Previous</span>
+                </Button>
+
+                <div className="hidden sm:flex items-center gap-1">{renderPaginationButtons}</div>
+
+                <div className="flex sm:hidden items-center gap-2 px-3">
+                  <span className="text-sm text-muted-foreground">
+                    {currentPage} / {totalPages}
+                  </span>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="rounded-full"
+                >
+                  <span className="hidden sm:inline mr-1">Next</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
               </div>
-            </TabsContent>
-
-            <TabsContent value="created">
-              <div className={viewMode === "grid" ? "masonry-grid" : "space-y-4"}>
-                {assets
-                  .filter((a) => a.creator === "0xArtist")
-                  .map((asset, index) => (
-                    <div key={asset.id} className={viewMode === "grid" ? "masonry-item mb-6" : ""}>
-                      {viewMode === "grid" 
-                        ? renderNFTCard(asset, index)
-                        : renderNFTCardList(asset, index)
-                      }
-                    </div>
-                  ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="collections">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-                {collections.map((collection) => (
-                  <Card key={collection.id} className="overflow-hidden">
-                    <div className="aspect-video relative">
-                      <Image
-                        src={collection.coverImage || "/placeholder.svg"}
-                        alt={collection.name}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
-                        <div className="p-4 text-white">
-                          <h3 className="text-xl font-bold">{collection.name}</h3>
-                          <p className="text-sm opacity-90">{collection.assetCount} assets</p>
-                        </div>
-                      </div>
-                    </div>
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Total Value</p>
-                          <p className="font-medium">{collection.totalValue}</p>
-                        </div>
-                        <Badge
-                          variant="outline"
-                          className={`flex items-center gap-1 ${
-                            collection.type === "Art"
-                              ? "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-                              : collection.type === "Audio"
-                                ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-                                : collection.type === "Software"
-                                  ? "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400"
-                                  : collection.type === "NFT"
-                                    ? "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400"
-                                    : collection.type === "Patent"
-                                      ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
-                                      : "bg-gray-100 text-gray-600 dark:bg-gray-900/30 dark:text-gray-400"
-                          }`}
-                        >
-                          {renderTypeIcon(collection.type as IPType)}
-                          {collection.type}
-                        </Badge>
-                      </div>
-                      <Button variant="outline" className="w-full">
-                        View Collection
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </motion.div>
-
-
-
-
-
-        
+            )}
+          </>
+        )}
       </main>
+
+      <Footer />
     </div>
-  )
-}
-
-function Eye(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  )
-}
-
-function FileCheck(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-      <polyline points="14 2 14 8 20 8" />
-      <path d="m9 15 2 2 4-4" />
-    </svg>
   )
 }

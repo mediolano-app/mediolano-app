@@ -83,6 +83,20 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/activities"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <FileCode className="mr-2 h-4 w-4  text-blue-600" />
+                      Activities
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Browse and interact with onchain activities
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                     href="/discover"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
@@ -158,7 +172,7 @@ export function MainNav() {
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
                       <FileCode className="mr-2 h-4 w-4  text-blue-600" />
-                      IP Templates
+                      With Templates
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
                       Create your IP using templates for common use cases
