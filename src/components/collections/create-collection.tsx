@@ -38,6 +38,9 @@ import {
 import { useIpfsUpload } from "@/hooks/useIpfs";
 import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
 import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer";
+import { useProvider } from "@starknet-react/core";
+import { num, hash, Contract } from "starknet";
+import { ipCollectionAbi } from "@/abis/ip_collection";
 
 export default function CreateCollectionView({
   isModalMode,
@@ -49,6 +52,7 @@ export default function CreateCollectionView({
   const { createCollection, isCreating, error: hookError } = useCollection();
   const { toast } = useToast();
   const { address: walletAddress } = useAccount();
+  const { provider } = useProvider();
 
   // Form State
   const [formData, setFormData] = useState<CollectionFormData>({
@@ -151,31 +155,137 @@ export default function CreateCollectionView({
       if (!result || !result.metadataUrl) {
         throw new Error("Failed to upload metadata to IPFS. Please try again.");
       }
+      console.log("Upload Complete. Proceeding to Mint.");
 
       // Step 2: Create collection on-chain
       setCreationStep("processing");
       setProgress(60);
+      console.log("Step: Minting collection on-chain...");
 
-      const hash = await createCollection({
+      const txHash = await createCollection({
         base_uri: result.metadataUrl,
         name: formData.name,
         symbol: formData.name, // Using name as symbol for simplicity or derive it
       });
 
-      setProgress(90);
+      console.log("Mint Initiated, Hash:", txHash);
 
-      if (hash) {
-        setTxHash(hash);
+      if (txHash) {
+        setTxHash(txHash);
+
+        // Wait for transaction to be accepted to get the event
+        console.log("Waiting for transaction receipt...");
+        const receipt = await provider.waitForTransaction(txHash);
+        console.log("Receipt received:", receipt);
+
+        // Default to listing page fallback
+        let collectionId = "collections";
+
+        // Attempt to parse events to find CollectionCreated
+        // We look for events emitted from our contract
+        // The event selector for CollectionCreated is:
+        const collectionCreatedSelector = hash.getSelectorFromName("CollectionCreated");
+
+        if (receipt.isSuccess() && 'events' in receipt) {
+          const events = receipt.events;
+          console.log("Transaction Events:", events);
+
+          // Find the event emitted by our contract
+          // We look for an event that has enough data to be CollectionCreated
+          // Structure: [collection_id (2), owner (1), name (3+), symbol (3+), base_uri (3+)]
+          // So expected data length is at least 10+ usually.
+          // But safely, let's just find the event from our contract that looks like it.
+
+          let creationEvent = events.find(
+            (e: any) =>
+              e.from_address?.toLowerCase() === COLLECTION_CONTRACT_ADDRESS.toLowerCase() &&
+              e.keys[0] === collectionCreatedSelector
+          );
+
+          // Fallback: If selector mismatch (e.g. component event), grab the first event from our contract
+          // that is NOT a Transfer event (Transfer has 2 keys usually or particular selector)
+          if (!creationEvent) {
+            creationEvent = events.find((e: any) =>
+              e.from_address?.toLowerCase() === COLLECTION_CONTRACT_ADDRESS.toLowerCase() &&
+              e.data.length >= 2 // At least enough for an ID
+            );
+          }
+
+          if (creationEvent) {
+            console.log("Found Creation Event:", creationEvent);
+            if (creationEvent.data && creationEvent.data.length > 0) {
+              const low = creationEvent.data[0];
+              collectionId = num.toBigInt(low).toString();
+              console.log("Parsed Collection ID:", collectionId);
+            }
+          }
+        }
+
+        // Fallback: If event parsing failed (collectionId is still "collections"), fetch robustly from chain
+        if (collectionId === "collections" && walletAddress) {
+          console.log("Event parsing failed, fetching user collections from chain...");
+          try {
+            // Use static imports
+            const contract = new Contract(ipCollectionAbi, COLLECTION_CONTRACT_ADDRESS, provider);
+
+            // call list_user_collections
+            const userCollections = await contract.list_user_collections(walletAddress);
+            console.log("User collections:", userCollections);
+
+            if (userCollections && userCollections.length > 0) {
+              // It returns valid array of u256 (as objects or bigints depending on provider/version)
+              // Starknet.js usually returns objects {low, high} or BigInts
+              // We take the last one
+              const lastId = userCollections[userCollections.length - 1];
+
+              // Handle potential types
+              if (typeof lastId === 'object' && 'low' in lastId) {
+                collectionId = num.toBigInt(lastId.low).toString();
+              } else {
+                collectionId = num.toBigInt(lastId).toString();
+              }
+              console.log("Fetched Last Collection ID:", collectionId);
+            }
+          } catch (err) {
+            console.error("Fallback fetch failed:", err);
+          }
+        }
+
+        // If we have a valid numeric ID, fetch the actual collection address to display
+        let collectionAddressForLink = collectionId;
+
+        if (collectionId !== "collections") {
+          try {
+            const contract = new Contract(ipCollectionAbi, COLLECTION_CONTRACT_ADDRESS, provider);
+            console.log("Fetching collection details for ID:", collectionId);
+
+            // get_collection returns [Collection] struct
+            const collectionData = await contract.get_collection(collectionId);
+            console.log("Collection Data:", collectionData);
+
+            // Extract ip_nft address
+            if (collectionData && collectionData.ip_nft) {
+              // ip_nft is a ContractAddress (felt)
+              const addressBigInt = num.toBigInt(collectionData.ip_nft);
+              collectionAddressForLink = "0x" + addressBigInt.toString(16);
+              console.log("Resolved Collection Address:", collectionAddressForLink);
+            }
+          } catch (err) {
+            console.error("Failed to fetch collection address:", err);
+          }
+        }
+
         // Construct result for drawer
         setMintResult({
-          transactionHash: hash,
-          tokenId: "Collection", // Collections don't have token IDs in the same way, but drawer expects it
-          assetSlug: "collections", // Redirect to portfolio or collections list?
+          transactionHash: txHash,
+          tokenId: collectionAddressForLink, // Display Address
+          assetSlug: collectionAddressForLink, // Link to Address
         });
       }
 
       setProgress(100);
       setCreationStep("success");
+      console.log("Collection creation flow complete.");
 
       toast({
         title: "Collection Created!",
@@ -200,9 +310,7 @@ export default function CreateCollectionView({
       console.error("Error creating collection:", err);
       const errorMessage = err instanceof Error ? err.message : "Failed to create collection";
       setError(errorMessage);
-      setCreationStep("idle"); // Go back to idle or stay? Better to show error state in drawer which supports retry
-      // Actually MintSuccessDrawer handles error display if error prop is set, and we can pass onConfirm to retry.
-      // So we keep step as is or reset? Drawer logic: if error is present, it shows error screen.
+      // Keep error step handling consistent
     }
   };
 
@@ -487,6 +595,7 @@ export default function CreateCollectionView({
         onConfirm={handleConfirmMint}
         cost="0.001 STRK" /* Estimate */
         previewImage={previewImage}
+        basePath="/collections/"
         data={{
           Symbol: formData.symbol || "MIP",
           Type: formData.type,

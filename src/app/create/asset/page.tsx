@@ -24,9 +24,12 @@ import CreateCollectionView from "@/components/collections/create-collection";
 import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer";
 import { IMintResult } from "@/hooks/use-create-asset";
 import { normalizeStarknetAddress } from "@/lib/utils";
+import { useProvider } from "@starknet-react/core";
+import { num, hash } from "starknet";
 
 export default function CreateAssetPage() {
   const { toast } = useToast();
+  const { provider } = useProvider();
   const [openCollection, setOpenCollection] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
@@ -155,7 +158,7 @@ export default function CreateAssetPage() {
       const result = await uploadToIpfs(formState?.mediaFile as File, metadata);
       setMintProgress(50);
 
-      //Then make contract call.
+      // Then make contract call.
       setMintStep("processing");
       setMintProgress(60);
 
@@ -165,6 +168,35 @@ export default function CreateAssetPage() {
         token_uri: result?.metadataUrl,
         collection_nft_address: contractHex,
       });
+
+      if (mintResultData?.transactionHash) {
+        // Wait for transaction to be accepted to get the event
+        const receipt = await provider.waitForTransaction(mintResultData.transactionHash);
+
+        const tokenMintedSelector = hash.getSelectorFromName("TokenMinted");
+
+        // Default to a fallback if we can't parse
+        let parsedId = mintResultData.tokenId || "0";
+
+        if (receipt.isSuccess() && 'events' in receipt) {
+          const events = receipt.events;
+          const mintEvent = events.find(
+            (e: any) => e.keys[0] === tokenMintedSelector
+          );
+
+          if (mintEvent && mintEvent.data) {
+            // token_id is u256 at index 2 and 3 of data array
+            // data layout: [collection_id_low, collection_id_high, token_id_low, token_id_high, ...]
+            const low = mintEvent.data[2];
+            parsedId = num.toBigInt(low).toString();
+            console.log("Parsed Token ID:", parsedId);
+
+            // Update mint result data with accurate ID
+            mintResultData.tokenId = parsedId;
+            mintResultData.assetSlug = `${contractHex}-${parsedId}`;
+          }
+        }
+      }
 
       setMintProgress(90);
 

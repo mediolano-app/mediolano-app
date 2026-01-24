@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react"
 import { useAccount, useContract, useSendTransaction, useProvider } from "@starknet-react/core"
 import { useRouter } from "next/navigation"
-import { Abi } from "starknet"
+import { Abi, num, hash } from "starknet"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -333,18 +333,27 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 const receipt = await provider.getTransactionReceipt(tx.transaction_hash);
                 let mintedId = "";
                 // @ts-ignore
+                const tokenMintedSelector = hash.getSelectorFromName("TokenMinted");
+                const transferSelector = hash.getSelectorFromName("Transfer");
+
+                // @ts-ignore
                 if (receipt.events) {
                     // @ts-ignore
                     const event = receipt.events.find((e: any) =>
-                        e.keys?.[0] === "0x18e1d8b2def1e40ffa4a5ca6e6bfa43f3c0b5c4a4e0b24b3e6c5db55d7a7e7c" || // Transfer
-                        e.keys?.[0] === "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9" // TokenMinted
+                        e.keys?.[0] === transferSelector ||
+                        e.keys?.[0] === tokenMintedSelector
                     );
 
-                    if (event && event.keys && event.keys.length > 2) {
-                        if (event.keys[3]) {
-                            mintedId = parseInt(event.keys[3], 16).toString();
-                        } else if (event.data && event.data.length > 0) {
-                            mintedId = parseInt(event.data[0], 16).toString();
+                    if (event) {
+                        if (event.keys?.[0] === tokenMintedSelector && event.data && event.data.length >= 4) {
+                            // TokenMinted: data[2] is low part of token_id
+                            const low = event.data[2];
+                            mintedId = num.toBigInt(low).toString();
+                        } else if (event.keys.length > 2) {
+                            // Transfer (ERC721): usually keys[3] is token_id
+                            if (event.keys[3]) {
+                                mintedId = parseInt(event.keys[3], 16).toString();
+                            }
                         }
                     }
                 }

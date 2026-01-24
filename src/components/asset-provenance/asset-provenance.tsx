@@ -31,14 +31,16 @@ import { useState } from "react"
 import Image from "next/image"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
+import { motion, AnimatePresence } from "framer-motion"
+
 interface ProvenanceEvent {
   id: string
-  type: "creation" | "transfer" | "license" | "modification" | "verification" | "dispute"
+  type: "mint" | "transfer" | "license" | "modification" | "verification" | "dispute"
   title: string
   description: string
   from?: string
   to?: string
-  date: string
+  date?: string
   timestamp: string
   transactionHash?: string
   blockNumber?: number
@@ -46,8 +48,6 @@ interface ProvenanceEvent {
   memo?: string
   verified: boolean
   location?: string
-  ipAddress?: string
-  userAgent?: string
   metadata?: Record<string, any>
 }
 
@@ -89,7 +89,6 @@ interface AssetProvenanceProps {
 
 export function AssetProvenance({ asset, events, showActions = true, compact = false }: AssetProvenanceProps) {
   const [copied, setCopied] = useState<string | null>(null)
-  const [expandedEvent, setExpandedEvent] = useState<string | null>(null)
   const [showAllEvents, setShowAllEvents] = useState(false)
 
   const handleCopy = async (text: string, type: string) => {
@@ -107,7 +106,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
       try {
         await navigator.share({
           title: `${asset.name} - Asset Provenance`,
-          text: `View the complete ownership history of ${asset.name}`,
+          text: `View the onchain history of ${asset.name}`,
           url: window.location.href,
         })
       } catch (error) {
@@ -120,54 +119,49 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
 
   const getEventIcon = (type: ProvenanceEvent["type"]) => {
     switch (type) {
-      case "creation":
-        return <FileText className="h-4 w-4" />
+      case "mint":
+        return <Zap className="h-5 w-5" />
       case "transfer":
-        return <ArrowRight className="h-4 w-4" />
+        return <ArrowRight className="h-5 w-5" />
       case "license":
-        return <Lock className="h-4 w-4" />
+        return <Lock className="h-5 w-5" />
       case "modification":
-        return <Zap className="h-4 w-4" />
+        return <Fingerprint className="h-5 w-5" />
       case "verification":
-        return <CheckCircle className="h-4 w-4" />
+        return <CheckCircle className="h-5 w-5" />
       case "dispute":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-5 w-5" />
       default:
-        return <FileText className="h-4 w-4" />
+        return <Activity className="h-5 w-5" />
     }
   }
 
-  const getEventColor = (type: ProvenanceEvent["type"]) => {
+  const getEventColorCode = (type: ProvenanceEvent["type"]) => {
     switch (type) {
-      case "creation":
-        return "text-blue-600 bg-blue-50 border-blue-200 dark:text-blue-400 dark:bg-blue-950/20 dark:border-blue-800"
-      case "transfer":
-        return "text-green-600 bg-green-50 border-green-200 dark:text-green-400 dark:bg-green-950/20 dark:border-green-800"
-      case "license":
-        return "text-purple-600 bg-purple-50 border-purple-200 dark:text-purple-400 dark:bg-purple-950/20 dark:border-purple-800"
-      case "modification":
-        return "text-orange-600 bg-orange-50 border-orange-200 dark:text-orange-400 dark:bg-orange-950/20 dark:border-orange-800"
-      case "verification":
-        return "text-emerald-600 bg-emerald-50 border-emerald-200 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-800"
-      case "dispute":
-        return "text-red-600 bg-red-50 border-red-200 dark:text-red-400 dark:bg-red-950/20 dark:border-red-800"
-      default:
-        return "text-gray-600 bg-gray-50 border-gray-200 dark:text-gray-400 dark:bg-gray-950/20 dark:border-gray-800"
+      case "mint": return "from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700 shadow-blue-500/10"
+      case "transfer": return "from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700 shadow-emerald-500/10"
+      case "license": return "from-purple-500 to-pink-600 dark:from-purple-600 dark:to-pink-700 shadow-purple-500/10"
+      case "verification": return "from-cyan-500 to-blue-600 shadow-cyan-500/20"
+      default: return "from-orange-500 to-red-600 dark:from-orange-600 dark:to-red-700 shadow-orange-500/10"
     }
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
+    try {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    } catch (e) {
+      return "Recently"
+    }
   }
 
   const truncateAddress = (address: string) => {
-    if (!address) return "Unknown"
+    if (!address) return "0x00...0000"
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
   }
 
@@ -175,362 +169,258 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
   const hasMoreEvents = events.length > 5
 
   return (
-    <div className="space-y-6">
-      {/* Mobile-Optimized Asset Overview */}
-      <Card className="border-2 border-primary/20 bg-gradient-to-br from-background to-muted/20">
-        <CardHeader className="pb-4">
-          <div className="flex flex-col sm:flex-row items-start gap-4">
-            <div className="relative w-full sm:w-20 h-48 sm:h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+    <div className="relative space-y-12 pb-20">
+      {/* Background Blooms - subtle for both themes */}
+      <div className="absolute top-0 -left-20 w-96 h-96 bg-primary/10 dark:bg-primary/20 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-40 -right-20 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-[100px] -z-10" />
+
+      {/* Main Asset Section - Focus on Ownership */}
+      <section className="relative overflow-hidden rounded-3xl border border-border bg-card/40 backdrop-blur-2xl shadow-xl dark:shadow-2xl dark:shadow-black/50 transition-colors animate-in fade-in zoom-in duration-500">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 min-h-[500px]">
+          {/* Vertical Image - uses all available height */}
+          <div className="lg:col-span-5 h-[400px] lg:h-auto relative group overflow-hidden border-b lg:border-b-0 lg:border-r border-border">
+            <motion.div
+              initial={{ scale: 1.05, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="w-full h-full"
+            >
               <Image
                 src={asset.image || "/placeholder.svg"}
                 alt={asset.name}
                 fill
-                className="object-cover"
-                sizes="(max-width: 640px) 100vw, 80px"
+                className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                priority
               />
+            </motion.div>
+            <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent pointer-events-none" />
+          </div>
+
+          {/* Content & Ownership Details */}
+          <div className="lg:col-span-7 p-6 lg:p-12 flex flex-col justify-center space-y-10">
+            <div className="space-y-4">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-foreground">
+                  {asset.name}
+                </h1>
+                <p className="text-base lg:text-lg text-muted-foreground mt-4 font-light leading-relaxed max-w-lg">
+                  {asset.description}
+                </p>
+              </motion.div>
             </div>
-            <div className="flex-1 min-w-0 w-full">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-xl sm:text-2xl font-bold mb-2 break-words">{asset.name}</h2>
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-3">{asset.description}</p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
-                      {asset.type}
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs">
-                      <Hash className="h-3 w-3 mr-1" />
-                      {asset.tokenId}
-                    </Badge>
+
+            {/* Ownership Focus Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {/* Creator Info */}
+              <div className="space-y-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Creator</p>
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/30 border border-border group hover:bg-secondary/50 transition-all duration-300">
+                  <div className="min-w-0">
+                    <p className="font-bold text-foreground text-base truncate">{asset.creator.name}</p>
+                    <p className="text-xs text-muted-foreground font-mono mt-1 opacity-70">{truncateAddress(asset.creator.address)}</p>
                   </div>
                 </div>
-                {showActions && (
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleShare}
-                      className="w-full sm:w-auto bg-transparent"
-                    >
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share
-                    </Button>
+              </div>
+
+              {/* Current Owner Info */}
+              <div className="space-y-4">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Owner</p>
+                <div className="flex items-center gap-4 p-4 rounded-2xl bg-primary/5 border border-primary/10 group hover:bg-primary/10 transition-all duration-300">
+                  <div className="min-w-0">
+                    <p className="font-bold text-foreground text-base truncate">{asset.currentOwner.name}</p>
+                    <p className="text-xs text-primary/60 font-mono mt-1">{truncateAddress(asset.currentOwner.address)}</p>
                   </div>
-                )}
+                </div>
+              </div>
+            </div>
+
+            {/* Minor Metadata Footer */}
+            <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-border/50">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Token ID</span>
+                <span className="font-mono text-sm font-bold text-foreground/80">#{asset.tokenId}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Network</span>
+                <span className="text-sm font-bold text-foreground/80">{asset.blockchain}</span>
+              </div>
+              <div className="ml-auto">
+                <Badge variant="outline" className="rounded-full px-4 py-1.5 border-border bg-background/50 hover:bg-accent transition-colors font-medium">
+                  ERC-721
+                </Badge>
               </div>
             </div>
           </div>
-        </CardHeader>
+        </div>
+      </section>
 
-        <CardContent className="pt-0">
-          {/* Mobile-First Info Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Creator Info */}
-            <div className="space-y-3 p-4 rounded-lg bg-background/50 border">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-sm font-semibold">Original Creator</h3>
-              </div>
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={asset.creator.avatar || "/placeholder.svg"} alt={asset.creator.name} />
-                  <AvatarFallback className="text-xs">{asset.creator.name.substring(0, 2)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-sm truncate">{asset.creator.name}</p>
-                    {asset.creator.verified && <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <p className="text-xs text-muted-foreground font-mono">{truncateAddress(asset.creator.address)}</p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-4 w-4 p-0"
-                      onClick={() => handleCopy(asset.creator.address, "creator")}
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
-                    {copied === "creator" && <span className="text-xs text-green-600">Copied!</span>}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Current Owner */}
-            <div className="space-y-3 p-4 rounded-lg bg-background/50 border">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-sm font-semibold">Current Owner</h3>
-              </div>
-              <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={asset.currentOwner.avatar || "/placeholder.svg"} alt={asset.currentOwner.name} />
-                  <AvatarFallback className="text-xs">{asset.currentOwner.name.substring(0, 2)}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-sm truncate">{asset.currentOwner.name}</p>
-                    {asset.currentOwner.verified && <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <p className="text-xs text-muted-foreground font-mono">
-                      {truncateAddress(asset.currentOwner.address)}
-                    </p>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-4 w-4 p-0"
-                      onClick={() => handleCopy(asset.currentOwner.address, "owner")}
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
-                    {copied === "owner" && <span className="text-xs text-green-600">Copied!</span>}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Blockchain Info */}
-            <div className="space-y-3 p-4 rounded-lg bg-background/50 border sm:col-span-2 lg:col-span-1">
-              <div className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-sm font-semibold">Blockchain</h3>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Network</span>
-                  <Badge variant="outline" className="text-xs">
-                    {asset.blockchain}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">Contract</span>
-                  <code className="text-xs bg-muted px-2 py-1 rounded font-mono flex-1 truncate">
-                    {truncateAddress(asset.contract)}
-                  </code>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-4 w-4 p-0 flex-shrink-0"
-                    onClick={() => handleCopy(asset.contract, "contract")}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Digital Fingerprint */}
-          <Separator className="my-6" />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 rounded-lg bg-muted/30">
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Fingerprint className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Decentralized data:</span>
-            </div>
-            <code className="text-xs bg-background px-3 py-2 rounded font-mono flex-1 break-all">
-              {asset.fingerprint}
-            </code>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 flex-shrink-0"
-              onClick={() => handleCopy(asset.fingerprint, "fingerprint")}
-            >
-              <Copy className="h-3 w-3" />
-            </Button>
-            {copied === "fingerprint" && <span className="text-xs text-green-600 ml-2">Copied!</span>}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Enhanced Mobile Timeline */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Provenance Timeline
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Complete history of all events and transactions for this asset
+      {/* Main Timeline Content */}
+      <section className="max-w-4xl mx-auto space-y-12">
+        <div className="text-center space-y-4 px-4">
+          <h2 className="text-3xl font-black text-foreground">Onchain History</h2>
+          <p className="text-muted-foreground max-w-lg mx-auto font-light">
+            Explore the immutable cryptographic lineage of this asset.
           </p>
-        </CardHeader>
+        </div>
 
-        <CardContent>
-          <div className="space-y-4">
-            {displayEvents.map((event, index) => (
-              <div key={event.id} className="relative">
-                {/* Mobile-optimized timeline connector */}
-                {index < displayEvents.length - 1 && <div className="absolute left-6 top-16 w-0.5 h-12 bg-border" />}
+        {events.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-20 px-8 rounded-[2.5rem] bg-card/30 border border-border border-dashed relative overflow-hidden text-center"
+          >
+            <div className="w-20 h-20 rounded-full bg-secondary/50 flex items-center justify-center mb-6 ring-1 ring-border">
+              <Clock className="h-10 w-10 text-muted-foreground/50 animate-pulse" />
+            </div>
+            <h3 className="text-2xl font-bold text-foreground/80">History in the making...</h3>
+            <p className="text-muted-foreground mt-2 max-w-sm font-light">
+              We're polling the network for new events. Provenance records will appear here as they are indexed.
+            </p>
+          </motion.div>
+        ) : (
+          <div className="relative space-y-6 px-4 sm:px-0">
+            {/* Visual Continuity Line */}
+            <div className="absolute left-[19px] sm:left-[23px] top-8 bottom-4 w-px bg-gradient-to-b from-border via-border/50 to-transparent" />
 
-                <div className="flex items-start gap-4">
-                  {/* Enhanced event icon */}
-                  <div
-                    className={`flex-shrink-0 w-12 h-12 rounded-full border-2 flex items-center justify-center ${getEventColor(event.type)}`}
-                  >
-                    {getEventIcon(event.type)}
+            <AnimatePresence mode="popLayout">
+              {displayEvents.map((event, index) => (
+                <motion.div
+                  key={event.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.08, duration: 0.4 }}
+                  className="relative pl-12 sm:pl-14 group"
+                >
+                  {/* Event Icon */}
+                  <div className={`absolute left-0 top-1 w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br ${getEventColorCode(event.type)} flex items-center justify-center z-10 shadow-md group-hover:scale-105 transition-transform duration-300`}>
+                    <div className="text-white">
+                      {getEventIcon(event.type)}
+                    </div>
                   </div>
 
-                  {/* Mobile-first event content */}
-                  <div className="flex-1 min-w-0">
-                    <div className={`p-4 rounded-lg border-2 ${getEventColor(event.type)}`}>
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                        <h3 className="font-semibold text-sm sm:text-base">{event.title}</h3>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {formatDate(event.timestamp)}
-                          </Badge>
-                          {event.verified && (
-                            <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 text-xs">
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Verified
+                  {/* Event Card */}
+                  <div className="p-5 sm:p-6 rounded-2xl border border-border/80 bg-card/80 backdrop-blur-sm hover:border-border hover:bg-card transition-all duration-300">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-base font-semibold text-foreground">{event.title}</h3>
+                          {event.type === "mint" && (
+                            <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 text-[10px] px-1.5 py-0">
+                              Genesis
                             </Badge>
                           )}
                         </div>
+                        <p className="text-xs text-muted-foreground">{formatDate(event.timestamp)}</p>
                       </div>
 
-                      <p className="text-sm text-muted-foreground mb-3">{event.description}</p>
-
-                      {/* Transfer details - mobile optimized */}
-                      {(event.from || event.to) && (
-                        <div className="grid grid-cols-1 gap-3 mb-3">
-                          {event.from && (
-                            <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
-                              <div className="text-xs text-muted-foreground font-medium">FROM</div>
-                              <Avatar className="h-8 w-8">
-                                <AvatarFallback className="text-xs">{event.from.substring(0, 2)}</AvatarFallback>
-                              </Avatar>
-                              <span className="text-sm font-medium truncate">{event.from}</span>
-                            </div>
-                          )}
-
-                          {event.to && (
-                            <div className="flex items-center gap-3 p-3 rounded-lg bg-background/50">
-                              <div className="text-xs text-muted-foreground font-medium">TO</div>
-                              <Avatar className="h-8 w-8">
-                                <AvatarFallback className="text-xs">{event.to.substring(0, 2)}</AvatarFallback>
-                              </Avatar>
-                              <span className="text-sm font-medium truncate">{event.to}</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Transaction details - collapsible on mobile */}
                       {event.transactionHash && (
-                        <Collapsible>
-                          <CollapsibleTrigger asChild>
-                            <Button variant="ghost" size="sm" className="w-full justify-between p-2 h-auto">
-                              <span className="text-xs">Transaction Details</span>
-                              <ChevronDown className="h-4 w-4" />
-                            </Button>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="space-y-2 mt-2">
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 p-3 rounded-lg bg-background/30">
-                              <span className="text-xs text-muted-foreground">Hash:</span>
-                              <code className="text-xs bg-muted px-2 py-1 rounded font-mono flex-1 break-all">
-                                {event.transactionHash}
-                              </code>
-                              <div className="flex items-center gap-1">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0"
-                                  onClick={() => handleCopy(event.transactionHash!, "tx")}
-                                >
-                                  <Copy className="h-3 w-3" />
-                                </Button>
-                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0" asChild>
-                                  <a
-                                    href={`https://etherscan.io/tx/${event.transactionHash}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                  >
-                                    <ExternalLink className="h-3 w-3" />
-                                  </a>
-                                </Button>
-                              </div>
-                            </div>
-
-                            {(event.blockNumber || event.gasUsed) && (
-                              <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground px-3">
-                                {event.blockNumber && <span>Block: {event.blockNumber.toLocaleString()}</span>}
-                                {event.gasUsed && <span>Gas: {event.gasUsed.toLocaleString()}</span>}
-                              </div>
-                            )}
-                          </CollapsibleContent>
-                        </Collapsible>
-                      )}
-
-                      {/* Additional info */}
-                      {(event.location || event.memo) && (
-                        <div className="space-y-2 mt-3 pt-3 border-t border-border/50">
-                          {event.location && (
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                              <MapPin className="h-3 w-3" />
-                              <span>{event.location}</span>
-                            </div>
-                          )}
-
-                          {event.memo && (
-                            <div className="text-sm italic text-muted-foreground bg-muted/30 p-3 rounded">
-                              "{event.memo}"
-                            </div>
-                          )}
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-[11px] font-mono text-muted-foreground hover:text-foreground"
+                            onClick={() => handleCopy(event.transactionHash!, "tx")}
+                          >
+                            {truncateAddress(event.transactionHash)}
+                            <Copy className="h-3 w-3 ml-1.5 opacity-50" />
+                          </Button>
+                          <Button
+                            asChild
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                          >
+                            <a href={`https://starkscan.co/tx/${event.transactionHash}`} target="_blank" rel="noreferrer">
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </a>
+                          </Button>
                         </div>
                       )}
                     </div>
+
+                    {/* From → To */}
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium text-muted-foreground shrink-0">
+                          {event.from && event.from !== "0x0" ? event.from.substring(2, 4).toUpperCase() : "Ø"}
+                        </div>
+                        <span className="font-mono text-xs text-muted-foreground truncate">
+                          {event.from && BigInt(event.from) !== 0n ? truncateAddress(event.from) : "Null Address"}
+                        </span>
+                      </div>
+
+                      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
+
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-medium text-primary shrink-0">
+                          {event.to ? event.to.substring(2, 4).toUpperCase() : "??"}
+                        </div>
+                        <span className="font-mono text-xs text-foreground/80 truncate">
+                          {truncateAddress(event.to || "0x0")}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
-            {/* Show more button */}
-            {hasMoreEvents && !showAllEvents && (
-              <div className="flex justify-center pt-4">
-                <Button variant="outline" onClick={() => setShowAllEvents(true)}>
-                  Show {events.length - 5} More Events
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                </Button>
-              </div>
-            )}
-
-            {showAllEvents && hasMoreEvents && (
-              <div className="flex justify-center pt-4">
-                <Button variant="outline" onClick={() => setShowAllEvents(false)}>
-                  Show Less
-                  <ChevronUp className="h-4 w-4 ml-2" />
+            {hasMoreEvents && (
+              <div className="pt-4 flex justify-center">
+                <Button
+                  onClick={() => setShowAllEvents(!showAllEvents)}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full px-6 text-xs font-medium"
+                >
+                  {showAllEvents ? "Show Less" : `View ${events.length - 5} More`}
                 </Button>
               </div>
             )}
           </div>
+        )}
+      </section>
 
-          {/* Enhanced Summary Statistics */}
-          <Separator className="my-8" />
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="text-center p-4 rounded-lg bg-muted/30">
-              <p className="text-2xl font-bold text-primary">{events.length}</p>
-              <p className="text-xs text-muted-foreground">Total Events</p>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-muted/30">
-              <p className="text-2xl font-bold text-primary">{events.filter((e) => e.type === "transfer").length}</p>
-              <p className="text-xs text-muted-foreground">Transfers</p>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-muted/30">
-              <p className="text-2xl font-bold text-primary">{events.filter((e) => e.verified).length}</p>
-              <p className="text-xs text-muted-foreground">Verified</p>
-            </div>
-            <div className="text-center p-4 rounded-lg bg-muted/30">
-              <p className="text-2xl font-bold text-primary">
-                {Math.floor((new Date().getTime() - new Date(asset.creationDate).getTime()) / (1000 * 60 * 60 * 24))}
-              </p>
-              <p className="text-xs text-muted-foreground">Days Old</p>
-            </div>
+      {/* Modern Digital Fingerprint - same glassmorphism style */}
+      <section className="p-8 rounded-[2.5rem] bg-card/40 border border-border shadow-xl backdrop-blur-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="space-y-6">
+            <h3 className="text-3xl font-black text-foreground">Digital Fingerprint</h3>
+            <p className="text-muted-foreground font-light leading-relaxed max-w-md">
+              Each asset is assigned a unique cryptographic hash that serves as its permanent fingerprint on the Starknet blockchain, ensuring ownership integrity.
+            </p>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="space-y-6">
+            <div className="bg-background/80 border border-border rounded-2xl p-6 group hover:border-primary/30 transition-all duration-500 shadow-inner">
+              <div className="flex items-center justify-between mb-3 px-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Cryptographic Hash (SHA-256 equivalent)</span>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-primary" onClick={() => handleCopy(asset.fingerprint, "fp")}>
+                  {copied === "fp" ? "COPIED" : "COPY"}
+                </Button>
+              </div>
+              <code className="block w-full break-all font-mono text-sm text-foreground/80 leading-relaxed tracking-tight select-all">
+                {asset.fingerprint}
+              </code>
+            </div>
+
+            <Button className="w-full h-14 rounded-2xl font-bold bg-foreground text-background hover:bg-foreground/90 transition-all shadow-lg" asChild>
+              <a href={`https://starkscan.co/contract/${asset.contract}`} target="_blank" rel="noreferrer">
+                <Shield className="h-4 w-4 mr-3" />
+                Verify Smart Contract Registry
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

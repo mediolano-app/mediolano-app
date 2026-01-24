@@ -38,6 +38,7 @@ interface MintSuccessDrawerProps {
   cost?: string
   previewImage?: string | null
   data?: Record<string, string> // Additional data to review (e.g., specific traits)
+  basePath?: string
 }
 
 export function MintSuccessDrawer({
@@ -53,7 +54,8 @@ export function MintSuccessDrawer({
   onConfirm,
   cost = "0.001 STRK", // Default estimated cost
   previewImage,
-  data
+  data,
+  ...props
 }: MintSuccessDrawerProps) {
   const [showCelebration, setShowCelebration] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
@@ -112,7 +114,7 @@ export function MintSuccessDrawer({
             )}
             {error && "Error Creating Asset"}
           </DrawerTitle>
-          <DrawerDescription className="text-sm mt-1">
+          <DrawerDescription className="text-sm text-center mt-1">
             {step === "idle" && "Please review the details below before confirming the transaction."}
             {step === "uploading" && "Securely storing your metadata and assets on IPFS."}
             {step === "processing" && "Please confirm the transaction in your wallet."}
@@ -250,7 +252,7 @@ export function MintSuccessDrawer({
                   {assetTitle}
                 </h3>
                 <p className="text-muted-foreground max-w-xs mx-auto text-sm">
-                  Successfully minted to your collection.
+                  Successfully minted.
                 </p>
               </div>
 
@@ -258,12 +260,6 @@ export function MintSuccessDrawer({
               <div className="bg-card rounded-xl border shadow-sm overflow-hidden">
                 {/* Blockchain Info */}
                 <div className="p-4 space-y-3 bg-muted/20">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Token ID</span>
-                    <span className="font-mono font-medium">#{mintResult.tokenId}</span>
-                  </div>
-
-                  <Separator />
 
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-muted-foreground">Transaction</span>
@@ -328,12 +324,6 @@ export function MintSuccessDrawer({
                 </Link>
               </Button>
 
-              <Button asChild size="default" className="flex-[2]">
-                <Link href={`/asset/${mintResult.assetSlug}`}>
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  View Asset
-                </Link>
-              </Button>
             </div>
           )}
 

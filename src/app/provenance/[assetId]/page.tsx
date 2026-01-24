@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 
 import { useMemo, useState, use } from "react"
 import { useAsset } from "@/hooks/use-asset"
-import { useAssetTransferEvents } from "@/hooks/useEvents"
+import { useAssetProvenanceEvents } from "@/hooks/useEvents"
 
 interface ProvenancePageProps {
   params: Promise<{
@@ -31,35 +31,39 @@ export default function ProvenancePage({ params }: ProvenancePageProps) {
   }, [assetId])
 
   const { asset, loading: assetLoading } = useAsset(contractAddress as `0x${string}`, Number(tokenId))
-  const { events: transferEvents, isLoading: eventsLoading } = useAssetTransferEvents(contractAddress, tokenId || "")
+
+  // Debug log to check addresses and owner
+  console.log(`[ProvenancePage] URL Address: ${contractAddress}, Asset NFT Address: ${asset?.nftAddress}, TokenID: ${tokenId}, Owner: ${asset?.owner}`);
+
+  const { events: provenanceEventsRaw, isLoading: eventsLoading } = useAssetProvenanceEvents(contractAddress, tokenId || "")
 
   const isLoading = assetLoading || eventsLoading
 
   const provenanceEvents = useMemo(() => {
-    if (!transferEvents) return []
+    if (!provenanceEventsRaw || provenanceEventsRaw.length === 0) return []
 
-    return transferEvents.map((event) => {
-      const from = event.keys?.[1] ? `0x${BigInt(event.keys[1]).toString(16)}` : "Unknown"
-      const to = event.keys?.[2] ? `0x${BigInt(event.keys[2]).toString(16)}` : "Unknown"
-      const isMint = BigInt(from) === 0n
+    return provenanceEventsRaw.map((event) => {
+      const isMint = event.type === "mint"
+      const from = event.from || "0x0"
+      const to = event.to || "Unknown"
 
       return {
-        id: event.transaction_hash,
+        id: event.id,
         type: isMint ? "creation" : "transfer",
-        title: isMint ? "Asset Minted" : "Ownership Transferred",
-        description: isMint
-          ? `Asset minted by ${to.substring(0, 6)}...`
-          : `Transferred from ${from.substring(0, 6)}... to ${to.substring(0, 6)}...`,
+        title: event.title || (isMint ? "Asset Minted" : "Ownership Transferred"),
+        description: event.description || (isMint
+          ? `Asset minted by ${to.substring(0, 6)}...${to.substring(to.length - 4)}`
+          : `Transferred from ${from.substring(0, 6)}...${from.substring(from.length - 4)} to ${to.substring(0, 6)}...${to.substring(to.length - 4)}`),
         from,
         to,
-        date: new Date(event.block_number * 1000).toLocaleDateString(), // Placeholder timestamp
-        timestamp: new Date().toISOString(), // Fallback if block param unavailable in event
-        transactionHash: event.transaction_hash,
-        blockNumber: event.block_number,
+        date: new Date().toLocaleDateString(), // We don't have block timestamp yet, using current date for UI placeholder
+        timestamp: new Date().toISOString(),
+        transactionHash: event.transactionHash,
+        blockNumber: event.blockNumber,
         verified: true,
       }
-    }).reverse() as any[]
-  }, [transferEvents])
+    }) as any[]
+  }, [provenanceEventsRaw])
 
   if (isLoading) {
     return (
@@ -157,23 +161,8 @@ export default function ProvenancePage({ params }: ProvenancePageProps) {
       <main className="container mx-auto px-4 py-12 sm:py-16 max-w-5xl">
         <div className="mb-12 space-y-6">
           <div className="text-center space-y-3">
-
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight mb-3">Provenance </h1>
-              <p className="text-muted-foreground text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-                Ownership history for <span className="font-medium text-foreground"><Link href={`/asset/${assetId}`}>{asset.name}</Link></span>
-              </p>
-            </div>
-
-            <div className="flex justify-center items-center gap-2 flex-wrap">
-              <Badge variant="outline">{asset.type || "Asset"}</Badge>
-              <Badge variant="secondary">
-                <Clock className="h-3 w-3 mr-1.5" />
-                {provenanceEvents.length} Events
-              </Badge>
-              <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
-                Verified
-              </Badge>
+              <h1 className="text-3xl font-black tracking-tight mb-3">Provenance </h1>
             </div>
           </div>
 

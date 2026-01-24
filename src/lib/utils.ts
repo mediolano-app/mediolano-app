@@ -56,7 +56,13 @@ export function formatDate(dateString: string) {
 }
 
 export function normalizeStarknetAddress(address: string): string {
-  return `0x${BigInt(address).toString(16).toLowerCase()}`;
+  if (!address || address === "N/A") return address;
+  try {
+    const bigIntAddr = BigInt(address);
+    return "0x" + bigIntAddr.toString(16).padStart(64, "0").toLowerCase();
+  } catch {
+    return address;
+  }
 }
 export function toHexString(value: string | number | bigint): string {
   try {
@@ -163,7 +169,7 @@ export async function fetchWithRateLimit<T>(
       currentDelay = baseDelayMs;
     } catch (err) {
       console.warn("Fetch failed:", err);
-      
+
       // If it's a rate limit error, use exponential backoff
       if (err instanceof Error && (err.message.includes('429') || err.message.includes('Too Many Requests'))) {
         console.log(`Rate limit hit, waiting ${currentDelay}ms...`);

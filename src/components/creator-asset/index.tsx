@@ -346,7 +346,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   </Alert>
                 )}
 
-                <Tabs defaultValue="overview" className="mt-8">
+                <Tabs defaultValue="overview" className="mt-8 bg-background p-2 rounded-md">
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="provenance">Provenance</TabsTrigger>

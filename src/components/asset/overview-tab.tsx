@@ -91,10 +91,9 @@ export function OverviewTab({ asset }: OverviewTabProps) {
         {/* Description removed from here as it is now in the header */}
       </div>
 
-      <Separator />
 
       <div className="grid grid-cols-2 gap-4">
-        <Card>
+        <Card className="bg-background/20 shadow-none">
           <CardContent className="p-4 flex items-center gap-3">
             <FileCheck className="h-8 w-8 text-primary" />
             <div>
@@ -103,7 +102,7 @@ export function OverviewTab({ asset }: OverviewTabProps) {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-background/20 shadow-none">
           <CardContent className="p-4 flex items-center gap-3">
             <Box className="h-8 w-8 text-primary" />
             <div>
@@ -114,10 +113,8 @@ export function OverviewTab({ asset }: OverviewTabProps) {
         </Card>
       </div>
 
-      <Separator />
 
       <div>
-        <h2 className="text-lg mb-4">Asset Information</h2>
         <dl className="grid grid-cols-2 gap-4">
           <div className="rounded-lg border p-3">
             <dt className="text-sm text-muted-foreground">Collection</dt>

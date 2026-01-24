@@ -1,6 +1,6 @@
 import { useEvents, useBlockNumber, useAccount } from "@starknet-react/core";
-import { BlockTag } from "starknet";
-import { useMemo } from "react";
+import { BlockTag, RpcProvider, hash, num } from "starknet";
+import { useMemo, useEffect, useState, useCallback } from "react";
 import { CONTRACT_ADDRESS } from "@/lib/constants";
 import { normalizeStarknetAddress, toHexString } from "@/lib/utils";
 
@@ -17,7 +17,9 @@ export function useMyTransferEvents() {
     fromBlock,
     toBlock,
     pageSize,
-  });
+    enabled: !!walletAddress,
+    refetchInterval: 0,
+  } as any);
 
   const myEvents = useMemo(() => {
     if (!walletAddress || !data?.data?.pages) return [];
@@ -53,7 +55,9 @@ export function useMyTransferEventsForTokenId(tokenId: string) {
     fromBlock,
     toBlock,
     pageSize,
-  });
+    enabled: !!walletAddress,
+    refetchInterval: 0,
+  } as any);
 
   const filteredEvents = useMemo(() => {
     if (!walletAddress || !data?.data?.pages) return [];
@@ -151,5 +155,170 @@ export function useAssetTransferEvents(contractAddress: string, tokenId: string)
   return {
     ...data,
     events: filteredEvents,
+  };
+}
+
+
+// Event selectors from the registry contract
+const REGISTRY_TOKEN_MINTED_SELECTOR = "0x3e517dedbc7bae62d4ace7e3dfd33255c4a7fe7c1c6f53c725d52b45f9c5a00";
+const REGISTRY_TOKEN_TRANSFERRED_SELECTOR = "0x3ddaa3f2d17cc7984d82075aa171282e6fff4db61944bf218f60678f95e2567";
+const STANDARD_TRANSFER_SELECTOR = "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9";
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL;
+
+/**
+ * Hook for fetching comprehensive provenance events for a specific asset
+ * Queries the central Collection Registry (CONTRACT_ADDRESS) for lifecycle events
+ */
+export function useAssetProvenanceEvents(contractAddress: string, tokenId: string) {
+  const [events, setEvents] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<any>(null);
+
+  const fetchProvenance = useCallback(async () => {
+    if (!tokenId || !RPC_URL || !CONTRACT_ADDRESS) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    const provider = new RpcProvider({ nodeUrl: RPC_URL });
+    const targetTokenId = BigInt(tokenId);
+
+    console.log(`[Provenance] Fetching events for Token ID: ${tokenId}`);
+
+    const fetchAllRegistryEvents = async () => {
+      try {
+        const registryAddress = normalizeStarknetAddress(CONTRACT_ADDRESS);
+
+        const response = await provider.getEvents({
+          address: registryAddress,
+          from_block: { block_number: 1861690 },
+          to_block: "latest",
+          keys: [[
+            REGISTRY_TOKEN_MINTED_SELECTOR,
+            REGISTRY_TOKEN_TRANSFERRED_SELECTOR,
+            STANDARD_TRANSFER_SELECTOR
+          ]],
+          chunk_size: 1000,
+        });
+
+        console.log(`[Provenance] Found ${response.events?.length || 0} registry events`);
+        return response.events || [];
+      } catch (err: any) {
+        console.error("[Provenance] Registry Fetch Error:", err.message || err);
+        return [];
+      }
+    };
+
+    try {
+      const registryRawEvents = await fetchAllRegistryEvents();
+      const processedEvents: any[] = [];
+      const seenHashes = new Set<string>();
+
+      for (const event of registryRawEvents) {
+        if (!event.transaction_hash) continue;
+
+        const keys = (event.keys || []).map(k => num.toHex(k));
+        const data = (event.data || []).map(d => num.toHex(d));
+        const eventSelector = keys[0];
+
+        let match = false;
+        let type: "mint" | "transfer" = "transfer";
+        let from = "0x0";
+        let to = "Unknown";
+
+        // Handle Registry TokenMinted
+        // Event data: [collection_id_low, collection_id_high, token_id_low, token_id_high, owner, ...]
+        if (eventSelector === REGISTRY_TOKEN_MINTED_SELECTOR && data.length >= 5) {
+          const tokenLow = BigInt(data[2]);
+          const tokenHigh = BigInt(data[3]);
+          const eventTokenId = tokenLow + (tokenHigh << 128n);
+
+          if (eventTokenId === targetTokenId) {
+            match = true;
+            type = "mint";
+            from = "0x0";
+            to = data[4];
+          }
+        }
+
+        // Handle Registry TokenTransferred
+        // Event data: [collection_id_low, collection_id_high, token_id_low, token_id_high, operator, ...]
+        else if (eventSelector === REGISTRY_TOKEN_TRANSFERRED_SELECTOR && data.length >= 5) {
+          const tokenLow = BigInt(data[2]);
+          const tokenHigh = BigInt(data[3]);
+          const eventTokenId = tokenLow + (tokenHigh << 128n);
+
+          if (eventTokenId === targetTokenId) {
+            match = true;
+            type = "transfer";
+            to = data[4];
+          }
+        }
+
+        // Standard ERC721 Transfer - keys: [selector, from, to, tokenId_low, tokenId_high]
+        else if (eventSelector === STANDARD_TRANSFER_SELECTOR && keys.length >= 4) {
+          const tokenLow = BigInt(keys[3]);
+          const tokenHigh = keys.length > 4 ? BigInt(keys[4]) : 0n;
+          const eventTokenId = tokenLow + (tokenHigh << 128n);
+
+          if (eventTokenId === targetTokenId) {
+            match = true;
+            type = BigInt(keys[1]) === 0n ? "mint" : "transfer";
+            from = keys[1];
+            to = keys[2];
+          }
+        }
+
+        if (match && !seenHashes.has(event.transaction_hash)) {
+          console.log(`[Provenance] MATCH! Token: ${targetTokenId}, Type: ${type}, TX: ${event.transaction_hash}`);
+          seenHashes.add(event.transaction_hash);
+
+          // Fetch block timestamp for accurate date
+          let timestamp = new Date().toISOString();
+          try {
+            if (event.block_number) {
+              const block = await provider.getBlock(event.block_number);
+              if (block?.timestamp) {
+                timestamp = new Date(block.timestamp * 1000).toISOString();
+              }
+            }
+          } catch (e) {
+            console.warn("[Provenance] Could not fetch block timestamp:", e);
+          }
+
+          processedEvents.push({
+            id: event.transaction_hash,
+            type,
+            title: type === "mint" ? "Asset Minted" : "Asset Transferred",
+            description: type === "mint" ? "Original IP Asset minted" : "Ownership transferred on-chain",
+            from: normalizeStarknetAddress(from),
+            to: normalizeStarknetAddress(to),
+            timestamp,
+            transactionHash: event.transaction_hash,
+            blockNumber: event.block_number,
+            verified: true,
+          });
+        }
+      }
+
+      setEvents(processedEvents.sort((a, b) => (b.blockNumber || 0) - (a.blockNumber || 0)));
+    } catch (err) {
+      setError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [tokenId]);
+
+  useEffect(() => {
+    fetchProvenance();
+  }, [fetchProvenance]);
+
+  return {
+    events,
+    isLoading,
+    error,
+    refetch: fetchProvenance,
+    transferData: { isLoading, error, data: { pages: [{ events }] } },
+    mintData: { isLoading, error, data: { pages: [{ events }] } }
   };
 }

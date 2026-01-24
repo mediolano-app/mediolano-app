@@ -19,6 +19,8 @@ import { useIpfsUpload } from "@/hooks/useIpfs"
 import { useCreateAsset, IMintResult } from "@/hooks/use-create-asset"
 import { useGetCollections, useIsCollectionOwner } from "@/hooks/use-collection"
 import { normalizeStarknetAddress } from "@/lib/utils"
+import { useProvider } from "@starknet-react/core"
+import { num, hash } from "starknet"
 import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import CreateCollectionView from "@/components/collections/create-collection"
@@ -28,6 +30,7 @@ export default function CreateAssetFromTemplate() {
   const params = useParams()
   const router = useRouter()
   const { toast } = useToast()
+  const { provider } = useProvider()
   const templateId = params.templateId as string
   const { address: walletAddress } = useAccount()
 
@@ -189,6 +192,30 @@ export default function CreateAssetFromTemplate() {
         token_uri: result?.metadataUrl,
         collection_nft_address: contractHex,
       })
+
+      if (mintTxApply?.transactionHash) {
+        // Wait for transaction to be accepted to get the event
+        const receipt = await provider.waitForTransaction(mintTxApply.transactionHash)
+
+        const tokenMintedSelector = hash.getSelectorFromName("TokenMinted")
+
+        if (receipt.isSuccess() && 'events' in receipt) {
+          const events = receipt.events
+          const mintEvent = events.find(
+            (e: any) => e.keys[0] === tokenMintedSelector
+          )
+
+          if (mintEvent && mintEvent.data) {
+            // token_id is u256 at index 2 and 3 of data array
+            const low = mintEvent.data[2]
+            const parsedId = num.toBigInt(low).toString()
+            console.log("Parsed Token ID from Template:", parsedId)
+
+            mintTxApply.tokenId = parsedId
+            mintTxApply.assetSlug = `${contractHex}-${parsedId}`
+          }
+        }
+      }
 
       setMintProgress(90)
 
