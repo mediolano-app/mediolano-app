@@ -157,7 +157,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ tokenId, status }) => {
 	}
 
 	return (
-		<Card className="overflow-hidden">
+		<Card className="overflow-hidden glass-card">
 			<CardHeader className="p-0">
 				{isImage ? (
 					<Image

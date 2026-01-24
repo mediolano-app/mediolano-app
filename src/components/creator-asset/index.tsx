@@ -188,7 +188,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
 
   return (
     <AssetErrorBoundary onRetry={reload}>
-      <div className="min-h-screen bg-background/60 text-foreground">
+      <div className="min-h-screen text-foreground">
         <main className="container mx-auto p-8 ">
           {showSkeleton || uiState === 'loading' ? (
             <AssetLoadingState loadingState={loadingState} error={error} onRetry={reload} />
@@ -232,7 +232,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
               {/* Left column - Image */}
               <div className="lg:col-span-3">
                 <div className="top-24">
-                  <div className="relative overflow-hidden rounded-xl border bg-muted/20 ">
+                  <div className="relative overflow-hidden glass-card">
                     <Image
                       src={(asset?.image as string) || "/background.jpg"}
                       alt={asset?.name as string}
@@ -346,14 +346,14 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   </Alert>
                 )}
 
-                <Tabs defaultValue="overview" className="mt-8 bg-background p-2 rounded-md">
+                <Tabs defaultValue="overview" className="mt-8 glass p-2">
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="provenance">Provenance</TabsTrigger>
                     <TabsTrigger value="license">License</TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="overview" className="mt-6">
+                  <TabsContent value="overview" className="mt-6 bg-card/30">
                     <OverviewTab asset={{
                       ...asset!,
                       collection: matchedCollection?.name
@@ -363,7 +363,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     }} />
                   </TabsContent>
 
-                  <TabsContent value="provenance" className="space-y-4">
+                  <TabsContent value="provenance" className="space-y-4 bg-card/30">
                     {enhancedAsset && (
                       <AssetProvenance
                         asset={enhancedAsset}
@@ -374,11 +374,11 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     )}
                   </TabsContent>
 
-                  <TabsContent value="license" className="mt-6 space-y-8">
+                  <TabsContent value="license" className="mt-6 space-y-8 bg-card/30">
                     <LicenseTab asset={asset!} />
 
                     <div>
-                      <h3 className="text-lg font-semibold mb-4">Current Owner</h3>
+                      <h3 className="text-lg font-semibold mb-4">Ownership</h3>
                       <OwnerTab asset={asset!} />
                     </div>
 

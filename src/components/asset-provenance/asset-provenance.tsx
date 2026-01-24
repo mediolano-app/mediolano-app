@@ -171,11 +171,11 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
   return (
     <div className="relative space-y-12 pb-20">
       {/* Background Blooms - subtle for both themes */}
-      <div className="absolute top-0 -left-20 w-96 h-96 bg-primary/10 dark:bg-primary/20 rounded-full blur-[120px] -z-10 animate-pulse" />
-      <div className="absolute bottom-40 -right-20 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-[100px] -z-10" />
+      <div className="absolute top-0 -left-20 w-96 h-96 bg-primary/10 dark:bg-primary/20 rounded-xl blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-40 -right-20 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/10 rounded-xl blur-[100px] -z-10" />
 
       {/* Main Asset Section - Focus on Ownership */}
-      <section className="relative overflow-hidden rounded-3xl border border-border bg-card/40 backdrop-blur-2xl shadow-xl dark:shadow-2xl dark:shadow-black/50 transition-colors animate-in fade-in zoom-in duration-500">
+      <section className="relative overflow-hidden rounded-xl glass backdrop-blur-2xl transition-colors animate-in fade-in zoom-in duration-500">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 min-h-[500px]">
           {/* Vertical Image - uses all available height */}
           <div className="lg:col-span-5 h-[400px] lg:h-auto relative group overflow-hidden border-b lg:border-b-0 lg:border-r border-border">
@@ -249,7 +249,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                 <span className="text-sm font-bold text-foreground/80">{asset.blockchain}</span>
               </div>
               <div className="ml-auto">
-                <Badge variant="outline" className="rounded-full px-4 py-1.5 border-border bg-background/50 hover:bg-accent transition-colors font-medium">
+                <Badge variant="outline" className="rounded-xl px-4 py-1.5 border-border bg-background/50 hover:bg-accent transition-colors font-medium">
                   ERC-721
                 </Badge>
               </div>
@@ -273,7 +273,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-20 px-8 rounded-[2.5rem] bg-card/30 border border-border border-dashed relative overflow-hidden text-center"
           >
-            <div className="w-20 h-20 rounded-full bg-secondary/50 flex items-center justify-center mb-6 ring-1 ring-border">
+            <div className="w-20 h-20 rounded-xl glass flex items-center justify-center mb-6">
               <Clock className="h-10 w-10 text-muted-foreground/50 animate-pulse" />
             </div>
             <h3 className="text-2xl font-bold text-foreground/80">History in the making...</h3>
@@ -347,7 +347,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                     {/* From → To */}
                     <div className="flex items-center gap-3 text-sm">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium text-muted-foreground shrink-0">
+                        <div className="w-7 h-7 rounded-xl glass flex items-center justify-center text-[10px] font-medium text-muted-foreground shrink-0">
                           {event.from && event.from !== "0x0" ? event.from.substring(2, 4).toUpperCase() : "Ø"}
                         </div>
                         <span className="font-mono text-xs text-muted-foreground truncate">
@@ -358,7 +358,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                       <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />
 
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-medium text-primary shrink-0">
+                        <div className="w-7 h-7 rounded-xl bg-primary/10 flex items-center justify-center text-[10px] font-medium text-primary shrink-0">
                           {event.to ? event.to.substring(2, 4).toUpperCase() : "??"}
                         </div>
                         <span className="font-mono text-xs text-foreground/80 truncate">
@@ -377,7 +377,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                   onClick={() => setShowAllEvents(!showAllEvents)}
                   variant="outline"
                   size="sm"
-                  className="rounded-full px-6 text-xs font-medium"
+                  className="rounded-xl px-6 text-xs font-medium"
                 >
                   {showAllEvents ? "Show Less" : `View ${events.length - 5} More`}
                 </Button>
@@ -388,21 +388,21 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
       </section>
 
       {/* Modern Digital Fingerprint - same glassmorphism style */}
-      <section className="p-8 rounded-[2.5rem] bg-card/40 border border-border shadow-xl backdrop-blur-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10" />
+      <section className="p-8 rounded-xl glass relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 -z-10" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <h3 className="text-3xl font-black text-foreground">Digital Fingerprint</h3>
+            <h3 className="text-2xl font-black text-foreground">Digital Fingerprint</h3>
             <p className="text-muted-foreground font-light leading-relaxed max-w-md">
-              Each asset is assigned a unique cryptographic hash that serves as its permanent fingerprint on the Starknet blockchain, ensuring ownership integrity.
+              Each asset is assigned a unique cryptographic hash, ensuring integrity.
             </p>
           </div>
 
           <div className="space-y-6">
-            <div className="bg-background/80 border border-border rounded-2xl p-6 group hover:border-primary/30 transition-all duration-500 shadow-inner">
+            <div className="bg-background/80 border border-border rounded-2xl p-6 group hover:border-primary/30 transition-all duration-500">
               <div className="flex items-center justify-between mb-3 px-1">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Cryptographic Hash (SHA-256 equivalent)</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Hash</span>
                 <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-primary" onClick={() => handleCopy(asset.fingerprint, "fp")}>
                   {copied === "fp" ? "COPIED" : "COPY"}
                 </Button>
@@ -415,7 +415,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
             <Button className="w-full h-14 rounded-2xl font-bold bg-foreground text-background hover:bg-foreground/90 transition-all shadow-lg" asChild>
               <a href={`https://starkscan.co/contract/${asset.contract}`} target="_blank" rel="noreferrer">
                 <Shield className="h-4 w-4 mr-3" />
-                Verify Smart Contract Registry
+                Onchain Registry
               </a>
             </Button>
           </div>

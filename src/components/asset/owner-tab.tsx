@@ -29,9 +29,9 @@ const toText = (value: unknown): string => (value === undefined || value === nul
 export function OwnerTab({ asset }: OwnerTabProps) {
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="glass">
         <CardHeader>
-          <CardTitle>Ownership</CardTitle>
+          <CardTitle>Owner</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-start gap-4">
@@ -57,7 +57,7 @@ export function OwnerTab({ asset }: OwnerTabProps) {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="glass">
         <CardHeader>
           <CardTitle>Author</CardTitle>
         </CardHeader>

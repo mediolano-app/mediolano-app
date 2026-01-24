@@ -298,7 +298,7 @@ export const mockIPTypeData: Record<string, IPTypeDataType> = {
     components: ["Visual Display", "Audio System", "Motion Sensors", "Custom Software"],
   },
   Generic: {
-    type: "Generic IP",
+    type: "Programmable IP",
     registrationDate: "2025-01-01",
     createdAt: "2024-12-25",
     creator: "Unknown Creator",

@@ -121,7 +121,7 @@ export function ProofCertificate({ asset, ownershipHistory = [] }: ProofCertific
             {/* Current Owner */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium text-muted-foreground">Current Owner</h4>
+                <h4 className="text-sm font-medium text-muted-foreground">Owner</h4>
                 <Badge variant="outline" className="text-xs">
                   Active
                 </Badge>

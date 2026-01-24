@@ -194,7 +194,7 @@ interface CollectionCardProps {
 function CollectionCard({ collection }: CollectionCardProps) {
   const isFeatured = isCollectionFeatured(collection.id);
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group">
+    <Card className="overflow-hidden transition-all hover:shadow-md cursor-pointer group glass">
       <div className="relative h-64 w-full">
         <Image
           src={collection.image || "/background.jpg"}
@@ -293,7 +293,7 @@ function FeaturedCollectionCard({ collection }: CollectionCardProps) {
   const isFeatured = isCollectionFeatured(collection.id);
 
   return (
-    <div className="rounded-xl overflow-hidden border cursor-pointer hover:shadow transition-all">
+    <div className="rounded-xl overflow-hidden cursor-pointer hover:shadow transition-all">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
         <div className="relative h-64 md:h-auto">
           <Image src={collection.image || "/background.jpg"} alt={collection.name} fill className="object-cover" />

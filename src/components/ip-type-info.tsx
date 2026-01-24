@@ -975,11 +975,11 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
   }
 
   return (
-    <Card>
-      <CardHeader className={cn("pb-3", colorClasses.bgLight)}>
+    <Card className="glass">
+      <CardHeader className={cn("glass rounded-xl pb-3", colorClasses.bgLight)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={cn("p-2 rounded-full bg-background", colorClasses.border)}>
+            <div className={cn("p-2 rounded-xl", colorClasses.border)}>
               <IconComponent className={cn("h-6 w-6", colorClasses.text)} />
             </div>
             <CardTitle className="text-xl">{ipType} IP Template</CardTitle>
@@ -1004,7 +1004,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             {asset.attributes && asset.attributes.length > 0 ? (
               <div className="grid grid-cols-2 gap-4">
                 {asset.attributes.map((attr, i) => (
-                  <div key={i} className="flex flex-col p-3 rounded-lg border bg-muted/20">
+                  <div key={i} className="flex flex-col p-3 rounded-xl border">
                     <span className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{attr.trait_type}</span>
                     <span className="font-semibold break-all" title={attr.value}>{formatTraitValue(attr.value)}</span>
                   </div>

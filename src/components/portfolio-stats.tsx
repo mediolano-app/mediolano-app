@@ -96,7 +96,7 @@ export function PortfolioStats({ useBlockchainData = false }: PortfolioStatsProp
     <>
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-background/80">
+        <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Collections</CardTitle>
             <Wallet className="h-4 w-4 text-muted-foreground" />
@@ -108,7 +108,7 @@ export function PortfolioStats({ useBlockchainData = false }: PortfolioStatsProp
             <p className="text-xs text-muted-foreground">IP Collection</p>
           </CardContent>
         </Card>
-        <Card className="bg-background/80">
+        <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
             <LayoutGrid className="h-4 w-4 text-muted-foreground" />
@@ -120,7 +120,7 @@ export function PortfolioStats({ useBlockchainData = false }: PortfolioStatsProp
             <p className="text-xs text-muted-foreground">Total IPs in your portfolio</p>
           </CardContent>
         </Card>
-        <Card className="bg-background/80">
+        <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Top Collection</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -134,7 +134,7 @@ export function PortfolioStats({ useBlockchainData = false }: PortfolioStatsProp
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-background/80">
+        <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />

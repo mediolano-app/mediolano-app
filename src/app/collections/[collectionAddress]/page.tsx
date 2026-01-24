@@ -193,7 +193,7 @@ export default function CollectionPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-2 space-y-6">
             {/* Description */}
-            <Card>
+            <Card className="glass">
               <CardContent className="mt-4">
                 <p className="text-muted-foreground leading-relaxed">
                   {collection.description || "No description available."}
@@ -203,7 +203,7 @@ export default function CollectionPage() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card>
+              <Card className="glass">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -217,7 +217,7 @@ export default function CollectionPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -233,7 +233,7 @@ export default function CollectionPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -247,7 +247,7 @@ export default function CollectionPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -265,7 +265,7 @@ export default function CollectionPage() {
 
           <div className="space-y-6">
             {/* Collection Details */}
-            <Card>
+            <Card className="glass">
               <CardContent className="space-y-4 mt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">

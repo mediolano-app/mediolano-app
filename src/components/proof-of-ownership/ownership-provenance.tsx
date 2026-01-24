@@ -176,7 +176,7 @@ export function OwnershipProvenance({ assetId, assetName, creationDate, creator,
             </div>
             <div className="text-center">
               <p className="text-2xl font-bold text-primary">1</p>
-              <p className="text-xs text-muted-foreground">Current Owner</p>
+              <p className="text-xs text-muted-foreground">Owner</p>
             </div>
           </div>
         </div>

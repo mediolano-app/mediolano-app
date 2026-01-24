@@ -18,7 +18,7 @@ interface CollectionCardProps {
 export function CollectionCard({ collection, index }: CollectionCardProps) {
   return (
     <div className="group">
-      <Card className="h-full overflow-hidden border-0 bg-gradient-to-br from-background to-muted/20 shadow-lg transition-all duration-300 hover:shadow-xl">
+      <Card className="h-full glass-card border-0">
         <CardHeader className="p-0">
           <div className="relative aspect-video overflow-hidden">
             <Image

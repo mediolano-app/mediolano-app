@@ -20,7 +20,7 @@ interface LicenseTabProps {
 export function LicenseTab({ asset }: LicenseTabProps) {
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="glass">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -70,7 +70,7 @@ export function LicenseTab({ asset }: LicenseTabProps) {
 
       {/* AI & Data Mining Policy */}
       {asset.attributes?.some(attr => attr.trait_type === "AI & Data Mining Policy" && attr.value !== "Unspecified") && (
-        <Card>
+        <Card className="glass">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               AI & Data Mining Policy
@@ -90,7 +90,7 @@ export function LicenseTab({ asset }: LicenseTabProps) {
       )}
 
       {/* Extended Licensing Terms */}
-      <Card>
+      <Card className="glass">
         <CardHeader>
           <CardTitle className="text-lg">Extended Licensing Terms</CardTitle>
         </CardHeader>

@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background/80">
+      <body className="vivid-gradient-bg min-h-screen text-foreground antialiased">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
