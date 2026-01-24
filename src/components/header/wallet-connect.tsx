@@ -65,7 +65,7 @@ export function WalletConnect() {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full glass">
             <Wallet className="h-4 w-4 mr-2" />
             {displayAddress?.slice(0, 6)}
           </Button>
@@ -101,7 +101,7 @@ export function WalletConnect() {
   }
 
   return (
-    <Button variant="outline" className="w-full" onClick={handleConnect}>
+    <Button variant="outline" className="w-full glass" onClick={handleConnect}>
       <Wallet className="h-4 w-4 mr-2" />
       Connect
     </Button>

@@ -76,20 +76,21 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="vivid-gradient-bg min-h-screen text-foreground antialiased">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <StarknetProvider>
-            <AnimatedBackground />
-            <Header />
-            {children}
-            <Toaster />
-            <Footer />
-          </StarknetProvider>
-        </ThemeProvider>
+        <div className="bg-background/75">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <StarknetProvider>
+              <Header />
+              {children}
+              <Toaster />
+              <Footer />
+            </StarknetProvider>
+          </ThemeProvider>
+        </div>
       </body>
     </html>
   );

@@ -12,7 +12,7 @@ import { Logo } from "@/components/header/logo"
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full glass border-0">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-lg">
 
       <div className="container mx-auto flex items-center justify-between h-16">
 

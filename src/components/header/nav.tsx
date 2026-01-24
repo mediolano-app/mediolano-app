@@ -58,7 +58,7 @@ export function MainNav() {
         <NavigationMenuList>
 
           <NavigationMenuItem>
-            <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
+            <NavigationMenuTrigger className="bg-background/10">
               <Grid2X2Icon className="mr-2 h-4 w-4" />
               Discover
             </NavigationMenuTrigger>
@@ -131,7 +131,7 @@ export function MainNav() {
           </NavigationMenuItem>
 
           <NavigationMenuItem>
-            <NavigationMenuTrigger className="bg-background/20 backdrop-blur">
+            <NavigationMenuTrigger className="bg-background/10">
               <Rocket className="mr-2 h-4 w-4" />
               Create
             </NavigationMenuTrigger>
@@ -200,7 +200,7 @@ export function MainNav() {
 
 
           <NavigationMenuItem>
-            <NavigationMenuTrigger className="bg-background/30 backdrop-blur">
+            <NavigationMenuTrigger className="bg-background/10">
               <Layers className="mr-2 h-4 w-4" />
               Manage
             </NavigationMenuTrigger>
