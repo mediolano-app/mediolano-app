@@ -90,7 +90,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   const timeAgo = formatTimeAgo(activity.timestamp)
 
   return (
-    <Card className="group hover:shadow-lg hover:border-primary/20 transition-all duration-300 border-border/60 bg-card overflow-hidden">
+    <Card className="group hover:shadow-lg hover:border-primary/20 transition-all duration-300 glass-card overflow-hidden">
       <div className="flex flex-col sm:flex-row gap-4 p-4">
         <Link
           href={`/assets/${activity.assetId}`}

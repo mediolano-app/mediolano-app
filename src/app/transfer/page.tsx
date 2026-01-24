@@ -229,7 +229,7 @@ export default function TransferPage() {
   const isLoading = portfolioLoading
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8 bg-background/60">
+    <div className="min-h-screen flex items-center justify-center p-8">
 
       <main className="flex-1 container p-6 space-y-6">
         {/* Page Header */}
@@ -416,7 +416,7 @@ export default function TransferPage() {
             ) : sortedAssets.length > 0 ? (
               <>
                 {/* Selection Header */}
-                <Card className="border-dashed border-2 border-primary/20 bg-primary/5">
+                <Card className="glass-card">
                   <CardContent className="p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
@@ -474,7 +474,7 @@ export default function TransferPage() {
                       return (
                         <Card
                           key={asset.id}
-                          className={`transition-all duration-200 hover:shadow-md cursor-pointer ${isSelected ? "ring-2 ring-primary bg-primary/5 border-primary/20" : "hover:bg-muted/50"
+                          className={`transition-all duration-200 hover:shadow-md cursor-pointer glass-card ${isSelected ? "ring-2 ring-primary ring-offset-2 border-primary/20" : "hover:bg-white/5"
                             }`}
                           onClick={() => toggleAssetSelection(asset.id)}
                         >
@@ -578,7 +578,7 @@ export default function TransferPage() {
                       return (
                         <Card
                           key={asset.id}
-                          className={`overflow-hidden transition-all hover:shadow-md cursor-pointer group ${isSelected ? "ring-2 ring-primary bg-primary/5" : ""
+                          className={`overflow-hidden transition-all hover:shadow-md cursor-pointer group glass-card ${isSelected ? "ring-2 ring-primary ring-offset-2" : ""
                             }`}
                           onClick={() => toggleAssetSelection(asset.id)}
                         >
@@ -658,8 +658,8 @@ export default function TransferPage() {
                   const TypeIcon = typeIcons[asset.type] || Box
 
                   return (
-                    <Card key={asset.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="aspect-square bg-muted relative">
+                    <Card key={asset.id} className="overflow-hidden hover:shadow-md transition-shadow glass-card">
+                      <div className="aspect-square relative">
                         <Image src={asset.image || "/placeholder.svg"} alt={asset.name} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
                         <div className="absolute top-3 left-3">
                           <Badge className={typeColors[asset.type]}>
@@ -733,7 +733,7 @@ export default function TransferPage() {
       {/* Mobile Selection Summary */}
       {selectedAssets.length > 0 && (
         <div className="fixed bottom-20 left-4 right-4 md:hidden z-10">
-          <Card className="bg-background/95 backdrop-blur border-primary/20">
+          <Card className="glass-card border-primary/20">
             <CardContent className="p-3">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">

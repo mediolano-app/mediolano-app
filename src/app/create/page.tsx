@@ -263,7 +263,7 @@ export default function CreatePage() {
   const selectedOptionData = creationOptions.find((opt) => opt.id === selectedOption)
 
   return (
-    <div className="min-h-screen bg-background/60 p-8">
+    <div className="min-h-screen p-8">
 
 
       <main className="container mx-auto max-w-10xl">
@@ -380,7 +380,7 @@ export default function CreatePage() {
               ) : (
                 <>
                   {/* Popular Templates */}
-                  <Card>
+                  <Card className="glass-card">
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-primary" />
@@ -444,7 +444,7 @@ export default function CreatePage() {
                   </Card>*/}
 
                   {/* Benefits */}
-                  <Card>
+                  <Card className="glass-card">
                     <CardContent className="p-4">
                       <h4 className="font-medium mb-3">Why tokenize with Mediolano?</h4>
                       <div className="space-y-2">

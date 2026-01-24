@@ -22,7 +22,7 @@ export default function CollectionsPage() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background/60">
+    <div className="min-h-screen flex items-center justify-center">
 
       <div className="container py-8">
 

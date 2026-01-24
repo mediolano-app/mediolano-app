@@ -58,7 +58,7 @@ export function CreationOptionCard({ option, viewMode, isSelected, onSelect }: C
   return (
     <Card
       className={cn(
-        "overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group relative",
+        "glass-card overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2 group relative",
         isSelected ? "ring-2 ring-primary ring-offset-2 shadow-lg" : "",
       )}
       onClick={onSelect}

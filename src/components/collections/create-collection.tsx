@@ -325,7 +325,7 @@ export default function CreateCollectionView({
   };
 
   return (
-    <div className="min-h-screen bg-background/70 text-foreground pb-20">
+    <div className="min-h-screen text-foreground pb-20">
       <main className="container mx-auto px-4 py-8">
         {!isModalMode && (
           <Link href="/create">
@@ -348,7 +348,7 @@ export default function CreateCollectionView({
             <form onSubmit={handleSubmit}>
               {/* HIDDEN INPUT for implicit submission if needed, but Button type=submit handles it */}
 
-              <Card>
+              <Card className="glass-card">
                 <CardHeader>
                   <CardTitle>Collection Details</CardTitle>
                   <CardDescription>
@@ -462,7 +462,7 @@ export default function CreateCollectionView({
 
           <div className="lg:col-span-1">
             <div className="space-y-6">
-              <Card>
+              <Card className="glass-card">
                 <CardHeader>
                   <CardTitle>Collection Settings</CardTitle>
                   <CardDescription>
@@ -517,7 +517,7 @@ export default function CreateCollectionView({
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-card">
                 <CardHeader>
                   <CardTitle>Collection Guide</CardTitle>
                   <CardDescription>

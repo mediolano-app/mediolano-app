@@ -5,7 +5,7 @@ import NFTSkeleton from "@/components/assets/nft-skeleton"
 
 export function CreatorPageSkeleton() {
     return (
-        <div className="min-h-screen bg-background/60">
+        <div className="min-h-screen">
             {/* Hero Skeleton */}
             <div className="relative h-[400px] w-full bg-muted/30">
                 <div className="container mx-auto px-4 py-12 md:py-20 h-full flex items-center">

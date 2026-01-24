@@ -237,7 +237,7 @@ export default function CreateAssetPage() {
           </DialogContent>
         </Dialog>
       )}
-      <div className="min-h-screen bg-background/70 text-foreground pb-20">
+      <div className="min-h-screen text-foreground pb-20">
         {/* Mobile Preview Modal */}
         {showMobilePreview && (
           <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden">
@@ -334,7 +334,7 @@ export default function CreateAssetPage() {
                 />
 
                 {/* Help Card */}
-                <Card>
+                <Card className="glass-card">
                   <CardContent className="p-4">
                     <h4 className="font-medium mb-2 flex items-center gap-2">
                       <FileText className="h-4 w-4" />

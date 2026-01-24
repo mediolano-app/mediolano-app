@@ -95,7 +95,7 @@ export default function RemixDiscoveryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background/60">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
 
         {/* Header */}
@@ -326,7 +326,7 @@ export default function RemixDiscoveryPage() {
 
 function AssetCard({ asset, nftAddress, onRemix }: { asset: any, nftAddress: string, onRemix: () => void }) {
   return (
-    <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 border-muted-foreground/20">
+    <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 glass-card">
       <div className="aspect-square relative bg-muted/50 overflow-hidden">
         <Image
           src={asset.image || "/placeholder.svg"}

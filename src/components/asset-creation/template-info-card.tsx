@@ -44,7 +44,7 @@ export function TemplateInfoCard({ template }: TemplateInfoCardProps) {
   const isPopular = template.id === "audio" || template.id === "art" || template.id === "nft"
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden glass-card">
       <CardHeader className={cn("pb-4 relative overflow-hidden", colorClasses.bgGradient)}>
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
         <div className="relative">

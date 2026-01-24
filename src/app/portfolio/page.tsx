@@ -25,7 +25,7 @@ export default function PortfolioPage() {
   });
 
   return (
-    <div className="p-8 bg-background/60">
+    <div className="p-8 glass">
       <main className="container mx-auto px-4 py-6">
         <div className="space-y-1 mb-5 px-4 mx-auto">
           <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>

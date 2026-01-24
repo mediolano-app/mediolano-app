@@ -48,7 +48,7 @@ export default function TemplatesPage() {
 
   return (
     <div className="min-h-screen">
-     
+
       <main className="container mx-auto p-4 py-8">
         <div className="mb-8 space-y-6">
           <Alert className="border-primary/20 bg-primary/5">
@@ -142,7 +142,7 @@ export default function TemplatesPage() {
                   </div>
                 </>
               ) : (
-                <Card>
+                <Card className="glass-card">
                   <CardContent className="p-6 text-center">
                     <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
                       <Sparkles className="h-8 w-8 text-primary" />
@@ -161,7 +161,7 @@ export default function TemplatesPage() {
               )}
 
               {/* Quick Stats */}
-              <Card>
+              <Card className="glass-card">
                 <CardContent className="p-4">
                   <h4 className="font-medium mb-3">Platform Stats</h4>
                   <div className="space-y-2 text-sm">

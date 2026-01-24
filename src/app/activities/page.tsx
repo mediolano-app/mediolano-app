@@ -62,7 +62,7 @@ export default function ActivitiesPage() {
   }, [activities, searchQuery, activityTypeFilter, activeTab]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
 
 
       <main className="container mx-auto px-4 py-8 md:py-12 lg:py-16 space-y-8 md:space-y-12">
@@ -80,7 +80,7 @@ export default function ActivitiesPage() {
         </div>
 
         {/* Filters Bar */}
-        <Card className="border-border/50 bg-card/50 backdrop-blur">
+        <Card className="glass">
           <div className="p-3 md:p-4 lg:p-6">
             <div className="flex flex-col gap-3 md:gap-4">
               <div className="relative flex-1">

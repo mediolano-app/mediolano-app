@@ -115,7 +115,7 @@ export default function SettingsPage() {
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold mb-8">Settings</h1>
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-8">
-        <Card className="flex flex-col">
+        <Card className="flex flex-col glass-card">
           <CardHeader>
             <CardTitle className="flex items-center">
               <User className="mr-2" /> Account Settings
@@ -170,14 +170,14 @@ export default function SettingsPage() {
               {saveStatus === "saving"
                 ? "Saving..."
                 : saveStatus === "saved"
-                ? "Saved!"
-                : "Save Changes"}
+                  ? "Saved!"
+                  : "Save Changes"}
             </Button>
           </div>
         </Card>
 
         {/* IP Management removed */}
-        <Card className="flex flex-col">
+        <Card className="flex flex-col glass-card">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Settings className="mr-2" /> New Profile Settings
@@ -249,8 +249,8 @@ export default function SettingsPage() {
               {saveStatus === "saving"
                 ? "Saving..."
                 : saveStatus === "saved"
-                ? "Saved!"
-                : "Save Changes"}
+                  ? "Saved!"
+                  : "Save Changes"}
             </Button>
           </div>
         </Card>
@@ -281,7 +281,7 @@ export default function SettingsPage() {
         </Alert>
       )}
 
-      <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/50 text-foreground">
+      <Card className="glass-card text-foreground">
         <CardHeader>
           <CardTitle className="flex items-center">
             <Zap className="mr-2" /> Benefits of Decentralized IP Management

@@ -64,7 +64,7 @@ export function ProofCertificate({ asset, ownershipHistory = [] }: ProofCertific
 
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden glass-card">
         <CardContent className="p-0">
           <div className="p-6 sm:p-8 border-b bg-foreground/[0.02]">
             <div className="flex items-start justify-between gap-4 mb-6">
@@ -246,7 +246,7 @@ export function ProofCertificate({ asset, ownershipHistory = [] }: ProofCertific
       </Card>
 
       {ownershipHistory.length > 0 && (
-        <Card>
+        <Card className="glass-card">
           <CardContent className="p-6 sm:p-8">
             <h3 className="font-medium mb-6">Ownership History</h3>
 
@@ -295,7 +295,7 @@ export function ProofCertificate({ asset, ownershipHistory = [] }: ProofCertific
         </Card>
       )}
 
-      <Card>
+      <Card className="glass-card">
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div className="text-sm text-muted-foreground">

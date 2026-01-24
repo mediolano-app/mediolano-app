@@ -437,15 +437,15 @@
 /* Glassmorphism Utilities */
 @layer utilities {
   .glass {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg;
+    @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-sm;
   }
 
   .dark .glass {
-    @apply bg-black/30 backdrop-blur-xl border border-white/10 shadow-xl;
+    @apply bg-black/30 backdrop-blur-xl border border-white/10 shadow-sm;
   }
 
   .glass-card {
-    @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-md rounded-xl transition-all duration-300;
+    @apply bg-white/15 backdrop-blur-md border border-white/10 shadow-md rounded-xl transition-all duration-300;
   }
 
   .glass-card:hover {
@@ -453,7 +453,7 @@
   }
 
   .dark .glass-card {
-    @apply bg-black/20 backdrop-blur-md border border-white/5 shadow-md rounded-xl;
+    @apply bg-black/20 backdrop-blur-md border border-white/5 shadow-sm rounded-xl;
   }
 
   .dark .glass-card:hover {

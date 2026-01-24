@@ -91,7 +91,7 @@ export default function DiscoverFeatures() {
               viewport={{ once: true, margin: "-50px" }}
               whileTap={{ scale: 0.98 }}
             >
-              <Card className="h-full border-border hover:border-primary/50 transition-colors duration-300 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+              <Card className="h-full glass-card hover:border-primary/50 transition-colors duration-300 hover:shadow-md transition-all duration-300 hover:-translate-y-1">
                 <CardHeader>
                   <motion.div
                     className="mb-4"
@@ -128,9 +128,8 @@ export default function DiscoverFeatures() {
               className="active:scale-95 transition-transform"
             >
               <Card
-                className={`h-full border-border transition-all duration-300 hover:shadow-md ${
-                  activeFeature === index ? "border-primary/50 shadow-lg" : ""
-                }`}
+                className={`h-full glass-card transition-all duration-300 hover:shadow-md ${activeFeature === index ? "border-primary/50 shadow-lg" : ""
+                  }`}
               >
                 <CardHeader>
                   <motion.div
@@ -138,9 +137,9 @@ export default function DiscoverFeatures() {
                     animate={
                       activeFeature === index
                         ? {
-                            scale: [1, 1.2, 1],
-                            rotate: [0, -10, 10, -10, 0],
-                          }
+                          scale: [1, 1.2, 1],
+                          rotate: [0, -10, 10, -10, 0],
+                        }
                         : {}
                     }
                     transition={{ duration: 0.5 }}

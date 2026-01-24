@@ -113,7 +113,7 @@ export default function StartUserShowcaseSection() {
   }
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <motion.div
@@ -165,9 +165,8 @@ export default function StartUserShowcaseSection() {
               className="h-full"
             >
               <Card
-                className={`h-full border-border transition-all duration-300 hover:shadow ${
-                  hoveredUser === user.id ? "border-primary/50" : ""
-                }`}
+                className={`h-full glass-card transition-all duration-300 hover:shadow ${hoveredUser === user.id ? "border-primary/50" : ""
+                  }`}
               >
                 <CardContent className="p-6 flex flex-col items-center text-center">
                   <div className="relative mb-4">

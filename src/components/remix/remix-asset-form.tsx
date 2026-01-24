@@ -439,7 +439,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
             <div className="lg:col-span-1">
                 <div className="sticky top-24 space-y-6">
                     {/* Original Asset Card */}
-                    <Card>
+                    <Card className="glass-card">
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2">
@@ -471,13 +471,13 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
 
                             <div className="space-y-2">
                                 <h4 className="font-medium text-sm">License: {originalAsset.licenseType || 'Unknown'}</h4>
-                                <Badge variant="secondary">This license allows remixing with proper attribution.</Badge>
+                                <Badge variant="outline">This license allows remixing with proper attribution.</Badge>
                             </div>
                         </CardContent>
                     </Card>
 
                     {/* Attribution Notice */}
-                    <Alert>
+                    <Alert className="glass-card">
                         <Info className="h-4 w-4" />
                         <AlertDescription>
                             Your remix will automatically include attribution to the original asset and creator.
@@ -487,10 +487,10 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
             </div>
 
             {/* Right Column - Remix Form */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-8 bg-card/20 no-border rounded-xl p-4">
 
                 {/* Collection Selection */}
-                <Card>
+                <Card className="glass-card">
                     <CardHeader>
                         <CardTitle>Destination Collection</CardTitle>
                     </CardHeader>
@@ -532,7 +532,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 </Card>
 
                 {/* Remix Type Selection */}
-                <Card>
+                <Card className="glass-card">
                     <CardHeader>
                         <CardTitle>Remix Type</CardTitle>
                     </CardHeader>
@@ -562,7 +562,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 </Card>
 
                 {/* File Upload */}
-                <Card>
+                <Card className="glass-card">
                     <CardHeader>
                         <CardTitle>
                             Upload Your Remix
@@ -618,7 +618,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 </Card>
 
                 {/* Remix Details */}
-                <Card>
+                <Card className="glass-card">
                     <CardHeader>
                         <CardTitle>Remix Details</CardTitle>
                     </CardHeader>
@@ -657,7 +657,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 </Card>
 
                 {/* License Configuration */}
-                <Card>
+                <Card className="glass-card">
                     <CardHeader>
                         <CardTitle>License Configuration</CardTitle>
                     </CardHeader>
@@ -752,7 +752,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 </Card>
 
                 {/* Submit Section */}
-                <Card>
+                <Card className="glass-card">
                     <CardContent className="pt-6">
                         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
                             <div className="text-sm text-muted-foreground">

@@ -77,7 +77,7 @@ export default function DiscoverBenefitsCreators() {
               viewport={{ once: true, margin: "-50px" }}
               className="snap-center flex-shrink-0 w-[85vw]"
             >
-              <div className="flex flex-col items-center text-center p-6 bg-card rounded-xl border border-border shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+              <div className="flex flex-col items-center text-center p-6 glass-card shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <motion.div
                   className="mb-6 p-4 rounded-full bg-primary/10"
                   whileHover={isMounted ? { scale: 1.1, rotate: 5 } : {}}
@@ -110,9 +110,9 @@ export default function DiscoverBenefitsCreators() {
                 animate={
                   hoveredIndex === index && isMounted
                     ? {
-                        scale: [1, 1.1, 1.05],
-                        rotate: [0, 5, 0],
-                      }
+                      scale: [1, 1.1, 1.05],
+                      rotate: [0, 5, 0],
+                    }
                     : {}
                 }
                 transition={{ duration: 0.5 }}
@@ -134,15 +134,15 @@ export default function DiscoverBenefitsCreators() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
-              
+
               <p className="text-foreground/80 mb-4 text-lg">
-              Mediolano provides seamless tokenization for Intellectual Property, leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets - - a groundbreaking solution to empower creators, collectors and organizations to protect and monetize their IP assets.
+                Mediolano provides seamless tokenization for Intellectual Property, leveraging Starknet’s unparalleled high-speed, low-cost and smart contract intelligence for digital assets - - a groundbreaking solution to empower creators, collectors and organizations to protect and monetize their IP assets.
               </p>
               <p className="text-foreground/80 mb-4 text-lg">
-              Registering Intellectual Property on Mediolano means the asset is automatically tokenize and protected in 181 countries, according to The Berne Convention for the Protection of Literary and Artistic Works, adopted in 1886, which guarantees recognition of the authorship of IP without the need for registration with WIPO (World Intellectual Property Organization).
+                Registering Intellectual Property on Mediolano means the asset is automatically tokenize and protected in 181 countries, according to The Berne Convention for the Protection of Literary and Artistic Works, adopted in 1886, which guarantees recognition of the authorship of IP without the need for registration with WIPO (World Intellectual Property Organization).
               </p>
               <p className="text-foreground/80 text-lg">
-              With Mediolano anyone can permissionless register their Intellectual Property assets -- such as artwork, video, music, literacy, AI model, software and other work of authorship. The copyright will be time stamped for your proof of ownership and valid for 50-70 years, according to the legal jurisdiction.
+                With Mediolano anyone can permissionless register their Intellectual Property assets -- such as artwork, video, music, literacy, AI model, software and other work of authorship. The copyright will be time stamped for your proof of ownership and valid for 50-70 years, according to the legal jurisdiction.
               </p>
             </div>
             <div className="flex justify-center">
@@ -156,9 +156,9 @@ export default function DiscoverBenefitsCreators() {
                     animate={
                       isMounted
                         ? {
-                            scale: [1, 1.1, 1],
-                            rotate: [0, 5, 0, -5, 0],
-                          }
+                          scale: [1, 1.1, 1],
+                          rotate: [0, 5, 0, -5, 0],
+                        }
                         : {}
                     }
                     transition={{

@@ -210,7 +210,7 @@ export default function StartFeaturedAssetsSection() {
                     onHoverEnd={() => setHoveredAsset(null)}
                     className="h-full"
                   >
-                    <Card className="overflow-hidden h-full border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md">
+                    <Card className="overflow-hidden h-full glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-md">
                       <div className="relative aspect-square overflow-hidden bg-muted/30">
                         <img
                           src={asset.image || "/placeholder.svg"}
@@ -219,13 +219,12 @@ export default function StartFeaturedAssetsSection() {
                         />
                         {asset.badge && (
                           <Badge
-                            className={`absolute top-3 left-3 ${
-                              asset.badge === "New"
+                            className={`absolute top-3 left-3 ${asset.badge === "New"
                                 ? "bg-green-500"
                                 : asset.badge === "Popular"
                                   ? "bg-orange-500"
                                   : "bg-primary"
-                            }`}
+                              }`}
                           >
                             {asset.badge}
                           </Badge>

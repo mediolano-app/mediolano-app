@@ -146,7 +146,7 @@ export default function CreatorPage({ params }: CreatorPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background/60">
+    <div className="min-h-screen">
       {/* Enhanced Hero Section */}
       <div className="relative overflow-hidden">
         {/* Background with gradient overlay and blur effect */}

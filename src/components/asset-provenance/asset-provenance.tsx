@@ -175,7 +175,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
       <div className="absolute bottom-40 -right-20 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/10 rounded-xl blur-[100px] -z-10" />
 
       {/* Main Asset Section - Focus on Ownership */}
-      <section className="relative overflow-hidden rounded-xl glass backdrop-blur-2xl transition-colors animate-in fade-in zoom-in duration-500">
+      <section className="relative overflow-hidden glass-card backdrop-blur-2xl transition-colors animate-in fade-in zoom-in duration-500">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 min-h-[500px]">
           {/* Vertical Image - uses all available height */}
           <div className="lg:col-span-5 h-[400px] lg:h-auto relative group overflow-hidden border-b lg:border-b-0 lg:border-r border-border">
@@ -273,7 +273,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center py-20 px-8 rounded-[2.5rem] bg-card/30 border border-border border-dashed relative overflow-hidden text-center"
           >
-            <div className="w-20 h-20 rounded-xl glass flex items-center justify-center mb-6">
+            <div className="w-20 h-20 rounded-xl bg-white/5 flex items-center justify-center mb-6">
               <Clock className="h-10 w-10 text-muted-foreground/50 animate-pulse" />
             </div>
             <h3 className="text-2xl font-bold text-foreground/80">History in the making...</h3>
@@ -347,7 +347,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                     {/* From → To */}
                     <div className="flex items-center gap-3 text-sm">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-7 h-7 rounded-xl glass flex items-center justify-center text-[10px] font-medium text-muted-foreground shrink-0">
+                        <div className="w-7 h-7 rounded-xl bg-white/5 flex items-center justify-center text-[10px] font-medium text-muted-foreground shrink-0">
                           {event.from && event.from !== "0x0" ? event.from.substring(2, 4).toUpperCase() : "Ø"}
                         </div>
                         <span className="font-mono text-xs text-muted-foreground truncate">
@@ -388,7 +388,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
       </section>
 
       {/* Modern Digital Fingerprint - same glassmorphism style */}
-      <section className="p-8 rounded-xl glass relative overflow-hidden">
+      <section className="p-8 rounded-xl glass-card relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 -z-10" />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
