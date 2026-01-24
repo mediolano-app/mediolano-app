@@ -118,7 +118,7 @@ function StatsSkeleton() {
       {Array(4)
         .fill(null)
         .map((_, i) => (
-          <div key={i} className="rounded-xl border bg-card text-card-foreground shadow space-y-2 p-6">
+          <div key={i} className="rounded-xl border glass text-card-foreground shadow space-y-2 p-6">
             <div className="flex flex-row items-center justify-between space-y-0 pb-2">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-4 w-4" />
