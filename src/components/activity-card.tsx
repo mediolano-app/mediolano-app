@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Plus, Send, Shield, GitBranch, Activity as ActivityIcon, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { AddressLink } from "@/components/ui/address-link"
 import Image from "next/image"
 import { format } from "date-fns"
 
@@ -115,12 +116,13 @@ export function ActivityCard({ activity }: ActivityCardProps) {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <Link
-                  href={`/creator/${activity.user}`}
-                  className="font-medium text-sm hover:text-primary transition-colors block truncate"
+                <AddressLink
+                  address={activity.user}
+                  showFull={true}
+                  className="font-medium text-sm block truncate"
                 >
                   {activity.user}
-                </Link>
+                </AddressLink>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Badge className={`${colors.badge} border-0 h-5 gap-1 px-1.5`}>
                     <Icon className="h-3 w-3" />

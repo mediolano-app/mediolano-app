@@ -10,6 +10,7 @@ import { Collection } from "@/lib/types"
 import Link from "next/link"
 import Image from "next/image"
 import { LazyImage } from "@/components/ui/lazy-image"
+import { AddressLink } from "@/components/ui/address-link"
 
 interface CollectionCardProps {
   collection: Collection
@@ -82,7 +83,7 @@ export function CollectionCard({ collection, index }: CollectionCardProps) {
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-1 text-muted-foreground">
                 <Users className="h-4 w-4" />
-                <span className="font-medium">{collection.owner.slice(0, 6)}...{collection.owner.slice(-4)}</span>
+                <AddressLink address={collection.owner} className="font-medium text-muted-foreground hover:text-primary z-20 relative" />
               </div>
               <div className="flex items-center gap-1 text-muted-foreground">
                 <Shield className="h-4 w-4" />

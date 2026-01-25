@@ -1,4 +1,6 @@
 import { Metadata } from 'next'
+import { CreatorHeader } from '@/components/creator/creator-header'
+import { CreatorNavigation } from '@/components/creator/creator-navigation'
 
 type Props = {
     params: Promise<{ slug: string }>
@@ -27,10 +29,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 }
 
-export default function CreatorLayout({
+export default async function CreatorLayout({
     children,
+    params,
 }: {
     children: React.ReactNode
+    params: Promise<{ slug: string }>
 }) {
-    return children
+    const { slug } = await params
+
+    return (
+        <div className="min-h-screen flex flex-col bg-background">
+            <CreatorHeader slug={slug} />
+            <CreatorNavigation slug={slug} />
+            <main className="flex-1">
+                {children}
+            </main>
+        </div>
+    )
 }

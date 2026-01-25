@@ -1,13 +1,14 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState, useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Search, X } from "lucide-react";
 import { usePortfolio } from "@/hooks/use-portfolio";
 import { useAccount } from "@starknet-react/core";
 import { Alert } from "@/components/ui/alert";
 import { CollectionValidator } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
@@ -19,12 +20,35 @@ const PortfolioAssets = dynamic(() =>
 export default function AssetsClientPage() {
     const { address } = useAccount();
     const { collections, loading, error, tokens } = usePortfolio();
+    const [searchQuery, setSearchQuery] = useState("");
 
     // Validate collections before passing to components
     const validCollections = collections.filter(collection => {
         const isValid = CollectionValidator.isValid(collection);
         return isValid;
     });
+
+    // Filter tokens based on search query
+    const filteredTokens = useMemo(() => {
+        if (!searchQuery) return tokens;
+
+        const query = searchQuery.toLowerCase();
+        const filtered: Record<string, any[]> = {};
+
+        Object.keys(tokens).forEach(collectionId => {
+            const collectionTokens = tokens[collectionId].filter(asset =>
+                (asset.name && asset.name.toLowerCase().includes(query)) ||
+                (asset.collection_id && asset.collection_id.toLowerCase().includes(query)) ||
+                (asset.token_id && asset.token_id.includes(query))
+            );
+
+            if (collectionTokens.length > 0) {
+                filtered[collectionId] = collectionTokens;
+            }
+        });
+
+        return filtered;
+    }, [tokens, searchQuery]);
 
     return (
         <div className="p-8">
@@ -52,13 +76,31 @@ export default function AssetsClientPage() {
                 {address && (
                     <Suspense fallback={<AssetsSkeleton />}>
                         <div className="space-y-8 container mx-auto">
+                            <div className="relative w-full sm:w-[350px]">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search your assets..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-9 pr-9"
+                                />
+                                {searchQuery && (
+                                    <button
+                                        onClick={() => setSearchQuery("")}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                )}
+                            </div>
+
                             {loading ? (
                                 <AssetsSkeleton />
                             ) : error ? (
                                 <Alert variant="destructive">{error}</Alert>
                             ) : (
                                 <PortfolioAssets
-                                    tokens={tokens}
+                                    tokens={filteredTokens}
                                     loading={loading}
                                     collections={validCollections}
                                 />

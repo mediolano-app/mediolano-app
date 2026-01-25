@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Box, Sparkles, ExternalLink, ArrowRight, MoreHorizontal, History, ShieldCheck, Flag, Send, Eye } from "lucide-react";
+import { Box, Sparkles, MoreHorizontal, History, ShieldCheck, Flag, Send, Eye } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,7 +12,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,30 +25,19 @@ interface PortfolioAssetsProps {
 }
 
 export function PortfolioAssets({ tokens, loading, collections = [] }: PortfolioAssetsProps) {
-    const [searchQuery, setSearchQuery] = useState("");
     const [visibleCount, setVisibleCount] = useState(12);
 
     // Flatten tokens from all collections
     const allAssets = Object.values(tokens).flat();
 
-    // Filter assets
-    const filteredAssets = allAssets.filter((asset) => {
-        const query = searchQuery.toLowerCase();
-        return (
-            (asset.name && asset.name.toLowerCase().includes(query)) ||
-            (asset.collection_id && asset.collection_id.toLowerCase().includes(query)) ||
-            (asset.token_id && asset.token_id.includes(query))
-        );
-    });
-
     // Pagination
-    const visibleAssets = filteredAssets.slice(0, visibleCount);
-    const hasMore = filteredAssets.length > visibleCount;
+    const visibleAssets = allAssets.slice(0, visibleCount);
+    const hasMore = allAssets.length > visibleCount;
 
-    // Reset pagination on search
+    // Reset pagination when tokens change (e.g. external filter)
     useEffect(() => {
         setVisibleCount(12);
-    }, [searchQuery]);
+    }, [tokens]);
 
     const handleLoadMore = () => {
         setVisibleCount((prev) => prev + 12);
@@ -72,25 +60,10 @@ export function PortfolioAssets({ tokens, loading, collections = [] }: Portfolio
 
     return (
         <div className="space-y-8">
-            {/* Search Bar */}
-            <div className="relative w-full sm:w-[350px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                    placeholder="Search your assets..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
-                />
-            </div>
-
-            {filteredAssets.length === 0 ? (
+            {allAssets.length === 0 ? (
                 <EmptyState
                     title="No Assets Found"
-                    description={
-                        searchQuery
-                            ? "Try a different search term."
-                            : "You don't own any assets locally."
-                    }
+                    description="No assets found to display."
                 />
             ) : (
                 <div className="space-y-8">

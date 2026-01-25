@@ -8,6 +8,7 @@ import Image from "next/image"
 import { LazyImage } from "@/components/ui/lazy-image"
 import { Calendar, DollarSign, FileCheck, Clock, Info, ExternalLink } from "lucide-react"
 import Link from "next/link"
+import { AddressLink } from "@/components/ui/address-link"
 
 interface Asset {
   id: string
@@ -65,7 +66,7 @@ export function SelectedAssetDetails({ asset }: SelectedAssetDetailsProps) {
         <div>
           <h3 className="font-medium text-lg">{asset.name}</h3>
           <div className="flex items-center gap-2">
-            <p className="text-sm text-muted-foreground">by {asset.creator}</p>
+            <p className="text-sm text-muted-foreground">by <AddressLink address={asset.creator} className="font-semibold text-foreground hover:text-primary transition-colors" /></p>
             {asset.verified && (
               <TooltipProvider>
                 <Tooltip>
