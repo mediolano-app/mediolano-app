@@ -73,10 +73,10 @@ export function FeaturedHero() {
 
                         <div className="text-center p-8 max-w-3xl relative z-10">
                             <Badge className="mb-6 bg-white/10 text-white border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors">
-                                Mediolano IP Creator
+                                IP Creator
                             </Badge>
                             <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white leading-tight tracking-tight">
-                                Loading...
+                                Loading collections...
                             </h2>
                             <p className="text-lg md:text-xl text-white/70 mb-10 leading-relaxed max-w-2xl mx-auto">
                                 Create, share, and remix with permissionless ownership.

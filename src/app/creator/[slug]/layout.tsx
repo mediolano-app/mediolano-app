@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: `Creator ${shortAddress}`,
         description: `View the profile and IP portfolio of creator ${shortAddress} on Mediolano. Explore their collections, assets, and contributions to the creator economy on Starknet.`,
         openGraph: {
-            title: `Creator ${shortAddress} | Mediolano IP Creator`,
+            title: `Creator ${shortAddress} | IP Creator`,
             description: `View the profile and IP portfolio of creator ${shortAddress}. Explore their collections and assets on Starknet.`,
             type: 'profile',
         },

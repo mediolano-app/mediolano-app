@@ -10,10 +10,10 @@ import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://mediolano.app'),
   title: {
-    default: 'Mediolano IP Creator | Programmable IP for the Integrity Web',
-    template: '%s | Mediolano IP Creator',
+    default: 'IP Creator | Programmable IP for the Integrity Web',
+    template: '%s | IP Creator',
   },
-  description: 'Create, manage, and protect your intellectual property on Starknet. Mediolano IP Creator enables programmable IP assets with provenance tracking, licensing, and ownership verification.',
+  description: 'Create, manage, and protect your intellectual property on Starknet. IP Creator enables programmable IP assets with provenance tracking, licensing, and ownership verification.',
   keywords: [
     'IP',
     'intellectual property',
