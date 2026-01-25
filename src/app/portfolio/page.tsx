@@ -25,8 +25,8 @@ export default function PortfolioPage() {
   });
 
   return (
-    <div className="p-8 glass">
-      <main className="container mx-auto px-4 py-6">
+    <div className="p-8">
+      <div className="container mx-auto px-4 py-6">
         <div className="space-y-1 mb-5 px-4 mx-auto">
           <h1 className="text-2xl font-bold tracking-tight">IP Portfolio</h1>
           {address ?
@@ -34,11 +34,11 @@ export default function PortfolioPage() {
               Showcase and manage your digital assets
             </p> :
             <p className="text-muted-foreground badge">
-              Connect your wallet to open your onchain portfolio
+              Connect your wallet to open your onchain portfolio.
             </p>
           }
         </div>
-      </main>
+      </div>
 
       {/* Show message when no wallet is connected */}
       {!address && (

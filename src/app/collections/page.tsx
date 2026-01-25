@@ -22,9 +22,13 @@ export default function CollectionsPage() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <main className="container mx-auto px-4">
 
-      <div className="container py-8">
+      <div className="py-4 text-center">
+        <h1 className="text-4xl font-bold tracking-tight">Collections</h1>
+      </div>
+
+      <div className="container">
 
 
         {/* Show loading state while data is being fetched */}
@@ -118,7 +122,7 @@ export default function CollectionsPage() {
         open={reportDialogState.isOpen}
         onOpenChange={(open) => setReportDialogState(prev => ({ ...prev, isOpen: open }))}
       />
-    </div>
+    </main>
   );
 }
 
@@ -138,7 +142,7 @@ function CollectionsSkeleton() {
         {Array(6)
           .fill(null)
           .map((_, i) => (
-            <div key={i} className="rounded-xl border bg-card text-card-foreground shadow overflow-hidden h-[380px]">
+            <div key={i} className="rounded-xl border glass text-card-foreground overflow-hidden h-[380px]">
               <Skeleton className="h-64 w-full" />
               <div className="p-6 space-y-4">
                 <div className="flex justify-between items-start">
