@@ -206,6 +206,7 @@ export function MainNav() {
               <Layers className="mr-2 h-4 w-4" />
               Manage
             </NavigationMenuTrigger>
+
             <NavigationMenuContent>
               <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                 <NavigationMenuLink asChild>
@@ -218,7 +219,38 @@ export function MainNav() {
                       Portfolio
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      View and manage your IP portfolio
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+
+
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/portfolio/assets"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Layers className="mr-2 h-4 w-4  text-blue-600" />
+                      My Assets
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
                       Total control over your assets onchain.
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/portfolio/collections"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Layers className="mr-2 h-4 w-4  text-blue-600" />
+                      My Collections
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Total control over your collections onchain.
                     </p>
                   </Link>
                 </NavigationMenuLink>

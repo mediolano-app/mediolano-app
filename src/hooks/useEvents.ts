@@ -189,33 +189,79 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
       try {
         const registryAddress = normalizeStarknetAddress(CONTRACT_ADDRESS);
 
+        // 1. Get the Collection ID for this asset's contract
+        let collectionId = -1n;
+        try {
+          const normalizedContractAddress = normalizeStarknetAddress(contractAddress);
+          let collectionIdResult: string[] | null = null;
+
+          // Try snake_case selector first
+          try {
+            const entrypointSnake = hash.getSelectorFromName("get_collection_id");
+            collectionIdResult = await provider.callContract({
+              contractAddress: normalizedContractAddress,
+              entrypoint: entrypointSnake,
+              calldata: []
+            });
+          } catch (snakeErr) {
+            console.warn(`[Provenance] 'get_collection_id' failed, trying 'getCollectionId'`, snakeErr);
+            // Try camelCase selector
+            const entrypointCamel = hash.getSelectorFromName("getCollectionId");
+            collectionIdResult = await provider.callContract({
+              contractAddress: normalizedContractAddress,
+              entrypoint: entrypointCamel,
+              calldata: []
+            });
+          }
+
+          // Result is u256 (low, high)
+          if (collectionIdResult && collectionIdResult.length >= 2) {
+            const low = BigInt(collectionIdResult[0]);
+            const high = BigInt(collectionIdResult[1]);
+            collectionId = low + (high << 128n);
+            console.log(`[Provenance] Contract ${contractAddress} maps to Collection ID: ${collectionId}`);
+          } else if (collectionIdResult && collectionIdResult.length === 1) {
+            collectionId = BigInt(collectionIdResult[0]);
+            console.log(`[Provenance] Contract ${contractAddress} maps to Collection ID (low only): ${collectionId}`);
+          }
+        } catch (e) {
+          console.warn(`[Provenance] Failed to fetch collection ID for ${contractAddress} with both selectors`, e);
+        }
+
         const response = await provider.getEvents({
           address: registryAddress,
           from_block: { block_number: 1861690 },
           to_block: "latest",
           keys: [[
             REGISTRY_TOKEN_MINTED_SELECTOR,
-            REGISTRY_TOKEN_TRANSFERRED_SELECTOR,
-            STANDARD_TRANSFER_SELECTOR
+            REGISTRY_TOKEN_TRANSFERRED_SELECTOR
           ]],
           chunk_size: 1000,
         });
 
         console.log(`[Provenance] Found ${response.events?.length || 0} registry events`);
-        return response.events || [];
+        return { events: response.events || [], collectionId };
       } catch (err: any) {
-        console.error("[Provenance] Registry Fetch Error:", err.message || err);
-        return [];
+        console.error("[Provenance] Registry/Collection Fetch Error:", err.message || err);
+        return { events: [], collectionId: -1n };
       }
     };
 
     try {
-      const registryRawEvents = await fetchAllRegistryEvents();
+      const { events: registryRawEvents, collectionId: targetCollectionId } = await fetchAllRegistryEvents();
+
+      if (targetCollectionId === -1n) {
+        // STRICT mode: If we don't know the collection ID, we cannot safely filter events.
+        // Returning empty prevents showing duplicates from other collections.
+        console.warn("[Provenance] Collection ID not resolved. Aborting event processing to avoid duplicates.");
+        setEvents([]);
+        return;
+      }
       const processedEvents: any[] = [];
       const seenHashes = new Set<string>();
 
-      // First pass: Filter relevance and collect block numbers
-      const relevantEvents: { event: any; type: string; from: string; to: string }[] = [];
+      // First pass: Group relevant events by transaction hash
+      const eventsByTx = new Map<string, { event: any; type: string; from: string; to: string }[]>();
       const blockNumbers = new Set<number>();
 
       for (const event of registryRawEvents) {
@@ -232,48 +278,48 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
 
         // Handle Registry TokenMinted
         if (eventSelector === REGISTRY_TOKEN_MINTED_SELECTOR && data.length >= 5) {
-          const tokenLow = BigInt(data[2]);
-          const tokenHigh = BigInt(data[3]);
-          const eventTokenId = tokenLow + (tokenHigh << 128n);
+          const eventCollectionId = BigInt(data[0]) + (BigInt(data[1]) << 128n);
+          const isCollectionMatch = eventCollectionId === targetCollectionId;
 
-          if (eventTokenId === targetTokenId) {
-            match = true;
-            type = "mint";
-            from = "0x0";
-            to = data[4];
+          if (isCollectionMatch) {
+            const tokenLow = BigInt(data[2]);
+            const tokenHigh = BigInt(data[3]);
+            const eventTokenId = tokenLow + (tokenHigh << 128n);
+
+            if (eventTokenId === targetTokenId) {
+              match = true;
+              type = "mint";
+              from = "0x0";
+              to = data[4];
+            }
           }
         }
 
         // Handle Registry TokenTransferred
         else if (eventSelector === REGISTRY_TOKEN_TRANSFERRED_SELECTOR && data.length >= 5) {
-          const tokenLow = BigInt(data[2]);
-          const tokenHigh = BigInt(data[3]);
-          const eventTokenId = tokenLow + (tokenHigh << 128n);
+          const eventCollectionId = BigInt(data[0]) + (BigInt(data[1]) << 128n);
+          const isCollectionMatch = eventCollectionId === targetCollectionId;
 
-          if (eventTokenId === targetTokenId) {
-            match = true;
-            type = "transfer";
-            to = data[4];
+          if (isCollectionMatch) {
+            const tokenLow = BigInt(data[2]);
+            const tokenHigh = BigInt(data[3]);
+            const eventTokenId = tokenLow + (tokenHigh << 128n);
+
+            if (eventTokenId === targetTokenId) {
+              match = true;
+              type = "transfer";
+              to = data[4];
+            }
           }
         }
 
-        // Standard ERC721 Transfer
-        else if (eventSelector === STANDARD_TRANSFER_SELECTOR && keys.length >= 4) {
-          const tokenLow = BigInt(keys[3]);
-          const tokenHigh = keys.length > 4 ? BigInt(keys[4]) : 0n;
-          const eventTokenId = tokenLow + (tokenHigh << 128n);
-
-          if (eventTokenId === targetTokenId) {
-            match = true;
-            type = BigInt(keys[1]) === 0n ? "mint" : "transfer";
-            from = keys[1];
-            to = keys[2];
+        if (match) {
+          const txHash = normalizeStarknetAddress(event.transaction_hash); // Normalize for consistent grouping
+          if (!eventsByTx.has(txHash)) {
+            eventsByTx.set(txHash, []);
           }
-        }
+          eventsByTx.get(txHash)?.push({ event, type, from, to });
 
-        if (match && !seenHashes.has(event.transaction_hash)) {
-          seenHashes.add(event.transaction_hash);
-          relevantEvents.push({ event, type, from, to });
           if (event.block_number) blockNumbers.add(event.block_number);
         }
       }
@@ -291,19 +337,33 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
         }
       }));
 
-      // Third pass: Assemble final events
-      for (const { event, type, from, to } of relevantEvents) {
+      // Third pass: Select best event per transaction and assemble final events
+      for (const [txHash, txEvents] of eventsByTx.entries()) {
+        // Priority: Mint > Transfer
+        // Within same type, prefer Registry events (TokenMinted/TokenTransferred) if they carry more info, 
+        // but for now we trust our parsing logic to extract enough from either.
+        // Let's simply prioritize "mint" type.
+
+        txEvents.sort((a, b) => {
+          if (a.type === "mint" && b.type !== "mint") return -1;
+          if (a.type !== "mint" && b.type === "mint") return 1;
+          return 0;
+        });
+
+        const bestEvent = txEvents[0]; // Pick the highest priority
+        const { event, type, from, to } = bestEvent;
+
         const timestamp = blockTimestamps.get(event.block_number) || new Date().toISOString();
 
         processedEvents.push({
-          id: event.transaction_hash,
+          id: txHash,
           type,
           title: type === "mint" ? "Asset Minted" : "Asset Transferred",
           description: type === "mint" ? "Original IP Asset minted" : "Ownership transferred on-chain",
           from: normalizeStarknetAddress(from),
           to: normalizeStarknetAddress(to),
           timestamp,
-          transactionHash: event.transaction_hash,
+          transactionHash: txHash,
           blockNumber: event.block_number,
           verified: true,
         });
