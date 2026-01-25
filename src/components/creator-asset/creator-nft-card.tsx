@@ -70,11 +70,6 @@ export const CreatorNFTCard: React.FC<NFTCardProps> = ({
           </Button>
         </Link>
 
-        <Button variant="outline" size="sm" disabled>
-          <FileText className="h-4 w-4 mr-2" />
-          License
-        </Button>
-
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
@@ -84,12 +79,7 @@ export const CreatorNFTCard: React.FC<NFTCardProps> = ({
           <DropdownMenuContent>
             <DropdownMenuLabel>More</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Link href={`/asset/dashboard/${tokenId}`}>
-              <DropdownMenuItem>
-                <Gauge className="h-4 w-4 mr-2" />
-                Asset Dashboard
-              </DropdownMenuItem>
-            </Link>
+
           </DropdownMenuContent>
         </DropdownMenu>
       </CardFooter>

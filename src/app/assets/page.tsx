@@ -51,11 +51,11 @@ function AssetCardSkeleton() {
 }
 
 function AssetCard({ asset }: { asset: RecentAsset }) {
-    const nftAddress = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as string;
+
 
     return (
         <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 border-muted-foreground/20">
-            <Link href={`/asset/${nftAddress}-${asset.tokenId}`}>
+            <Link href={`/asset/${asset.collectionAddress}-${asset.tokenId}`}>
                 <div className="aspect-square relative bg-muted/50 overflow-hidden cursor-pointer">
                     <Image
                         src={asset.image || "/placeholder.svg"}
@@ -68,7 +68,7 @@ function AssetCard({ asset }: { asset: RecentAsset }) {
             <CardContent className="p-4 space-y-3">
                 <div className="space-y-1">
                     <div className="flex items-start justify-between gap-2">
-                        <Link href={`/asset/${nftAddress}-${asset.tokenId}`} className="flex-1 min-w-0">
+                        <Link href={`/asset/${asset.collectionAddress}-${asset.tokenId}`} className="flex-1 min-w-0">
                             <h3 className="font-semibold truncate text-base hover:text-primary transition-colors" title={asset.name}>
                                 {asset.name}
                             </h3>
@@ -79,7 +79,7 @@ function AssetCard({ asset }: { asset: RecentAsset }) {
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <Link href={`/collections/${nftAddress}`} className="hover:underline truncate max-w-[70%] font-medium text-foreground/80">
+                        <Link href={`/collections/${asset.collectionAddress}`} className="hover:underline truncate max-w-[70%] font-medium text-foreground/80">
                             Collection #{asset.collectionId}
                         </Link>
                     </div>
@@ -87,7 +87,7 @@ function AssetCard({ asset }: { asset: RecentAsset }) {
 
                 <div className="pt-2 flex gap-2">
                     <Button asChild variant="default" size="sm" className="flex-1 h-8 text-xs gap-1">
-                        <Link href={`/asset/${nftAddress}-${asset.tokenId}`}>
+                        <Link href={`/asset/${asset.collectionAddress}-${asset.tokenId}`}>
                             <Eye className="h-3 w-3" />
                             View Asset
                         </Link>
@@ -104,21 +104,21 @@ function AssetCard({ asset }: { asset: RecentAsset }) {
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem asChild>
-                                <Link href={`/create/remix/${nftAddress}-${asset.tokenId}`} className="cursor-pointer">
+                                <Link href={`/create/remix/${asset.collectionAddress}-${asset.tokenId}`} className="cursor-pointer">
                                     <Sparkles className="mr-2 h-4 w-4" />
                                     Remix Asset
                                 </Link>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem asChild>
-                                <Link href={`/provenance/${asset.collectionId}-${asset.tokenId}`} className="cursor-pointer">
+                                <Link href={`/provenance/${asset.collectionAddress}-${asset.tokenId}`} className="cursor-pointer">
                                     <History className="mr-2 h-4 w-4" />
                                     Open Provenance
                                 </Link>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem asChild>
-                                <Link href={`/proof-of-ownership/${asset.collectionId}-${asset.tokenId}`} className="cursor-pointer">
+                                <Link href={`/proof-of-ownership/${asset.collectionAddress}-${asset.tokenId}`} className="cursor-pointer">
                                     <ShieldCheck className="mr-2 h-4 w-4" />
                                     View Proof
                                 </Link>
@@ -158,21 +158,8 @@ export default function AssetsPage() {
     return (
         <div className="min-h-screen">
             <main className="container mx-auto px-4 py-8 md:py-12 lg:py-16 space-y-8 md:space-y-12">
-                {/* Hero Section */}
-                <div className="text-center space-y-4 md:space-y-6 max-w-4xl mx-auto">
-                    <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary/10 border border-primary/20">
-                        <span className="text-xs text-primary">Mediolano Protocol</span>
-                    </div>
-                    <h1 className="text-3xl font-bold tracking-tight">
-                        Explore Assets
-                    </h1>
-                    <p className="text-base text-muted-foreground leading-relaxed px-4">
-                        Discover the latest minted IP assets from our global creator community
-                    </p>
-                </div>
 
-                {/* Search Bar */}
-                <Card className="glass">
+                <Card>
                     <div className="p-3 md:p-4 lg:p-6">
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                             <div className="relative flex-1">
@@ -202,7 +189,7 @@ export default function AssetsPage() {
                     <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
                             <Box className="h-5 w-5" />
-                            Recent Assets
+                            IP Assets
                         </h2>
                         {totalCount > 0 && (
                             <span className="text-sm text-muted-foreground">

@@ -2,6 +2,9 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { RpcProvider, shortString } from "starknet";
+import type { Abi } from "starknet";
+import { useContract } from "@starknet-react/core";
+import { ipCollectionAbi } from "@/abis/ip_collection";
 import { processIPFSHashToUrl } from "@/utils/ipfs";
 import { isAssetReported } from "@/lib/reported-content";
 
@@ -21,6 +24,7 @@ export interface RecentAsset {
     txHash: string;
     metadataUri?: string;
     blockNumber?: number;
+    collectionAddress: string;
 }
 
 export interface UseRecentAssetsReturn {
@@ -76,6 +80,7 @@ interface ParsedEvent {
     metadataUri: string;
     txHash: string;
     blockNumber: number;
+    collectionAddress: string;
 }
 
 export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
@@ -86,6 +91,11 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
     const [error, setError] = useState<string | null>(null);
     const [displayCount, setDisplayCount] = useState(pageSize);
     const [totalCount, setTotalCount] = useState(0);
+
+    const { contract: registryContract } = useContract({
+        abi: ipCollectionAbi as unknown as Abi,
+        address: COLLECTION_ADDRESS as `0x${string}`,
+    });
 
     // Fetch ALL events from blockchain
     const fetchAllEvents = useCallback(async () => {
@@ -137,7 +147,9 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                         // Parse metadata_uri (ByteArray)
                         const metadataUri = parseByteArray(dataIter);
 
-                        const assetId = `${COLLECTION_ADDRESS}-${collectionId}-${tokenId}`;
+
+                        const collectionAddress = "0x" + (BigInt(collectionIdLow) + (BigInt(collectionIdHigh) << 128n)).toString(16);
+                        const assetId = `${collectionAddress}-${tokenId}`;
 
                         // Check if asset is reported
                         if (isAssetReported(assetId)) continue;
@@ -149,6 +161,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                             metadataUri,
                             txHash: event.transaction_hash,
                             blockNumber: event.block_number || 0,
+                            collectionAddress,
                         });
                     } catch (e) {
                         console.error("Error parsing TokenMinted event:", e);
@@ -162,16 +175,46 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
 
             } while (continuationToken && pageCount < maxPages);
 
-            // Sort by block number descending (most recent first)
-            // Higher block number = more recent transaction
-            allEvents.sort((a, b) => b.blockNumber - a.blockNumber);
+            // Step 2: Resolve real collection addresses from Registry
+            const uniqueCollectionIds = [...new Set(allEvents.map(e => e.collectionId))];
+            const addressMap = new Map<string, string>();
 
-            console.log(`Total events fetched: ${allEvents.length}`);
-            if (allEvents.length > 0) {
-                console.log(`First asset block: ${allEvents[0].blockNumber}, Last asset block: ${allEvents[allEvents.length - 1].blockNumber}`);
+            if (registryContract) {
+
+                await Promise.all(uniqueCollectionIds.map(async (id) => {
+                    try {
+                        // Call get_collection(id)
+                        const result = await registryContract.get_collection(id);
+                        const collection = result as any;
+
+                        // Access ip_nft (field index 4 in struct, or property name)
+                        // Note: Depending on starknet.js version, struct might be Object or Array
+                        // Based on ABI struct members: name, symbol, base_uri, owner, ip_nft, ...
+                        let ipNftVal = collection.ip_nft;
+
+                        if (ipNftVal) {
+                            const addr = "0x" + BigInt(ipNftVal).toString(16);
+                            addressMap.set(id, addr);
+                        }
+                    } catch (err) {
+                        console.warn(`Failed to resolve collection address for ID ${id}`, err);
+                    }
+                }));
             }
-            setAllParsedEvents(allEvents);
-            setTotalCount(allEvents.length);
+
+            // Step 3: Update events with resolved addresses
+            const resolvedEvents = allEvents.map(e => ({
+                ...e,
+                collectionAddress: addressMap.get(e.collectionId) || e.collectionAddress
+            }));
+
+            // Sort by block number descending (most recent first)
+            resolvedEvents.sort((a, b) => b.blockNumber - a.blockNumber);
+
+            console.log(`Total events fetched: ${resolvedEvents.length}`);
+
+            setAllParsedEvents(resolvedEvents);
+            setTotalCount(resolvedEvents.length);
 
         } catch (err: any) {
             console.error("Error fetching all events:", err);
@@ -179,7 +222,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [registryContract]);
 
     // Process visible assets with metadata (in batches)
     useEffect(() => {
@@ -219,7 +262,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                         }
 
                         return {
-                            id: `${COLLECTION_ADDRESS}-${parsed.collectionId}-${parsed.tokenId}`,
+                            id: `${parsed.collectionAddress}-${parsed.tokenId}`,
                             tokenId: parsed.tokenId,
                             collectionId: parsed.collectionId,
                             name,
@@ -228,6 +271,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                             txHash: parsed.txHash,
                             metadataUri: parsed.metadataUri,
                             blockNumber: parsed.blockNumber,
+                            collectionAddress: parsed.collectionAddress,
                         } as RecentAsset;
                     })
                 );

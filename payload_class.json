@@ -1,0 +1,9 @@
+{
+  "id": 1,
+  "jsonrpc": "2.0",
+  "method": "starknet_getClassHashAt",
+  "params": [
+    "0x3c7b68a0bd18308b3c27fcdb0733d025fbe6b46eadc5cd6e74dde7efa82cfbd",
+    "latest"
+  ]
+}
