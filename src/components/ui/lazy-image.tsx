@@ -74,9 +74,9 @@ export function LazyImage({
                     isLoading ? "opacity-0" : "opacity-100",
                     className // Apply className to usage (restoring object-cover, etc)
                 )}
+                {...props}
                 onLoad={handleLoad}
                 onError={handleError}
-                {...props}
             />
         </div>
     );

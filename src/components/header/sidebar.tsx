@@ -49,7 +49,7 @@ const navigationItems = [
     title: 'Explore',
     items: [
       { title: 'Collections', href: '/collections', icon: Grid },
-      { title: 'Assets', href: '/assets', icon: Grid },
+      { title: 'IP Assets', href: '/assets', icon: Grid },
     ],
   },
 ]

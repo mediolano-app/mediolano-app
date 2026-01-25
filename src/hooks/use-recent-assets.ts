@@ -5,7 +5,7 @@ import { RpcProvider, shortString } from "starknet";
 import type { Abi } from "starknet";
 import { useContract } from "@starknet-react/core";
 import { ipCollectionAbi } from "@/abis/ip_collection";
-import { processIPFSHashToUrl } from "@/utils/ipfs";
+import { processIPFSHashToUrl, fetchIPFSMetadata } from "@/utils/ipfs";
 import { isAssetReported } from "@/lib/reported-content";
 
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
@@ -358,10 +358,24 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                     let image = "/placeholder.svg";
 
                     if (parsed.metadataUri) {
-                        try {
-                            const ipfsUrl = processIPFSHashToUrl(parsed.metadataUri, "/placeholder.svg");
-                            if (ipfsUrl !== "/placeholder.svg") {
-                                const res = await fetch(ipfsUrl, {
+                        // Check if it's likely an IPFS CID or ipfs:// URI
+                        const isIpfs = !parsed.metadataUri.startsWith("http") || parsed.metadataUri.startsWith("ipfs://");
+
+                        if (isIpfs) {
+                            // Extract CID for the utility
+                            let cid = parsed.metadataUri;
+                            if (cid.startsWith("ipfs://")) cid = cid.replace("ipfs://", "");
+                            if (cid.startsWith("ipfs/")) cid = cid.replace("ipfs/", "");
+
+                            const metadata = await fetchIPFSMetadata(cid);
+                            if (metadata) {
+                                name = metadata.name || name;
+                                image = processIPFSHashToUrl(metadata.image || "/placeholder.svg", "/placeholder.svg");
+                            }
+                        } else {
+                            // Direct HTTP fetch for non-IPFS URIs
+                            try {
+                                const res = await fetch(parsed.metadataUri, {
                                     signal: AbortSignal.timeout(5000)
                                 });
                                 if (res.ok) {
@@ -369,9 +383,9 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                                     name = metadata.name || name;
                                     image = processIPFSHashToUrl(metadata.image || "/placeholder.svg", "/placeholder.svg");
                                 }
+                            } catch {
+                                // Continue with default values
                             }
-                        } catch {
-                            // Continue with default values
                         }
                     }
 

@@ -236,9 +236,9 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     {/* Main Image */}
                     <div className="relative z-10 w-full h-full">
                       <LazyImage
-                        src={asset?.image as string}
+                        src={asset?.image || "/placeholder.svg"}
                         fallbackSrc="/background.jpg"
-                        alt={asset?.name as string}
+                        alt={asset?.name || "Asset Image"}
                         fill
                         className="object-contain"
                         sizes="(max-width: 768px) 100vw, 40vw"
