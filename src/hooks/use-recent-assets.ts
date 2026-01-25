@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { RpcProvider, shortString } from "starknet";
-import { fetchIPFSMetadata, processIPFSHashToUrl } from "@/utils/ipfs";
+import { processIPFSHashToUrl } from "@/utils/ipfs";
 import { isAssetReported } from "@/lib/reported-content";
 
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
@@ -20,6 +20,7 @@ export interface RecentAsset {
     owner: string;
     txHash: string;
     metadataUri?: string;
+    blockNumber?: number;
 }
 
 export interface UseRecentAssetsReturn {
@@ -28,6 +29,7 @@ export interface UseRecentAssetsReturn {
     loadingMore: boolean;
     error: string | null;
     hasMore: boolean;
+    totalCount: number;
     loadMore: () => Promise<void>;
     refresh: () => void;
 }
@@ -67,141 +69,199 @@ function parseByteArray(dataIter: IterableIterator<string>): string {
     return result;
 }
 
-export function useRecentAssets(pageSize: number = 20): UseRecentAssetsReturn {
+interface ParsedEvent {
+    collectionId: string;
+    tokenId: string;
+    owner: string;
+    metadataUri: string;
+    txHash: string;
+    blockNumber: number;
+}
+
+export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
+    const [allParsedEvents, setAllParsedEvents] = useState<ParsedEvent[]>([]);
     const [assets, setAssets] = useState<RecentAsset[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [continuationToken, setContinuationToken] = useState<string | undefined>(undefined);
-    const [hasMore, setHasMore] = useState(true);
+    const [displayCount, setDisplayCount] = useState(pageSize);
+    const [totalCount, setTotalCount] = useState(0);
 
-    const fetchAssets = useCallback(async (isLoadMore: boolean = false) => {
-        if ((isLoadMore && !hasMore) || !ALCHEMY_API_KEY || !COLLECTION_ADDRESS) return;
+    // Fetch ALL events from blockchain
+    const fetchAllEvents = useCallback(async () => {
+        if (!ALCHEMY_API_KEY || !COLLECTION_ADDRESS) return;
 
         try {
-            if (isLoadMore) {
-                setLoadingMore(true);
-            } else {
-                setLoading(true);
-            }
+            setLoading(true);
+            setError(null);
 
             const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || `https://starknet-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
             const provider = new RpcProvider({ nodeUrl: rpcUrl });
 
-            // Fetch TokenMinted events
-            const response = await provider.getEvents({
-                address: COLLECTION_ADDRESS,
-                keys: [[TOKEN_MINTED_SELECTOR]],
-                from_block: { block_number: 1861690 },
-                chunk_size: pageSize,
-                continuation_token: isLoadMore ? continuationToken : undefined,
-            });
+            const allEvents: ParsedEvent[] = [];
+            let continuationToken: string | undefined = undefined;
+            let pageCount = 0;
+            const maxPages = 20; // Safety limit to prevent infinite loops
 
-            const events = response.events;
-            const nextToken = response.continuation_token;
+            // Fetch all pages of events
+            do {
+                const response = await provider.getEvents({
+                    address: COLLECTION_ADDRESS,
+                    keys: [[TOKEN_MINTED_SELECTOR]],
+                    from_block: { block_number: 1861690 },
+                    chunk_size: 100, // Max chunk size for efficiency
+                    continuation_token: continuationToken,
+                });
 
-            const processedAssets: RecentAsset[] = [];
+                for (const event of response.events) {
+                    try {
+                        const data = event.data;
+                        const dataIter = data[Symbol.iterator]();
 
-            for (const event of events) {
-                try {
-                    // TokenMinted: collection_id(2), token_id(2), owner(1), metadata_uri(ByteArray)
-                    const data = event.data;
-                    const dataIter = data[Symbol.iterator]();
+                        // Parse collection_id (u256: low, high)
+                        const collectionIdLow = dataIter.next().value;
+                        const collectionIdHigh = dataIter.next().value;
+                        if (!collectionIdLow || !collectionIdHigh) continue;
+                        const collectionId = (BigInt(collectionIdLow) + (BigInt(collectionIdHigh) << 128n)).toString();
 
-                    // Parse collection_id (u256: low, high)
-                    const collectionIdLow = dataIter.next().value;
-                    const collectionIdHigh = dataIter.next().value;
-                    const collectionId = (BigInt(collectionIdLow) + (BigInt(collectionIdHigh) << 128n)).toString();
+                        // Parse token_id (u256: low, high)
+                        const tokenIdLow = dataIter.next().value;
+                        const tokenIdHigh = dataIter.next().value;
+                        if (!tokenIdLow || !tokenIdHigh) continue;
+                        const tokenId = (BigInt(tokenIdLow) + (BigInt(tokenIdHigh) << 128n)).toString();
 
-                    // Parse token_id (u256: low, high)
-                    const tokenIdLow = dataIter.next().value;
-                    const tokenIdHigh = dataIter.next().value;
-                    if (!tokenIdLow || !tokenIdHigh) continue;
-                    const tokenId = (BigInt(tokenIdLow) + (BigInt(tokenIdHigh) << 128n)).toString();
+                        // Parse owner
+                        const owner = dataIter.next().value;
+                        if (!owner) continue;
 
-                    // Parse owner
-                    const owner = dataIter.next().value;
-                    if (!owner) continue;
+                        // Parse metadata_uri (ByteArray)
+                        const metadataUri = parseByteArray(dataIter);
 
-                    // Parse metadata_uri (ByteArray)
-                    const metadataUri = parseByteArray(dataIter);
+                        const assetId = `${COLLECTION_ADDRESS}-${collectionId}-${tokenId}`;
 
-                    const assetId = `${COLLECTION_ADDRESS}-${collectionId}-${tokenId}`;
+                        // Check if asset is reported
+                        if (isAssetReported(assetId)) continue;
 
-                    // Check if asset is reported
-                    if (isAssetReported(assetId)) continue;
-
-                    let name = `Asset #${tokenId}`;
-                    let image = "/placeholder.svg";
-
-                    // Fetch metadata from IPFS
-                    if (metadataUri) {
-                        try {
-                            const ipfsUrl = processIPFSHashToUrl(metadataUri, "/placeholder.svg");
-                            if (ipfsUrl !== "/placeholder.svg") {
-                                const res = await fetch(ipfsUrl, {
-                                    signal: AbortSignal.timeout(3000)
-                                });
-                                if (res.ok) {
-                                    const metadata = await res.json();
-                                    name = metadata.name || name;
-                                    image = processIPFSHashToUrl(metadata.image || "/placeholder.svg", "/placeholder.svg");
-                                }
-                            }
-                        } catch {
-                            // Continue with default values
-                        }
+                        allEvents.push({
+                            collectionId,
+                            tokenId,
+                            owner,
+                            metadataUri,
+                            txHash: event.transaction_hash,
+                            blockNumber: event.block_number || 0,
+                        });
+                    } catch (e) {
+                        console.error("Error parsing TokenMinted event:", e);
                     }
-
-                    processedAssets.push({
-                        id: assetId,
-                        tokenId,
-                        collectionId,
-                        name,
-                        image,
-                        owner,
-                        txHash: event.transaction_hash,
-                        metadataUri,
-                    });
-                } catch (e) {
-                    console.error("Error processing TokenMinted event:", e);
                 }
-            }
 
-            if (isLoadMore) {
-                setAssets(prev => [...prev, ...processedAssets]);
-            } else {
-                setAssets(processedAssets);
-            }
+                continuationToken = response.continuation_token;
+                pageCount++;
 
-            setContinuationToken(nextToken);
-            setHasMore(!!nextToken);
+                console.log(`Fetched page ${pageCount}, got ${response.events.length} events, total: ${allEvents.length}`);
+
+            } while (continuationToken && pageCount < maxPages);
+
+            // Sort by block number descending (most recent first)
+            // Higher block number = more recent transaction
+            allEvents.sort((a, b) => b.blockNumber - a.blockNumber);
+
+            console.log(`Total events fetched: ${allEvents.length}`);
+            if (allEvents.length > 0) {
+                console.log(`First asset block: ${allEvents[0].blockNumber}, Last asset block: ${allEvents[allEvents.length - 1].blockNumber}`);
+            }
+            setAllParsedEvents(allEvents);
+            setTotalCount(allEvents.length);
 
         } catch (err: any) {
-            console.error("Error fetching recent assets:", err);
+            console.error("Error fetching all events:", err);
             setError(err.message || "Failed to load assets");
         } finally {
             setLoading(false);
-            setLoadingMore(false);
         }
-    }, [pageSize, continuationToken, hasMore]);
-
-    useEffect(() => {
-        fetchAssets(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Process visible assets with metadata (in batches)
+    useEffect(() => {
+        const processAssets = async () => {
+            if (allParsedEvents.length === 0) return;
+
+            const visibleEvents = allParsedEvents.slice(0, displayCount);
+
+            // Process metadata in parallel batches
+            const batchSize = 10;
+            const processedAssets: RecentAsset[] = [];
+
+            for (let i = 0; i < visibleEvents.length; i += batchSize) {
+                const batch = visibleEvents.slice(i, i + batchSize);
+
+                const batchResults = await Promise.all(
+                    batch.map(async (parsed) => {
+                        let name = `Asset #${parsed.tokenId}`;
+                        let image = "/placeholder.svg";
+
+                        if (parsed.metadataUri) {
+                            try {
+                                const ipfsUrl = processIPFSHashToUrl(parsed.metadataUri, "/placeholder.svg");
+                                if (ipfsUrl !== "/placeholder.svg") {
+                                    const res = await fetch(ipfsUrl, {
+                                        signal: AbortSignal.timeout(5000)
+                                    });
+                                    if (res.ok) {
+                                        const metadata = await res.json();
+                                        name = metadata.name || name;
+                                        image = processIPFSHashToUrl(metadata.image || "/placeholder.svg", "/placeholder.svg");
+                                    }
+                                }
+                            } catch {
+                                // Continue with default values
+                            }
+                        }
+
+                        return {
+                            id: `${COLLECTION_ADDRESS}-${parsed.collectionId}-${parsed.tokenId}`,
+                            tokenId: parsed.tokenId,
+                            collectionId: parsed.collectionId,
+                            name,
+                            image,
+                            owner: parsed.owner,
+                            txHash: parsed.txHash,
+                            metadataUri: parsed.metadataUri,
+                            blockNumber: parsed.blockNumber,
+                        } as RecentAsset;
+                    })
+                );
+
+                processedAssets.push(...batchResults);
+            }
+
+            setAssets(processedAssets);
+        };
+
+        processAssets();
+    }, [allParsedEvents, displayCount]);
+
+    // Initial fetch
+    useEffect(() => {
+        fetchAllEvents();
+    }, [fetchAllEvents]);
+
     const loadMore = async () => {
-        if (!loadingMore && hasMore) {
-            await fetchAssets(true);
-        }
+        if (loadingMore || displayCount >= allParsedEvents.length) return;
+
+        setLoadingMore(true);
+        setDisplayCount(prev => Math.min(prev + pageSize, allParsedEvents.length));
+        setLoadingMore(false);
     };
 
     const refresh = () => {
-        setContinuationToken(undefined);
-        setHasMore(true);
-        fetchAssets(false);
+        setDisplayCount(pageSize);
+        setAllParsedEvents([]);
+        setAssets([]);
+        fetchAllEvents();
     };
+
+    const hasMore = displayCount < allParsedEvents.length;
 
     return {
         assets,
@@ -209,6 +269,7 @@ export function useRecentAssets(pageSize: number = 20): UseRecentAssetsReturn {
         loadingMore,
         error,
         hasMore,
+        totalCount,
         loadMore,
         refresh
     };

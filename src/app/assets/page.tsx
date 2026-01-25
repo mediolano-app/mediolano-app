@@ -140,7 +140,7 @@ function AssetCard({ asset }: { asset: RecentAsset }) {
 
 export default function AssetsPage() {
     const [searchQuery, setSearchQuery] = useState("")
-    const { assets, loading, loadingMore, error, hasMore, loadMore, refresh } = useRecentAssets(20)
+    const { assets, loading, loadingMore, error, hasMore, totalCount, loadMore, refresh } = useRecentAssets(50)
 
     // Client-side filtering of loaded assets
     const filteredAssets = useMemo(() => {
@@ -204,9 +204,12 @@ export default function AssetsPage() {
                             <Box className="h-5 w-5" />
                             Recent Assets
                         </h2>
-                        {assets.length > 0 && (
+                        {totalCount > 0 && (
                             <span className="text-sm text-muted-foreground">
-                                {filteredAssets.length} asset{filteredAssets.length !== 1 ? "s" : ""}
+                                {searchQuery
+                                    ? `${filteredAssets.length} of ${totalCount} assets`
+                                    : `${assets.length} of ${totalCount} assets`
+                                }
                             </span>
                         )}
                     </div>
