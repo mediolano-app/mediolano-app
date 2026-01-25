@@ -20,8 +20,12 @@ import {
   useIsCollectionOwner,
 } from "@/hooks/use-collection";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import CreateCollectionView from "@/components/collections/create-collection";
 import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer";
+import dynamic from "next/dynamic";
+
+const CreateCollectionView = dynamic(() => import("@/components/collections/create-collection"), {
+  loading: () => <div className="h-96 flex items-center justify-center">Loading...</div>
+});
 import { IMintResult } from "@/hooks/use-create-asset";
 import { normalizeStarknetAddress } from "@/lib/utils";
 import { useProvider } from "@starknet-react/core";

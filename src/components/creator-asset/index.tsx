@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRightLeft } from "lucide-react";
 import Image from "next/image";
+import { LazyImage } from "@/components/ui/lazy-image";
 import Link from "next/link";
 import { useAccount } from "@starknet-react/core";
 import { TransferAssetDialog, TransferableAsset } from "@/components/transfer-asset-dialog";
@@ -213,8 +214,9 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
               <div className="lg:col-span-3">
                 <div className="top-24">
                   <div className="relative overflow-hidden glass-card">
-                    <Image
-                      src={(asset?.image as string) || "/background.jpg"}
+                    <LazyImage
+                      src={asset?.image as string}
+                      fallbackSrc="/background.jpg"
                       alt={asset?.name as string}
                       width={0}
                       height={0}

@@ -6,13 +6,22 @@ import { Grid3X3 } from "lucide-react";
 import { usePortfolio } from "@/hooks/use-portfolio";
 import { useAccount } from "@starknet-react/core";
 import { Alert } from "@/components/ui/alert";
-import { CollectionsPortfolioGrid } from "@/components/collections/collections-portfolio";
 import { CollectionStats } from "@/components/collections/collections-stats";
 import { CollectionValidator } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PortfolioAssets } from "@/components/portfolio/portfolio-assets";
+import dynamic from "next/dynamic";
+
+const CollectionsPortfolioGrid = dynamic(() =>
+  import("@/components/collections/collections-portfolio").then(mod => mod.CollectionsPortfolioGrid), {
+  loading: () => <CollectionsSkeleton />
+});
+
+const PortfolioAssets = dynamic(() =>
+  import("@/components/portfolio/portfolio-assets").then(mod => mod.PortfolioAssets), {
+  loading: () => <CollectionsSkeleton />
+});
 
 export default function PortfolioPage() {
   const { address } = useAccount();

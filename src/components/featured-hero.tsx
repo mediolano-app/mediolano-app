@@ -21,6 +21,52 @@ const GRADIENTS = [
     "from-rose-500/20 to-orange-500/20",
 ];
 
+// Default "Welcome" Hero Content
+const DefaultHero = () => (
+    <div className="container mx-auto relative overflow-hidden rounded-2xl">
+        <Card className="border-0">
+            <CardContent className="p-0">
+                <div className="relative h-[600px] md:h-[640px] bg-gradient-to-br from-gray-900/20 to-gray-800/20 flex items-center justify-center">
+                    {/* Minimal abstract background */}
+                    <div className="absolute inset-0 overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent opacity-50"></div>
+                        <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-purple-500/20 via-transparent to-transparent opacity-50"></div>
+                    </div>
+
+                    <div className="text-center p-8 max-w-3xl relative z-10">
+                        <Badge className="mb-6 bg-white/10 text-white border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors">
+                            IP Creator
+                        </Badge>
+                        <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white leading-tight tracking-tight">
+                            Loading collections...
+                        </h2>
+                        <p className="text-lg md:text-xl text-white/70 mb-10 leading-relaxed max-w-2xl mx-auto">
+                            Create, share, and remix with permissionless ownership.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <Button
+                                asChild
+                                size="lg"
+                                className="bg-white text-black hover:bg-white/90 font-bold px-8 h-12 text-base transition-all hover:scale-105"
+                            >
+                                <Link href="/create/">Create</Link>
+                            </Button>
+                            <Button
+                                asChild
+                                size="lg"
+                                variant="outline"
+                                className="text-white bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 font-semibold px-8 h-12 text-base backdrop-blur-sm transition-all hover:scale-105"
+                            >
+                                <Link href="/collections">Explore</Link>
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+);
+
 export function FeaturedHero() {
     const { collections, loading } = useFeaturedCollections([7, 10, 11]);
     const [currentSlide, setCurrentSlide] = useState(0)
@@ -59,51 +105,14 @@ export function FeaturedHero() {
         [isTransitioning, currentSlide, collections.length],
     )
 
-    // Default "Welcome" Hero Content
-    const DefaultHero = () => (
-        <div className="container mx-auto relative overflow-hidden rounded-2xl">
-            <Card className="border-0">
-                <CardContent className="p-0">
-                    <div className="relative h-[600px] md:h-[640px] bg-gradient-to-br from-gray-900/20 to-gray-800/20 flex items-center justify-center">
-                        {/* Minimal abstract background */}
-                        <div className="absolute inset-0 overflow-hidden">
-                            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent opacity-50"></div>
-                            <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-purple-500/20 via-transparent to-transparent opacity-50"></div>
-                        </div>
+    // While loading, we show the DefaultHero
+    if (loading && collections.length === 0) {
+        return <DefaultHero />
+    }
 
-                        <div className="text-center p-8 max-w-3xl relative z-10">
-                            <Badge className="mb-6 bg-white/10 text-white border-white/20 backdrop-blur-sm hover:bg-white/20 transition-colors">
-                                IP Creator
-                            </Badge>
-                            <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white leading-tight tracking-tight">
-                                Loading collections...
-                            </h2>
-                            <p className="text-lg md:text-xl text-white/70 mb-10 leading-relaxed max-w-2xl mx-auto">
-                                Create, share, and remix with permissionless ownership.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <Button
-                                    asChild
-                                    size="lg"
-                                    className="bg-white text-black hover:bg-white/90 font-bold px-8 h-12 text-base transition-all hover:scale-105"
-                                >
-                                    <Link href="/create/">Create</Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    size="lg"
-                                    variant="outline"
-                                    className="text-white bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 font-semibold px-8 h-12 text-base backdrop-blur-sm transition-all hover:scale-105"
-                                >
-                                    <Link href="/collections">Explore</Link>
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    );
+    if (!loading && collections.length === 0) {
+        return <DefaultHero />
+    }
 
     // While loading, we show the Default Hero with a subtle loading indicator or just the Default Hero itself?
     // Showing the Default Hero immediately is faster perceived performance.

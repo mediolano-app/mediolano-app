@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Image from "next/image"
+import { LazyImage } from "@/components/ui/lazy-image"
 import { Calendar, DollarSign, FileCheck, Clock, Info, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
@@ -48,8 +49,9 @@ export function SelectedAssetDetails({ asset }: SelectedAssetDetailsProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="relative rounded-md overflow-hidden">
-          <Image
-            src={asset.image || "/placeholder.svg"}
+          <LazyImage
+            src={asset.image}
+            fallbackSrc="/placeholder.svg"
             alt={asset.name}
             width={400}
             height={300}

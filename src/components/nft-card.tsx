@@ -23,6 +23,7 @@ import {
   Shield,
 } from "lucide-react";
 import Image from "next/image";
+import { LazyImage } from "@/components/ui/lazy-image";
 import Link from "next/link";
 import { TransferAssetDialog } from "@/components/transfer-asset-dialog";
 import { ReportAssetDialog } from "@/components/report-asset-dialog";
@@ -71,8 +72,9 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
               {/* Asset Image */}
               <Link href={`/asset/${asset.id}`} className="flex-shrink-0">
                 <div className="relative w-20 h-20 bg-gradient-to-br from-muted/50 to-muted rounded-lg overflow-hidden">
-                  <Image
-                    src={asset.image || "/placeholder.svg"}
+                  <LazyImage
+                    src={asset.image}
+                    fallbackSrc="/placeholder.svg"
                     alt={asset.name}
                     fill
                     className="object-cover"
@@ -206,8 +208,9 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
           {/* Asset Image */}
           <Link href={`/asset/${asset.id}`}>
             <div className="relative aspect-square bg-gradient-to-br from-muted/50 to-muted overflow-hidden rounded-t-lg">
-              <Image
-                src={asset.image || "/placeholder.svg"}
+              <LazyImage
+                src={asset.image}
+                fallbackSrc="/placeholder.svg"
                 alt={asset.name}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-200"

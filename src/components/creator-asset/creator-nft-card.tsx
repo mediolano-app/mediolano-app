@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Eye, MoreHorizontal, FileText, Gauge } from "lucide-react";
 import Image from "next/image";
+import { LazyImage } from "@/components/ui/lazy-image";
 import Link from "next/link";
 import type { NFTCardProps } from "./types";
 
@@ -40,8 +41,9 @@ export const CreatorNFTCard: React.FC<NFTCardProps> = ({
   return (
     <Card className="overflow-hidden">
       <CardHeader className="p-0">
-        <Image
+        <LazyImage
           src={isImage ? metadata.image : "/background.jpg"}
+          fallbackSrc="/background.jpg"
           alt={metadata.name}
           width={400}
           height={400}

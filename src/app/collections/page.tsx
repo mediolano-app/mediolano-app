@@ -7,7 +7,6 @@ import { CollectionsGrid, FeaturedCollectionCard } from "@/components/collection
 import { Skeleton } from "@/components/ui/skeleton"
 import { usePaginatedCollections } from "@/hooks/use-collection"
 import { ReportAssetDialog } from "@/components/report-asset-dialog"
-import { HeroSlider, HeroSliderSkeleton } from "@/components/hero-slider"
 import { Grid3X3, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 

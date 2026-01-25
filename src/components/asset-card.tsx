@@ -32,6 +32,7 @@ import {
 	Gauge,
 } from "lucide-react";
 import Image from "next/image";
+import { LazyImage } from "@/components/ui/lazy-image";
 import { abi } from "../abis/abi";
 import { type Abi } from "starknet";
 import { useReadContract } from "@starknet-react/core";
@@ -159,24 +160,13 @@ const AssetCard: React.FC<AssetCardProps> = ({ tokenId, status }) => {
 	return (
 		<Card className="overflow-hidden glass-card">
 			<CardHeader className="p-0">
-				{isImage ? (
-					<Image
-						src={metadata.image}
-						alt={metadata.name}
-						width={400}
-						height={400}
-						className="w-full h-48 object-cover"
-					/>) : (
-					<Image
-						src={
-							"/background.jpg"
-						} // Add fallback image
-						alt={metadata.name}
-						width={400}
-						height={400}
-						className="w-full h-48 object-cover"
-					/>
-				)}
+				<LazyImage
+					src={isImage ? metadata.image : "/background.jpg"}
+					alt={metadata.name}
+					width={400}
+					height={400}
+					className="w-full h-48 object-cover"
+				/>
 			</CardHeader>
 			<CardContent className="p-4">
 				<CardTitle className="mb-2 text-xl">{metadata.name}</CardTitle>

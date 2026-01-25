@@ -234,8 +234,8 @@ interface CollectionCardProps {
 
 function CollectionCard({ collection, nftCount, onReportClick, onCollectionClick }: CollectionCardProps) {
   const isFeatured = String(collection.id) === "5" || String(collection.id) === "0"
-  if (isFeatured) { console.log("featured collection", collection.id) }
-  console.log("collection", collection.id)
+  if (isFeatured) { /* console.log("featured collection", collection.id) */ }
+  // console.log("collection", collection.id)
   const coverImage = collection.image || "/background.jpg"
 
   return (

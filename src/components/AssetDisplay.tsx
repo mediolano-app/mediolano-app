@@ -5,15 +5,16 @@ import { useCreatorNFTPortfolio } from '../hooks/useCreatorNFTPortfolio';
 import { useAccount } from '@starknet-react/core';
 import LicensingModal from './LicensingModal';
 import { ConnectWallet } from './ConnectWallet';
+import { LazyImage } from "@/components/ui/lazy-image";
 
 interface IP {
-    tokenId: string;
-    name: string;
-    description: string;
-    external_url: string;
-    image: string;
-    attributes: any[];
-    collection: string;
+  tokenId: string;
+  name: string;
+  description: string;
+  external_url: string;
+  image: string;
+  attributes: any[];
+  collection: string;
 }
 
 const AssetDisplay: React.FC = () => {
@@ -45,9 +46,8 @@ const AssetDisplay: React.FC = () => {
             {metadata.map((asset) => (
               <Card
                 key={asset.tokenId}
-                className={`cursor-pointer hover:shadow-xl transition-shadow ${
-                  selectedAsset?.tokenId === asset.tokenId ? 'border-primary shadow-lg' : 'border-input'
-                }`}
+                className={`cursor-pointer hover:shadow-xl transition-shadow ${selectedAsset?.tokenId === asset.tokenId ? 'border-primary shadow-lg' : 'border-input'
+                  }`}
                 onClick={() => handleAssetSelect(asset)}
               >
                 <CardHeader>
@@ -55,11 +55,11 @@ const AssetDisplay: React.FC = () => {
                   <p className="text-sm text-muted-foreground">{asset.collection}</p>
                 </CardHeader>
                 <CardContent>
-                  <img
+                  <LazyImage
                     src={asset.image}
+                    fallbackSrc="/placeholder.svg"
                     alt={asset.name}
                     className="w-full h-48 object-cover rounded-md mb-3"
-                    onError={(e) => (e.currentTarget.src = '/images/placeholder.svg')}
                   />
                   <CardDescription className="text-sm line-clamp-2">{asset.description}</CardDescription>
                 </CardContent>

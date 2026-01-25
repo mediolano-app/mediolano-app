@@ -1,6 +1,5 @@
 "use client"
 import Link from "next/link"
-import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -41,12 +40,15 @@ import {
   Shield,
   Layers,
   Send,
+  MessageSquare,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { toast } from "@/components/ui/use-toast"
 import Image from "next/image";
+import { useState } from "react";
+import { ContactDialog } from "@/components/contact-dialog";
 
 const features = [
   { icon: <Brain className="h-6 w-6" />, title: "Learn", description: "IP for the Integrity Web", link: "/discover" },
@@ -68,6 +70,8 @@ export function Footer() {
     resolver: zodResolver(formSchema),
   })
 
+  const [isContactOpen, setIsContactOpen] = useState(false)
+
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     toast({
       title: "Subscribed!",
@@ -78,6 +82,7 @@ export function Footer() {
   return (
 
     <>
+      <ContactDialog open={isContactOpen} onOpenChange={setIsContactOpen} />
       {/*<DappInfo/>*/}
 
       <footer className="text-foreground glass">
@@ -94,11 +99,9 @@ export function Footer() {
 
               <div className="space-y-4">
                 {features.map((feature, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    className="group relative overflow-hidden rounded-lg bg-accent/25 transition-all duration-300 ease-in-out hover:bg-accent mr-10"
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    className="group relative overflow-hidden rounded-lg bg-accent/25 transition-all duration-300 ease-in-out hover:bg-accent mr-10 hover:scale-[1.02]"
                   >
                     <Link href={feature.link} className="block p-4">
                       <div className="flex items-center space-x-4">
@@ -115,10 +118,11 @@ export function Footer() {
                         </div>
                       </div>
                     </Link>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
+
 
 
 
@@ -182,6 +186,11 @@ export function Footer() {
                     <li><Link href="/docs/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
                     <li><Link href="/docs/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance</Link></li>
                     <li><Link href="/docs/governance-charter" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Governance</Link></li>
+                    <li>
+                      <Button variant="link" className="p-0 h-auto font-normal hover:underline flex items-center text-foreground" onClick={() => setIsContactOpen(true)}>
+                        <MessageSquare className="w-4 h-4 mr-2 ml-blue" /> Contact Us
+                      </Button>
+                    </li>
                   </ul>
                 </div>
 
@@ -201,14 +210,9 @@ export function Footer() {
             <div className="space-y-4 lg:col-span-1 bg-blue-600/10 p-4 rounded-lg">
 
               <Link href="/" className="flex items-center space-x-2">
-                <motion.span
-                  className="text-1xl font-bold"
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                >
+                <span className="text-1xl font-bold animate-in fade-in slide-in-from-bottom-4 duration-500">
                   Programmable IP for the Integrity Web
-                </motion.span>
+                </span>
               </Link>
 
               <p className="text-muted-foreground mr-5">
