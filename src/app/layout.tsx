@@ -8,7 +8,7 @@ import AnimatedBackground from "@/components/animated-bg";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://mediolano.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://ip.mediolano.app'),
   title: {
     default: 'IP Creator | Programmable IP for the Integrity Web',
     template: '%s | IP Creator',
