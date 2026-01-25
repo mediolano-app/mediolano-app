@@ -607,7 +607,7 @@ export function IPLicensing() {
               Transaction Hash: {submissionStatus.txHash}
             </p>
             <Link
-              href={`https://starkscan.co/tx/${submissionStatus.txHash}`}
+              href={`https://sepolia.starkscan.co/tx/${submissionStatus.txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline text-sm"

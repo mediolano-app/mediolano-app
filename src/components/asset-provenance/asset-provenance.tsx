@@ -336,7 +336,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                             size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-foreground"
                           >
-                            <a href={`https://starkscan.co/tx/${event.transactionHash}`} target="_blank" rel="noreferrer">
+                            <a href={`https://sepolia.starkscan.co/tx/${event.transactionHash}`} target="_blank" rel="noreferrer">
                               <ExternalLink className="h-3.5 w-3.5" />
                             </a>
                           </Button>
@@ -413,7 +413,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
             </div>
 
             <Button className="w-full h-14 rounded-2xl font-bold bg-foreground text-background hover:bg-foreground/90 transition-all shadow-lg" asChild>
-              <a href={`https://starkscan.co/contract/${asset.contract}`} target="_blank" rel="noreferrer">
+              <a href={`https://sepolia.starkscan.co/contract/${asset.contract}`} target="_blank" rel="noreferrer">
                 <Shield className="h-4 w-4 mr-3" />
                 Onchain Registry
               </a>

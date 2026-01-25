@@ -152,21 +152,21 @@ export default function CollectionPage() {
             <div className="absolute bottom-4 left-4 right-4">
               <div className="flex items-end justify-between">
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
                     {collection.name}
                   </h1>
                   <div className="flex items-center gap-2">
                     {collection.type && (
                       <Badge
-                        variant="secondary"
-                        className="bg-white/20 text-white backdrop-blur-sm"
+                        variant="outline"
+                        className="glass"
                       >
                         {collection.type}
                       </Badge>
                     )}
                     <Badge
                       variant="outline"
-                      className="bg-white/20 text-white backdrop-blur-sm border-white/30"
+                      className="glass"
                     >
                       {collection.itemCount || 0} assets
                     </Badge>
@@ -175,10 +175,10 @@ export default function CollectionPage() {
                 <div className="flex items-center gap-2">
 
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="sm"
                     onClick={handleShare}
-                    className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30"
+                    className="glass"
                   >
                     <Share2 className="h-4 w-4 mr-2" />
                     Share
@@ -269,7 +269,7 @@ export default function CollectionPage() {
               <CardContent className="space-y-4 mt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
-                    Contract Address
+                    Contract
                   </span>
                   <Button
                     variant="ghost"
@@ -307,14 +307,14 @@ export default function CollectionPage() {
 
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
-                    Token Standard
+                    Standard
                   </span>
                   <Badge variant="outline">ERC-721</Badge>
                 </div>
 
                 <div className="pt-2">
                   <a
-                    href={`https://starkscan.co/contract/${collection.nftAddress}`}
+                    href={`https://sepolia.starkscan.co/contract/${collection.nftAddress}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full"
@@ -370,7 +370,7 @@ export default function CollectionPage() {
                       </div>
                       <Link href={`/creator/${(creator as any).id}`}>
                         <Button variant="outline" size="sm">
-                          View Profile
+                          Profile
                         </Button>
                       </Link>
                     </div>
