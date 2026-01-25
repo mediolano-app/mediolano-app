@@ -26,6 +26,7 @@ export interface RecentAsset {
     metadataUri?: string;
     blockNumber?: number;
     collectionAddress: string;
+    collectionName?: string;
 }
 
 export interface UseRecentAssetsReturn {
@@ -82,6 +83,7 @@ interface ParsedEvent {
     txHash: string;
     blockNumber: number;
     collectionAddress: string;
+    collectionName?: string;
 }
 
 export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
@@ -225,30 +227,45 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
 
             setLastScannedBlock(currentToBlock);
 
-            // Resolve addresses for new events
+            // Resolve addresses and names for new events
             if (newEvents.length > 0 && registryContract) {
                 const uniqueCollectionIds = [...new Set(newEvents.map(e => e.collectionId))];
-                const addressMap = new Map<string, string>();
+                const collectionMap = new Map<string, { address: string, name: string }>();
 
                 await Promise.all(uniqueCollectionIds.map(async (id) => {
                     try {
                         const result = await registryContract.get_collection(id);
                         const collection = result as any;
                         let ipNftVal = collection.ip_nft;
+                        let addr = "";
                         if (ipNftVal) {
-                            const addr = "0x" + BigInt(ipNftVal).toString(16);
-                            addressMap.set(id, addr);
+                            addr = "0x" + BigInt(ipNftVal).toString(16);
+                        }
+
+                        // Try to get name (handle ByteArray or string)
+                        let name = collection.name;
+                        // Some basic cleaning if it's a string
+                        if (typeof name === 'string') {
+                            name = name.replace(/\0/g, '').trim();
+                        }
+
+                        if (addr) {
+                            collectionMap.set(id, { address: addr, name: name || `Collection #${id}` });
                         }
                     } catch (err) {
-                        console.warn(`Failed to resolve collection address for ID ${id}`, err);
+                        console.warn(`Failed to resolve collection info for ID ${id}`, err);
                     }
                 }));
 
-                // Update events with resolved addresses
-                const resolvedEvents = newEvents.map(e => ({
-                    ...e,
-                    collectionAddress: addressMap.get(e.collectionId) || e.collectionAddress
-                }));
+                // Update events with resolved info
+                const resolvedEvents = newEvents.map(e => {
+                    const info = collectionMap.get(e.collectionId);
+                    return {
+                        ...e,
+                        collectionAddress: info?.address || e.collectionAddress,
+                        collectionName: info?.name
+                    };
+                });
 
                 setAllParsedEvents(prev => {
                     const combined = [...prev, ...resolvedEvents];
@@ -369,6 +386,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                         metadataUri: parsed.metadataUri,
                         blockNumber: parsed.blockNumber,
                         collectionAddress: parsed.collectionAddress,
+                        collectionName: parsed.collectionName,
                     } as RecentAsset;
                 }));
             }

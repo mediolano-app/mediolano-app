@@ -388,9 +388,8 @@ export default function CollectionPage() {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div>
-              <h3 className="text-2xl font-bold">Assets</h3>
               <p className="text-muted-foreground">
-                {filteredAssets.length} of {collectionAssets.length} assets
+                {filteredAssets.length} of {collectionAssets.length} IP assets
               </p>
             </div>
             <div className="flex items-center gap-4">

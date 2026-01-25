@@ -69,6 +69,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [isTransferOpen, setIsTransferOpen] = useState(false);
   const [copied, setCopied] = useState(false)
+  const [imageRatio, setImageRatio] = useState<number | null>(null)
 
   const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online";
   const tokenId = Number(tokenIdStr?.trim());
@@ -213,22 +214,48 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
               {/* Left column - Image */}
               <div className="lg:col-span-3">
                 <div className="top-24">
-                  <div className="relative overflow-hidden glass-card">
-                    <LazyImage
-                      src={asset?.image as string}
-                      fallbackSrc="/background.jpg"
-                      alt={asset?.name as string}
-                      width={0}
-                      height={0}
-                      className="w-full h-auto object-contain"
-                      sizes="(max-width: 768px) 100vw, 40vw"
-                      style={{ width: '100%', height: 'auto' }}
-                      priority
-                    />
-                    <div className="absolute top-3 left-3">
+                  <div
+                    className="relative overflow-hidden glass-card w-full flex items-center justify-center bg-muted/20"
+                    style={{
+                      aspectRatio: imageRatio ? `${imageRatio}` : '1 / 1',
+                      maxHeight: '70vh'
+                    }}
+                  >
+                    {/* Background Blur Layer */}
+                    <div className="absolute inset-0 z-0">
+                      <LazyImage
+                        src={asset?.image as string}
+                        fallbackSrc="/background.jpg"
+                        alt="Background"
+                        fill
+                        className="object-cover blur-2xl opacity-50 scale-110"
+                        priority
+                      />
+                    </div>
+
+                    {/* Main Image */}
+                    <div className="relative z-10 w-full h-full">
+                      <LazyImage
+                        src={asset?.image as string}
+                        fallbackSrc="/background.jpg"
+                        alt={asset?.name as string}
+                        fill
+                        className="object-contain"
+                        sizes="(max-width: 768px) 100vw, 40vw"
+                        priority
+                        onLoad={(e) => {
+                          const img = e.currentTarget;
+                          if (img.naturalWidth && img.naturalHeight) {
+                            setImageRatio(img.naturalWidth / img.naturalHeight);
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <div className="absolute top-3 left-3 z-20">
                       {(matchedCollection?.name || asset.collection) &&
-                        <Badge className="bg-primary/10 text-xs text-primary-foreground">
-                          {matchedCollection?.name ? `${matchedCollection.symbol ? ` ${matchedCollection.symbol}` : ''}` : asset.collection}
+                        <Badge className="bg-primary/10 text-xs text-primary-foreground backdrop-blur-md">
+                          {matchedCollection?.name ? `${matchedCollection.name}${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}` : asset.collection}
                         </Badge>
                       }
                     </div>

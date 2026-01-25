@@ -5,7 +5,7 @@ import Image, { ImageProps } from "next/image";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface LazyImageProps extends Omit<ImageProps, "onError"> {
+interface LazyImageProps extends ImageProps {
     fallbackSrc?: string;
 }
 
@@ -37,13 +37,19 @@ export function LazyImage({
         }
     }, [src]);
 
-    const handleLoad = () => {
+    const handleLoad = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         setIsLoading(false);
+        if (props.onLoad) {
+            props.onLoad(e);
+        }
     };
 
-    const handleError = () => {
+    const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         setIsLoading(false);
         setError(true);
+        if (props.onError) {
+            props.onError(e);
+        }
     };
 
     // If fill is true, the wrapper needs to take full width/height of parent

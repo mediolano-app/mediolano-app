@@ -511,7 +511,13 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                                                 {collection.name}
                                             </SelectItem>
                                         ))}
-                                        {collections.length === 0 && (
+                                        {collectionsLoading && (
+                                            <div className="p-2 text-sm text-muted-foreground text-center flex items-center justify-center gap-2">
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                Loading...
+                                            </div>
+                                        )}
+                                        {!collectionsLoading && collections.length === 0 && (
                                             <div className="p-2 text-sm text-muted-foreground text-center">
                                                 No collections found
                                             </div>

@@ -208,8 +208,14 @@ export default function RemixDiscoveryPage() {
                 {viewState === "collections" && (
                   <div className="space-y-8">
                     {collectionsLoading && allCollections.length === 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {Array(6).fill(0).map((_, i) => <CollectionCardSkeleton key={i} />)}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <p>Loading collections...</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {Array(6).fill(0).map((_, i) => <CollectionCardSkeleton key={i} />)}
+                        </div>
                       </div>
                     ) : allCollections && allCollections.length > 0 ? (
                       <>

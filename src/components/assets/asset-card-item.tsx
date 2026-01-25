@@ -73,7 +73,7 @@ function AssetCardItemComponent({ asset }: { asset: RecentAsset }) {
 
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                         <Link href={`/collections/${asset.collectionAddress}`} className="hover:underline truncate max-w-[70%] font-medium text-foreground/80">
-                            Collection #{asset.collectionId}
+                            {asset.collectionName || `Collection #${asset.collectionId}`}
                         </Link>
                     </div>
                 </div>

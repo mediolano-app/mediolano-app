@@ -385,7 +385,7 @@ interface UseGetCollectionsReturn {
 
 export function useGetCollections(walletAddress?: `0x${string}`): UseGetCollectionsReturn {
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const { contract } = useContract({
@@ -396,7 +396,10 @@ export function useGetCollections(walletAddress?: `0x${string}`): UseGetCollecti
   const { fetchCollection } = useGetCollection();
 
   const loadCollections = useCallback(async () => {
-    if (!contract || !walletAddress) return;
+    if (!contract || !walletAddress) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -467,7 +470,7 @@ export function usePaginatedCollections(pageSize: number = 12): UsePaginatedColl
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [nextId, setNextId] = useState(0);
+  const [nextId, setNextId] = useState<number | null>(null); // Start with null until we find max
   const [hasMore, setHasMore] = useState(true);
 
   const { contract } = useContract({
@@ -475,112 +478,172 @@ export function usePaginatedCollections(pageSize: number = 12): UsePaginatedColl
     address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
   });
 
-  const fetchBatch = useCallback(async (startId: number, count: number) => {
-    if (!contract) return { data: [], nextStartId: startId, foundEnd: false };
-
-    const newCollections: Collection[] = [];
-    let currentId = startId;
-    let foundEnd = false;
-
-    // Strategy: Scan ahead to find 'count' valid collections.
-    const MAX_SCAN_AHEAD = 50; // Scan at most 50 IDs to find candidates
-
-    // We will scan in chunks until we find enough items or confirm no more
-    // But for a single batch call, let's limit to one chunk of scanning to keep response fast
-
-    const promises = [];
-    for (let i = 0; i < MAX_SCAN_AHEAD; i++) {
-      promises.push(contract.call("is_valid_collection", [(currentId + i).toString()]));
-    }
-
+  // Helper to find the highest valid collection ID
+  const findMaxCollectionId = useCallback(async () => {
+    if (!contract) return 0;
     try {
-      const validityResults = await Promise.all(promises);
+      let low = 0;
+      let startFound = false;
 
-      const validIds: number[] = [];
-      for (let i = 0; i < validityResults.length; i++) {
-        if (validityResults[i] && !isCollectionReported((currentId + i).toString())) {
-          validIds.push(currentId + i);
+      // 1. Initial Scan: Handle cases where ID 0 is burned or list starts at 1
+      // Check first 10 IDs to find a valid anchor
+      for (let i = 0; i < 10; i++) {
+        try {
+          const isValid = await contract.call("is_valid_collection", [i.toString()]);
+          if (isValid) {
+            low = i;
+            startFound = true;
+          }
+        } catch (e) { }
+      }
+
+      if (!startFound) {
+        // If we didn't find any valid ID in 0-9, verify one last time with a higher probe just in case (e.g. 10)
+        // or assume empty. Let's assume empty to avoid long waits.
+        return -1;
+      }
+
+      // 2. Exponential Probe upwards from our found `low`
+      let high = Math.max(low + 1, 1);
+      let maxFound = false;
+
+      while (!maxFound && high < 1000000) {
+        try {
+          const isValid = await contract.call("is_valid_collection", [high.toString()]);
+          if (isValid) {
+            low = high;
+            high = high * 2;
+          } else {
+            maxFound = true;
+          }
+        } catch (e) {
+          maxFound = true;
         }
       }
 
-      if (validIds.length === 0) {
-        // Found nothing in this range, so next time start after this range
-        currentId = currentId + MAX_SCAN_AHEAD;
-        // If we found nothing in a large scan, we might assume end, 
-        // but let's be careful. If the user clicks 'Load More' again, we continue scanning from new currentId.
-        // If we want to auto-stop, we can return foundEnd=true. 
-        // Let's assume for now that 50 empty slots means end of list.
-        foundEnd = true;
-      } else {
-        // Take only up to 'count' valid IDs
-        const idsToFetch = validIds.slice(0, count);
+      // 3. Binary Search between low (valid) and high (invalid)
+      let ans = low;
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        try {
+          const isValid = await contract.call("is_valid_collection", [mid.toString()]);
+          if (isValid) {
+            ans = mid;
+            low = mid + 1;
+          } else {
+            high = mid - 1;
+          }
+        } catch (e) {
+          high = mid - 1;
+        }
+      }
+      return ans;
+    } catch (e) {
+      console.error("Error finding max collection ID:", e);
+      return 0; // Fallback
+    }
+  }, [contract]);
 
-        const collectionsData = await Promise.all(
-          idsToFetch.map(async (id) => {
-            try {
-              const collection = await contract.call("get_collection", [id.toString()]);
-              const collectionStat = await contract.call("get_collection_stats", [id.toString()]);
-              // Process metadata safely
-              const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
-              return await processCollectionMetadata(id.toString(), metadata);
-            } catch (e) {
-              console.warn(`Failed to fetch details for collection ${id}`, e);
-              return null;
-            }
-          })
-        );
+  const fetchBatch = useCallback(async (startId: number, count: number) => {
+    if (!contract) return { data: [], nextStartId: startId };
 
-        // Filter out any nulls from failed individual fetches
-        const validData = collectionsData.filter(c => c !== null) as Collection[];
-        newCollections.push(...validData);
+    const newCollections: Collection[] = [];
+    let currentId = startId;
 
-        // CRITICAL FIX: Set next start ID to be the one AFTER the last one we actually used.
-        // This ensures we catch the remaining valid IDs in the scan range on the NEXT call.
-        const lastUsedId = idsToFetch[idsToFetch.length - 1];
-        currentId = lastUsedId + 1;
+    // Scan BACKWARDS from startId
+    // Use parallel scanning for speed with a larger window
+    const SCAN_WINDOW = 50; // Check 50 items in parallel
+    const MAX_TOTAL_SCAN = 500; // Limit total items checked per user action to avoid timeout
+    let totalScanned = 0;
 
-        // If we found fewer valid items than the scan range, AND we exhausted the scan range, 
-        // foundEnd might be true, OR we just need to scan further next time.
-        // We don't set foundEnd=true here unless we are sure. 
-        foundEnd = false;
+    // Continue until we find enough items or exhaust our scan limit/ID range
+    while (newCollections.length < count && currentId >= 0 && totalScanned < MAX_TOTAL_SCAN) {
+      // Determine batch range
+      // e.g. if currentId is 100, and SCAN_WINDOW is 50, we want to check 100, 99, ... 51
+      const batchSize = Math.min(SCAN_WINDOW, currentId + 1);
+      const batchIds: number[] = [];
+
+      for (let i = 0; i < batchSize; i++) {
+        batchIds.push(currentId - i);
       }
 
-    } catch (e) {
-      console.warn("Error scanning collections:", e);
-      foundEnd = true;
+      try {
+        // Parallel check validity
+        const validityResults = await Promise.all(
+          batchIds.map(id =>
+            contract!.call("is_valid_collection", [id.toString()])
+              .then(valid => ({ id, valid }))
+              .catch(() => ({ id, valid: false }))
+          )
+        );
+
+        // Filter valid IDs that are not reported
+        const validIds = validityResults
+          .filter(r => r.valid && !isCollectionReported(r.id.toString()))
+          .map(r => r.id);
+
+        if (validIds.length > 0) {
+          // Fetch details for found valid IDs in parallel
+          // Limit concurrency if needed but usually okay for small N
+          const details = await Promise.all(
+            validIds.map(async (id) => {
+              try {
+                const collection = await contract!.call("get_collection", [id.toString()]);
+                const collectionStat = await contract!.call("get_collection_stats", [id.toString()]);
+                const metadata = { id: id.toString(), ...collection, ...collectionStat } as CollectionMetadata;
+                return await processCollectionMetadata(id.toString(), metadata);
+              } catch (e) {
+                return null;
+              }
+            })
+          );
+
+          // Sort by ID descending to maintain order (since Promise.all waits for all)
+          // and add to list
+          const validDetails = details.filter(c => c !== null) as Collection[];
+          // validDetails might be out of order due to async if mapped, but here we mapped validIds which are sorted desc (100, 99, 98)
+          // But Promise.all preserves order of input array! 
+          // So they are already in desc order of ID.
+
+          newCollections.push(...validDetails);
+        }
+
+      } catch (e) {
+        console.warn("Error scanning batch:", e);
+      }
+
+      // Move pointer past this batch
+      currentId -= batchSize;
+      totalScanned += batchSize;
+
+      // If we have filled our quota, we might have extra valid items in this batch that we added.
+      // That's fine, returning more than 'count' is allowed/better.
     }
 
-    return { data: newCollections, nextStartId: currentId, foundEnd };
+    return { data: newCollections, nextStartId: currentId };
 
   }, [contract]);
 
   const loadMore = useCallback(async () => {
-    if (!contract || !hasMore || loadingMore) return;
+    if (!contract || !hasMore || loadingMore || nextId === null) return;
     setLoadingMore(true);
 
     try {
-      const { data, nextStartId, foundEnd } = await fetchBatch(nextId, pageSize);
+      const { data, nextStartId } = await fetchBatch(nextId, pageSize);
 
       if (data.length > 0) {
         setCollections(prev => [...prev, ...data]);
         setNextId(nextStartId);
+      }
 
-        // If we got *some* data but less than page size, it implies 
-        // we either hit the end OR the scan range wasn't big enough to fill the page.
-        if (foundEnd) setHasMore(false);
-
-        // NOTE: We do NOT set hasMore=false just because data.length < pageSize, 
-        // because there might be more valid items just beyond our 50-item scan window.
-      } else {
-        // If we got NO data, and foundEnd is true (50 empty slots), stop.
-        if (foundEnd) {
-          setHasMore(false);
-        } else {
-          // We scanned 50 items and found 0 valid, but didn't error. 
-          // We updated nextId used in fetchBatch to skip them.
-          // We must update state nextId so next click continues from there.
-          setNextId(nextStartId);
-        }
+      // If we hit bottom (less than 0), stop.
+      if (nextStartId < 0) {
+        setHasMore(false);
+      } else if (data.length === 0 && nextStartId >= 0) {
+        // If we didn't find any data but still have IDs to scan, update nextId
+        // logic in fetchBatch returns nextStartId as the last checked - 1.
+        // If we scanned MAX_SCAN and found nothing, we should update nextId to continue from there next time.
+        setNextId(nextStartId);
       }
 
     } catch (err) {
@@ -594,28 +657,42 @@ export function usePaginatedCollections(pageSize: number = 12): UsePaginatedColl
   useEffect(() => {
     let mounted = true;
 
-    if (contract && loading) {
-      fetchBatch(0, pageSize).then(({ data, nextStartId, foundEnd }) => {
+    const init = async () => {
+      if (!contract) return;
+      setLoading(true);
+
+      const maxId = await findMaxCollectionId();
+      console.log("Max Collection ID found:", maxId); // Debug
+
+      if (maxId < 0) {
         if (mounted) {
-          setCollections(data);
-          setNextId(nextStartId);
+          setCollections([]);
           setLoading(false);
-          if (foundEnd || data.length < pageSize) setHasMore(false);
+          setHasMore(false);
         }
-      }).catch(err => {
-        if (mounted) {
-          setError(err instanceof Error ? err.message : "Failed to load collections");
-          setLoading(false);
-        }
-      });
+        return;
+      }
+
+      const { data, nextStartId } = await fetchBatch(maxId, pageSize);
+
+      if (mounted) {
+        setCollections(data);
+        setNextId(nextStartId);
+        setLoading(false);
+        if (nextStartId < 0) setHasMore(false);
+      }
+    };
+
+    if (loading && contract) {
+      init();
     }
 
     return () => { mounted = false; };
-  }, [contract, loading, fetchBatch, pageSize]);
+  }, [contract, loading, findMaxCollectionId, fetchBatch, pageSize]);
 
   const reload = useCallback(() => {
     setCollections([]);
-    setNextId(0);
+    setNextId(null);
     setHasMore(true);
     setLoading(true);
     setError(null);
