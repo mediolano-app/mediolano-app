@@ -149,7 +149,7 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
     const isOwner = true; // Since this is "My Assets", the user is the owner.
 
     return (
-        <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300 border-muted-foreground/20">
+        <Card className="overflow-hidden group glass">
             <Link href={`/asset/${nftAddress}-${asset.token_id}`}>
                 <div className="aspect-square relative bg-muted/50 overflow-hidden cursor-pointer">
                     <Image
@@ -168,9 +168,6 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
                                 {asset.name}
                             </h3>
                         </Link>
-                        <Badge variant="outline" className="font-mono text-[10px] shrink-0">
-                            #{asset.token_id}
-                        </Badge>
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
@@ -181,7 +178,7 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
                 </div>
 
                 <div className="pt-2 flex gap-2">
-                    <Button asChild variant="default" size="sm" className="flex-1 h-8 text-xs gap-1">
+                    <Button asChild variant="outline" size="sm" className="flex-1 h-8 text-xs gap-1">
                         <Link href={`/asset/${nftAddress}-${asset.token_id}`}>
                             <Eye className="h-3 w-3" />
                             View Asset
@@ -266,7 +263,7 @@ function EmptyState({ title, description }: { title: string; description: string
                 <Box className="h-8 w-8 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-medium">{title}</h3>
-            <p className="text-muted-foreground max-w-sm mt-1 mb-6">{description}</p>
+            <p className="text-muted-foreground max-w-sm mt-1 mb-6 overflow-hidden">{description}</p>
         </div>
     );
 }

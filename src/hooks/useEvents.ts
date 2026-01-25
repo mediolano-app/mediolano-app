@@ -214,6 +214,10 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
       const processedEvents: any[] = [];
       const seenHashes = new Set<string>();
 
+      // First pass: Filter relevance and collect block numbers
+      const relevantEvents: { event: any; type: string; from: string; to: string }[] = [];
+      const blockNumbers = new Set<number>();
+
       for (const event of registryRawEvents) {
         if (!event.transaction_hash) continue;
 
@@ -227,7 +231,6 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
         let to = "Unknown";
 
         // Handle Registry TokenMinted
-        // Event data: [collection_id_low, collection_id_high, token_id_low, token_id_high, owner, ...]
         if (eventSelector === REGISTRY_TOKEN_MINTED_SELECTOR && data.length >= 5) {
           const tokenLow = BigInt(data[2]);
           const tokenHigh = BigInt(data[3]);
@@ -242,7 +245,6 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
         }
 
         // Handle Registry TokenTransferred
-        // Event data: [collection_id_low, collection_id_high, token_id_low, token_id_high, operator, ...]
         else if (eventSelector === REGISTRY_TOKEN_TRANSFERRED_SELECTOR && data.length >= 5) {
           const tokenLow = BigInt(data[2]);
           const tokenHigh = BigInt(data[3]);
@@ -255,7 +257,7 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
           }
         }
 
-        // Standard ERC721 Transfer - keys: [selector, from, to, tokenId_low, tokenId_high]
+        // Standard ERC721 Transfer
         else if (eventSelector === STANDARD_TRANSFER_SELECTOR && keys.length >= 4) {
           const tokenLow = BigInt(keys[3]);
           const tokenHigh = keys.length > 4 ? BigInt(keys[4]) : 0n;
@@ -270,35 +272,41 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
         }
 
         if (match && !seenHashes.has(event.transaction_hash)) {
-          console.log(`[Provenance] MATCH! Token: ${targetTokenId}, Type: ${type}, TX: ${event.transaction_hash}`);
           seenHashes.add(event.transaction_hash);
-
-          // Fetch block timestamp for accurate date
-          let timestamp = new Date().toISOString();
-          try {
-            if (event.block_number) {
-              const block = await provider.getBlock(event.block_number);
-              if (block?.timestamp) {
-                timestamp = new Date(block.timestamp * 1000).toISOString();
-              }
-            }
-          } catch (e) {
-            console.warn("[Provenance] Could not fetch block timestamp:", e);
-          }
-
-          processedEvents.push({
-            id: event.transaction_hash,
-            type,
-            title: type === "mint" ? "Asset Minted" : "Asset Transferred",
-            description: type === "mint" ? "Original IP Asset minted" : "Ownership transferred on-chain",
-            from: normalizeStarknetAddress(from),
-            to: normalizeStarknetAddress(to),
-            timestamp,
-            transactionHash: event.transaction_hash,
-            blockNumber: event.block_number,
-            verified: true,
-          });
+          relevantEvents.push({ event, type, from, to });
+          if (event.block_number) blockNumbers.add(event.block_number);
         }
+      }
+
+      // Second pass: Fetch block timestamps in parallel
+      const blockTimestamps = new Map<number, string>();
+      await Promise.all(Array.from(blockNumbers).map(async (blockNum) => {
+        try {
+          const block = await provider.getBlock(blockNum);
+          if (block?.timestamp) {
+            blockTimestamps.set(blockNum, new Date(block.timestamp * 1000).toISOString());
+          }
+        } catch (e) {
+          console.warn(`[Provenance] Failed to fetch block ${blockNum}:`, e);
+        }
+      }));
+
+      // Third pass: Assemble final events
+      for (const { event, type, from, to } of relevantEvents) {
+        const timestamp = blockTimestamps.get(event.block_number) || new Date().toISOString();
+
+        processedEvents.push({
+          id: event.transaction_hash,
+          type,
+          title: type === "mint" ? "Asset Minted" : "Asset Transferred",
+          description: type === "mint" ? "Original IP Asset minted" : "Ownership transferred on-chain",
+          from: normalizeStarknetAddress(from),
+          to: normalizeStarknetAddress(to),
+          timestamp,
+          transactionHash: event.transaction_hash,
+          blockNumber: event.block_number,
+          verified: true,
+        });
       }
 
       setEvents(processedEvents.sort((a, b) => (b.blockNumber || 0) - (a.blockNumber || 0)));

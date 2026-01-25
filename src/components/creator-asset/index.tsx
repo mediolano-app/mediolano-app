@@ -25,8 +25,8 @@ import { normalizeStarknetAddress } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { isAssetReported } from "@/lib/reported-content"
 import { AlertTriangle, ShieldCheck, History, Palette, Share2, ExternalLink } from "lucide-react"
-import { AssetProvenance } from "@/components/asset-provenance/asset-provenance";
-import { useAssetTransferEvents } from "@/hooks/useEvents";
+import { SimpleProvenance } from "@/components/asset-provenance/simple-provenance";
+import { useAssetProvenanceEvents } from "@/hooks/useEvents";
 
 interface AssetPageProps {
   params: Promise<{
@@ -108,33 +108,13 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
     Number.isFinite(tokenId) ? tokenId : undefined
   );
 
-  const { events: transferEvents } = useAssetTransferEvents(nftAddress || "", tokenIdStr || "");
+  const { events: provenanceEventsData } = useAssetProvenanceEvents(nftAddress || "", tokenIdStr || "");
 
   const provenanceEvents = useMemo(() => {
-    if (!transferEvents) return [];
-
-    return transferEvents.map((event) => {
-      const from = event.keys?.[1] ? `0x${BigInt(event.keys[1]).toString(16)}` : "Unknown";
-      const to = event.keys?.[2] ? `0x${BigInt(event.keys[2]).toString(16)}` : "Unknown";
-      const isMint = BigInt(from) === 0n;
-
-      return {
-        id: event.transaction_hash,
-        type: isMint ? "creation" : "transfer",
-        title: isMint ? "Asset Minted" : "Ownership Transferred",
-        description: isMint
-          ? `Asset minted by ${to.substring(0, 6)}...`
-          : `Transferred from ${from.substring(0, 6)}... to ${to.substring(0, 6)}...`,
-        from,
-        to,
-        date: new Date(event.block_number * 1000).toLocaleDateString(),
-        timestamp: new Date().toISOString(),
-        transactionHash: event.transaction_hash,
-        blockNumber: event.block_number,
-        verified: true,
-      };
-    }).reverse() as any[];
-  }, [transferEvents]);
+    // The hook returns processed events, we just need to ensure they match the interface if needed or just pass them through
+    // The hook in useEvents.ts returns objects compatible with SimpleProvenance
+    return provenanceEventsData || [];
+  }, [provenanceEventsData]);
 
   const enhancedAsset = useMemo(() => {
     if (!asset) return null;
@@ -365,10 +345,8 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
 
                   <TabsContent value="provenance" className="space-y-4 bg-card/30">
                     {enhancedAsset && (
-                      <AssetProvenance
-                        asset={enhancedAsset}
+                      <SimpleProvenance
                         events={provenanceEvents}
-                        showActions={false}
                         compact={true}
                       />
                     )}

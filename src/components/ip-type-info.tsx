@@ -976,13 +976,13 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
 
   return (
     <Card className="glass">
-      <CardHeader className={cn("glass rounded-xl pb-3", colorClasses.bgLight)}>
+      <CardHeader className={cn("bg-transparent rounded-xl pb-3", colorClasses.bgLight)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={cn("p-2 rounded-xl", colorClasses.border)}>
               <IconComponent className={cn("h-6 w-6", colorClasses.text)} />
             </div>
-            <CardTitle className="text-xl">{ipType} IP Template</CardTitle>
+            <CardTitle className="text-xl">{asset.name}</CardTitle>
           </div>
           <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
             #{Number(asset.tokenId)}
@@ -994,7 +994,7 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
       <CardContent className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="details">Template Details</TabsTrigger>
+            <TabsTrigger value="details">{ipType}</TabsTrigger>
             <TabsTrigger value="traits">Traits</TabsTrigger>
           </TabsList>
           <TabsContent value="details" className="mt-4">

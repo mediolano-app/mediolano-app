@@ -46,6 +46,7 @@ export default function ProvenancePage({ params }: ProvenancePageProps) {
       const isMint = event.type === "mint"
       const from = event.from || "0x0"
       const to = event.to || "Unknown"
+      const timestamp = event.timestamp ? new Date(event.timestamp) : new Date();
 
       return {
         id: event.id,
@@ -56,8 +57,8 @@ export default function ProvenancePage({ params }: ProvenancePageProps) {
           : `Transferred from ${from.substring(0, 6)}...${from.substring(from.length - 4)} to ${to.substring(0, 6)}...${to.substring(to.length - 4)}`),
         from,
         to,
-        date: new Date().toLocaleDateString(), // We don't have block timestamp yet, using current date for UI placeholder
-        timestamp: new Date().toISOString(),
+        date: timestamp.toLocaleDateString(),
+        timestamp: timestamp.toISOString(),
         transactionHash: event.transactionHash,
         blockNumber: event.blockNumber,
         verified: true,
