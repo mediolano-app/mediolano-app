@@ -53,10 +53,10 @@ export default function AssetsPage() {
 
     return (
         <div className="min-h-screen">
-            <main className="container mx-auto px-4 py-8 md:py-12 lg:py-16 space-y-8 md:space-y-12">
+            <main className="container mx-auto px-4 py-8">
 
-                <Card>
-                    <div className="p-3 md:p-4 lg:p-6">
+                <div>
+                    <div className="py-4">
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -78,7 +78,7 @@ export default function AssetsPage() {
                             </Button>
                         </div>
                     </div>
-                </Card>
+                </div>
 
                 {/* Assets Grid */}
                 <div className="space-y-6">
@@ -106,11 +106,17 @@ export default function AssetsPage() {
                     )}
 
                     {loading && !loadingMore && assets.length === 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {Array(8).fill(0).map((_, i) => (
-                                <AssetCardSkeleton key={i} />
-                            ))}
-                        </div>
+                        <Card className="border-dashed">
+                            <div className="p-12 flex flex-col items-center justify-center text-center space-y-4 min-h-[300px]">
+                                <Loader2 className="h-10 w-10 text-primary animate-spin" />
+                                <div className="space-y-2">
+                                    <h3 className="text-lg font-medium">Retrieving onchain data...</h3>
+                                    <p className="text-sm text-muted-foreground max-w-sm">
+                                        Please wait while we fetch the latest assets directly from the blockchain. This might take a moment.
+                                    </p>
+                                </div>
+                            </div>
+                        </Card>
                     ) : filteredAssets.length === 0 && !loading ? (
                         <Card className="border-dashed">
                             <div className="p-8 md:p-12 text-center space-y-4">

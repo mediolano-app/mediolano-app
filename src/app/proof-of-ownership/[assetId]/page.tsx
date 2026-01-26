@@ -75,7 +75,7 @@ export default function ProofOfOwnershipPage({ params }: ProofOfOwnershipPagePro
               <ShieldCheck className="h-8 w-8 text-muted-foreground" />
             </div>
             <div className="space-y-2">
-              <h1 className="text-2xl font-semibold">Certificate Not Found</h1>
+              <h1 className="text-2xl font-semibold">Not Found</h1>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 This ownership certificate doesn't exist in our records or could not be loaded.
               </p>
@@ -95,13 +95,13 @@ export default function ProofOfOwnershipPage({ params }: ProofOfOwnershipPagePro
   const enhancedAsset = {
     ...asset,
     creator: {
-      name: asset.collectionName || "Unknown Creator", // Fallback
+      name: (asset.properties?.creator as string) || "Unknown",
       address: asset.properties?.creator as string || "Unknown",
       avatar: "/placeholder.svg?height=40&width=40",
       verified: true,
     },
     owner: {
-      name: asset.owner ? `${String(asset.owner).substring(0, 6)}...${String(asset.owner).substring(String(asset.owner).length - 4)}` : "Unknown Owner",
+      name: asset.owner ? String(asset.owner) : "Unknown Owner",
       address: asset.owner ? String(asset.owner) : "",
       avatar: "/placeholder.svg?height=40&width=40",
       verified: true,

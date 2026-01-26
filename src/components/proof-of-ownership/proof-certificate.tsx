@@ -80,7 +80,7 @@ export function ProofCertificate({ asset, ownershipHistory = [] }: ProofCertific
               </div>
               <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
                 <CheckCircle className="h-3 w-3 mr-1.5" />
-                Verified
+                Onchain
               </Badge>
             </div>
 
@@ -123,14 +123,10 @@ export function ProofCertificate({ asset, ownershipHistory = [] }: ProofCertific
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-medium text-muted-foreground">Owner</h4>
                 <Badge variant="outline" className="text-xs">
-                  Active
+                  Onchain
                 </Badge>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-lg border bg-foreground/[0.02]">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={asset.owner.avatar || "/placeholder.svg"} alt={asset.owner.name} />
-                  <AvatarFallback>{asset.owner.name.substring(0, 2)}</AvatarFallback>
-                </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium">{asset.owner.name}</p>
                   <div className="flex items-center gap-2 mt-1">
@@ -156,12 +152,8 @@ export function ProofCertificate({ asset, ownershipHistory = [] }: ProofCertific
 
             {/* Original Creator */}
             <div className="space-y-3">
-              <h4 className="text-sm font-medium text-muted-foreground">Original Creator</h4>
+              <h4 className="text-sm font-medium text-muted-foreground">Creator</h4>
               <div className="flex items-center gap-3 p-4 rounded-lg border bg-foreground/[0.02]">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={asset.creator.avatar || "/placeholder.svg"} alt={asset.creator.name} />
-                  <AvatarFallback>{asset.creator.name.substring(0, 2)}</AvatarFallback>
-                </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{asset.creator.name}</p>

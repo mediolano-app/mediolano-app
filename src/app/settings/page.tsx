@@ -15,9 +15,9 @@ import { toEpochTime } from "@/lib/utils";
 
 // Mockup data with booleans replaced by numbers
 const mockUser = {
-  name: "Testing",
-  email: "alice@mediolano.app",
-  username: "alice_ip_creator",
+  name: "",
+  email: "support@mediolano.app",
+  username: "mediolano",
   language: "en",
   twoFactorEnabled: 0,
   notificationsEnabled: 1,

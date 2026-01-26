@@ -441,7 +441,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
 
     return {
         assets,
-        loading,
+        loading: loading || (allParsedEvents.length > 0 && assets.length < Math.min(allParsedEvents.length, displayCount)),
         loadingMore,
         error,
         hasMore,

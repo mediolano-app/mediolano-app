@@ -3,7 +3,7 @@
 import { createContext, useContext, useMemo, ReactNode } from "react"
 import { useGetCollections } from "@/hooks/use-collection"
 import { useOwnerAssets } from "@/hooks/use-owner-assets"
-import { getCreatorBySlug } from "@/lib/mock-data"
+import { getCreatorBySlug } from "@/lib/start-data"
 import type { Collection } from "@/lib/types"
 import type { TokenData, PortfolioStats } from "@/hooks/use-portfolio"
 

@@ -1,38 +1,41 @@
 
-const { RpcProvider, hash, num } = require("starknet");
+const { RpcProvider, num, hash } = require("starknet");
+
+const ALCHEMY_URL = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/tOTwt1ug3YNOsaPjinDvS";
+const CONTRACT_ADDRESS = "0x060bb4536c3db677637eda4e2f14c1d22d01d3dfd9e592c62ba7a36e749726cc";
+const REGISTRY_ADDRESS = "0x03990b145bec2bb3d3143e7cb3b8a89a72272cf562d2b0278f38e3357cbc976f";
 
 async function main() {
-    const provider = new RpcProvider({ nodeUrl: "https://starknet-sepolia.g.alchemy.com/v2/tOTwt1ug3YNOsaPjinDvS" });
-    const targetBlock = 5652710;
+    console.log("Connecting to RPC:", ALCHEMY_URL);
+    const provider = new RpcProvider({ nodeUrl: ALCHEMY_URL });
+    const targetAddressBigInt = BigInt(CONTRACT_ADDRESS);
 
-    console.log("Inspecting block:", targetBlock);
+    console.log(`Searching for Target Contract in Registry: ${REGISTRY_ADDRESS}`);
 
-    try {
-        const block = await provider.getBlockWithTxHashes(targetBlock);
-        console.log("Block found. Transactions:", block.transactions.length);
-
-        if (block.transactions.length > 0) {
-            const txHash = block.transactions[0];
-            console.log("Checking Tx:", txHash);
-
-            const receipt = await provider.getTransactionReceipt(txHash);
-            console.log("Receipt status:", receipt.execution_status);
-            console.log("Events:", receipt.events.length);
-
-            receipt.events.forEach((e, i) => {
-                console.log(`Event ${i}: from=${e.from_address}`);
-                console.log(`keys=[${e.keys.join(", ")}]`);
-                // Check if address matches what we expect
-                if (e.from_address === "0x03990b145bec2bb3d3143e7cb3b8a89a72272cf562d2b0278f38e3357cbc976f" ||
-                    e.from_address === "0x3990b145bec2bb3d3143e7cb3b8a89a72272cf562d2b0278f38e3357cbc976f") {
-                    console.log(">>> MATCHED CONTRACT ADDRESS <<<");
-                }
+    for (let i = 1; i <= 50; i++) {
+        try {
+            const res = await provider.callContract({
+                contractAddress: REGISTRY_ADDRESS,
+                entrypoint: hash.getSelectorFromName("get_collection"),
+                calldata: [i.toString(), "0"]
             });
-        }
 
-    } catch (e) {
-        console.error("Error:", e);
+            // Check if target address matches ANY felt in the response
+            const found = res.some(val => BigInt(val) === targetAddressBigInt);
+
+            if (found) {
+                console.log(`[FOUND!] Target Address found in get_collection(${i}) result!`);
+                console.log(`Collection ID is likely: ${i}`);
+                return;
+            } else {
+                // console.log(`ID ${i}: No match in ${res.length} felts`);
+            }
+        } catch (err) {
+            // ignore
+        }
+        if (i % 10 === 0) process.stdout.write(".");
     }
+    console.log("\nFinished searching IDs 1-50.");
 }
 
 main();

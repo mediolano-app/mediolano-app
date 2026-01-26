@@ -4,7 +4,7 @@ import ipcollectionABI from "../abis/ipcollection";
 const SEPOLIA_CONTRACT = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as string;
 const MAINNET_CONTRACT = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS_MAINNET as string;
 const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
- 
+
 
 
 export async function fetchUserProfile({ address, network }: { address: string; network: "sepolia" | "mainnet" }) {
