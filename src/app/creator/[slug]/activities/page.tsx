@@ -50,7 +50,7 @@ export default function CreatorActivitiesPage() {
 
     return (
         <div className="container mx-auto px-4 py-8 space-y-8">
-            {/* Glassmorphism Filters Bar */}
+            {/*  Filters Bar */}
             <div className="sticky top-[57px] z-10 -mx-4 px-4 pb-4">
                 <Card className="bg-background/80 backdrop-blur-xl border-white/10 shadow-lg">
                     <div className="p-3 md:p-4">

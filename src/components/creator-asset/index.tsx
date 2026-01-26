@@ -206,7 +206,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
           <div className="w-full flex items-center justify-center p-12 pt-32">No asset found</div>
         ) : asset ? (
           <>
-            {/* Glassmorphism Header */}
+            {/*  Header */}
             <div className="relative overflow-hidden -mt-[88px] pt-[120px] lg:pt-[150px] pb-12 lg:pb-24 min-h-[450px] lg:min-h-[600px] flex flex-col justify-center">
               {/* Background with gradient and blur */}
               <div className="absolute inset-0">
@@ -223,7 +223,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   priority
                 />
 
-                {/* Glassmorphism overlay */}
+                {/*  overlay */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-background/90 backdrop-blur-[2px]" />
               </div>
 

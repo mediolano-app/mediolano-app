@@ -120,7 +120,7 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
 
     return (
         <div className="min-h-screen bg-background">
-            {/* Glassmorphism Header */}
+            {/*  Header */}
             <div className="relative overflow-hidden -mt-[88px] pt-[150px] pb-24 min-h-[500px] flex flex-col justify-center">
                 {/* Background with gradient and blur */}
                 <div className="absolute inset-0">
@@ -137,7 +137,7 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                         sizes="100vw"
                     />
 
-                    {/* Glassmorphism overlay - Lighter for vividness */}
+                    {/*  overlay - Lighter for vividness */}
                     <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-background/90 backdrop-blur-[2px]" />
                 </div>
 
@@ -161,8 +161,8 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                         <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
                             {/* Collection Avatar - Larger */}
                             <div className="flex-shrink-0 relative group">
-                                <div className="absolute -inset-1 bg-gradient-to-br from-primary to-secondary rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative h-40 w-40 md:h-56 md:w-56 rounded-2xl overflow-hidden border-[3px] border-white/20 shadow-2xl bg-black/20 backdrop-blur-xl">
+                                <div className="absolute -inset-1 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                                <div className="relative h-40 w-40 md:h-72 md:w-72 rounded-2xl overflow-hidden border-[2px] border-white/20 backdrop-blur-xl">
                                     <Image
                                         src={collection.image || "/placeholder.svg"}
                                         alt={collection.name}

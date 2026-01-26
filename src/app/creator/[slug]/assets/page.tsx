@@ -49,7 +49,7 @@ export default function CreatorAssetsPage() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            {/* Glassmorphism Search Bar */}
+            {/*  Search Bar */}
             <div className="mb-6">
                 <div className="relative max-w-md">
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-lg blur-xl opacity-50" />

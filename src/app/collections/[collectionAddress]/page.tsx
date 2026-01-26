@@ -11,8 +11,8 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
   const { collectionAddress } = await params;
 
   // Dynamic metadata based on address
-  const title = `Collection ${collectionAddress.substring(0, 8)}... | Mediolano`;
-  const description = "Explore this IP collection on Mediolano.";
+  const title = `Collection ${collectionAddress.substring(0, 8)}... | IP Creator`;
+  const description = "Explore this onchain IP collection.";
 
   return {
     title: title,
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
     openGraph: {
       title: title,
       description: description,
-      siteName: "Mediolano IP Creator",
+      siteName: "IP Creator",
       type: "website",
     },
     twitter: {
