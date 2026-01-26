@@ -118,7 +118,14 @@ export function OverviewTab({ asset }: OverviewTabProps) {
         <dl className="grid grid-cols-2 gap-4">
           <div className="rounded-lg border p-3">
             <dt className="text-sm text-muted-foreground">Collection</dt>
-            <dd className="font-medium">{displayValues.collection}</dd>
+            <dd className="font-medium flex items-center justify-between gap-2 overflow-hidden">
+              <span className="truncate">{displayValues.collection}</span>
+              {(displayValues.contract && displayValues.contract !== "Unknown") && (
+                <Button variant="outline" size="sm" className="h-6 px-2 text-xs shrink-0" asChild>
+                  <Link href={`/collections/${displayValues.contract}`}>View</Link>
+                </Button>
+              )}
+            </dd>
           </div>
           <div className="rounded-lg border p-3">
             <dt className="text-sm text-muted-foreground">Blockchain</dt>

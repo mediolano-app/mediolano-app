@@ -20,11 +20,11 @@ export function AssetLoadingState({ loadingState, error }: AssetLoadingStateProp
         <div className="text-center space-y-2">
           <div className="text-lg font-semibold">Unable to load asset</div>
           <div className="text-sm text-muted-foreground max-w-md">
-            {error?.includes("Connection timeout") 
+            {error?.includes("Connection timeout")
               ? "Please check your internet connection and try again."
               : error?.includes("Unable to load asset details")
-              ? "Asset loaded with limited information."
-              : "Something went wrong. Please try again."}
+                ? "Asset loaded with limited information."
+                : "Something went wrong. Please try again."}
           </div>
         </div>
       </div>
@@ -32,76 +32,61 @@ export function AssetLoadingState({ loadingState, error }: AssetLoadingStateProp
   }
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
-      {/* Left column - Image skeleton with loading indicator */}
-      <div className="lg:col-span-3 space-y-4">
-        <div className="relative overflow-hidden rounded-xl border bg-muted/20 p-4">
-          <Skeleton className="h-[360px] w-full" />
-          {(isInitializing || isFetchingOnchainData || isFetchingMetadata) && (
-            <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
-              <div className="text-center text-sm text-muted-foreground">
-                {currentStep || (isInitializing ? "Establishing connection..." : isFetchingOnchainData ? "Fetching onchain data..." : "Fetching metadata...")}
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Hero Section Skeleton */}
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        {/* Left: Image */}
+        <div className="w-full lg:w-[450px] flex-shrink-0">
+          <div className="relative aspect-square rounded-2xl overflow-hidden border border-white/10 bg-muted/10">
+            <Skeleton className="h-full w-full" />
+
+            {/* Loading Overlay */}
+            {(isInitializing || isFetchingOnchainData || isFetchingMetadata) && (
+              <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center">
+                <div className="text-center text-sm font-medium text-foreground bg-background/80 px-4 py-2 rounded-full border shadow-sm">
+                  {currentStep || (isInitializing ? "Connecting..." : isFetchingOnchainData ? "Loading data..." : "Fetching metadata...")}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-        
-        <div className="text-sm text-muted-foreground">
-          {currentStep || (isInitializing ? "Establishing connection..." : isFetchingOnchainData ? "Fetching onchain data..." : isFetchingMetadata ? "Fetching metadata..." : "Preparing your asset…")}
+            )}
+          </div>
         </div>
 
-        <div className="flex gap-2">
-          <Skeleton className="h-6 w-20" />
-          <Skeleton className="h-6 w-24" />
-          <Skeleton className="h-6 w-16" />
+        {/* Right: Info */}
+        <div className="flex-1 space-y-6 py-2">
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-32" /> {/* Collection Badge */}
+            <Skeleton className="h-12 w-3/4" /> {/* Title */}
+            <Skeleton className="h-20 w-full" /> {/* Description */}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-2 pt-2">
+            <Skeleton className="h-11 w-32 rounded-md" />
+            <Skeleton className="h-11 w-32 rounded-md" />
+            <Skeleton className="h-11 w-32 rounded-md" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </div>
         </div>
       </div>
 
-      {/* Right column - Content skeleton */}
-      <div className="lg:col-span-3 space-y-4">
-        <Skeleton className="h-8 w-64" />
-        
-        {/* Loading state for different sections */}
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-6 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-6 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-6 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-18" />
-              <Skeleton className="h-6 w-full" />
-            </div>
+      {/* Stats Grid Skeleton */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="glass-card p-4 rounded-xl border border-white/10 bg-muted/5 h-24 flex flex-col justify-center space-y-2">
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-6 w-24" />
           </div>
-        </div>
+        ))}
+      </div>
 
-        {/* Tab skeleton */}
-        <div className="space-y-4">
-          <div className="flex space-x-1 bg-muted p-1 rounded-lg">
-            <Skeleton className="h-8 w-20" />
-            <Skeleton className="h-8 w-20" />
-            <Skeleton className="h-8 w-20" />
-            <Skeleton className="h-8 w-20" />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
-        </div>
-
-        {/* Action buttons skeleton */}
-        <div className="flex flex-wrap gap-4">
-          <Skeleton className="h-10 flex-1" />
-          <Skeleton className="h-10 flex-1" />
+      {/* Tabs Skeleton */}
+      <div className="mt-8 space-y-6">
+        <Skeleton className="h-10 w-full max-w-md rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-xl" />
+          ))}
         </div>
       </div>
     </div>
@@ -110,25 +95,35 @@ export function AssetLoadingState({ loadingState, error }: AssetLoadingStateProp
 
 export function AssetLoadingSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
-      <div className="lg:col-span-3 space-y-4">
-        <div className="relative overflow-hidden rounded-xl border bg-muted/20 p-4">
-          <Skeleton className="h-[360px] w-full" />
+    <div className="space-y-8">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <div className="w-full lg:w-[450px] flex-shrink-0">
+          <Skeleton className="aspect-square rounded-2xl w-full" />
         </div>
-        <div className="flex gap-2">
-          <Skeleton className="h-6 w-20" />
-          <Skeleton className="h-6 w-24" />
-          <Skeleton className="h-6 w-16" />
+        <div className="flex-1 space-y-6 py-2">
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-12 w-3/4" />
+            <Skeleton className="h-20 w-full" />
+          </div>
+          <div className="flex flex-wrap gap-2 pt-2">
+            <Skeleton className="h-11 w-32 rounded-md" />
+            <Skeleton className="h-11 w-32 rounded-md" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </div>
         </div>
       </div>
-      <div className="lg:col-span-3 space-y-4">
-        <Skeleton className="h-8 w-64" />
-        <div className="grid grid-cols-2 gap-4">
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="glass-card p-4 rounded-xl border border-white/10 h-24 flex flex-col justify-center space-y-2">
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-6 w-24" />
+          </div>
+        ))}
+      </div>
+      <div className="mt-8 space-y-6">
+        <Skeleton className="h-10 w-full max-w-md rounded-lg" />
+        <Skeleton className="h-64 w-full rounded-xl" />
       </div>
     </div>
   );

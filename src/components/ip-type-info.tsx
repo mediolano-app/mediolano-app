@@ -261,7 +261,7 @@ interface IPTypeInfoProps {
 }
 
 export function IPTypeInfo({ asset }: IPTypeInfoProps) {
-  const [activeTab, setActiveTab] = useState("details")
+  const [activeTab, setActiveTab] = useState("traits")
   const [isLoading, setIsLoading] = useState(true)
   const [ipfsMetadata, setIpfsMetadata] = useState<IPFSMetadata | null>(null)
   const [mergedData, setMergedData] = useState<AssetType | null>(null)

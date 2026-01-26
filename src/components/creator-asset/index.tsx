@@ -3,6 +3,7 @@
 import { use, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card"; // Added missing import
 import { ArrowLeft, ArrowRightLeft } from "lucide-react";
 import Image from "next/image";
 import { LazyImage } from "@/components/ui/lazy-image";
@@ -170,78 +171,84 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
 
   return (
     <AssetErrorBoundary onRetry={reload}>
-      <div className="min-h-screen text-foreground">
-        <main className="container mx-auto p-8 ">
-          {showSkeleton || uiState === 'loading' ? (
-            <AssetLoadingState loadingState={loadingState} error={error} onRetry={reload} />
-          ) : uiState === 'not_found' || notFound ? (
-            <div className="w-full flex flex-col items-center justify-center p-12 space-y-4">
-              <div className="text-center space-y-2">
-                <div className="text-lg font-semibold">This asset doesn&apos;t exist or has been removed.</div>
-              </div>
-              <button
-                onClick={() => router.back()}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-              >
-                Go Back
-              </button>
-            </div>
-          ) : uiState === 'error' || error ? (
-            (() => {
-              const errorMessage = typeof error === 'string' ? error :
-                (typeof error === 'object' && error !== null && 'message' in error)
-                  ? String((error as { message: unknown }).message)
-                  : 'Unknown error occurred'
-              const extractedMessage = extractErrorMessage(errorMessage)
-              return (
-                <div className="w-full flex flex-col items-center justify-center p-12 space-y-4">
-                  <div className="text-center space-y-2">
-                    <div className="text-lg font-semibold">{extractedMessage}</div>
-                  </div>
-                  <button
-                    onClick={reload}
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                  >
-                    Try Again
-                  </button>
-                </div>
-              )
-            })()
-          ) : !asset && !loading ? (
-            <div className="w-full flex items-center justify-center p-12">No asset found</div>
-          ) : asset ? (
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-6">
-              {/* Left column - Image */}
-              <div className="lg:col-span-3">
-                <div className="top-24">
-                  <div
-                    className="relative overflow-hidden glass-card w-full flex items-center justify-center bg-muted/20"
-                    style={{
-                      aspectRatio: imageRatio ? `${imageRatio}` : '1 / 1',
-                      maxHeight: '70vh'
-                    }}
-                  >
-                    {/* Background Blur Layer */}
-                    <div className="absolute inset-0 z-0">
-                      <LazyImage
-                        src={asset?.image as string}
-                        fallbackSrc="/background.jpg"
-                        alt="Background"
-                        fill
-                        className="object-cover blur-2xl opacity-50 scale-110"
-                        priority
-                      />
-                    </div>
+      <div className="min-h-screen text-foreground bg-background">
 
-                    {/* Main Image */}
-                    <div className="relative z-10 w-full h-full">
+        {/* Loading / Error States - Keep existing logic if possible, or wrap them */}
+        {showSkeleton || uiState === 'loading' ? (
+          <div className="container mx-auto p-8 pt-24">
+            <AssetLoadingState loadingState={loadingState} error={error} onRetry={reload} />
+          </div>
+        ) : uiState === 'not_found' || notFound ? (
+          <div className="w-full flex flex-col items-center justify-center p-12 space-y-4 pt-32">
+            <div className="text-center space-y-2">
+              <div className="text-lg font-semibold">This asset doesn&apos;t exist or has been removed.</div>
+            </div>
+            <button
+              onClick={() => router.back()}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
+        ) : uiState === 'error' || error ? (
+          <div className="w-full flex flex-col items-center justify-center p-12 space-y-4 pt-32">
+            <div className="text-center space-y-2">
+              <div className="text-lg font-semibold">{extractErrorMessage(typeof error === 'string' ? error : (error as any)?.message || 'Error content')}</div>
+            </div>
+            <button
+              onClick={reload}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : !asset && !loading ? (
+          <div className="w-full flex items-center justify-center p-12 pt-32">No asset found</div>
+        ) : asset ? (
+          <>
+            {/* Glassmorphism Header */}
+            <div className="relative overflow-hidden -mt-[88px] pt-[120px] lg:pt-[150px] pb-12 lg:pb-24 min-h-[450px] lg:min-h-[600px] flex flex-col justify-center">
+              {/* Background with gradient and blur */}
+              <div className="absolute inset-0">
+                {/* Base gradient - Vivid */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-purple-500/20 to-secondary/40 mix-blend-overlay" />
+
+                {/* Asset Image Background */}
+                <LazyImage
+                  src={asset?.image || "/placeholder.svg"}
+                  fallbackSrc="/background.jpg"
+                  alt="Background"
+                  fill
+                  className="object-cover opacity-60 blur-2xl scale-110"
+                  priority
+                />
+
+                {/* Glassmorphism overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-background/90 backdrop-blur-[2px]" />
+              </div>
+
+              <div className="relative z-10 container mx-auto px-4 max-w-7xl">
+                {asset && isAssetReported(asset.id) && (
+                  <Alert variant="destructive" className="mb-6 lg:mb-8 border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/50 backdrop-blur-md">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Reported Content</AlertTitle>
+                    <AlertDescription>
+                      This asset has been flagged by the Mediolano Community. Proceed with caution.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-16">
+                  {/* Asset Image - Large Glass Card */}
+                  <div className="flex-shrink-0 relative group w-full max-w-[320px] lg:max-w-[400px] mx-auto lg:mx-0">
+                    <div className="absolute -inset-1 rounded-2xl" />
+                    <div className="relative aspect-square rounded-2xl overflow-hidden">
                       <LazyImage
                         src={asset?.image || "/placeholder.svg"}
                         fallbackSrc="/background.jpg"
-                        alt={asset?.name || "Asset Image"}
+                        alt={asset?.name || "IP Asset"}
                         fill
                         className="object-contain"
-                        sizes="(max-width: 768px) 100vw, 40vw"
                         priority
                         onLoad={(e) => {
                           const img = e.currentTarget;
@@ -251,193 +258,252 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                         }}
                       />
                     </div>
-
-                    <div className="absolute top-3 left-3 z-20">
-                      {(matchedCollection?.name || asset.collection) &&
-                        <Badge className="bg-primary/10 text-xs text-primary-foreground backdrop-blur-md">
-                          {matchedCollection?.name ? `${matchedCollection.name}${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}` : asset.collection}
-                        </Badge>
-                      }
-                    </div>
                   </div>
 
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {asset.tags && asset.tags.length > 0 && asset.tags.map((tag: string, index: number) => (
-                      <Badge
-                        key={index}
-                        variant="outline"
-                        className="bg-background capitalize"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-6">
-                  <IPTypeInfo
-                    asset={{ ...asset, ipfsCid: asset.ipfsCid, contractAddress: nftAddress || undefined }}
-                  />
-                </div>
-              </div>
-
-              {/* Right column - Content */}
-              <div className="lg:col-span-3">
-                <div className="mb-6">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h1 className="text-3xl font-bold text-clip mb-2">{asset?.name}</h1>
-                      <p className="text-muted-foreground">{asset?.description}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mb-8 flex flex-wrap gap-2">
-                  {isOwner && (
-                    <Button
-                      variant="outline"
-                      className="flex-1 gap-2 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 hover:from-blue-700/20 hover:to-indigo-700/20 text-blue-600 hover:text-blue-700 border-blue-600/20 hover:border-blue-700/20 shadow-sm transition-all hover:shadow-md"
-                      onClick={() => setIsTransferOpen(true)}
-                    >
-                      <ArrowRightLeft className="h-4 w-4" />
-                      Transfer
-                    </Button>
-                  )}
-
-                  <Link href={`/create/remix/${decodedSlug}`} className="flex-1">
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 bg-gradient-to-r from-purple-600/10 to-pink-600/10 hover:from-purple-700/20 hover:to-pink-700/20 text-purple-600 hover:text-purple-700 border-purple-600/20 hover:border-purple-700/20 shadow-sm transition-all hover:shadow-md"
-                    >
-                      <Palette className="h-4 w-4" />
-                      Remix
-                    </Button>
-                  </Link>
-
-                  <Link href={`/proof-of-ownership/${decodedSlug}`} className="flex-1">
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 border-emerald-500/20 hover:border-emerald-500/30 text-emerald-700 dark:text-emerald-400 transition-all"
-                    >
-                      <ShieldCheck className="h-4 w-4" />
-                      Ownership
-                    </Button>
-                  </Link>
-
-                  <Link href={`/provenance/${decodedSlug}`} className="flex-1">
-                    <Button
-                      variant="outline"
-                      className="w-full gap-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 hover:from-amber-500/20 hover:to-orange-500/20 border-amber-500/20 hover:border-amber-500/30 text-amber-700 dark:text-amber-400 transition-all"
-                    >
-                      <History className="h-4 w-4" />
-                      Provenance
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    className="w-full gap-2 bg-gradient-to-r from-gray-100/10 to-gray-200/10 dark:from-gray-800/10 dark:to-gray-900/10 border-gray-200/20 dark:border-gray-700/20 hover:border-gray-300/20 dark:hover:border-gray-600/20 transition-all"
-                    onClick={handleShare}
-                  >
-                    <Share2 className="h-4 w-4" />
-                    {copied ? "Copied!" : "Share"}
-                  </Button>
-                </div>
-
-
-
-                {asset && isAssetReported(asset.id) && (
-                  <Alert variant="destructive" className="mb-6 border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/50">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Reported Content</AlertTitle>
-                    <AlertDescription>
-                      This asset has been flagged by the Mediolano Community. Proceed with caution.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <Tabs defaultValue="overview" className="mt-8 glass p-2">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="provenance">Provenance</TabsTrigger>
-                    <TabsTrigger value="license">License</TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="overview" className="mt-6 bg-card/30">
-                    <OverviewTab asset={{
-                      ...asset!,
-                      collection: matchedCollection?.name
-                        ? `${matchedCollection.name}${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}`
-                        : asset!.collection,
-                      contract: asset!.contract || nftAddress
-                    }} />
-                  </TabsContent>
-
-                  <TabsContent value="provenance" className="space-y-4 bg-card/30">
-                    {enhancedAsset && (
-                      <SimpleProvenance
-                        events={provenanceEvents}
-                        compact={true}
-                      />
-                    )}
-                  </TabsContent>
-
-                  <TabsContent value="license" className="mt-6 space-y-8 bg-card/30">
-                    <LicenseTab asset={asset!} />
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4">Ownership</h3>
-                      <OwnerTab asset={asset!} />
-                    </div>
-
-                    <div className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 p-6 rounded-lg border border-purple-200 dark:border-purple-800">
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="space-y-1">
-                          <h3 className="text-lg font-semibold flex items-center gap-2">
-                            Remix this Asset
-                            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 hover:bg-purple-200">Creative</Badge>
-                          </h3>
-                          <p className="text-sm text-muted-foreground max-w-md">
-                            Create a derivative work based on this asset's license terms.
-                          </p>
+                  {/* Asset Info */}
+                  <div className="flex-1 text-white text-center lg:text-left flex flex-col justify-center h-full pt-4">
+                    <div className="flex flex-col gap-6">
+                      <div>
+                        <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-4">
+                          {(matchedCollection?.name || asset.collection) && (
+                            <Badge className="bg-white/10 text-white hover:bg-white/20 border-white/20 backdrop-blur-md px-3 py-1 text-sm h-7">
+                              {matchedCollection?.name ? `${matchedCollection.name}${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}` : asset.collection}
+                            </Badge>
+                          )}
+                          {asset.type && (
+                            <Badge variant="outline" className="border-white/30 text-white/90 bg-white/5 backdrop-blur-sm h-7">
+                              {asset.type}
+                            </Badge>
+                          )}
                         </div>
-                        <Link href={`/create/remix/${decodedSlug}`}>
-                          <Button size="lg" className="w-full sm:w-auto gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-none shadow-md">
-                            <Palette className="h-4 w-4" />
-                            Start Remix
+
+                        <h1 className="text-4xl lg:text-7xl font-bold drop-shadow-xl tracking-tight leading-tight mb-4 lg:mb-6 break-words">{asset.name}</h1>
+
+                        {asset.tags && asset.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2 justify-center lg:justify-start mb-6">
+                            {asset.tags.map((tag: string, index: number) => (
+                              <Badge
+                                key={index}
+                                variant="secondary"
+                                className="bg-black/30 text-white hover:bg-black/40 border-transparent capitalize backdrop-blur-sm"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        <p className="text-lg lg:text-xl text-white/90 max-w-2xl leading-relaxed drop-shadow-md font-medium px-4 lg:px-0 mx-auto lg:mx-0 break-words break-all">
+                          {asset.description}
+                        </p>
+                      </div>
+
+                      {/* Action Buttons Panel */}
+                      {/* Action Buttons Panel - Optimized for Mobile */}
+                      <div className="flex flex-row flex-wrap items-center justify-center lg:justify-start gap-2 mt-2 lg:mt-4 w-full px-1">
+                        {isOwner && (
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            className="flex-1 sm:flex-none border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base px-3"
+                            onClick={() => setIsTransferOpen(true)}
+                          >
+                            <ArrowRightLeft className="h-3.5 w-3.5 lg:h-5 lg:w-5" />
+                            Transfer
+                          </Button>
+                        )}
+
+                        <Link href={`/create/remix/${decodedSlug}`} className="flex-1 sm:flex-none">
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            className="w-full border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base px-3"
+                          >
+                            <Palette className="h-3.5 w-3.5 lg:h-5 lg:w-5" />
+                            Remix
                           </Button>
                         </Link>
+
+                        <Link href={`/provenance/${decodedSlug}`} className="flex-1 sm:flex-none">
+                          <Button
+                            variant="outline"
+                            size="lg"
+                            className="w-full border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base px-3"
+                          >
+                            <History className="h-3.5 w-3.5 lg:h-5 lg:w-5" />
+                            Provenance
+                          </Button>
+                        </Link>
+
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-10 w-10 text-white hover:bg-white/20 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shrink-0"
+                          onClick={handleShare}
+                        >
+                          <Share2 className="h-5 w-5" />
+                        </Button>
+
+                        <div className="flex gap-2 shrink-0">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-10 w-10 text-white hover:bg-white/20 rounded-full bg-white/5 backdrop-blur-md border border-white/10"
+                            onClick={() => setIsReportOpen(true)}
+                            title="Report Asset"
+                          >
+                            <AlertTriangle className="h-5 w-5" />
+                          </Button>
+
+                          <Link
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`${EXPLORER_URL}/nft/${nftAddress}/${tokenId}`}
+                          >
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-10 w-10 text-white hover:bg-white/20 rounded-full bg-white/5 backdrop-blur-md border border-white/10"
+                              title="View on Explorer"
+                            >
+                              <ExternalLink className="h-5 w-5" />
+                            </Button>
+                          </Link>
+                        </div>
                       </div>
                     </div>
-                  </TabsContent>
-                </Tabs>
-
-                <div className="flex gap-3 mb-8 mt-8">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex-1 h-9 text-xs border border-destructive/50 hover:bg-destructive/70"
-                    onClick={() => setIsReportOpen(true)}
-                  >
-                    <AlertTriangle className="h-3 w-3 mr-2" />
-                    Report Asset
-                  </Button>
-                  <Link
-                    className="flex-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={`${EXPLORER_URL}/nft/${nftAddress}/${tokenId}`}
-                  >
-                    <Button variant="ghost" size="sm" className="w-full h-9 text-xs border border-input hover:bg-accent hover:text-accent-foreground">
-                      View on Explorer <ExternalLink className="ml-2 h-3 w-3" />
-                    </Button>
-                  </Link>
+                  </div>
                 </div>
-
-                {/* Actions moved to top */}
               </div>
             </div>
-          ) : null}
-        </main>
+
+            {/* Main Content Area - Tabs */}
+            <div className="container mx-auto px-4 pb-16 max-w-7xl relative z-20">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column: Tabs & Details (Spans 2 cols) */}
+                <div className="lg:col-span-2 space-y-8">
+                  {/* Quick Stats Grid */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 -mt-12 mb-12 relative z-30">
+                    <div className="glass-card p-4 rounded-xl bg-background/50 backdrop-blur-md border border-border/50">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Blockchain</p>
+                      <p className="font-bold flex items-center gap-2">Starknet</p>
+                    </div>
+                    <div className="glass-card p-4 rounded-xl bg-background/50 backdrop-blur-md border border-border/50">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Standard</p>
+                      <p className="font-bold">ERC-721</p>
+                    </div>
+                    <div className="glass-card p-4 rounded-xl bg-background/50 backdrop-blur-md border border-border/50">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">IP Type</p>
+                      <p className="font-bold truncate" title={asset?.type}>{asset?.type || "Generic"}</p>
+                    </div>
+                    <div className="glass-card p-4 rounded-xl bg-background/50 backdrop-blur-md border border-border/50">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Status</p>
+                      <Badge variant="secondary" className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">Protected</Badge>
+                    </div>
+                  </div>
+
+                  <Tabs defaultValue="overview" className="w-full">
+                    <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted/50 rounded-xl">
+                      <TabsTrigger value="overview" className="py-3 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Overview</TabsTrigger>
+                      <TabsTrigger value="provenance" className="py-3 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">Provenance</TabsTrigger>
+                      <TabsTrigger value="license" className="py-3 rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm">License</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="overview" className="mt-6 space-y-6">
+                      <Card className="border-border/50 bg-background/50 backdrop-blur-sm overflow-hidden">
+                        <div className="p-6">
+                          <OverviewTab asset={{
+                            ...asset!,
+                            collection: matchedCollection?.name
+                              ? `${matchedCollection.name}${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}`
+                              : asset!.collection,
+                            contract: asset!.contract || nftAddress
+                          }} />
+                        </div>
+                      </Card>
+                      <div className="mt-6">
+                        <IPTypeInfo
+                          asset={{ ...asset, ipfsCid: asset.ipfsCid, contractAddress: nftAddress || undefined }}
+                        />
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="provenance" className="mt-6">
+                      <Card className="border-border/50 bg-background/50 backdrop-blur-sm p-6 min-h-[400px]">
+                        {enhancedAsset ? (
+                          <SimpleProvenance
+                            events={provenanceEvents}
+                            compact={true}
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-48 text-muted-foreground">
+                            No provenance data available
+                          </div>
+                        )}
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="license" className="mt-6 space-y-8">
+                      <Card className="border-border/50 bg-background/50 backdrop-blur-sm p-6">
+                        <LicenseTab asset={asset!} />
+                      </Card>
+                    </TabsContent>
+                  </Tabs>
+                </div>
+
+                {/* Right Column: Ownership & CTA (Spans 1 col) */}
+                <div className="space-y-6 lg:pt-4">
+                  <div className="sticky top-24 space-y-6">
+                    <Card className="border-border/50 bg-background/50 backdrop-blur-sm overflow-hidden">
+                      <div className="p-5 border-b border-border/50 bg-muted/20">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <ShieldCheck className="h-4 w-4 text-primary" />
+                          Ownership
+                        </h3>
+                      </div>
+                      <div className="p-5">
+                        <OwnerTab asset={asset!} />
+                        <div className="mt-4 pt-4 border-t border-border/50">
+                          <Link href={`/proof-of-ownership/${decodedSlug}`}>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-between group border-2 border-transparent bg-gradient-to-r from-purple-500/10 to-blue-500/10 hover:from-purple-500/20 hover:to-blue-500/20 relative before:absolute before:inset-0 before:p-[1px] before:bg-gradient-to-r before:from-purple-500 before:to-blue-500 before:content-[''] before:rounded-md before:-z-10 before:mask-linear-gradient"
+                              style={{ backgroundClip: 'padding-box, border-box', backgroundOrigin: 'border-box' }}
+                            >
+                              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 font-semibold">View Proof of Ownership</span>
+                              <ArrowRightLeft className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity -rotate-45 text-purple-600 dark:text-purple-400" />
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </Card>
+
+                    <div className="bg-gradient-to-br from-purple-600/5 to-blue-600/5 p-1 rounded-2xl border border-purple-500/20">
+                      <div className="bg-background/80 backdrop-blur-xl rounded-xl p-5">
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 mb-2">
+                              Remix this IP
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              Create a derivative work based on this asset&apos;s license terms and earn royalties.
+                            </p>
+                          </div>
+                          <Link href={`/create/remix/${decodedSlug}`} className="block">
+                            <Button size="lg" className="w-full gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg shadow-purple-500/20">
+                              <Palette className="h-4 w-4" />
+                              Start Remixing
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
 
         <ReportAssetDialog
           contentId={nftAddress || ""}

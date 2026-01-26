@@ -35,12 +35,8 @@ export function OwnerTab({ asset }: OwnerTabProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-start gap-4">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src={asset.owner?.avatar} alt={toText(asset.owner?.name)} />
-              <AvatarFallback>{toText(asset?.owner?.name).substring(0, 2)}</AvatarFallback>
-            </Avatar>
             <div className="flex-1">
-              <h3 className="text-sm font-semibold truncate">
+              <h3 className="text-sm font-semibold truncate text-lg">
                 {toText(asset?.owner?.name).startsWith("0x") ? shortenAddress(toText(asset?.owner?.name)) : toText(asset?.owner?.name)}
               </h3>
 
@@ -59,17 +55,13 @@ export function OwnerTab({ asset }: OwnerTabProps) {
 
       <Card className="glass">
         <CardHeader>
-          <CardTitle>Author</CardTitle>
+          <CardTitle>Creator</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-start gap-4">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src={asset.author.avatar} alt={toText(asset.author.name)} />
-              <AvatarFallback>{toText(asset.author.name).substring(0, 2)}</AvatarFallback>
-            </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold truncate">{toText(asset.author.name).startsWith("0x") ? shortenAddress(toText(asset.author.name)) : toText(asset.author.name)}</h3>
+                <h3 className="text-sm font-semibold truncate text-lg">{toText(asset.author.name).startsWith("0x") ? shortenAddress(toText(asset.author.name)) : toText(asset.author.name)}</h3>
               </div>
               <p className="text-sm text-muted-foreground">{asset.author.bio}</p>
 
