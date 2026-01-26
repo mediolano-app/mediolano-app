@@ -41,6 +41,7 @@ import {
   Layers,
   Send,
   MessageSquare,
+  Sparkles,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -52,8 +53,9 @@ import { ContactDialog } from "@/components/contact-dialog";
 
 const features = [
   { icon: <Brain className="h-6 w-6" />, title: "Learn", description: "IP for the Integrity Web", link: "/discover" },
-  { icon: <Box className="h-6 w-6" />, title: "Create", description: "Create Programmable IP", link: "/create" },
-  { icon: <Layers className="h-6 w-6" />, title: "Explore", description: "Explorer IP collections", link: "/collections" },
+  { icon: <Plus className="h-6 w-6" />, title: "Create", description: "Create Programmable IP", link: "/create" },
+  { icon: <Layers className="h-6 w-6" />, title: "Collections", description: "Explore IP collections", link: "/collections" },
+  { icon: <Box className="h-6 w-6" />, title: "IP Assets", description: "Explore IP assets", link: "/assets" },
 
 ]
 
@@ -71,13 +73,6 @@ export function Footer() {
   })
 
   const [isContactOpen, setIsContactOpen] = useState(false)
-
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    toast({
-      title: "Subscribed!",
-      description: `You've successfully subscribed with ${data.email}`,
-    })
-  }
 
   return (
 
@@ -152,14 +147,21 @@ export function Footer() {
                     <li><Link href="/create" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create Panel </Link></li>
                     <li><Link href="/create/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
                     <li><Link href="/create/asset" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create IP Asset</Link></li>
-                    <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> IP Templates</Link></li>
+                    <li><Link href="/create/remix" className="flex items-center hover:underline"><Sparkles className="w-4 h-4 mr-2 ml-blue" /> Create Remix</Link></li>
                     <li><Link href="/transfer" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" />Transfer Assets</Link></li>
+                    <li><Link href="/activities" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" />Community Activities</Link></li>
+                    <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />IP Portfolio</Link></li>
+                    <li><Link href="/portfolio/collections" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Collections</Link></li>
+                    <li><Link href="/portfolio/assets" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Assets</Link></li>
+                    <li><Link href="/portfolio/activities" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Activities</Link></li>
+                    <li><Link href="/account" className="flex items-center hover:underline"><User className="w-4 h-4 mr-2 ml-blue" /> Account Settings</Link></li>
                   </ul>
                 </div>
 
                 <div>
                   <h3 className="mb-6 text-sm font-semibold uppercase">IP Templates</h3>
                   <ul className="space-y-4">
+                    <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> Templates Panel</Link></li>
                     <li><Link href="/create/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> General</Link></li>
                     <li><Link href="/create/templates/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Artwork</Link></li>
                     <li><Link href="/create/templates/audio" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2 ml-blue" /> Audio</Link></li>
@@ -174,18 +176,14 @@ export function Footer() {
                 </div>
 
                 <div>
-                  <h3 className="mb-6 text-sm font-semibold uppercase">Manage</h3>
+                  <h3 className="mb-6 text-sm font-semibold uppercase">Guidelines</h3>
                   <ul className="space-y-4">
-                    <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />IP Portfolio</Link></li>
-                    <li><Link href="/account" className="flex items-center hover:underline"><User className="w-4 h-4 mr-2 ml-blue" /> Account Setting</Link></li>
-                  </ul>
-                  <h3 className="mb-6 mt-6 text-sm font-semibold uppercase">Guidelines</h3>
-                  <ul className="space-y-4">
+                    <li><Link href="https://mediolano.xyz/mediolano-protocol/" target="_blank" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Zero Fees Protocol</Link></li>
                     <li><Link href="/docs/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
-                    <li><Link href="/docs/community-guidelines" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> Community</Link></li>
+                    <li><Link href="/docs/community-guidelines" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> Community Guidelines</Link></li>
                     <li><Link href="/docs/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
-                    <li><Link href="/docs/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance</Link></li>
-                    <li><Link href="/docs/governance-charter" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Governance</Link></li>
+                    <li><Link href="/docs/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance Guidelines</Link></li>
+                    <li><Link href="/docs/governance-charter" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Governance Charter</Link></li>
                     <li>
                       <Button variant="link" className="p-0 h-auto font-normal hover:underline flex items-center text-foreground" onClick={() => setIsContactOpen(true)}>
                         <MessageSquare className="w-4 h-4 mr-2 ml-blue" /> Contact Us
