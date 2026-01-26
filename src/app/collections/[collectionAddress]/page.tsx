@@ -118,288 +118,220 @@ export default function CollectionPage() {
     );
   }
 
+  // ... imports remain the same, adding missing ones if needed
+  // We need to ensure we have all icons relative to the new design
+
+  if (collectionLoading) {
+    return <CollectionPageSkeleton />;
+  }
+
+  if (error || !collection) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-destructive">
+            Error Loading Collection
+          </h1>
+          <p className="mt-2 text-muted-foreground">
+            {error || "Collection not found"}
+          </p>
+          <Link href="/collections">
+            <Button variant="outline" className="mt-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Collections
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen">
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="min-h-screen bg-background">
+      {/* Glassmorphism Header */}
+      <div className="relative overflow-hidden -mt-[88px] pt-[150px] pb-24 min-h-[500px] flex flex-col justify-center">
+        {/* Background with gradient and blur */}
+        <div className="absolute inset-0">
+          {/* Base gradient - More vivid */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-purple-500/20 to-secondary/40 mix-blend-overlay" />
 
-        {collection && isCollectionReported(collection.id.toString()) && (
-          <Alert
-            variant="destructive"
-            className="mb-6 border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/50"
-          >
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Reported Content</AlertTitle>
-            <AlertDescription>
-              This collection has been flagged by the Mediolano Community.
-              Proceed with caution.
-            </AlertDescription>
-          </Alert>
-        )}
+          {/* Collection Image Background - More visible */}
+          <Image
+            src={collection.image || "/placeholder.svg"}
+            alt="Collection Background"
+            fill
+            className="object-cover opacity-60 blur-2xl scale-110"
+            priority
+            sizes="100vw"
+          />
 
-        {/* Collection Header */}
-        <div className="relative mb-8">
-          {/* Cover Image */}
-          <div className="aspect-video relative overflow-hidden rounded-xl mb-6">
-            <Image
-              src={collection.image || "/placeholder.svg"}
-              alt={collection.name}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1280px) 100vw, 1280px"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="flex items-end justify-between">
-                <div>
-                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-                    {collection.name}
-                  </h1>
-                  <div className="flex items-center gap-2">
+          {/* Glassmorphism overlay - Lighter for vividness */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-background/90 backdrop-blur-[2px]" />
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 max-w-7xl">
+          {collection && isCollectionReported(collection.id.toString()) && (
+            <Alert
+              variant="destructive"
+              className="mb-8 border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/50 backdrop-blur-md"
+            >
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Reported Content</AlertTitle>
+              <AlertDescription>
+                This collection has been flagged by the Mediolano Community.
+                Proceed with caution.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex flex-col gap-10">
+            {/* Top Section: Avatar + Info */}
+            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
+              {/* Collection Avatar - Larger */}
+              <div className="flex-shrink-0 relative group">
+                <div className="absolute -inset-1 bg-gradient-to-br from-primary to-secondary rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative h-40 w-40 md:h-56 md:w-56 rounded-2xl overflow-hidden border-[3px] border-white/20 shadow-2xl bg-black/20 backdrop-blur-xl">
+                  <Image
+                    src={collection.image || "/placeholder.svg"}
+                    alt={collection.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+
+              {/* Collection Info */}
+              <div className="flex-1 text-white text-center lg:text-left flex flex-col justify-center h-full pt-4">
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-2">
+                    <h1 className="text-5xl lg:text-7xl font-bold drop-shadow-xl tracking-tight leading-none">{collection.name}</h1>
                     {collection.type && (
-                      <Badge
-                        variant="outline"
-                        className="glass"
-                      >
+                      <Badge variant="outline" className="bg-white/10 text-white border-white/20 backdrop-blur-md px-3 py-1 text-base">
                         {collection.type}
                       </Badge>
                     )}
-                    <Badge
+                  </div>
+
+                  <p className="text-xl md:text-2xl text-white/90 max-w-3xl leading-relaxed drop-shadow-md font-medium">
+                    {collection.description || "No description available."}
+                  </p>
+
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-4">
+                    <Button
                       variant="outline"
-                      className="glass"
+                      size="lg"
+                      className="border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all text-base px-6 h-12"
+                      onClick={handleShare}
                     >
-                      {collection.itemCount || 0} assets
-                    </Badge>
+                      <Share2 className="h-5 w-5 mr-2" />
+                      Share
+                    </Button>
+                    <a
+                      href={`https://sepolia.starkscan.co/contract/${collection.nftAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all text-base px-6 h-12"
+                      >
+                        <ExternalLink className="h-5 w-5 mr-2" />
+                        Explorer
+                      </Button>
+                    </a>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+              </div>
+            </div>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleShare}
-                    className="glass"
-                  >
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Share
-                  </Button>
+            {/* Bottom Section: Stats Widget - Moved below */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 mt-4">
+              <div className="bg-black/20 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-black/30 transition-all duration-300">
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-white/70 mb-2 uppercase tracking-wider">Total Assets</p>
+                  <p className="text-3xl md:text-4xl font-bold text-white">{collection.itemCount || 0}</p>
+                </div>
+              </div>
+              <div className="bg-black/20 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-black/30 transition-all duration-300">
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-white/70 mb-2 uppercase tracking-wider">Total Minted</p>
+                  <p className="text-3xl md:text-4xl font-bold text-white">{collection.totalMinted || 0}</p>
+                </div>
+              </div>
+              <div className="bg-black/20 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-black/30 transition-all duration-300">
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-white/70 mb-2 uppercase tracking-wider">Floor Price</p>
+                  <p className="text-3xl md:text-4xl font-bold text-white">--</p>
+                </div>
+              </div>
+              <div className="bg-black/20 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-black/30 transition-all duration-300">
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-white/70 mb-2 uppercase tracking-wider">Owners</p>
+                  <p className="text-3xl md:text-4xl font-bold text-white">--</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Collection Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          <div className="lg:col-span-2 space-y-6">
-            {/* Description */}
-            <Card className="glass">
-              <CardContent className="mt-4">
-                <p className="text-muted-foreground leading-relaxed">
-                  {collection.description || "No description available."}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="glass">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Total Assets
-                      </p>
-                      <p className="text-2xl font-bold">{collection.itemCount || 0}</p>
-                    </div>
-                    <Grid3X3 className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Total Minted
-                      </p>
-                      <p className="text-2xl font-bold">
-                        {collection.totalMinted || 0}
-                      </p>
-                    </div>
-                    <BarChart3 className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        Floor Price
-                      </p>
-                      <p className="text-2xl font-bold"></p>
-                    </div>
-                    <Eye className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Owners</p>
-                      <p className="text-2xl font-bold">
-                        --
-                      </p>
-                    </div>
-                    <Users className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Contract and Creator Details - Inline or minimal */}
+          <div className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start items-center text-sm text-white/80 font-medium">
+            <div className="flex items-center bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+              <span className="mr-2">Contract:</span>
+              <button
+                onClick={() => handleCopy(collection.nftAddress, "address")}
+                className="font-mono hover:text-white transition-colors flex items-center"
+              >
+                {collection.nftAddress.substring(0, 6)}...{collection.nftAddress.substring(collection.nftAddress.length - 4)}
+                <Copy className="h-3 w-3 ml-2" />
+              </button>
+              {copied === "address" && <span className="ml-2 text-green-400 text-xs">Copied!</span>}
             </div>
-          </div>
 
-          <div className="space-y-6">
-            {/* Collection Details */}
-            <Card className="glass">
-              <CardContent className="space-y-4 mt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Contract
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      handleCopy(collection.nftAddress, "address")
-                    }
-                    className="h-auto p-1 font-mono text-xs"
-                  >
-                    {collection.nftAddress.substring(0, 6)}...
-                    {collection.nftAddress.substring(
-                      collection.nftAddress.length - 4,
-                    )}
-                    <Copy className="h-3 w-3 ml-1" />
-                  </Button>
-                </div>
-
-                {!creator && collection.owner && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Owner
-                    </span>
-                    <Link href={`/creator/${collection.owner}`} className="text-sm font-mono truncate max-w-[150px] hover:text-primary transition-colors hover:underline">
-                      {collection.owner}
-                    </Link>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Blockchain
-                  </span>
-                  <Badge variant="outline">Starknet</Badge>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Standard
-                  </span>
-                  <Badge variant="outline">ERC-721</Badge>
-                </div>
-
-                <div className="pt-2">
-                  <a
-                    href={`https://sepolia.starkscan.co/contract/${collection.nftAddress}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full"
-                  >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full bg-transparent"
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      View on Explorer
-                    </Button>
-                  </a>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Creator Info */}
-            {creator && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Creator</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-start gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage
-                        src={
-                          (creator as any).avatar ||
-                          "/placeholder.svg?height=40&width=40"
-                        }
-                        alt={(creator as any).name}
-                      />
-                      <AvatarFallback>
-                        {(creator as any).name?.substring(0, 2).toUpperCase() || "??"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Link href={`/creator/${(creator as any).id}`}>
-                          <h3 className="font-semibold hover:text-primary transition-colors cursor-pointer">
-                            {(creator as any).name && (creator as any).name.length > 10
-                              ? (creator as any).name.substring(0, 10) + "..."
-                              : (creator as any).name || "Unknown"}
-                          </h3>
-                        </Link>
-                        {(creator as any).verified && (
-                          <Badge variant="secondary">
-                            <Shield className="h-3 w-3 mr-1" />
-                            Verified
-                          </Badge>
-                        )}
-                      </div>
-                      <Link href={`/creator/${(creator as any).id}`}>
-                        <Button variant="outline" size="sm">
-                          Profile
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {!creator && collection.owner && (
+              <div className="flex items-center bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+                <span className="mr-2">Owner:</span>
+                <Link href={`/creator/${collection.owner}`} className="font-mono hover:text-white transition-colors hover:underline">
+                  {collection.owner.substring(0, 6)}...
+                </Link>
+              </div>
             )}
 
-
-
+            {creator && (
+              <div className="flex items-center bg-white/5 px-3 py-1.5 rounded-full border border-white/10 gap-2">
+                <span className="mr-1">Creator:</span>
+                <Avatar className="h-5 w-5">
+                  <AvatarImage src={(creator as any).avatar} />
+                  <AvatarFallback className="text-[10px]">{(creator as any).name?.substring(0, 2)}</AvatarFallback>
+                </Avatar>
+                <Link href={`/creator/${(creator as any).id}`} className="hover:text-white hover:underline">
+                  {(creator as any).name}
+                </Link>
+              </div>
+            )}
           </div>
-        </div>
 
+        </div>
+      </div>
+
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Assets Section */}
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div>
+              <h2 className="text-2xl font-bold">Collection Assets</h2>
               <p className="text-muted-foreground">
                 {filteredAssets.length} of {collectionAssets.length} IP assets
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="relative">
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search assets..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-64"
+                  className="pl-10"
                 />
               </div>
             </div>
