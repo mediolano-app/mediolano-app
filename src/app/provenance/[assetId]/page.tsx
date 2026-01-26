@@ -50,7 +50,7 @@ export default function ProvenancePage({ params }: ProvenancePageProps) {
 
       return {
         id: event.id,
-        type: isMint ? "creation" : "transfer",
+        type: isMint ? "mint" : "transfer",
         title: event.title || (isMint ? "Asset Minted" : "Ownership Transferred"),
         description: event.description || (isMint
           ? `Asset minted by ${to.substring(0, 6)}...${to.substring(to.length - 4)}`
@@ -65,6 +65,51 @@ export default function ProvenancePage({ params }: ProvenancePageProps) {
       }
     }) as any[]
   }, [provenanceEventsRaw])
+
+  const enhancedAsset = useMemo(() => {
+    if (!asset) return null;
+
+    // improved creator detection from provenance
+    // The 'to' address of the creation/mint event is the original creator
+    const mintEvent = provenanceEvents.find(e => e.type === "mint");
+    const minterAddress = mintEvent?.to || asset.properties?.creator as string;
+
+    // logic to determine display name
+    let creatorName = "Unknown Creator";
+    if (asset.collectionName) {
+      creatorName = asset.collectionName;
+    } else if (typeof asset.properties?.creator === 'string' && !asset.properties.creator.startsWith("0x")) {
+      creatorName = asset.properties.creator;
+    } else if (minterAddress && typeof minterAddress === 'string' && minterAddress !== "Unknown") {
+      creatorName = `${minterAddress.substring(0, 6)}...${minterAddress.substring(minterAddress.length - 4)}`;
+    }
+
+    return {
+      id: asset.id,
+      name: asset.name,
+      type: asset.type || "Asset",
+      creator: {
+        name: creatorName,
+        address: minterAddress || "Unknown",
+        avatar: "/placeholder.svg?height=40&width=40",
+        verified: true,
+      },
+      currentOwner: {
+        name: asset.owner ? `${String(asset.owner).substring(0, 6)}...` : "Unknown",
+        address: asset.owner ? String(asset.owner) : "0x0",
+        avatar: "/placeholder.svg?height=40&width=40",
+        verified: true,
+      },
+      creationDate: asset.registrationDate || new Date().toISOString(),
+      registrationDate: asset.registrationDate || new Date().toISOString(),
+      blockchain: "Starknet",
+      contract: asset.nftAddress,
+      tokenId: asset.tokenId.toString(),
+      image: asset.image || "/placeholder.svg",
+      description: asset.description || "",
+      fingerprint: asset.ipfsCid ? `ipfs://${asset.ipfsCid}` : `sha256:${Math.random().toString(16).substr(2, 64)}`,
+    } as any
+  }, [asset, provenanceEvents]);
 
   if (isLoading) {
     return (
@@ -95,10 +140,10 @@ export default function ProvenancePage({ params }: ProvenancePageProps) {
             </div>
             <div className="flex gap-3 justify-center">
               <Link href="/">
-                <Button variant="outline">Return Home</Button>
+                <Button variant="outline">Start</Button>
               </Link>
               <Link href="/assets">
-                <Button>Browse Assets</Button>
+                <Button>Explore</Button>
               </Link>
             </div>
           </div>
@@ -107,32 +152,6 @@ export default function ProvenancePage({ params }: ProvenancePageProps) {
       </>
     )
   }
-
-  const enhancedAsset = {
-    id: asset.id,
-    name: asset.name,
-    type: asset.type || "Asset",
-    creator: {
-      name: asset.collectionName || "Unknown Creator",
-      address: asset.properties?.creator as string || "Unknown",
-      avatar: "/placeholder.svg?height=40&width=40",
-      verified: true,
-    },
-    currentOwner: {
-      name: asset.owner ? `${String(asset.owner).substring(0, 6)}...` : "Unknown",
-      address: asset.owner ? String(asset.owner) : "0x0",
-      avatar: "/placeholder.svg?height=40&width=40",
-      verified: true,
-    },
-    creationDate: asset.registrationDate || new Date().toISOString(),
-    registrationDate: asset.registrationDate || new Date().toISOString(),
-    blockchain: "Starknet",
-    contract: asset.nftAddress,
-    tokenId: asset.tokenId.toString(),
-    image: asset.image || "/placeholder.svg",
-    description: asset.description || "",
-    fingerprint: asset.ipfsCid ? `ipfs://${asset.ipfsCid}` : `sha256:${Math.random().toString(16).substr(2, 64)}`,
-  } as any
 
   const handleShare = async () => {
     if (navigator.share) {

@@ -26,6 +26,7 @@ import {
   Shield,
   Users,
   Activity,
+  User,
 } from "lucide-react"
 import { useState } from "react"
 import { AddressLink } from "@/components/ui/address-link"
@@ -205,10 +206,10 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <h1 className="text-3xl lg:text-5xl font-black tracking-tight text-foreground">
+                <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-foreground">
                   {asset.name}
                 </h1>
-                <p className="text-base lg:text-lg text-muted-foreground mt-4 font-light leading-relaxed max-w-lg">
+                <p className="text-base text-muted-foreground mt-4 font-light leading-relaxed max-w-lg">
                   {asset.description}
                 </p>
               </motion.div>
@@ -221,8 +222,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Creator</p>
                 <div className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/30 border border-border group hover:bg-secondary/50 transition-all duration-300">
                   <div className="min-w-0">
-                    <p className="font-bold text-foreground text-base truncate">{asset.creator.name}</p>
-                    <AddressLink address={asset.creator.address} className="text-xs font-mono mt-1 opacity-70 block" />
+                    <AddressLink address={asset.creator.address} className="font-mono block" />
                   </div>
                 </div>
               </div>
@@ -232,8 +232,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Owner</p>
                 <div className="flex items-center gap-4 p-4 rounded-2xl bg-primary/5 border border-primary/10 group hover:bg-primary/10 transition-all duration-300">
                   <div className="min-w-0">
-                    <p className="font-bold text-foreground text-base truncate">{asset.currentOwner.name}</p>
-                    <AddressLink address={asset.currentOwner.address} className="text-xs font-mono mt-1 opacity-80 block text-primary/80" />
+                    <AddressLink address={asset.currentOwner.address} className="font-mono block" />
                   </div>
                 </div>
               </div>
@@ -352,7 +351,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
                           {event.from && event.from !== "0x0" ? event.from.substring(2, 4).toUpperCase() : "Ø"}
                         </div>
                         <span className="font-mono text-xs text-muted-foreground truncate">
-                          {event.from && BigInt(event.from) !== 0n ? truncateAddress(event.from) : "Null Address"}
+                          {event.from && BigInt(event.from) !== 0n ? truncateAddress(event.from) : "Genesis"}
                         </span>
                       </div>
 
