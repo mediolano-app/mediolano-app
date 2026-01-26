@@ -8,7 +8,7 @@ import { Alert } from "@/components/ui/alert";
 import { CollectionValidator } from "@/lib/types";
 import { CollectionStats } from "@/components/collections/collections-stats";
 import Link from "next/link";
-import { ArrowRight, Grid3X3, Layers } from "lucide-react";
+import { ArrowRight, Grid3X3, Layers, Activity } from "lucide-react";
 
 export default function PortfolioClientPage() {
     const { address } = useAccount();
@@ -62,7 +62,7 @@ export default function PortfolioClientPage() {
 
                             {error && <Alert variant="destructive">{error}</Alert>}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {/* Collections Card */}
                                 <Link href="/portfolio/collections" className="group">
                                     <div className="glass-card h-full rounded-2xl p-8 transition-all duration-300 hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.3)] relative overflow-hidden">
@@ -114,6 +114,33 @@ export default function PortfolioClientPage() {
 
                                             <div className="flex items-center text-sm font-medium text-primary group-hover:translate-x-2 transition-transform duration-300">
                                                 Open Assets <ArrowRight className="ml-2 h-4 w-4" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Link>
+
+                                {/* Activities Card */}
+                                <Link href="/portfolio/activities" className="group">
+                                    <div className="glass-card h-full rounded-2xl p-8 transition-all duration-300 hover:shadow-[0_0_30px_-5px_hsl(var(--primary)/0.3)] relative overflow-hidden">
+                                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
+                                            <Activity size={120} />
+                                        </div>
+
+                                        <div className="relative z-10 flex flex-col h-full justify-between space-y-6">
+                                            <div className="space-y-4">
+                                                <div className="h-12 w-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                                                    <Activity size={24} />
+                                                </div>
+                                                <div>
+                                                    <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">Activities</h2>
+                                                    <p className="text-muted-foreground">
+                                                        Track your onchain history.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center text-sm font-medium text-primary group-hover:translate-x-2 transition-transform duration-300">
+                                                View Activities <ArrowRight className="ml-2 h-4 w-4" />
                                             </div>
                                         </div>
                                     </div>

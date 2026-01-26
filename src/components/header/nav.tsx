@@ -47,6 +47,8 @@ import {
   Grid3X3,
   IterationCwIcon,
   IterationCcw,
+  Activity,
+  Boxes,
 } from "lucide-react"
 import { Logo } from "@/components/header/logo"
 
@@ -215,7 +217,7 @@ export function MainNav() {
                     href="/portfolio"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Layers className="mr-2 h-4 w-4  text-blue-600" />
+                      <Boxes className="mr-2 h-4 w-4  text-blue-600" />
                       Portfolio
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -231,7 +233,7 @@ export function MainNav() {
                     href="/portfolio/assets"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Layers className="mr-2 h-4 w-4  text-blue-600" />
+                      <Box className="mr-2 h-4 w-4  text-blue-600" />
                       My Assets
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
@@ -258,14 +260,14 @@ export function MainNav() {
                 <NavigationMenuLink asChild>
                   <Link
                     className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                    href="/account"
+                    href="/portfolio/activities"
                   >
                     <div className="text-sm font-medium leading-none flex items-center">
-                      <Shield className="mr-2 h-4 w-4  text-blue-600" />
-                      Account
+                      <Activity className="mr-2 h-4 w-4  text-blue-600" />
+                      Activities
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
-                      Manage your account settings.
+                      Track your onchain IP history
                     </p>
                   </Link>
                 </NavigationMenuLink>

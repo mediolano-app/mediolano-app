@@ -347,21 +347,16 @@ function AssetCard({ asset, nftAddress, onRemix }: { asset: any, nftAddress: str
         <div className="space-y-1">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold truncate flex-1 text-base" title={asset.name}>{asset.name}</h3>
-            <span className="text-[10px] font-mono font-medium text-muted-foreground bg-secondary/50 px-1.5 py-0.5 rounded border">
-              #{asset.token_id}
-            </span>
           </div>
 
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span className="truncate max-w-[60%] font-medium text-foreground/80">{asset.collectionName || "Collection"}</span>
-            <Badge variant="outline" className="text-[10px] h-5 px-1.5 font-normal">
-              {asset.type || "Asset"}
-            </Badge>
+
           </div>
         </div>
 
         <div className="pt-1">
-          <Button onClick={onRemix} className="w-full gap-2 h-9 text-sm font-medium shadow-sm" size="sm">
+          <Button variant="outline" onClick={onRemix} className="w-full gap-2 h-9 text-sm font-medium shadow-sm" size="sm">
             <Sparkles className="h-3.5 w-3.5" />
             Remix Asset
           </Button>
