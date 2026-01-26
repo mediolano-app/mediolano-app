@@ -153,7 +153,6 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
                 <div className="pt-2 flex gap-2">
                     <Button asChild variant="outline" size="sm" className="flex-1 h-8 text-xs gap-1">
                         <Link href={`/asset/${nftAddress}-${asset.token_id}`}>
-                            <Eye className="h-3 w-3" />
                             View Asset
                         </Link>
                     </Button>
@@ -165,8 +164,6 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
 
                             <DropdownMenuItem asChild>
                                 <Link href={`/create/remix/${nftAddress}-${asset.token_id}`} className="cursor-pointer">
@@ -176,14 +173,14 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
                             </DropdownMenuItem>
 
                             <DropdownMenuItem asChild>
-                                <Link href={`/provenance/${asset.collection_id}-${asset.token_id}`} className="cursor-pointer">
+                                <Link href={`/provenance/${nftAddress}-${asset.token_id}`} className="cursor-pointer">
                                     <History className="mr-2 h-4 w-4" />
                                     Open Provenance
                                 </Link>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem asChild>
-                                <Link href={`/proof-of-ownership/${asset.collection_id}-${asset.token_id}`} className="cursor-pointer">
+                                <Link href={`/proof-of-ownership/${nftAddress}-${asset.token_id}`} className="cursor-pointer">
                                     <ShieldCheck className="mr-2 h-4 w-4" />
                                     View Proof
                                 </Link>

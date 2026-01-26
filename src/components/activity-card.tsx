@@ -93,8 +93,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   return (
     <Card className="group hover:shadow-lg hover:border-primary/20 transition-all duration-300 glass-card overflow-hidden">
       <div className="flex flex-col sm:flex-row gap-4 p-4">
-        <Link
-          href={`/assets/${activity.assetId}`}
+        <div
           className="relative w-full sm:w-24 h-32 sm:h-24 flex-shrink-0 overflow-hidden rounded-lg bg-muted/50 group-hover:shadow-md transition-all duration-300"
         >
           <Image
@@ -104,29 +103,17 @@ export function ActivityCard({ activity }: ActivityCardProps) {
             className="object-cover group-hover:scale-110 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </Link>
+        </div>
 
         <div className="flex-1 flex flex-col justify-between gap-3 min-w-0">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-2.5 flex-1 min-w-0">
-              <Avatar className="h-9 w-9 border border-border">
-                <AvatarImage src="/placeholder.svg" alt={activity.user} />
-                <AvatarFallback className="text-xs">
-                  {activity.user.slice(2, 4).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+
               <div className="flex-1 min-w-0">
-                <AddressLink
-                  address={activity.user}
-                  showFull={true}
-                  className="font-medium text-sm block truncate"
-                >
-                  {activity.user}
-                </AddressLink>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Badge className={`${colors.badge} border-0 h-5 gap-1 px-1.5`}>
-                    <Icon className="h-3 w-3" />
-                    <span className="capitalize text-[10px] font-medium">{activity.type}</span>
+                    <Icon className="h-8 w-8" />
+                    <span className="capitalize font-medium text-lg">{activity.type}</span>
                   </Badge>
                   <span>•</span>
                   <span>{timeAgo}</span>
@@ -134,23 +121,22 @@ export function ActivityCard({ activity }: ActivityCardProps) {
               </div>
             </div>
 
-            {activity.price && (
-              <Badge variant="outline" className="font-mono text-xs h-6 bg-primary/5 border-primary/20">
-                {activity.price}
-              </Badge>
-            )}
           </div>
 
           <div className="space-y-1.5">
-            <Link
-              href={`/assets/${activity.assetId}`}
-              className="font-semibold hover:text-primary transition-colors line-clamp-1 block leading-tight"
+
+            <AddressLink
+              address={activity.user}
+              showFull={true}
+              className="font-medium text-sm block truncate"
             >
-              {activity.assetName}
-            </Link>
+              {activity.user}
+            </AddressLink>
             <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{activity.details}</p>
+            <h4>{activity.assetName}</h4>
           </div>
 
+          {/*
           <div className="flex items-center justify-end pt-1">
             <Button
               variant="ghost"
@@ -158,12 +144,14 @@ export function ActivityCard({ activity }: ActivityCardProps) {
               className="h-8 gap-2 text-xs font-medium group/btn hover:bg-primary/10 hover:text-primary"
               asChild
             >
-              <Link href={`/assets/${activity.assetId}`}>
+              <Link href={`/asset/${activity.assetId}`}>
                 <span>View Asset</span>
                 <ArrowRight className="h-3.5 w-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
               </Link>
             </Button>
           </div>
+          */}
+
         </div>
       </div>
     </Card>
