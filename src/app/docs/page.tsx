@@ -89,25 +89,10 @@ export default function DocsLandingPage() {
                         Mediolano Documentation
                     </h1>
                     <p className="text-xl text-muted-foreground leading-relaxed mb-8">
-                        The definitive guide to the Integrity Web. Explore the protocol, build with our tools, or participate in DAO governance.
+                        Explore the protocol, build with our tools, or participate in Mediolano DAO.
                     </p>
 
-                    {/* Enhanced Search */}
-                    <div className="relative max-w-lg mx-auto group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        <div className="relative flex items-center bg-background/50 backdrop-blur-xl border border-primary/20 rounded-full px-6 py-4 shadow-2xl transition-all duration-300 group-hover:bg-background/80 group-hover:border-primary/40">
-                            <Search className="w-5 h-5 text-muted-foreground mr-3" />
-                            <input
-                                type="text"
-                                placeholder="Search documentation..."
-                                className="w-full bg-transparent border-none focus:outline-none text-foreground placeholder:text-muted-foreground/70"
-                            />
-                            <div className="hidden sm:flex items-center space-x-1 text-xs text-muted-foreground border border-border/50 rounded px-1.5 py-0.5 bg-muted/20">
-                                <span>⌘</span>
-                                <span>K</span>
-                            </div>
-                        </div>
-                    </div>
+
                 </motion.div>
 
                 {/* SECTION 1: PROTOCOL & PLATFORM */}
@@ -304,8 +289,8 @@ export default function DocsLandingPage() {
                         {/* Reference Cards */}
                         {[
                             { title: "Public Goods", href: "/docs/public-goods", icon: Heart, color: "text-rose-500", bg: "bg-rose-500/10" },
-                            { title: "Compliance", href: "/docs/compliance-guidelines", icon: Scale, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-                            { title: "Legal", href: "/docs/terms-of-use", icon: FileText, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+                            { title: "Compliance Guidelines", href: "/docs/compliance-guidelines", icon: Scale, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+                            { title: "Terms of use", href: "/docs/terms-of-use", icon: FileText, color: "text-indigo-500", bg: "bg-indigo-500/10" },
                         ].map((item, i) => {
                             const Icon = item.icon
                             return (
@@ -324,17 +309,6 @@ export default function DocsLandingPage() {
                     </div>
                 </motion.section>
 
-                {/* Footer Copyright */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1, duration: 1 }}
-                    className="mt-24 border-t border-border/30 pt-12 flex flex-col justify-center items-center text-sm text-muted-foreground"
-                >
-                    <div className="mb-4">
-                        &copy; 2024 Mediolano Protocol. Open Source & Permissionless.
-                    </div>
-                </motion.div>
 
             </div>
         </div>

@@ -75,322 +75,166 @@ export function Footer() {
   const [isContactOpen, setIsContactOpen] = useState(false)
 
   return (
-
     <>
       <ContactDialog open={isContactOpen} onOpenChange={setIsContactOpen} />
-      {/*<DappInfo/>*/}
 
-      <footer className="text-foreground glass">
-        <div className="container mx-auto px-4 py-6 md:py-8 lg:py-10">
+      <footer className="w-full bg-background/40 backdrop-blur-xl border-t border-border/50">
+        <div className="container mx-auto px-6 py-12 md:py-16">
 
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-8 pt-6">
+          {/* Top Feature Links */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+            {features.map((feature, index) => (
+              <Link
+                key={index}
+                href={feature.link}
+                className="group flex flex-col items-center p-4 rounded-xl bg-accent/5 hover:bg-accent/10 border border-transparent hover:border-accent/20 transition-all duration-300 transform hover:-translate-y-1"
+              >
+                <div className="mb-3 p-3 rounded-full bg-blue-500/10 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">
+                  {feature.icon}
+                </div>
+                <h4 className="font-semibold text-sm mb-1">{feature.title}</h4>
+                <p className="text-xs text-muted-foreground text-center group-hover:text-muted-foreground/80">{feature.description}</p>
+              </Link>
+            ))}
+          </div>
 
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">
 
-
-            {/* Start */}
-            <div className="lg:col-span-1">
-
-              <h3 className="mb-6 text-sm font-semibold uppercase">Quick Links</h3>
-
+            {/* Brand & Socials - Spans 4 columns */}
+            <div className="lg:col-span-4 space-y-8">
               <div className="space-y-4">
-                {features.map((feature, index) => (
-                  <div
-                    key={index}
-                    className="group relative overflow-hidden rounded-lg bg-accent/25 transition-all duration-300 ease-in-out hover:bg-accent mr-10 hover:scale-[1.02]"
-                  >
-                    <Link href={feature.link} className="block p-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-600/10 flex items-center justify-center ml-blue group-hover:bg-blue/40 transition-colors duration-300">
-                          {feature.icon}
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium group-hover:text-primary transition-colors duration-300">
-                            {feature.title}
-                          </h4>
-                          <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                            {feature.description}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
+                <Link href="/" className="inline-block">
+                  <div className="flex items-center gap-2">
+                    <Image
+                      className="hidden dark:block"
+                      src="/mediolano-logo-dark.png"
+                      alt="Mediolano"
+                      width={160}
+                      height={40}
+                    />
+                    <Image
+                      className="block dark:hidden"
+                      src="/mediolano-logo-light.svg"
+                      alt="Mediolano"
+                      width={160}
+                      height={40}
+                    />
                   </div>
-                ))}
-              </div>
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            {/* Navigation */}
-            <div className="lg:col-span-2">
-              <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-
-
-                <div>
-                  <h4 className="mb-6 text-sm font-semibold uppercase">Programmable IP</h4>
-                  <ul className="space-y-4">
-                    <li><Link href="/create" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create Panel </Link></li>
-                    <li><Link href="/create/collection" className="flex items-center hover:underline"><Grid className="w-4 h-4 mr-2 ml-blue" /> Create Collection</Link></li>
-                    <li><Link href="/create/asset" className="flex items-center hover:underline"><Box className="w-4 h-4 mr-2 ml-blue" /> Create IP Asset</Link></li>
-                    <li><Link href="/create/remix" className="flex items-center hover:underline"><Sparkles className="w-4 h-4 mr-2 ml-blue" /> Create Remix</Link></li>
-                    <li><Link href="/transfer" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" />Transfer Assets</Link></li>
-                    <li><Link href="/activities" className="flex items-center hover:underline"><ArrowRightLeft className="w-4 h-4 mr-2 ml-blue" />Community Activities</Link></li>
-                    <li><Link href="/portfolio" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />IP Portfolio</Link></li>
-                    <li><Link href="/portfolio/collections" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Collections</Link></li>
-                    <li><Link href="/portfolio/assets" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Assets</Link></li>
-                    <li><Link href="/portfolio/activities" className="flex items-center hover:underline"><Book className="w-4 h-4 mr-2 ml-blue" />My Activities</Link></li>
-                    <li><Link href="/account" className="flex items-center hover:underline"><User className="w-4 h-4 mr-2 ml-blue" /> Account Settings</Link></li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="mb-6 text-sm font-semibold uppercase">IP Templates</h3>
-                  <ul className="space-y-4">
-                    <li><Link href="/create/templates" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> Templates Panel</Link></li>
-                    <li><Link href="/create/asset" className="flex items-center hover:underline"><FileCheck className="w-4 h-4 mr-2 ml-blue" /> General</Link></li>
-                    <li><Link href="/create/templates/art" className="flex items-center hover:underline"><Palette className="w-4 h-4 mr-2 ml-blue" /> Artwork</Link></li>
-                    <li><Link href="/create/templates/audio" className="flex items-center hover:underline"><BookMarked className="w-4 h-4 mr-2 ml-blue" /> Audio</Link></li>
-                    <li><Link href="/create/templates/documents" className="flex items-center hover:underline"><FileIcon className="w-4 h-4 mr-2 ml-blue" /> Document</Link></li>
-                    <li><Link href="/create/templates/nft" className="flex items-center hover:underline"><FileLock className="w-4 h-4 mr-2 ml-blue" /> NFT</Link></li>
-                    <li><Link href="/create/templates/patents" className="flex items-center hover:underline"><ScrollText className="w-4 h-4 mr-2 ml-blue" /> Patent</Link></li>
-                    <li><Link href="/create/templates/publications" className="flex items-center hover:underline"><BookIcon className="w-4 h-4 mr-2 ml-blue" /> Publication</Link></li>
-                    <li><Link href="/create/templates/rwa" className="flex items-center hover:underline"><Globe2 className="w-4 h-4 mr-2 ml-blue" /> Real World Assets</Link></li>
-                    <li><Link href="/create/templates/software" className="flex items-center hover:underline"><FileCode className="w-4 h-4 mr-2 ml-blue" /> Software</Link></li>
-                    <li><Link href="/create/templates/video" className="flex items-center hover:underline"><Film className="w-4 h-4 mr-2 ml-blue" /> Video</Link></li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="mb-6 text-sm font-semibold uppercase">Guidelines</h3>
-                  <ul className="space-y-4">
-                    <li><Link href="https://mediolano.xyz/mediolano-protocol/" target="_blank" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Zero Fees Protocol</Link></li>
-                    <li><Link href="/docs/terms-of-use" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Terms of Use</Link></li>
-                    <li><Link href="/docs/community-guidelines" className="flex items-center hover:underline"><ShieldQuestion className="w-4 h-4 mr-2 ml-blue" /> Community Guidelines</Link></li>
-                    <li><Link href="/docs/privacy-policy" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Privacy Policy</Link></li>
-                    <li><Link href="/docs/compliance-guidelines" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Compliance Guidelines</Link></li>
-                    <li><Link href="/docs/governance-charter" className="flex items-center hover:underline"><Shield className="w-4 h-4 mr-2 ml-blue" /> Governance Charter</Link></li>
-                    <li>
-                      <Button variant="link" className="p-0 h-auto font-normal hover:underline flex items-center text-foreground" onClick={() => setIsContactOpen(true)}>
-                        <MessageSquare className="w-4 h-4 mr-2 ml-blue" /> Contact Us
-                      </Button>
-                    </li>
-                  </ul>
-                </div>
-
-              </div>
-            </div>
-
-
-
-
-
-
-
-
-
-
-            {/* Mediolano */}
-            <div className="space-y-4 lg:col-span-1 bg-blue-600/10 p-4 rounded-lg">
-
-              <Link href="/" className="flex items-center space-x-2">
-                <span className="text-1xl font-bold animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  Programmable IP for the Integrity Web
-                </span>
-              </Link>
-
-              <p className="text-muted-foreground mr-5">
-                IP Creator empower creators, developers, business, AI agents and communities to assert ownership and share intellectual property.
-              </p>
-              <p className="text-muted-foreground mr-5">
-                Integrating smart contracts with zero knowledge-proofs, IP Creator turns code, content, and culture into programmable, sovereign assets.</p><br></br>
-              <div className="flex space-x-4">
-                <div className="flex items-center space-x-2">
-
-                  <Link href="/" className="flex items-center space-x-2">
-                    <div>
-                      <Image
-                        className="hidden dark:block"
-                        src="/mediolano-logo-dark.png"
-                        alt="dark-mode-image"
-                        width={140}
-                        height={33}
-                      />
-                      <Image
-                        className="block dark:hidden"
-                        src="/mediolano-logo-light.svg"
-                        alt="light-mode-image"
-                        width={140}
-                        height={33}
-                      />
-                    </div>
-
-                    <span className="hidden font-bold sm:inline-block">
-                    </span>
+                </Link>
+                <p className="text-muted-foreground leading-relaxed text-sm max-w-sm">
+                  Programmable IP for the Integrity Web. Empowering creators, developers, and AI agents to assets ownership and share intellectual property securely.
+                </p>
+                <div className="flex items-center gap-4 pt-2">
+                  <Link href="/" passHref>
+                    <Image
+                      className="hidden dark:block opacity-80 hover:opacity-100 transition-opacity"
+                      src="/Starknet-Dark.svg"
+                      alt="Starknet"
+                      width={120}
+                      height={30}
+                    />
+                    <Image
+                      className="block dark:hidden opacity-80 hover:opacity-100 transition-opacity"
+                      src="/Starknet-Light.svg"
+                      alt="Starknet"
+                      width={120}
+                      height={30}
+                    />
                   </Link>
-
-                  <Link href="/" className="flex items-center space-x-2">
-                    <div>
-                      <Image
-                        className="hidden dark:block"
-                        src="/Starknet-Dark.svg"
-                        alt="dark-mode-image"
-                        width={140}
-                        height={33}
-                      />
-                      <Image
-                        className="block dark:hidden"
-                        src="/Starknet-Light.svg"
-                        alt="light-mode-image"
-                        width={140}
-                        height={33}
-                      />
-                    </div>
-
-                    <span className="hidden font-bold sm:inline-block">
-                    </span>
-                  </Link>
-
-
                 </div>
+              </div>
+
+              {/* Social Links Compact */}
+              <div className="flex flex-wrap gap-3">
+                <Button variant="outline" size="sm" className="h-9 gap-2" asChild>
+                  <Link href="https://x.com/MediolanoApp" target="_blank">
+                    <Twitter className="h-4 w-4 text-blue-400" />
+                    <span>X</span>
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" className="h-9 gap-2" asChild>
+                  <Link href="https://github.com/mediolano-app" target="_blank">
+                    <Github className="h-4 w-4" />
+                    <span>GitHub</span>
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" className="h-9 gap-2" asChild>
+                  <Link href="https://t.me/integrityweb" target="_blank">
+                    <Send className="h-4 w-4 text-blue-500" />
+                    <span>Telegram</span>
+                  </Link>
+                </Button>
               </div>
             </div>
 
+            {/* Navigation Lists - Spans 8 columns (2+3+3) */}
+            <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
+              {/* Programmable IP */}
+              <div className="space-y-6">
+                <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground/80">Programmable IP</h4>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li><Link href="/create" className="flex items-center gap-2 hover:text-primary transition-colors"><Box className="w-3.5 h-3.5" /> Create Panel</Link></li>
+                  <li><Link href="/create/collection" className="flex items-center gap-2 hover:text-primary transition-colors"><Grid className="w-3.5 h-3.5" /> Create Collection</Link></li>
+                  <li><Link href="/create/asset" className="flex items-center gap-2 hover:text-primary transition-colors"><Box className="w-3.5 h-3.5" /> Create IP Asset</Link></li>
+                  <li><Link href="/create/remix" className="flex items-center gap-2 hover:text-primary transition-colors"><Sparkles className="w-3.5 h-3.5" /> Create Remix</Link></li>
+                  <li><Link href="/transfer" className="flex items-center gap-2 hover:text-primary transition-colors"><ArrowRightLeft className="w-3.5 h-3.5" /> Transfer Assets</Link></li>
+                  <li><Link href="/activities" className="flex items-center gap-2 hover:text-primary transition-colors"><Scroll className="w-3.5 h-3.5" /> Community Activities</Link></li>
+                  <li className="pt-2 border-t border-border/50"></li>
+                  <li><Link href="/portfolio" className="flex items-center gap-2 hover:text-primary transition-colors"><User className="w-3.5 h-3.5" /> IP Portfolio</Link></li>
+                  <li><Link href="/account" className="flex items-center gap-2 hover:text-primary transition-colors"><Cog className="w-3.5 h-3.5" /> Account Settings</Link></li>
+                </ul>
+              </div>
 
+              {/* Templates */}
+              <div className="space-y-6">
+                <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground/80">IP Templates</h4>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li><Link href="/create/templates" className="flex items-center gap-2 hover:text-primary transition-colors"><LayoutDashboard className="w-3.5 h-3.5" /> Templates Panel</Link></li>
+                  <li><Link href="/create/asset" className="flex items-center gap-2 hover:text-primary transition-colors"><FileCheck className="w-3.5 h-3.5" /> General</Link></li>
+                  <li><Link href="/create/templates/art" className="flex items-center gap-2 hover:text-primary transition-colors"><Palette className="w-3.5 h-3.5" /> Artwork</Link></li>
+                  <li><Link href="/create/templates/audio" className="flex items-center gap-2 hover:text-primary transition-colors"><BookMarked className="w-3.5 h-3.5" /> Audio</Link></li>
+                  <li><Link href="/create/templates/documents" className="flex items-center gap-2 hover:text-primary transition-colors"><FileIcon className="w-3.5 h-3.5" /> Document</Link></li>
+                  <li><Link href="/create/templates/nft" className="flex items-center gap-2 hover:text-primary transition-colors"><FileLock className="w-3.5 h-3.5" /> NFT</Link></li>
+                  <li><Link href="/create/templates/video" className="flex items-center gap-2 hover:text-primary transition-colors"><Film className="w-3.5 h-3.5" /> Video</Link></li>
+                </ul>
+              </div>
 
-
-
-
+              {/* Resources */}
+              <div className="space-y-6">
+                <h4 className="text-sm font-semibold uppercase tracking-wider text-foreground/80">Resources</h4>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li><Link href="/docs/" className="flex items-center gap-2 hover:text-primary transition-colors"><Book className="w-3.5 h-3.5" /> Documentation</Link></li>
+                  <li><Link href="/docs/dapp-guide" className="flex items-center gap-2 hover:text-primary transition-colors"><Brain className="w-3.5 h-3.5" /> Dapp Guide</Link></li>
+                  <li><Link href="/docs/user-guide" className="flex items-center gap-2 hover:text-primary transition-colors"><Brain className="w-3.5 h-3.5" /> User Guide</Link></li>
+                  <li><Link href="/docs/mediolano-dao" className="flex items-center gap-2 hover:text-primary transition-colors"><Globe className="w-3.5 h-3.5" /> DAO</Link></li>
+                  <li><Link href="/docs/faq" className="flex items-center gap-2 hover:text-primary transition-colors"><ShieldQuestion className="w-3.5 h-3.5" /> FAQ</Link></li>
+                  <li className="pt-2 border-t border-border/50"></li>
+                  <li><Link href="/docs/terms-of-use" className="hover:text-primary transition-colors">Terms of Use</Link></li>
+                  <li><Link href="/docs/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                  <li>
+                    <button
+                      onClick={() => setIsContactOpen(true)}
+                      className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-medium"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" /> Contact Us
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
 
+          <Separator className="my-12 opacity-50" />
 
-
-          {/* Twitter Showcase */}
-          <div className="mt-16 grid max-w-full grid-cols-1 w-full gap-8 md:grid-cols-3">
-            <Card className="bg-background/20">
-              <CardHeader>
-                <CardTitle>Join on X</CardTitle>
-                <CardDescription>Interact and stay updated with the latest news and announcements.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-4 mb-4">
-                  <Twitter className="h-8 w-8 ml-blue" />
-                  <div>
-                    <h4 className="text-sm font-semibold">@MediolanoApp</h4>
-                    <p className="text-xs text-muted-foreground">Sharing freedom tech!</p>
-                  </div>
-                </div>
-                <Button variant="outline" asChild className="w-full">
-                  <Link href="https://twitter.com/MediolanoApp" target="_blank" rel="noopener noreferrer">
-                    <Twitter className="mr-2 h-4 w-4" /> Join on X/Twitter
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* GitHub Repository Showcase */}
-            <Card className="bg-background/20">
-              <CardHeader>
-                <CardTitle>Open-Source GitHub</CardTitle>
-                <CardDescription>
-                  Explore our open-source codebase and join our developer community.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <Github className="h-8 w-8 ml-blue" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Cooking the Integrity Web</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary" className="flex items-center space-x-1">
-                      <Lock className="h-3 w-3" />
-                      <span>Permissionless</span>
-                    </Badge>
-                  </div>
-                </div>
-                <Separator className="my-4" />
-                <Button variant="outline" asChild className="w-full">
-                  <Link href="https://github.com/mediolano-app" target="_blank" rel="noopener noreferrer">
-                    <Github className="mr-2 h-4 w-4" /> View on GitHub
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-background/20">
-              <CardHeader>
-                <CardTitle>Get involved</CardTitle>
-                <CardDescription>
-                  News, updates, discussions on the Integrity Web!
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <Send className="h-8 w-8 ml-blue" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Telegram community to stay on the loop.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary" className="flex items-center space-x-1">
-                      <Star className="h-3 w-3" />
-                      <span>Social</span>
-                    </Badge>
-
-                  </div>
-                </div>
-                <Separator className="my-4" />
-                <Button variant="outline" asChild className="w-full">
-                  <Link href="https://t.me/integrityweb" target="_blank" rel="noopener noreferrer">
-                    <Send className="mr-2 h-4 w-4" /> Join on Telegram
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-
-
-
-
-
-
-
-          <Separator className="my-8" />
-
-          {/* Bottom Bar */}
-          <div className="mt-8 flex flex-col items-center justify-between space-y-4 sm:flex-row sm:space-y-0">
-            <p className="text-sm text-muted-foreground text-center sm:text-left">
-              Mediolano DAO &copy; 2026
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-              <Link href="https://mediolano.xyz/" className="hover:underline">
-                Mediolano.xyz
-              </Link>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+            <p>© 2026 Mediolano DAO</p>
+            <div className="flex items-center gap-6">
+              <Link href="https://mediolano.xyz/" target="_blank" className="hover:text-foreground transition-colors">Mediolano.xyz</Link>
             </div>
           </div>
         </div>
       </footer>
-
     </>
   )
 }
