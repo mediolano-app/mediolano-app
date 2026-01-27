@@ -60,7 +60,7 @@ export default function DevelopersContent() {
     }
 
     return (
-        <div className="min-h-screen bg-background relative selection:bg-primary/30 selection:text-foreground">
+        <div className="min-h-screen relative selection:bg-primary/30 selection:text-foreground">
             {/* Ambient Background */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
                 <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-slate-500/5 rounded-full blur-[120px] animate-pulse" />
@@ -129,16 +129,16 @@ export default function DevelopersContent() {
                                     <div className="w-12 h-12 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/5 rotate-2 transition-transform hover:rotate-3">
                                         <Terminal className="w-6 h-6 text-blue-500" />
                                     </div>
-                                    <h2 className="text-3xl font-semibold tracking-tight">Quick Start</h2>
+                                    <h2 className="text-3xl font-semibold tracking-tight">Open Source Repository</h2>
                                 </div>
                                 <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-muted-foreground">
                                     <p className="leading-relaxed mb-6">
-                                        To get started with the Mediolano, you can clone our starter kit. It comes pre-configured with Starknet.js and our contract ABI types.
+                                        You can find the source code for the Mediolano on GitHub. It is open source and available for anyone to use, modify, and contribute to. The Mediolano IP Creator dapp is fully permissionless and can be run locally or deployed independently to create your own instance.
                                     </p>
                                     <div className="bg-black/80 rounded-xl p-4 overflow-x-auto relative group">
                                         <div className="absolute top-4 right-4">
                                             <button
-                                                onClick={() => copyToClipboard("git clone https://github.com/mediolano-protocol/starter-kit.git", "clone_cmd")}
+                                                onClick={() => copyToClipboard("git clone https://github.com/mediolano-app/mediolano-app.git", "clone_cmd")}
                                                 className="p-2 bg-white/10 rounded-md hover:bg-white/20 transition-colors"
                                             >
                                                 {copied === "clone_cmd" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-gray-400" />}
@@ -168,9 +168,7 @@ export default function DevelopersContent() {
                                     </p>
                                     <div className="space-y-4">
                                         {[
-                                            { name: "Registry Core", address: "0x0123...abc", network: "Starknet Mainnet" },
-                                            { name: "License Module V1", address: "0x0456...def", network: "Starknet Mainnet" },
-                                            { name: "MGT Token", address: "0x0789...123", network: "Starknet Mainnet" },
+                                            { name: "Mediolano Protocol IP Collections", address: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS, network: "Starknet Mainnet" },
                                         ].map((contract, index) => (
                                             <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-muted/20 rounded-xl gap-4">
                                                 <div>
@@ -180,7 +178,7 @@ export default function DevelopersContent() {
                                                 <div className="flex items-center gap-2 w-full sm:w-auto bg-background/50 p-2 rounded-lg border border-border/30">
                                                     <code className="text-xs font-mono text-muted-foreground truncate flex-1 sm:flex-none">{contract.address}</code>
                                                     <button
-                                                        onClick={() => copyToClipboard(contract.address, `addr_${index}`)}
+                                                        onClick={() => copyToClipboard(process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS || "", `addr_${index}`)}
                                                         className="p-1 hover:bg-muted rounded transition-colors"
                                                     >
                                                         {copied === `addr_${index}` ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
@@ -192,13 +190,85 @@ export default function DevelopersContent() {
                                 </div>
                             </section>
 
+
+
+                            {/* API Services */}
+                            <section id="subgraphs" className="mb-20 scroll-mt-32">
+                                <div className="flex items-center space-x-4 mb-8">
+                                    <div className="w-12 h-12 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/5 -rotate-1 transition-transform hover:-rotate-2">
+                                        <GitMerge className="w-6 h-6 text-green-500" />
+                                    </div>
+                                    <h2 className="text-3xl font-semibold tracking-tight">API Services</h2>
+                                </div>
+                                <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-muted-foreground">
+                                    <p className="leading-relaxed mb-6">
+                                        Mediolano provides a REST API for querying indexed NFT data from Starknet contracts.
+                                    </p>
+
+                                    <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl space-y-6">
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-foreground mb-4">NFT Indexer API</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                                <div className="flex flex-col space-y-1">
+                                                    <span className="text-muted-foreground">Version</span>
+                                                    <span className="font-mono text-foreground">1.0.0</span>
+                                                </div>
+                                                <div className="flex flex-col space-y-1">
+                                                    <span className="text-muted-foreground">Specification</span>
+                                                    <span className="font-mono text-foreground">OAS 3.0</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="flex flex-col space-y-2">
+                                                <span className="text-sm font-medium text-foreground">Documentation</span>
+                                                <a
+                                                    href="https://mediolano-api-service.onrender.com/docs/"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center space-x-2 text-primary hover:underline"
+                                                >
+                                                    <span>View Swagger UI</span>
+                                                    <ChevronRight className="w-4 h-4" />
+                                                </a>
+                                                <a
+                                                    href="https://mediolano-api-service.onrender.com/docs/json"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center space-x-2 text-primary hover:underline"
+                                                >
+                                                    <span>View JSON Specification</span>
+                                                    <ChevronRight className="w-4 h-4" />
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h4 className="text-sm font-semibold text-foreground mb-3">Available Schemas</h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {[
+                                                    "Asset", "Collection", "Transfer", "Stats",
+                                                    "PaginatedAssets", "PaginatedCollections", "PaginatedTransfers"
+                                                ].map((schema) => (
+                                                    <Badge key={schema} variant="secondary" className="bg-muted/50">
+                                                        {schema}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+
                             {/* SDK */}
                             <section id="sdk" className="mb-20 scroll-mt-32">
                                 <div className="flex items-center space-x-4 mb-8">
                                     <div className="w-12 h-12 bg-orange-500/10 border border-orange-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/5 rotate-1 transition-transform hover:rotate-2">
                                         <Braces className="w-6 h-6 text-orange-500" />
                                     </div>
-                                    <h2 className="text-3xl font-semibold tracking-tight">SDK Integration</h2>
+                                    <h2 className="text-3xl font-semibold tracking-tight">SDK (Coming Soon)</h2>
                                 </div>
                                 <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
                                     <p className="text-muted-foreground leading-relaxed mb-4">
@@ -215,20 +285,8 @@ export default function DevelopersContent() {
                                 </div>
                             </section>
 
-                            {/* Subgraphs */}
-                            <section id="subgraphs" className="mb-20 scroll-mt-32">
-                                <div className="flex items-center space-x-4 mb-8">
-                                    <div className="w-12 h-12 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/5 -rotate-1 transition-transform hover:-rotate-2">
-                                        <GitMerge className="w-6 h-6 text-green-500" />
-                                    </div>
-                                    <h2 className="text-3xl font-semibold tracking-tight">API Services</h2>
-                                </div>
-                                <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-muted-foreground">
-                                    <p className="leading-relaxed">
-                                        Mediolano provides a REST API for interacting with the Mediolano contract. This API is available at <a href="#" className="text-primary hover:underline">api.mediolano.app</a>.
-                                    </p>
-                                </div>
-                            </section>
+
+
 
                             {/* Resources */}
                             <section id="resources" className="mb-20 scroll-mt-32">

@@ -67,7 +67,7 @@ export default function ConstitutionContent() {
     }
 
     return (
-        <div className="min-h-screen bg-background relative selection:bg-primary/30 selection:text-foreground">
+        <div className="min-h-screen relative selection:bg-primary/30 selection:text-foreground">
             {/* Scroll Progress Bar */}
             <motion.div
                 className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-amber-500 to-red-500 origin-left z-50"

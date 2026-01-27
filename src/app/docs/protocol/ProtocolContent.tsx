@@ -9,6 +9,9 @@ import { DocsNavigation } from "@/components/docs/docs-navigation"
 const tableOfContents = [
     { id: "architecture", title: "Architecture", icon: Layers },
     { id: "smart-contracts", title: "Smart Contracts", icon: Code2 },
+    { id: "contract-overview", title: "IPCollection Contract", icon: ShieldCheck },
+    { id: "core-functions", title: "Core Functions", icon: Code2 },
+    { id: "erc721-functions", title: "ERC721 Standard", icon: Layers },
     { id: "starknet", title: "Why Starknet?", icon: Zap },
     { id: "decentralization", title: "Decentralization", icon: Network },
     { id: "data-availability", title: "Data Availability", icon: Database },
@@ -53,7 +56,7 @@ export default function ProtocolContent() {
     }
 
     return (
-        <div className="min-h-screen bg-background relative selection:bg-primary/30 selection:text-foreground">
+        <div className="min-h-screen relative selection:bg-primary/30 selection:text-foreground">
             {/* Ambient Background */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
                 <div className="absolute top-1/4 left-0 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px] animate-pulse" />
@@ -106,13 +109,13 @@ export default function ProtocolContent() {
                             <div className="mb-16 relative">
                                 <div className="inline-flex items-center space-x-2 mb-6 backdrop-blur-md bg-primary/10 border border-primary/20 px-3 py-1 rounded-full text-sm font-medium text-primary">
                                     <Network className="w-4 h-4" />
-                                    <span>Technical</span>
+                                    <span>Public Goods</span>
                                 </div>
                                 <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
                                     Mediolano Protocol
                                 </h1>
                                 <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance">
-                                    The technical foundation of the Integrity Web. A high-performance, modular infrastructure for programmable intellectual property on Starknet.
+                                    Programmable IP foundation of the Integrity Web. A high-performance, modular infrastructure for programmable intellectual property onchain.
                                 </p>
                             </div>
 
@@ -131,11 +134,11 @@ export default function ProtocolContent() {
                                     <div className="grid md:grid-cols-2 gap-6">
                                         <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
                                             <h3 className="text-lg font-medium text-foreground mb-2">Core Registry</h3>
-                                            <p className="text-sm">The single source of truth for IP ownership and metadata. Implemented as an ERC-721 compatible contract on Starknet.</p>
+                                            <p className="text-sm">IP ownership and metadata. Implemented as an ERC-721 compatible contract onchain.</p>
                                         </div>
                                         <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
                                             <h3 className="text-lg font-medium text-foreground mb-2">Licensing Modules</h3>
-                                            <p className="text-sm">Pluggable smart contracts that define usage rights, royalties, and transferability. Creators can attach custom modules to their assets.</p>
+                                            <p className="text-sm">Immutable data defining usage rights, licensing terms, and transferability. Create with freedom.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -156,8 +159,8 @@ export default function ProtocolContent() {
                                     <ul className="space-y-4">
                                         {[
                                             "Optimized for low gas consumption and high throughput.",
-                                            "Formally verified components where possible.",
-                                            "Upgradable via DAO governance only.",
+                                            "Censorship resistant with decentralized storage.",
+                                            "Public Goods first principles.",
                                         ].map((item, index) => (
                                             <li key={index} className="flex items-start space-x-3">
                                                 <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
@@ -178,13 +181,13 @@ export default function ProtocolContent() {
                                 </div>
                                 <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
                                     <p className="text-muted-foreground leading-relaxed mb-4">
-                                        Starknet provides the computational power necessary for complex IP logic while maintaining Ethereum-level security.
+                                        Starknet provides the computational layer and zero-knowledge proofs necessary for the Integrity Web, while maintaining decentralization and Ethereum security.
                                     </p>
                                     <div className="space-y-4">
                                         {[
                                             { title: "Validity Proofs", desc: "Mathematical integrity powered by STARKs." },
                                             { title: "Account Abstraction", desc: "Native support for advanced wallet features and improved UX." },
-                                            { title: "L1 Security", desc: "Settlement and data availability on Ethereum mainnet." },
+                                            { title: "Ethereum Security", desc: "Settlement and data availability on Ethereum mainnet." },
                                         ].map((item, index) => (
                                             <div key={index} className="flex items-center space-x-4 p-4 bg-muted/20 rounded-xl">
                                                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
@@ -210,7 +213,7 @@ export default function ProtocolContent() {
                                 </div>
                                 <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-muted-foreground">
                                     <p className="leading-relaxed">
-                                        The protocol is designed to be unstoppable and censorship-resistant. No single entity controls the registry or the rules of engagement. Governance is distributed among MGT holders.
+                                        The protocol is designed to be unstoppable and censorship-resistant. No single entity controls the registry or the rules of engagement.
                                     </p>
                                 </div>
                             </section>
@@ -227,6 +230,114 @@ export default function ProtocolContent() {
                                     <p className="text-muted-foreground leading-relaxed mb-4">
                                         Critical metadata (ownership, license terms) is stored on-chain or posted as calldata to Ethereum, ensuring it remains available as long as Ethereum exists. Heavy media assets are referenced via IPFS/Arweave hashes.
                                     </p>
+                                </div>
+                            </section>
+
+                            {/* Contract Overview */}
+                            <section id="contract-overview" className="mb-20 scroll-mt-32">
+                                <div className="flex items-center space-x-4 mb-8">
+                                    <div className="w-12 h-12 bg-pink-500/10 border border-pink-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/5 -rotate-2 transition-transform hover:-rotate-3">
+                                        <ShieldCheck className="w-6 h-6 text-pink-500" />
+                                    </div>
+                                    <h2 className="text-3xl font-semibold tracking-tight">Mediolano Protocol - IP Collection Smart Contract</h2>
+                                </div>
+                                <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-muted-foreground">
+                                    <p className="leading-relaxed mb-6">
+                                        The `IPCollection` contract is the core of the Mediolano Protocol. It implements the ERC721 standard for non-fungible tokens, extended with upgradeability and specific IP management features.
+                                    </p>
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                                            <h3 className="text-lg font-medium text-foreground mb-2">Interfaces Implemented</h3>
+                                            <ul className="list-disc pl-5 space-y-2 text-sm">
+                                                <li><code className="bg-muted px-1 py-0.5 rounded text-primary">IUpgradeable</code>: Allows for logic upgrades without state loss.</li>
+                                                <li><code className="bg-muted px-1 py-0.5 rounded text-primary">IIPCollection</code>: Custom interface for minting and token management.</li>
+                                                <li><code className="bg-muted px-1 py-0.5 rounded text-primary">ERC721ABI</code>: Standard NFT functionality.</li>
+                                                <li><code className="bg-muted px-1 py-0.5 rounded text-primary">OwnableABI</code>: Access control for administrative actions.</li>
+                                                <li><code className="bg-muted px-1 py-0.5 rounded text-primary">IERC721Enumerable</code>: Enumerability extension.</li>
+                                            </ul>
+                                        </div>
+                                        <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                                            <h3 className="text-lg font-medium text-foreground mb-2">Contract Interactions</h3>
+                                            <p className="text-sm">Interacting with the contract typically requires a Starknet wallet like Argent X or Braavos in order to sign transactions. Read-only functions can be called via any Starknet provider.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Core Functions */}
+                            <section id="core-functions" className="mb-20 scroll-mt-32">
+                                <div className="flex items-center space-x-4 mb-8">
+                                    <div className="w-12 h-12 bg-teal-500/10 border border-teal-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/5 rotate-1 transition-transform hover:rotate-2">
+                                        <Code2 className="w-6 h-6 text-teal-500" />
+                                    </div>
+                                    <h2 className="text-3xl font-semibold tracking-tight">Core Functions</h2>
+                                </div>
+                                <div className="space-y-6">
+                                    {[
+                                        {
+                                            name: "mint",
+                                            sig: "mint(recipient: ContractAddress) -> u256",
+                                            desc: "Mints a new IP asset token to the specified recipient. Returns the new Token ID."
+                                        },
+                                        {
+                                            name: "burn",
+                                            sig: "burn(token_id: u256)",
+                                            desc: "Burns a specific token. Operates only if the caller is the owner or approved."
+                                        },
+                                        {
+                                            name: "transfer_token",
+                                            sig: "transfer_token(from: ContractAddress, to: ContractAddress, token_id: u256)",
+                                            desc: "Transfers ownership of a specific token from one address to another."
+                                        },
+                                        {
+                                            name: "list_user_tokens",
+                                            sig: "list_user_tokens(owner: ContractAddress) -> Array<u256>",
+                                            desc: "Returns an array of all token IDs owned by a specific address. Useful for fetching user portfolios."
+                                        }
+                                    ].map((func, index) => (
+                                        <div key={index} className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl group hover:border-primary/30 transition-colors">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <code className="text-primary font-mono text-sm bg-primary/10 px-2 py-1 rounded">{func.name}</code>
+                                                <Badge variant="outline" className="text-xs">External</Badge>
+                                            </div>
+                                            <pre className="text-xs md:text-sm text-muted-foreground bg-black/20 p-3 rounded-lg mb-3 overflow-x-auto">
+                                                {func.sig}
+                                            </pre>
+                                            <p className="text-sm text-muted-foreground">{func.desc}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+
+                            {/* Standard ERC721 Functions */}
+                            <section id="erc721-functions" className="mb-20 scroll-mt-32">
+                                <div className="flex items-center space-x-4 mb-8">
+                                    <div className="w-12 h-12 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-500/5 -rotate-1 transition-transform hover:-rotate-2">
+                                        <Layers className="w-6 h-6 text-yellow-500" />
+                                    </div>
+                                    <h2 className="text-3xl font-semibold tracking-tight">Standard ERC721</h2>
+                                </div>
+                                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                                    <p className="text-muted-foreground mb-6">
+                                        Mediolano fully complies with the ERC721 standard, ensuring compatibility with all Starknet NFT marketplaces and wallets.
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {[
+                                            { name: "balance_of", desc: "Count of tokens owned by an address." },
+                                            { name: "owner_of", desc: "Owner of a specific token ID." },
+                                            { name: "approve", desc: "Approve another address to transfer a token." },
+                                            { name: "get_approved", desc: "Get the approved address for a token." },
+                                            { name: "set_approval_for_all", desc: "Approve an operator for all tokens." },
+                                            { name: "is_approved_for_all", desc: "Check if an operator is approved for all." },
+                                            { name: "token_uri", desc: "Get the metadata URI for a token." },
+                                            { name: "safe_transfer_from", desc: "Transfer with safety checks." },
+                                        ].map((item, i) => (
+                                            <div key={i} className="flex flex-col p-3 rounded-xl bg-muted/20">
+                                                <span className="font-mono text-sm text-foreground mb-1">{item.name}</span>
+                                                <span className="text-xs text-muted-foreground">{item.desc}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </section>
 

@@ -68,7 +68,7 @@ export default function DAppGuideContent() {
     }
 
     return (
-        <div className="min-h-screen bg-background relative selection:bg-primary/30 selection:text-foreground">
+        <div className="min-h-screen relative selection:bg-primary/30 selection:text-foreground">
             {/* Ambient Background - Subtle Gradients */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
                 <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] animate-pulse" />
