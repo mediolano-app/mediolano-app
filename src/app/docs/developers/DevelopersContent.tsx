@@ -5,17 +5,18 @@ import { ChevronRight, Terminal, Braces, GitMerge, FileJson, ArrowUp, Code2, Cop
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DocsNavigation } from "@/components/docs/docs-navigation"
+import { AiAgentOverview } from "@/components/docs/ai-agent-overview"
 
 const tableOfContents = [
-    { id: "quick-start", title: "Quick Start", icon: Terminal },
+    { id: "open-source", title: "Open Source Repository", icon: Terminal },
     { id: "contracts", title: "Smart Contracts", icon: FileJson },
     { id: "sdk", title: "SDK Integration", icon: Braces },
-    { id: "subgraphs", title: "Subgraphs", icon: GitMerge },
+    { id: "api-services", title: "API Services", icon: GitMerge },
     { id: "resources", title: "Resources", icon: Code2 },
 ]
 
 export default function DevelopersContent() {
-    const [activeSection, setActiveSection] = useState("quick-start")
+    const [activeSection, setActiveSection] = useState("open-source")
     const [showBackToTop, setShowBackToTop] = useState(false)
     const [copied, setCopied] = useState<string | null>(null)
 
@@ -124,7 +125,7 @@ export default function DevelopersContent() {
                             </div>
 
                             {/* Quick Start */}
-                            <section id="quick-start" className="mb-20 scroll-mt-32">
+                            <section id="open-source" className="mb-20 scroll-mt-32">
                                 <div className="flex items-center space-x-4 mb-8">
                                     <div className="w-12 h-12 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/5 rotate-2 transition-transform hover:rotate-3">
                                         <Terminal className="w-6 h-6 text-blue-500" />
@@ -193,7 +194,7 @@ export default function DevelopersContent() {
 
 
                             {/* API Services */}
-                            <section id="subgraphs" className="mb-20 scroll-mt-32">
+                            <section id="api-services" className="mb-20 scroll-mt-32">
                                 <div className="flex items-center space-x-4 mb-8">
                                     <div className="w-12 h-12 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/5 -rotate-1 transition-transform hover:-rotate-2">
                                         <GitMerge className="w-6 h-6 text-green-500" />
@@ -313,6 +314,29 @@ export default function DevelopersContent() {
                                     </div>
                                 </div>
                             </section>
+
+
+                            <AiAgentOverview
+                                title="Developer API & SDK Integration"
+                                summary="Interact with the Mediolano Protocol via our REST API or TypeScript SDK. The API follows OpenAPI 3.0 standards and provides indexed access to on-chain Asset, Collection, and Transfer data. Designed for programmatic access, allowing agents to query asset provenance and market stats efficiently."
+                                roles={["Integrator", "Data Analyst", "Bot Developer"]}
+                                schema={{
+                                    Asset: {
+                                        type: "object",
+                                        properties: {
+                                            contract_address: { type: "string" },
+                                            token_id: { type: "string" },
+                                            owner: { type: "string" },
+                                            metadata_uri: { type: "string" }
+                                        }
+                                    }
+                                }}
+                                codeSnippet={{
+                                    language: "typescript",
+                                    code: "import { MediolanoSDK } from '@mediolano/sdk';\n\nconst sdk = new MediolanoSDK();\nconst asset = await sdk.getAsset(contractAddress, tokenId);",
+                                    description: "Fetch Asset Data (SDK)"
+                                }}
+                            />
 
                             <DocsNavigation />
 

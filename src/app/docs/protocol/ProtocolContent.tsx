@@ -5,6 +5,7 @@ import { ChevronRight, Cpu, Layers, Network, ShieldCheck, Zap, Code2, ArrowUp, D
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { DocsNavigation } from "@/components/docs/docs-navigation"
+import { AiAgentOverview } from "@/components/docs/ai-agent-overview"
 
 const tableOfContents = [
     { id: "architecture", title: "Architecture", icon: Layers },
@@ -340,6 +341,21 @@ export default function ProtocolContent() {
                                     </div>
                                 </div>
                             </section>
+
+
+                            <AiAgentOverview
+                                title="Protocol Architecture & Contracts"
+                                summary="A modular system of Cairo smart contracts on Starknet. The Core Registry (ERC721) manages asset ownership, while Licensing Modules define usage rights. Logic is separated from state for upgradeability. Validated by STARK proofs for integrity."
+                                roles={["Contract Caller", "Verifier", "Indexer"]}
+                                contracts={[
+                                    { name: "IPCollection", address: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS || "0x...", network: "Starknet Mainnet" }
+                                ]}
+                                codeSnippet={{
+                                    language: "cairo",
+                                    code: "use mediolano::interfaces::IIPCollectionDispatcherTrait;\n\nlet dispatcher = IIPCollectionDispatcher { contract_address };\nlet token_id = dispatcher.mint(recipient);",
+                                    description: "Cross-Contract Interaction (Cairo)"
+                                }}
+                            />
 
                             <DocsNavigation />
 

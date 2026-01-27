@@ -24,6 +24,7 @@ import {
     Globe2
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { AiAgentOverview } from "@/components/docs/ai-agent-overview"
 
 const container = {
     hidden: { opacity: 0 },
@@ -42,7 +43,7 @@ const item = {
 
 export default function DocsLandingClient() {
     return (
-        <div className="min-h-screen bg-background relative selection:bg-primary/30 selection:text-foreground overflow-hidden">
+        <div className="min-h-screen relative selection:bg-primary/30 selection:text-foreground overflow-hidden">
             {/* Ambient Background with Motion */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
                 <motion.div
@@ -328,6 +329,20 @@ export default function DocsLandingClient() {
                 </motion.section>
 
 
+
+                <AiAgentOverview
+                    title="Mediolano Protocol System Context"
+                    summary="Mediolano is a permissionless, Starknet-based protocol for programmable intellectual property. It serves as the foundation for the Integrity Web, enabling on-chain IP registration, flexible licensing modules, and immutable provenance tracking. Designed for autonomy, it allows AI agents to register self-generated content and manage IP rights programmatically."
+                    roles={["IP Creator", "IP Consumer", "Module Developer", "DAO Governance"]}
+                    contracts={[
+                        { name: "IPCollection Core", address: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS || "0x...", network: "Starknet Mainnet" }
+                    ]}
+                    codeSnippet={{
+                        language: "bash",
+                        code: "npx create-mediolano-app@latest",
+                        description: "Scaffold a new IP Application"
+                    }}
+                />
             </div>
         </div>
     )
