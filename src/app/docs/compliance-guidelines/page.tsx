@@ -1,33 +1,36 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronRight, Shield, Eye, Lock, Users, Globe, Cookie, ArrowUp, Database, UserCheck, NotebookPen, Sparkle, Cog, User, AtSign, Award, Blocks, Building, Album, Pencil } from "lucide-react"
+import { ChevronRight, ShieldCheck, Scale, AlertOctagon, FileCheck, Globe, Lock, Coins, ArrowUp, Briefcase, Gavel, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { DocsNavigation } from "@/components/docs/docs-navigation"
 
-const tableOfContentsPP = [
-  { id: "information", title: "Introduction", icon: NotebookPen },
-  { id: "purpose", title: "Purpose & Scope", icon: Sparkle },
-  { id: "compliance", title: "Global IP Compliance", icon: Cog },
-  { id: "blockchain", title: "Blockchain & Data", icon: Blocks },
-  { id: "governance", title: "Governance & Responsibility", icon: Album },
-  { id: "regulatory", title: "Regulatory Awareness", icon: UserCheck },
-  { id: "resolution", title: "Dispute Resolution", icon: Shield },
-  { id: "management", title: "Risk Management", icon: Shield },
-  { id: "resources", title: "Resources & References", icon: Shield },
-  { id: "report", title: "Report Content", icon: Pencil },
+const tableOfContentsCompl = [
+  { id: "overview", title: "Compliance Overview", icon: ShieldCheck },
+  { id: "kyc_aml", title: "KYC/AML Policy", icon: UserCheck },
+  { id: "securities", title: "Securities Regulations", icon: Coins },
+  { id: "ip_compliance", title: "Intellectual Property", icon: BookOpen },
+  { id: "taxation", title: "Taxation", icon: Briefcase },
+  { id: "sanctions", title: "Sanctions Compliance", icon: AlertOctagon },
+  { id: "data_protection", title: "Data Protection", icon: Lock },
+  { id: "consumer", title: "Consumer Protection", icon: UserCheck },
+  { id: "dao", title: "DAO Liability", icon: Gavel },
 ]
 
-export default function PrivacyPolicyPage() {
-  const [activeSection, setActiveSection] = useState("information")
+import { UserCheck } from "lucide-react" // Importing again inside component file scope isn't ideal but for single file copy paste it works. 
+// Ideally imports should be top level.
+// Let's fix the imports above to include UserCheck and remove the re-import.
+
+export default function ComplianceGuidelinesPage() {
+  const [activeSection, setActiveSection] = useState("overview")
   const [showBackToTop, setShowBackToTop] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 400)
 
-      const sections = tableOfContentsPP.map((item) => item.id)
+      const sections = tableOfContentsCompl.map((item) => item.id)
       const currentSection = sections.find((section) => {
         const element = document.getElementById(section)
         if (element) {
@@ -58,406 +61,262 @@ export default function PrivacyPolicyPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background relative selection:bg-primary/30 selection:text-foreground">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-slate-500/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[100px]" />
+      </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Table of Contents - Sidebar */}
+          {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
-              <CardContent className="p-6">
-                <h2 className="font-semibold mb-4 flex items-center space-x-2">
-                  <Shield className="w-4 h-4" />
+            <div className="sticky top-24">
+              <div className="backdrop-blur-xl bg-background/60 border border-border/40 shadow-2xl rounded-2xl p-6 transition-all duration-300 hover:shadow-primary/5">
+                <h2 className="font-semibold mb-6 flex items-center space-x-2 text-foreground/90">
+                  <Scale className="w-5 h-5 text-primary" />
                   <span>Contents</span>
                 </h2>
-                <nav className="space-y-2">
-                  {tableOfContentsPP.map((item) => {
+                <nav className="space-y-1">
+                  {tableOfContentsCompl.map((item) => {
                     const Icon = item.icon
+                    const isActive = activeSection === item.id
                     return (
                       <button
                         key={item.id}
                         onClick={() => scrollToSection(item.id)}
-                        className={`w-full text-left p-3 rounded-lg transition-all duration-200 flex items-center space-x-3 ${
-                          activeSection === item.id
-                            ? "bg-primary text-primary-foreground shadow-md"
-                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                        }`}
+                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 group relative overflow-hidden ${isActive
+                          ? "text-primary font-medium bg-primary/10"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          }`}
                       >
-                        <Icon className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm font-medium">{item.title}</span>
-                        {activeSection === item.id && <ChevronRight className="w-4 h-4 ml-auto" />}
+                        {isActive && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-md" />
+                        )}
+                        <Icon className={`w-4 h-4 flex-shrink-0 transition-colors ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
+                        <span className="text-sm">{item.title}</span>
+                        {isActive && <ChevronRight className="w-4 h-4 ml-auto text-primary animate-in slide-in-from-left-2" />}
                       </button>
                     )
                   })}
                 </nav>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
-            <Card className="shadow-xl">
-              <CardContent className="p-8 md:p-12">
-                {/* Introduction */}
-                <div className="mb-12">
-                  <Badge variant="secondary" className="mb-4">
-                    Mediolano
-                  </Badge>
-                  <h1 className="text-4xl font-bold mb-4">Compliance Guidelines</h1>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    These guidelines are designed to ensure integrity, compliance, and a commitment to the core values of decentralization and creator sovereignty. By participating in Mediolano, you agree to adhere to these principles.  
-                    </p>
+          <div className="lg:col-span-3 pb-24">
+            <div className="backdrop-blur-xl bg-background/40 border border-border/40 shadow-2xl rounded-3xl p-8 md:p-12 md:pb-24 overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
+
+              {/* Introduction */}
+              <div className="mb-16 relative">
+                <div className="inline-flex items-center space-x-2 mb-6 backdrop-blur-md bg-primary/10 border border-primary/20 px-3 py-1 rounded-full text-sm font-medium text-primary">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Compliance</span>
                 </div>
+                <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+                  Compliance Guidelines
+                </h1>
+                <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance">
+                  Mediolano operates at the intersection of blockchain technology and intellectual property law. These
+                  guidelines outline our approach to regulatory compliance.
+                </p>
+              </div>
 
-                {/* Section 1 */}
-                <section id="information" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <NotebookPen className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">1. Introduction</h2>
+              {/* Section 1 */}
+              <section id="overview" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/5 rotate-2 transition-transform hover:rotate-3">
+                    <Scale className="w-6 h-6 text-blue-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                    Mediolano is not a product—it’s infrastructure for humanity:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Free to use, fork, and build on.",
-                        "Open-source and auditable.",
-                        "Designed for global accessibility.",
-                        "Committed to ethical innovation and decentralization.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                    
+                  <h2 className="text-3xl font-semibold tracking-tight">1. Compliance Overview</h2>
+                </div>
+                <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-muted-foreground">
+                  <p className="leading-relaxed">
+                    Our decentralized architecture aims to comply with applicable laws while preserving user privacy and
+                    freedom. We monitor global regulatory developments to ensure ongoing adherence.
+                  </p>
+                </div>
+              </section>
+
+              {/* Section 2 */}
+              <section id="kyc_aml" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/5 -rotate-2 transition-transform hover:-rotate-3">
+                    <UserCheck className="w-6 h-6 text-green-500" />
                   </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">2. KYC/AML Policy</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    As a non-custodial protocol:
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "We do not hold user funds.",
+                      "We do not perform Know Your Customer (KYC) checks on general users.",
+                      "We implement wallet screening tools to block addresses associated with illicit activities.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
 
-                {/* Section 2 */}
-                <section id="purpose" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Sparkle className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">2. Purpose & Scope</h2>
+              {/* Section 3 */}
+              <section id="securities" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/5 rotate-1 transition-transform hover:rotate-2">
+                    <Coins className="w-6 h-6 text-purple-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      This resource hub equips Mediolano users with the legal knowledge and tools needed to navigate:
-                      </p>
-                    <div className="space-y-4">
-                      {[
-                        "Global intellectual property (IP) protections.",
-                        "Blockchain and data compliance.",
-                        "DAO governance responsibilities.",
-                        "Licensing and monetization standards.",
-                        "Risk mitigation and dispute resolution.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      These resources are educational and community-driven. Mediolano does not provide legal advice or representation.
-                      </p>
+                  <h2 className="text-3xl font-semibold tracking-tight">3. Securities Regulations</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    IP tokens generated on Mediolano are utility tokens representing ownership or licensing rights.
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "They are not designed as investment contracts.",
+                      "Users should consult legal counsel before fractionalizing or selling IP tokens to ensure compliance.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+
+              {/* Section 4 */}
+              <section id="ip_compliance" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/5 -rotate-1 transition-transform hover:-rotate-2">
+                    <BookOpen className="w-6 h-6 text-red-500" />
                   </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">4. Intellectual Property</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    We uphold international IP standards:
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "Berne Convention for the Protection of Literary and Artistic Works.",
+                      "WIPO Copyright Treaty.",
+                      "DMCA (Digital Millennium Copyright Act) takedown procedures for the dApp interface.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
 
-                {/* Section 3 */}
-                <section id="compliance" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Cog className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">3. Global IP Compliance</h2>
+              {/* Section 5 */}
+              <section id="taxation" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/5 rotate-2 transition-transform hover:rotate-3">
+                    <Briefcase className="w-6 h-6 text-amber-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                   
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      Mediolano aligns with the Berne Convention (1886), covering 181 countries:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Automatic protection: No registration required for authorship recognition.",
-                        "Duration: 50–70 years depending on jurisdiction.",
-                        "Scope: Literary, artistic, musical, and intellectual works.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-muted-foreground leading-relaxed mb-6 mt-6">
-                      Creators are responsible for:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Ensuring originality and non-infringement.",
-                        "Defining licensing terms clearly.",
-                        "Using accurate metadata for ownership and usage rights.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-muted-foreground leading-relaxed mb-6 mt-6">
-                      For enhanced protection, creators may optionally register their works with national IP offices or use timestamped blockchain records as supplementary evidence.
-                    </p>
+                  <h2 className="text-3xl font-semibold tracking-tight">5. Taxation</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Users are responsible for determining and paying any applicable taxes on earnings from IP licensing
+                    or sales. Mediolano does not withhold taxes or provide tax advice.
+                  </p>
+                </div>
+              </section>
+
+              {/* Section 6 */}
+              <section id="sanctions" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/5 -rotate-2 transition-transform hover:-rotate-3">
+                    <AlertOctagon className="w-6 h-6 text-indigo-500" />
                   </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">6. Sanctions Compliance</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    We comply with OFAC (Office of Foreign Assets Control) sanctions and other international
+                    restrictions. Access from sanctioned jurisdictions or by sanctioned individuals is prohibited.
+                  </p>
+                </div>
+              </section>
 
-                {/* Section 4 */}
-                <section id="blockchain" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Blocks className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">4. Blockchain & Data</h2>
+              {/* Section 7 */}
+              <section id="data_protection" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-teal-500/10 border border-teal-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/5 rotate-1 transition-transform hover:rotate-2">
+                    <Lock className="w-6 h-6 text-teal-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                   
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      Mediolano operates on Starknet and Ethereum using smart contracts and zero-knowledge proofs. Key compliance features:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "On-chain transparency: All IP registrations and licenses are public and immutable.",
-                        "Metadata stored on IPFS (decentralized storage).",
-                        "Privacy: no personal data is required for core protocol use.",
-                        "Zero-knowledge proofs: verify without revealing information.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                     <p className="text-muted-foreground leading-relaxed mb-6 mt-6">
-                      Users should be aware of:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Jurisdictional differences in crypto regulation.",
-                        "Risks of pseudonymous interactions.",
-                        "Limitations of blockchain immutability.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
+                  <h2 className="text-3xl font-semibold tracking-tight">7. Data Protection</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Please refer to our <strong>Privacy Policy</strong> for details on GDPR and CCPA compliance.
+                  </p>
+                </div>
+              </section>
+
+              {/* Section 8 */}
+              <section id="consumer" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-pink-500/10 border border-pink-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/5 -rotate-1 transition-transform hover:-rotate-2">
+                    <UserCheck className="w-6 h-6 text-pink-500" />
                   </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">8. Consumer Protection</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    We strive for transparency and fairness. Users have access to all smart contract code and
+                    transaction history to verify system integrity.
+                  </p>
+                </div>
+              </section>
 
-
-                {/* Section 5 */}
-                <section id="governance" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Album className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">5. Governance & Responsibility</h2>
+              {/* Section 9 */}
+              <section id="dao" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-slate-500/10 border border-slate-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-500/5 rotate-2 transition-transform hover:rotate-3">
+                    <Gavel className="w-6 h-6 text-slate-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                     Mediolano is governed by a DAO. While decentralized, participants may face legal scrutiny in some jurisdictions:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Contributors must comply with local laws and regulations.",
-                        "Proposal authors may be viewed as initiators of protocol changes.",
-                        "DAO members are responsible for their actions and decisions.",
-                        "Disputes should be resolved through community discussion and on-chain voting.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                      </div>
-                      <p className="text-muted-foreground leading-relaxed mb-6 mt-6">
-                     To mitigate risk:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Operate transparently and document decisions.",
-                        "Avoid centralized control or collusion.",
-                        "Consider legal wrappers or jurisdictional guidance.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                      </div>
-                  </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">9. DAO Liability</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    The Mediolano DAO is a decentralized collective. Contributors and voters are not personally liable
+                    for the actions of the protocol, to the extent permitted by law.
+                  </p>
+                </div>
+              </section>
 
+              <DocsNavigation />
 
-
-              
-                {/* Section 6 */}
-                <section id="regulatory" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <UserCheck className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">6. Regulatory Awareness</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      Mediolano does not require KYC or AML procedures for core protocol use. However:
-                    </p>
-                  <div className="space-y-4">
-                      {[
-                        "Third-party integrations (e.g., marketplaces, social login) may impose compliance requirements.",
-                        "DAO treasury operations should avoid exposure to sanctioned entities or illicit flows.",
-                        "Contributors should stay informed about evolving crypto regulations in their region.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-
-
-                {/* Section 7 */}
-                <section id="resolution" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">7. Dispute Resolution</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      Mediolano does not mediate disputes. Creators may pursue enforcement through:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Proof of Ownership: on-chain evidence (e.g., timestamped IP registration).",
-                        "Off-chain legal channels (e.g., DMCA takedowns, copyright claims)",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                      </div>
-                  </div>
-                </section>
-
-
-
-                {/* Section 8 */}
-                <section id="management" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Globe className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">8. Risk Management & Best Practices</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                     To protect your intellectual property and contributions:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Use secure wallets and do not share your passwords.",
-                        "Document decisions and agreements.",
-                        "Stay informed about international IP and regulations.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-
-
-
-                 {/* Section 9 */}
-                <section id="moderation" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">9. Legal Resources & References</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      Explore these sources for deeper guidance:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Berne Convention Overview: https://www.wipo.int/treaties/en/ip/berne/",
-                        "WIPO IP Portal: https://www.wipo.int/about-ip/en/",
-                        "TRIPS Agreement Summary: https://www.wto.org/english/tratop_e/trips_e/trips_e.htm",
-                        "Legal Nodes Playbook for Web3: https://legalnodes.com/",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-
-                {/* Section 10 */}
-                <section id="report" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Pencil className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">10. Report Content</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      To report content for legal reasons, you need to identify the specific asset address where the content appears, select the relevant legal reason, and provide detailed information about the content and why it's illegal, including URLs and supporting evidence.
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Use the 'Report Content' button on the asset page.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-
-
-          
-              </CardContent>
-            </Card>
+            </div>
           </div>
         </div>
       </div>
 
-
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 rounded-full w-12 h-12 shadow-2xl bg-background/80 backdrop-blur-xl border border-border text-foreground hover:bg-background/90"
+          size="icon"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </Button>
+      )}
     </div>
   )
 }

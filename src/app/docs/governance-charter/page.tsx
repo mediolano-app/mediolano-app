@@ -1,33 +1,32 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronRight, Shield, Eye, Lock, Users, Globe, Cookie, ArrowUp, Database, UserCheck, NotebookPen, Sparkle, Cog, User, AtSign, Award, Blocks, Building, Album, Pencil, Coins } from "lucide-react"
+import { ChevronRight, Vote, Users, Scale, AlertTriangle, Coins, FileText, ArrowUp, Flag, Landmark, Gavel, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { DocsNavigation } from "@/components/docs/docs-navigation"
 
-const tableOfContentsPP = [
-  { id: "information", title: "Introduction", icon: NotebookPen },
-  { id: "principles", title: "Core Principles", icon: Sparkle },
-  { id: "participation", title: "Participation", icon: Users },
-  { id: "tokens", title: "Governance Tokens", icon: Coins },
-  { id: "proposal", title: "Proposal Lifecycle", icon: Pencil },
-  { id: "domains", title: "Governance Domains", icon: Building },
-  { id: "working", title: "Working Groups", icon: Users },
-  { id: "treasury", title: "Treasury & Funding", icon: Globe },
-  { id: "resolution", title: "Conflict Resolution", icon: Shield },
-  { id: "amendments", title: "Amendments & Evolution", icon: Pencil },
+const tableOfContentsGov = [
+  { id: "preamble", title: "Preamble", icon: BookOpen },
+  { id: "mission", title: "Mission & Values", icon: Flag },
+  { id: "membership", title: "Membership & Voting Rights", icon: Users },
+  { id: "proposals", title: "Proposal Process", icon: FileText },
+  { id: "voting", title: "Voting Mechanisms", icon: Vote },
+  { id: "treasury", title: "Treasury Management", icon: Coins },
+  { id: "conduct", title: "Code of Conduct", icon: Scale },
+  { id: "disputes", title: "Dispute Resolution", icon: Gavel },
+  { id: "amendments", title: "Amendments", icon: FileText },
 ]
 
-export default function PrivacyPolicyPage() {
-  const [activeSection, setActiveSection] = useState("information")
+export default function GovernanceCharterPage() {
+  const [activeSection, setActiveSection] = useState("preamble")
   const [showBackToTop, setShowBackToTop] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 400)
 
-      const sections = tableOfContentsPP.map((item) => item.id)
+      const sections = tableOfContentsGov.map((item) => item.id)
       const currentSection = sections.find((section) => {
         const element = document.getElementById(section)
         if (element) {
@@ -58,349 +57,281 @@ export default function PrivacyPolicyPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background relative selection:bg-primary/30 selection:text-foreground">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[100px]" />
+      </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Table of Contents - Sidebar */}
+          {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
-              <CardContent className="p-6">
-                <h2 className="font-semibold mb-4 flex items-center space-x-2">
-                  <Shield className="w-4 h-4" />
+            <div className="sticky top-24">
+              <div className="backdrop-blur-xl bg-background/60 border border-border/40 shadow-2xl rounded-2xl p-6 transition-all duration-300 hover:shadow-primary/5">
+                <h2 className="font-semibold mb-6 flex items-center space-x-2 text-foreground/90">
+                  <Landmark className="w-5 h-5 text-primary" />
                   <span>Contents</span>
                 </h2>
-                <nav className="space-y-2">
-                  {tableOfContentsPP.map((item) => {
+                <nav className="space-y-1">
+                  {tableOfContentsGov.map((item) => {
                     const Icon = item.icon
+                    const isActive = activeSection === item.id
                     return (
                       <button
                         key={item.id}
                         onClick={() => scrollToSection(item.id)}
-                        className={`w-full text-left p-3 rounded-lg transition-all duration-200 flex items-center space-x-3 ${
-                          activeSection === item.id
-                            ? "bg-primary text-primary-foreground shadow-md"
-                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                        }`}
+                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 group relative overflow-hidden ${isActive
+                          ? "text-primary font-medium bg-primary/10"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          }`}
                       >
-                        <Icon className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm font-medium">{item.title}</span>
-                        {activeSection === item.id && <ChevronRight className="w-4 h-4 ml-auto" />}
+                        {isActive && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-md" />
+                        )}
+                        <Icon className={`w-4 h-4 flex-shrink-0 transition-colors ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
+                        <span className="text-sm">{item.title}</span>
+                        {isActive && <ChevronRight className="w-4 h-4 ml-auto text-primary animate-in slide-in-from-left-2" />}
                       </button>
                     )
                   })}
                 </nav>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
-            <Card className="shadow-xl">
-              <CardContent className="p-8 md:p-12">
-                {/* Introduction */}
-                <div className="mb-12">
-                  <Badge variant="secondary" className="mb-4">
-                    Mediolano
-                  </Badge>
-                  <h1 className="text-4xl font-bold mb-4">Governance Charter</h1>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    Mediolano DAO exists to unlock intellectual property for the Integrity Web. Our governance framework ensures that creators, contributors, and communities can collaborate transparently, equitably, and autonomously.
-                    </p>
-                  
+          <div className="lg:col-span-3 pb-24">
+            <div className="backdrop-blur-xl bg-background/40 border border-border/40 shadow-2xl rounded-3xl p-8 md:p-12 md:pb-24 overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
+
+              {/* Introduction */}
+              <div className="mb-16 relative">
+                <div className="inline-flex items-center space-x-2 mb-6 backdrop-blur-md bg-primary/10 border border-primary/20 px-3 py-1 rounded-full text-sm font-medium text-primary">
+                  <Vote className="w-4 h-4" />
+                  <span>DAO</span>
                 </div>
+                <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+                  Governance Charter
+                </h1>
+                <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance">
+                  This Charter establishes the principles, processes, and structures for the decentralized governance
+                  of Mediolano.
+                </p>
+              </div>
 
-                {/* Section 1 */}
-                <section id="information" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <NotebookPen className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">1. Introduction</h2>
+              {/* Section 1 */}
+              <section id="preamble" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/5 rotate-2 transition-transform hover:rotate-3">
+                    <BookOpen className="w-6 h-6 text-blue-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                    This Charter defines how decisions are made, responsibilities are shared, and the protocol evolves—guided by the principles of decentralization, creator sovereignty, and long-term sustainability.
-                    </p>
-                    
-                    
+                  <h2 className="text-3xl font-semibold tracking-tight">1. Preamble</h2>
+                </div>
+                <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-muted-foreground">
+                  <p className="leading-relaxed">
+                    Mediolano DAO is a collective of creators, developers, and enthusiasts dedicated to building a fair
+                    and open intellectual property ecosystem on Starknet.
+                  </p>
+                </div>
+              </section>
+
+              {/* Section 2 */}
+              <section id="mission" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/5 -rotate-2 transition-transform hover:-rotate-3">
+                    <Flag className="w-6 h-6 text-green-500" />
                   </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">2. Mission & Values</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    We are guided by:
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "Sovereignty: Users own their data and IP.",
+                      "Transparency: Governance is open and verifiable.",
+                      "Innovation: Continuous improvement of the protocol.",
+                      "Inclusivity: Anyone can participate.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
 
-                {/* Section 2 */}
-                <section id="principles" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Sparkle className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">2. Core Principles</h2>
+              {/* Section 3 */}
+              <section id="membership" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/5 rotate-1 transition-transform hover:rotate-2">
+                    <Users className="w-6 h-6 text-purple-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      We are governed by values that reflect our commitment to a fair and open digital future:
-                      </p>
-                    <div className="space-y-4">
-                      {[
-                        "Decentralization: decisions are made collectively.",
-                        "Transparency: governance actions are recorded on-chain.",
-                        "Sovereignty: creators retain full control over their IP and participation.",
-                        "Inclusivity: participation is open to all users.",
-                        "Integrity: we uphold ethical standards in all protocol and community actions.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
+                  <h2 className="text-3xl font-semibold tracking-tight">3. Membership & Voting Rights</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Membership is defined by holding the Mediolano Governance Token (MGT).
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "One token, one vote.",
+                      "Delegation of voting power is supported.",
+                      "Minimum holding requirements may apply for proposal submission.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
 
+              {/* Section 4 */}
+              <section id="proposals" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/5 -rotate-1 transition-transform hover:-rotate-2">
+                    <FileText className="w-6 h-6 text-red-500" />
                   </div>
-                </section>
-
-                {/* Section 3 */}
-                <section id="participation" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Users className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">3. Participation</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                   
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      Anyone with a compatible wallet may participate in Mediolano DAO. No KYC or registration is required. Members may:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Submit proposals and vote on governance decisions.",
-                        "Join working groups and community initiatives",
-                        "Contribute to protocol development, education, business",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                  </div>
-                </section>
-
-                {/* Section 4 */}
-                <section id="tokens" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Coins className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">4. Governance Tokens</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                   
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      Governance tokens may be used to:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Propose changes to the protocol or governance structure.",
-                        "Vote on proposals, protocol upgrades and business decisions.",
-                        "Participate in working groups and community initiatives.",
-                        "Access contributor rewards and reputation systems.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                     <p className="text-muted-foreground leading-relaxed mb-6 mt-6">
-                      Token distribution and voting mechanisms are defined by smart contracts and may evolve through DAO consensus.
-                    </p>
-                  </div>
-                </section>
-
-
-                {/* Section 5 */}
-                <section id="proposal" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Pencil className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">5. Proposal Lifecycle</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                     Decisions follow a transparent, structured process:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Submission: Any member may submit a proposal using the DAO template.",
-                        "Discussion: Community feedback is gathered via communication channels.",
-                        "Voting: Proposals are voted on using governance tokens or delegated voting.",
-                        "Execution: Approved proposals are implemented via smart contracts or working groups.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                      </div>
-                      <p className="text-muted-foreground leading-relaxed mb-6 mt-6">
-                     Minimum quorum and majority thresholds are enforced by protocol logic.
-                    </p>
-
-                  </div>
-                </section>
-
-
-
-              
-                {/* Section 6 */}
-                <section id="domains" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Building className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">6. Governance Domains</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      The DAO governs key areas of the Mediolano ecosystem:
-                    </p>
+                  <h2 className="text-3xl font-semibold tracking-tight">4. Proposal Process</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    The lifecycle of a proposal:
+                  </p>
                   <div className="space-y-4">
-                      {[
-                        "Protocol Upgrades: Smart contract changes and feature enhancements.",
-                        "Treasury Management: Grants, bounties, and ecosystem funding.",
-                        "Business Development: Business operations to build clients and commercial partnerships.",
-                        "Community Initiatives: Events, education, and outreach programs.",
-                        "Support: user and business LTS support, bug fixes, products and services.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
+                    {[
+                      { step: "1. Discussion", desc: "Forums and community calls." },
+                      { step: "2. Submission", desc: "Formal on-chain proposal." },
+                      { step: "3. Voting", desc: "Token-weighted voting period." },
+                      { step: "4. Execution", desc: "Automatic or timelocked implementation via smart contract." },
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-center space-x-4 p-4 bg-muted/20 rounded-xl">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                          {index + 1}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-
-
-                {/* Section 7 */}
-                <section id="working" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Users className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">7. Working Groups</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      To scale governance and empower contributors, the DAO may delegate responsibilities to working groups: Task-specific teams (e.g., Business, Development, Creator Relations, Marketing and Communications).
-                    </p>
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      Working group operates transparently and reports to the DAO.
-                    </p>
- 
-                  </div>
-                </section>
-
-
-
-                {/* Section 8 */}
-                <section id="treasury" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Globe className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">8. Treasury & Funding</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                     The DAO treasury is managed via smart contracts or multisig wallets:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Funds are allocated through approved proposals.",
-                        "All transactions are publicly auditable.",
-                        "Treasury inflows may include services fees, donations, or royalties.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
+                        <div>
+                          <h4 className="font-semibold">{item.step}</h4>
+                          <p className="text-sm text-muted-foreground">{item.desc}</p>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                </section>
+                </div>
+              </section>
 
-
-
-
-                 {/* Section 9 */}
-                <section id="resolution" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">9. Conflict Resolution</h2>
+              {/* Section 5 */}
+              <section id="voting" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/5 rotate-2 transition-transform hover:rotate-3">
+                    <Vote className="w-6 h-6 text-amber-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      Disputes are resolved through:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Open discussion and mediation.",
-                        "Proposal-based arbitration mechanisms.",
-                        "Optional integration with decentralized dispute resolution protocols.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
+                  <h2 className="text-3xl font-semibold tracking-tight">5. Voting Mechanisms</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    We use Quadratic Voting or other mechanisms to prevent plutocracy and ensure broader community
+                    alignment (subject to technical implementation).
+                  </p>
+                </div>
+              </section>
+
+              {/* Section 6 */}
+              <section id="treasury" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/5 -rotate-2 transition-transform hover:-rotate-3">
+                    <Coins className="w-6 h-6 text-indigo-500" />
                   </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">6. Treasury Management</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    DAO funds are used for:
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "Protocol development and maintenance.",
+                      "Marketing and ecosystem grants.",
+                      "Liquidity provision.",
+                      "Direct compensation for contributors.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
 
-
-                {/* Section 10 */}
-                <section id="amendments" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Pencil className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">10. Amendments & Evolution</h2>
+              {/* Section 7 */}
+              <section id="conduct" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-teal-500/10 border border-teal-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/5 rotate-1 transition-transform hover:rotate-2">
+                    <Scale className="w-6 h-6 text-teal-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      This Charter may be amended through DAO proposals:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Changes require quorum and supermajority approval.",
-                        "Decisions and updates are recorded on-chain for transparency.",
-                        "The DAO may evolve its structure through progressive decentralization",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
+                  <h2 className="text-3xl font-semibold tracking-tight">7. Code of Conduct</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    All DAO members must adhere to the Community Guidelines. Malicious behavior may result in slashing mechanisms (if applicable) or social ostracization.
+                  </p>
+                </div>
+              </section>
+
+              {/* Section 8 */}
+              <section id="disputes" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-pink-500/10 border border-pink-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/5 -rotate-1 transition-transform hover:-rotate-2">
+                    <Gavel className="w-6 h-6 text-pink-500" />
                   </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">8. Dispute Resolution</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Disputes are resolved through on-chain arbitration protocols (e.g., Kleros integration, if planned)
+                    or DAO voting.
+                  </p>
+                </div>
+              </section>
 
+              {/* Section 9 */}
+              <section id="amendments" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-slate-500/10 border border-slate-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-500/5 rotate-2 transition-transform hover:rotate-3">
+                    <FileText className="w-6 h-6 text-slate-500" />
+                  </div>
+                  <h2 className="text-3xl font-semibold tracking-tight">9. Amendments</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    This Charter may be amended by a supermajority vote (implementation detail) of the DAO.
+                  </p>
+                </div>
+              </section>
 
+              <DocsNavigation />
 
-          
-              </CardContent>
-            </Card>
+            </div>
           </div>
         </div>
       </div>
 
-
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 rounded-full w-12 h-12 shadow-2xl bg-background/80 backdrop-blur-xl border border-border text-foreground hover:bg-background/90"
+          size="icon"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </Button>
+      )}
     </div>
   )
 }

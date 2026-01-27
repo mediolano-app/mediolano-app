@@ -1,33 +1,31 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ChevronRight, Shield, Eye, Lock, Users, Globe, Cookie, ArrowUp, Database, UserCheck, NotebookPen, Sparkle, Cog, User, AtSign, Award } from "lucide-react"
+import { ChevronRight, Users, MessageSquare, Shield, AlertTriangle, UserCheck, HeartHandshake, ArrowUp, Flag, Gavel } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { DocsNavigation } from "@/components/docs/docs-navigation"
 
-const tableOfContentsPP = [
-  { id: "information", title: "Introduction", icon: NotebookPen },
-  { id: "ethos", title: "Purpose & Ethos", icon: Sparkle },
-  { id: "principles", title: "Core Principles", icon: Cog },
-  { id: "conduct", title: "Code of Conduct", icon: Lock },
-  { id: "journey", title: "Contributor Journey", icon: User },
-  { id: "standarts", title: "Contributor Standards", icon: UserCheck },
-  { id: "channels", title: "Communication Channels", icon: AtSign },
-  { id: "incentives", title: "Recognition & Incentives", icon: Award },
-  { id: "moderation", title: "Moderation & Enforcement", icon: Shield },
-  { id: "decentralization", title: "Decentralization", icon: Globe },
+const tableOfContentsCG = [
+  { id: "introduction", title: "Introduction", icon: Users },
+  { id: "respect", title: "Respect & Inclusivity", icon: HeartHandshake },
+  { id: "content_standards", title: "Content Standards", icon: MessageSquare },
+  { id: "prohibited_conduct", title: "Prohibited Conduct", icon: AlertTriangle },
+  { id: "safety", title: "Safety & Privacy", icon: Shield },
+  { id: "reporting", title: "Reporting Violations", icon: Flag },
+  { id: "enforcement", title: "Enforcement", icon: Gavel },
+  { id: "appeals", title: "Appeals", icon: UserCheck },
 ]
 
-export default function PrivacyPolicyPage() {
-  const [activeSection, setActiveSection] = useState("information")
+export default function CommunityGuidelinesPage() {
+  const [activeSection, setActiveSection] = useState("introduction")
   const [showBackToTop, setShowBackToTop] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 400)
 
-      const sections = tableOfContentsPP.map((item) => item.id)
+      const sections = tableOfContentsCG.map((item) => item.id)
       const currentSection = sections.find((section) => {
         const element = document.getElementById(section)
         if (element) {
@@ -58,408 +56,280 @@ export default function PrivacyPolicyPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background relative selection:bg-primary/30 selection:text-foreground">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[100px]" />
+      </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Table of Contents - Sidebar */}
+          {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
-              <CardContent className="p-6">
-                <h2 className="font-semibold mb-4 flex items-center space-x-2">
-                  <Shield className="w-4 h-4" />
+            <div className="sticky top-24">
+              <div className="backdrop-blur-xl bg-background/60 border border-border/40 shadow-2xl rounded-2xl p-6 transition-all duration-300 hover:shadow-primary/5">
+                <h2 className="font-semibold mb-6 flex items-center space-x-2 text-foreground/90">
+                  <Users className="w-5 h-5 text-primary" />
                   <span>Contents</span>
                 </h2>
-                <nav className="space-y-2">
-                  {tableOfContentsPP.map((item) => {
+                <nav className="space-y-1">
+                  {tableOfContentsCG.map((item) => {
                     const Icon = item.icon
+                    const isActive = activeSection === item.id
                     return (
                       <button
                         key={item.id}
                         onClick={() => scrollToSection(item.id)}
-                        className={`w-full text-left p-3 rounded-lg transition-all duration-200 flex items-center space-x-3 ${
-                          activeSection === item.id
-                            ? "bg-primary text-primary-foreground shadow-md"
-                            : "hover:bg-muted text-muted-foreground hover:text-foreground"
-                        }`}
+                        className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center space-x-3 group relative overflow-hidden ${isActive
+                          ? "text-primary font-medium bg-primary/10"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          }`}
                       >
-                        <Icon className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm font-medium">{item.title}</span>
-                        {activeSection === item.id && <ChevronRight className="w-4 h-4 ml-auto" />}
+                        {isActive && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-md" />
+                        )}
+                        <Icon className={`w-4 h-4 flex-shrink-0 transition-colors ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"}`} />
+                        <span className="text-sm">{item.title}</span>
+                        {isActive && <ChevronRight className="w-4 h-4 ml-auto text-primary animate-in slide-in-from-left-2" />}
                       </button>
                     )
                   })}
                 </nav>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
-            <Card className="shadow-xl">
-              <CardContent className="p-8 md:p-12">
-                {/* Introduction */}
-                <div className="mb-12">
-                  <Badge variant="secondary" className="mb-4">
-                    Mediolano
-                  </Badge>
-                  <h1 className="text-4xl font-bold mb-4">Community Guidelines</h1>
-                  <p className="text-lg text-muted-foreground leading-relaxed">
-                    Welcome to Mediolano, a decentralized protocol for creators and communities. These guidelines are designed to foster a respectful, inclusive, and collaborative environment for all participants.
+          <div className="lg:col-span-3 pb-24">
+            <div className="backdrop-blur-xl bg-background/40 border border-border/40 shadow-2xl rounded-3xl p-8 md:p-12 md:pb-24 overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
+
+              {/* Introduction */}
+              <div className="mb-16 relative">
+                <div className="inline-flex items-center space-x-2 mb-6 backdrop-blur-md bg-primary/10 border border-primary/20 px-3 py-1 rounded-full text-sm font-medium text-primary">
+                  <Users className="w-4 h-4" />
+                  <span>Community</span>
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+                  Community Guidelines
+                </h1>
+                <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance">
+                  Mediolano is a community-driven platform. These guidelines are designed to foster a safe, inclusive, and respectful environment for all creators and collectors.
+                </p>
+              </div>
+
+              {/* Section 1 */}
+              <section id="introduction" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/5 rotate-2 transition-transform hover:rotate-3">
+                    <Users className="w-6 h-6 text-blue-500" />
+                  </div>
+                  <h2 className="text-3xl font-semibold tracking-tight">1. Introduction</h2>
+                </div>
+                <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-muted-foreground">
+                  <p className="leading-relaxed">
+                    Our mission is to empower creators through decentralized technology. To achieve this, we rely on a
+                    community that upholds values of integrity, respect, and collaboration.
                   </p>
                 </div>
+              </section>
 
-                {/* Section 1 */}
-                <section id="information" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <NotebookPen className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">1. Introduction</h2>
+              {/* Section 2 */}
+              <section id="respect" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/5 -rotate-2 transition-transform hover:-rotate-3">
+                    <HeartHandshake className="w-6 h-6 text-green-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                    Mediolano is not a product—it’s infrastructure for humanity:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Free to use, fork, and build on.",
-                        "Open-source and auditable.",
-                        "Designed for global accessibility.",
-                        "Committed to ethical innovation and decentralization.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                    
-                  </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">2. Respect & Inclusivity</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    We serve a diverse, global community. We expect all users to:
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "Treat others with dignity and respect.",
+                      "Welcome diverse perspectives and backgrounds.",
+                      "Engage in constructive and professional dialogue.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
 
-                {/* Section 2 */}
-                <section id="ethos" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Sparkle className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">2. Purpose & Ethos</h2>
+              {/* Section 3 */}
+              <section id="content_standards" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/5 rotate-1 transition-transform hover:rotate-2">
+                    <MessageSquare className="w-6 h-6 text-purple-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">Mediolano is more than a protocol—it’s a movement to empower creators through decentralized intellectual property. These guidelines are designed to:</p>
-                    <div className="space-y-4">
-                      {[
-                        "Foster a respectful, inclusive, and collaborative environment.",
-                        "Encourage open-source innovation and DAO participation.",
-                        "Protect the integrity of creative works and governance processes.",
-                        "Align community behavior with the values of sovereignty, transparency, and equity.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-                {/* Section 3 */}
-                <section id="principles" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Cog className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">3. Core Principles</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                   
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      We uphold the following foundational values:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Creator Sovereignty: Every contributor retains full control over their work and identity",
-                        "Decentralized Integrity: Actions are made transparently, without centralized gatekeepers.",
-                        "Open Collaboration: Contributions are welcomed from all skill levels and backgrounds.",
-                        "Respectful Dialogue: Disagreement is welcome; disrespect is not.",
-                        "Public Good Orientation: Mediolano is a protocol for collective benefit, not private gain.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-                {/* Section 4 */}
-                <section id="conduct" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Users className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">4. Code of Conduct</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                   
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      All participants agree to:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Engage with empathy, professionalism, and integrity",
-                        "Avoid harassment, hate speech, or discriminatory behavior.",
-                        "Refrain from spamming, trolling, or disruptive conduct.",
-                        "Respect licensing terms and intellectual property rights.",
-                        "Use pseudonymous identities responsibly and ethically.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                     <p className="text-muted-foreground leading-relaxed mb-6 mt-6">
-                      Violations may result in moderation actions or DAO-led proposals for restriction.
-                    </p>
-                  </div>
-                </section>
-
-
-                {/* Section 5 */}
-                <section id="conduct" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Users className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">5. Contributor Journey</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                     Mediolano welcomes contributions across multiple domains:
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {[
-                        { icon: UserCheck, title: "Creators", desc: "Tokenize and license original works" },
-                        { icon: UserCheck, title: "Developers", desc: "Build smart contracts, dApps, and services" },
-                        {
-                          icon: UserCheck,
-                          title: "Curators",
-                          desc: "Organize, promote, and contextualize IP assets",
-                        },
-                        {
-                          icon: UserCheck,
-                          title: "Governors",
-                          desc: "Propose and vote on upgrades and policies",
-                        },
-                        {
-                          icon: UserCheck,
-                          title: "Educators",
-                          desc: "Create tutorials, guides, and documentation",
-                        },
-                        {
-                          icon: UserCheck,
-                          title: "Community",
-                          desc: "Host events, moderate forums, and grow the ecosystem",
-                        },
-                        {
-                          icon: UserCheck,
-                          title: "Researchers",
-                          desc: "Analyze trends, metrics, and impact of the protocol",
-                        },
-                        {
-                          icon: UserCheck,
-                          title: "Business",
-                          desc: "Services, partnerships, integrations, and monetization opportunities",
-                        },
-
-                      ].map((item, index) => {
-                        const Icon = item.icon
-                        return (
-                          <Card key={index} className="p-4 hover:shadow-md transition-shadow">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <Icon className="w-5 h-5 text-blue-500" />
-                              <h4 className="font-medium">{item.title}</h4>
-                            </div>
-                            <p className="text-sm text-muted-foreground">{item.desc}</p>
-                          </Card>
-                        )
-                      })}
-                    </div>
-                  </div>
-                </section>
-
-
-
-              
-                {/* Section 6 */}
-                <section id="standarts" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Award className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">6. Contributor Standards</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      To maintain quality and trust:
-                    </p>
-                  <div className="space-y-4">
-                      {[
-                        "Follow Mediolano’s documentation and licensing protocols.",
-                        "Submit code with clear commit history and comments.",
-                        "Attribute third-party assets and respect open-source licenses.",
-                        "Engage in governance with thoughtful proposals and votes.",
-                        "Disclose conflicts of interest when relevant to DAO decisions.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-
-
-                {/* Section 7 */}
-                <section id="channels" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Globe className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">7. Communication Channels</h2>
-                  </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-4">
-                      We encourage open dialogue across platforms:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Discord / Telegram: Real-time support and discussion.",
-                        "GitHub: For code contributions, issue tracking.",
-                        "Social Media: Amplify updates and creator stories.",
-                        "Email: For formal communications and inquiries.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
+                  <h2 className="text-3xl font-semibold tracking-tight">3. Content Standards</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    All content uploaded or linked to the platform must comply with these standards:
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      "No illegal content or facilitation of illegal acts.",
+                      "No hate speech, harassment, or threats.",
+                      "No sexually explicit content without appropriate tagging (if supported).",
+                      "No malware, viruses, or malicious code.",
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-start space-x-3 p-3 bg-background/50 rounded-xl">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-sm text-muted-foreground">{item}</span>
                       </div>
+                    ))}
                   </div>
-                </section>
+                </div>
+              </section>
 
-
-
-                {/* Section 8 */}
-                <section id="incentives" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Globe className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">8. Recognition & Incentives</h2>
+              {/* Section 4 */}
+              <section id="prohibited_conduct" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/5 -rotate-1 transition-transform hover:-rotate-2">
+                    <AlertTriangle className="w-6 h-6 text-red-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                     Contributors may be rewarded through:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "DAO grants and bounties.",
-                        "Governance token allocations.",
-                        "Reputation scores or contributor badges.",
-                        "Public acknowledgment in releases and documentation.",
-                        "Token distribution/airdrops.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                      <p className="text-muted-foreground leading-relaxed mb-6">
-                     All incentives are subject to DAO approval and transparent reporting.
-                    </p>
+                  <h2 className="text-3xl font-semibold tracking-tight">4. Prohibited Conduct</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    The following activities are strictly prohibited:
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "Impersonating others or misrepresenting affiliation.",
+                      "Spamming, phishing, or deceptive practices.",
+                      "Market manipulation or wash trading.",
+                      "Interfering with the operation or security of the platform.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+
+              {/* Section 5 */}
+              <section id="safety" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/5 rotate-2 transition-transform hover:rotate-3">
+                    <Shield className="w-6 h-6 text-amber-500" />
                   </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">5. Safety & Privacy</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Protect yourself and others:
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "Do not share private keys or seed phrases.",
+                      "Do not doxx or reveal personal information of others without consent.",
+                      "Report suspicious activity immediately.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
 
-
-
-
-                 {/* Section 9 */}
-                <section id="moderation" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">9. Moderation & Enforcement</h2>
+              {/* Section 6 */}
+              <section id="reporting" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/5 -rotate-2 transition-transform hover:-rotate-3">
+                    <Flag className="w-6 h-6 text-indigo-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      While Mediolano is permissionless, community spaces may be moderated to:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Remove harmful or illegal content.",
-                        "Enforce these guidelines.",
-                        "Protect the integrity of governance and collaboration.",
-                        "Address spam, trolling, or disruptive behavior.",
-                        "Ensure network protection.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      Moderation actions may be appealed via DAO proposals.
-                    </p>
+                  <h2 className="text-3xl font-semibold tracking-tight">6. Reporting Violations</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    If you witness a violation of these guidelines, please report it via:
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button variant="outline" className="justify-start gap-2">
+                      <Flag className="w-4 h-4" />
+                      DAO Governance Proposal
+                    </Button>
+                    <Button variant="outline" className="justify-start gap-2">
+                      <MessageSquare className="w-4 h-4" />
+                      Community Discord
+                    </Button>
                   </div>
-                </section>
+                </div>
+              </section>
 
-
-                {/* Section 10 */}
-                <section id="decentralization" className="mb-12 scroll-mt-24">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <Globe className="w-4 h-4 text-white" />
-                    </div>
-                    <h2 className="text-2xl font-semibold">10. Decentralization</h2>
+              {/* Section 7 */}
+              <section id="enforcement" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-teal-500/10 border border-teal-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/5 rotate-1 transition-transform hover:rotate-2">
+                    <Gavel className="w-6 h-6 text-teal-500" />
                   </div>
-                  <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      As Mediolano evolves:
-                    </p>
-                    <div className="space-y-4">
-                      {[
-                        "Governance power will shift increasingly to the community.",
-                        "Contributor roles may expand through subDAOs and working groups.",
-                        "Guidelines will be updated through transparent, on-chain proposals.",
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-start space-x-3 p-4 rounded-lg bg-muted/30">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-muted-foreground">{item}</span>
-                        </div>
-                      ))}
-                    </div>
+                  <h2 className="text-3xl font-semibold tracking-tight">7. Enforcement</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Violations are handled through community governance and may result in:
+                  </p>
+                  <ul className="space-y-4">
+                    {[
+                      "Warnings issued by community moderators.",
+                      "Removal of content from the dApp interface (content remains on-chain).",
+                      "Blacklisting of wallet addresses from the dApp interface.",
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-start space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                        <span className="text-muted-foreground">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+
+              {/* Section 8 */}
+              <section id="appeals" className="mb-20 scroll-mt-32">
+                <div className="flex items-center space-x-4 mb-8">
+                  <div className="w-12 h-12 bg-pink-500/10 border border-pink-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/5 -rotate-1 transition-transform hover:-rotate-2">
+                    <UserCheck className="w-6 h-6 text-pink-500" />
                   </div>
-                </section>
+                  <h2 className="text-3xl font-semibold tracking-tight">8. Appeals</h2>
+                </div>
+                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
+                  <p className="text-muted-foreground leading-relaxed">
+                    Users who believe enforcement actions were taken in error may submit an appeal proposal to the DAO for
+                    review and voting.
+                  </p>
+                </div>
+              </section>
 
+              <DocsNavigation />
 
-
-          
-              </CardContent>
-            </Card>
+            </div>
           </div>
         </div>
       </div>
 
-
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 rounded-full w-12 h-12 shadow-2xl bg-background/80 backdrop-blur-xl border border-border text-foreground hover:bg-background/90"
+          size="icon"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </Button>
+      )}
     </div>
   )
 }
