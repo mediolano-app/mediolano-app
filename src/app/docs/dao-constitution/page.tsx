@@ -1,6 +1,6 @@
 
 import type { Metadata } from "next"
-import ConstitutionContent from "@/app/docs/constitution/ConstitutionContent"
+import ConstitutionContent from "@/app/docs/dao-constitution/ConstitutionContent"
 
 export const metadata: Metadata = {
     title: "Constitution | Mediolano DAO",
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Constitution | Mediolano DAO",
         description: "The governing principles of the Mediolano Tokenized IP Protocol.",
-        url: 'https://ip.mediolano.app/docs/constitution',
+        url: 'https://ip.mediolano.app/docs/dao-constitution',
         siteName: 'Mediolano IP Creator',
         images: [
             {

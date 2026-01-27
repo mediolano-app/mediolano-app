@@ -145,8 +145,8 @@ export default function DevelopersContent() {
                                             </button>
                                         </div>
                                         <code className="text-sm font-mono text-green-400">
-                                            git clone https://github.com/mediolano-protocol/starter-kit.git<br />
-                                            cd starter-kit<br />
+                                            git clone https://github.com/mediolano-app/mediolano-app.git<br />
+                                            cd mediolano-app<br />
                                             npm install<br />
                                             npm run dev
                                         </code>
@@ -160,11 +160,11 @@ export default function DevelopersContent() {
                                     <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/5 -rotate-2 transition-transform hover:-rotate-3">
                                         <FileJson className="w-6 h-6 text-purple-500" />
                                     </div>
-                                    <h2 className="text-3xl font-semibold tracking-tight">Smart Contracts</h2>
+                                    <h2 className="text-3xl font-semibold tracking-tight">Cairo Smart Contracts</h2>
                                 </div>
                                 <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
                                     <p className="text-muted-foreground leading-relaxed mb-6">
-                                        Deployed addresses for Mainnet and Sepolia Testnet.
+                                        Mediolano implements zero-knowledge proofs to ensure the integrity of your intellectual property.
                                     </p>
                                     <div className="space-y-4">
                                         {[
@@ -221,11 +221,11 @@ export default function DevelopersContent() {
                                     <div className="w-12 h-12 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/5 -rotate-1 transition-transform hover:-rotate-2">
                                         <GitMerge className="w-6 h-6 text-green-500" />
                                     </div>
-                                    <h2 className="text-3xl font-semibold tracking-tight">Subgraphs</h2>
+                                    <h2 className="text-3xl font-semibold tracking-tight">API Services</h2>
                                 </div>
                                 <div className="prose prose-lg prose-slate dark:prose-invert max-w-none text-muted-foreground">
                                     <p className="leading-relaxed">
-                                        Query protocol data efficiently using our GraphQL endpoint hosted on The Graph (or similar indexing solution). Retrieve asset ownership history, licensing events, and more.
+                                        Mediolano provides a REST API for interacting with the Mediolano contract. This API is available at <a href="#" className="text-primary hover:underline">api.mediolano.app</a>.
                                     </p>
                                 </div>
                             </section>
@@ -242,14 +242,14 @@ export default function DevelopersContent() {
                                     <div className="grid gap-4 md:grid-cols-2">
                                         <Button variant="outline" className="justify-start gap-2 h-auto py-4">
                                             <div className="flex flex-col items-start text-left">
-                                                <span className="font-semibold">Discord Dev Channel</span>
+                                                <span className="font-semibold">Telegram Channel</span>
                                                 <span className="text-xs text-muted-foreground font-normal">Get support from the community</span>
                                             </div>
                                         </Button>
                                         <Button variant="outline" className="justify-start gap-2 h-auto py-4">
                                             <div className="flex flex-col items-start text-left">
-                                                <span className="font-semibold">Audits Repository</span>
-                                                <span className="text-xs text-muted-foreground font-normal">Review security reports</span>
+                                                <span className="font-semibold">Open-source Repository</span>
+                                                <span className="text-xs text-muted-foreground font-normal">Audit and contribute to the project</span>
                                             </div>
                                         </Button>
                                     </div>

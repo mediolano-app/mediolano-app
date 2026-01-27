@@ -9,7 +9,6 @@ import { DocsNavigation } from "@/components/docs/docs-navigation"
 const tableOfContents = [
     { id: "approach", title: "Security Approach", icon: Shield },
     { id: "audits", title: "Audit Reports", icon: FileCheck },
-    { id: "bug-bounty", title: "Bug Bounty", icon: Bug },
     { id: "risks", title: "Risk Disclosure", icon: AlertTriangle },
     { id: "monitoring", title: "Monitoring", icon: Eye },
 ]
@@ -106,10 +105,10 @@ export default function SecurityContent() {
                             <div className="mb-16 relative">
                                 <div className="inline-flex items-center space-x-2 mb-6 backdrop-blur-md bg-primary/10 border border-primary/20 px-3 py-1 rounded-full text-sm font-medium text-primary">
                                     <Shield className="w-4 h-4" />
-                                    <span>Security</span>
+                                    <span>Mediolano dapp and protocol</span>
                                 </div>
                                 <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-                                    Security & Audits
+                                    Security
                                 </h1>
                                 <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance">
                                     Security is paramount for the Integrity Web. We employ rigorous testing, third-party audits, and continuous monitoring to safeguard the protocol.
@@ -157,49 +156,16 @@ export default function SecurityContent() {
                                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-muted/20 rounded-xl gap-4">
                                             <div>
                                                 <h4 className="font-semibold text-foreground">Core Protocol Audit</h4>
-                                                <p className="text-sm text-muted-foreground">Audited by Trail of Bits</p>
+                                                <p className="text-sm text-muted-foreground">Audited by Dev Team</p>
                                             </div>
-                                            <Badge variant="outline" className="border-green-500/50 text-green-500">Passed</Badge>
-                                            <Button variant="ghost" size="sm" className="ml-auto sm:ml-0">
-                                                Download PDF
-                                            </Button>
+                                            <Badge variant="outline" className="border-green-500/50 text-green-500">10/2025</Badge>
                                         </div>
-                                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-muted/20 rounded-xl gap-4">
-                                            <div>
-                                                <h4 className="font-semibold text-foreground">License Module V1 Audit</h4>
-                                                <p className="text-sm text-muted-foreground">Audited by OpenZeppelin</p>
-                                            </div>
-                                            <Badge variant="outline" className="border-green-500/50 text-green-500">Passed</Badge>
-                                            <Button variant="ghost" size="sm" className="ml-auto sm:ml-0">
-                                                Download PDF
-                                            </Button>
-                                        </div>
+
                                     </div>
                                 </div>
                             </section>
 
-                            {/* Bug Bounty */}
-                            <section id="bug-bounty" className="mb-20 scroll-mt-32">
-                                <div className="flex items-center space-x-4 mb-8">
-                                    <div className="w-12 h-12 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/5 rotate-1 transition-transform hover:rotate-2">
-                                        <Bug className="w-6 h-6 text-green-500" />
-                                    </div>
-                                    <h2 className="text-3xl font-semibold tracking-tight">Bug Bounty</h2>
-                                </div>
-                                <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
-                                    <p className="text-muted-foreground leading-relaxed mb-4">
-                                        We incentivize the security community to help us find and fix vulnerabilities.
-                                    </p>
-                                    <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl mb-4">
-                                        <p className="text-yellow-600 dark:text-yellow-400 font-semibold">
-                                            Up to $50,000 USDC for critical vulnerabilities.
-                                        </p>
-                                    </div>
-                                    <Button variant="default" className="w-full sm:w-auto">
-                                        Submit a Report on Immunefi
-                                    </Button>
-                                </div>
-                            </section>
+
 
                             {/* Risks */}
                             <section id="risks" className="mb-20 scroll-mt-32">

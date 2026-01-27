@@ -3,11 +3,11 @@ import type { Metadata } from "next"
 import SecurityContent from "@/app/docs/security/SecurityContent"
 
 export const metadata: Metadata = {
-    title: "Security & Audits | Mediolano IP Creator",
-    description: "Security is paramount for the Integrity Web. Learn about our audits, bug bounty programs, and risk approach.",
+    title: "Security | Mediolano IP Creator",
+    description: "Security is paramount for the Integrity Web. Learn about our security and risk approach.",
     openGraph: {
-        title: "Security & Audits | Mediolano IP Creator",
-        description: "Official security audits and bug bounty information for Mediolano Protocol.",
+        title: "Security | Mediolano IP Creator",
+        description: "Official security information for Mediolano Protocol and IP Creator.",
         url: 'https://ip.mediolano.app/docs/security',
         siteName: 'Mediolano IP Creator',
         images: [
@@ -23,8 +23,8 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: "Security & Audits | Mediolano IP Creator",
-        description: "Official security audits and bug bounty information for Mediolano Protocol.",
+        title: "Security | Mediolano IP Creator",
+        description: "Official security information for Mediolano Protocol and IP Creator.",
         images: ['/mediolano-logo-dark.png'],
     },
 }

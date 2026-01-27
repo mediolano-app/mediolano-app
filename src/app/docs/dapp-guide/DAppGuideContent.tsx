@@ -128,7 +128,7 @@ export default function DAppGuideContent() {
                                     Mediolano IP Creator
                                 </h1>
                                 <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance">
-                                    The integrity web's premier permissionless platform for intellectual property. Tokenize, protect, and manage your creative assets with zero fees and full ownership.
+                                    The integrity web's permissionless provider for intellectual property. Tokenize, protect, and manage your creative assets with zero fees and full ownership.
                                 </p>
                             </div>
 
@@ -171,10 +171,10 @@ export default function DAppGuideContent() {
                                     <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl hover:bg-card/50 transition-colors">
                                         <h3 className="text-xl font-medium mb-3 flex items-center">
                                             <span className="w-2 h-2 bg-purple-500 rounded-full mr-3 animate-pulse" />
-                                            Crypto Native
+                                            Zero Knowledge Proof
                                         </h3>
                                         <p className="text-muted-foreground leading-relaxed">
-                                            Built for the integrity web as a public good. We aim to empower anyone with programmable IP, unlocking new possibilities without gatekeepers.
+                                            Mediolano is built on zero-knowledge proofs to ensure the integrity of your intellectual property.
                                         </p>
                                     </div>
                                 </div>

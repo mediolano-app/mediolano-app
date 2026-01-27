@@ -28,12 +28,14 @@ const protocolLinks = [
 ]
 
 const daoLinks = [
+    { title: "Community Guidelines", href: "/docs/community-guidelines", icon: Users, desc: "Guidelines for community members" },
+    { title: "Compliance Guidelines", href: "/docs/compliance-guidelines", icon: Scale, desc: "Regulatory compliance info" },
     { title: "Mediolano DAO", href: "/docs/mediolano-dao", icon: Users, desc: "Mission and governance model" },
-    { title: "Constitution", href: "/docs/constitution", icon: Landmark, desc: "Foundation Governing Document" },
+    { title: "DAO Constitution", href: "/docs/dao-constitution", icon: Landmark, desc: "Foundation Governing Document" },
     { title: "Governance Charter", href: "/docs/governance-charter", icon: Gavel, desc: "DAO governance rules" },
     { title: "Public Goods", href: "/docs/public-goods", icon: Heart, desc: "Mission and open source" },
-    { title: "Compliance Guidelines", href: "/docs/compliance-guidelines", icon: Scale, desc: "Regulatory compliance info" },
     { title: "Terms of Use", href: "/docs/terms-of-use", icon: FileText, desc: "Legal terms and conditions" },
+    { title: "Privacy Policy", href: "/docs/privacy-policy", icon: FileText, desc: "Privacy policy" },
 ]
 
 export function DocsNavigation() {

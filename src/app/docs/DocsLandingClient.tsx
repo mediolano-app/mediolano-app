@@ -227,7 +227,7 @@ export default function DocsLandingClient() {
                         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                         <div className="flex items-center space-x-2 px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
                             <Scale className="w-4 h-4" />
-                            <span className="text-sm font-semibold tracking-wide uppercase">DAO & Governance</span>
+                            <span className="text-sm font-semibold tracking-wide uppercase">Guidelines</span>
                         </div>
                         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
                     </div>
@@ -257,9 +257,25 @@ export default function DocsLandingClient() {
                             </div>
                         </motion.div>
 
+                        {/* Community Guidelines */}
+                        <motion.div variants={item} className="group relative overflow-hidden rounded-[2rem] border border-border/50 bg-background/30 backdrop-blur-md hover:bg-background/50 transition-all duration-500">
+                            <Link href="/docs/community-guidelines" className="absolute inset-0 z-20" />
+                            <div className="p-8 h-full flex flex-col justify-between">
+                                <div className="flex items-start justify-between">
+                                    <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500 mb-4">
+                                        <Users className="w-8 h-8" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-bold mb-2">Community Guidelines</h3>
+                                    <p className="text-muted-foreground">Guidelines for community members.</p>
+                                </div>
+                            </div>
+                        </motion.div>
+
                         {/* Constitution (Large) */}
                         <motion.div variants={item} className="md:col-span-2 group relative overflow-hidden rounded-[2rem] border border-border/50 bg-background/30 backdrop-blur-md hover:bg-background/50 transition-all duration-500">
-                            <Link href="/docs/constitution" className="absolute inset-0 z-20" />
+                            <Link href="/docs/dao-constitution" className="absolute inset-0 z-20" />
                             <div className="p-8 h-full flex flex-col justify-between">
                                 <div className="flex items-start justify-between">
                                     <div className="p-3 bg-red-500/10 rounded-xl text-red-500 mb-4">
@@ -291,6 +307,7 @@ export default function DocsLandingClient() {
                             { title: "Public Goods", href: "/docs/public-goods", icon: Heart, color: "text-rose-500", bg: "bg-rose-500/10" },
                             { title: "Compliance Guidelines", href: "/docs/compliance-guidelines", icon: Scale, color: "text-emerald-500", bg: "bg-emerald-500/10" },
                             { title: "Terms of use", href: "/docs/terms-of-use", icon: FileText, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+                            { title: "Privacy Policy", href: "/docs/privacy-policy", icon: Lock, color: "text-red-500", bg: "bg-red-500/10" },
                         ].map((data, i) => {
                             // Separating the motion prop 'variants' from the data object to fix the lint error
                             const Icon = data.icon

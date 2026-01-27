@@ -152,7 +152,7 @@ export default function FAQContent() {
                                     <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/5 -rotate-2 transition-transform hover:-rotate-3">
                                         <User className="w-6 h-6 text-purple-500" />
                                     </div>
-                                    <h2 className="text-3xl font-semibold tracking-tight">For Creators</h2>
+                                    <h2 className="text-3xl font-semibold tracking-tight">IP Creator</h2>
                                 </div>
                                 <Accordion type="single" collapsible className="w-full">
                                     <AccordionItem value="item-3">
@@ -180,15 +180,15 @@ export default function FAQContent() {
                                 </div>
                                 <Accordion type="single" collapsible className="w-full">
                                     <AccordionItem value="item-5">
-                                        <AccordionTrigger>Does it cost money to use Mediolano?</AccordionTrigger>
+                                        <AccordionTrigger>Does it cost money to use IP Creator or Mediolano Protocol?</AccordionTrigger>
                                         <AccordionContent>
-                                            The Mediolano protocol itself charges **zero fees**. You only pay the network gas fees required by Starknet, which are extremely low (typically cents).
+                                            The Mediolano protocol and IP Creator charges **zero fees**. You only pay the network gas fees required by Starknet, which are extremely low (typically cents).
                                         </AccordionContent>
                                     </AccordionItem>
                                     <AccordionItem value="item-6">
                                         <AccordionTrigger>Which wallets do you support?</AccordionTrigger>
                                         <AccordionContent>
-                                            We support all major Starknet wallets, including Argent X and Braavos.
+                                            We support all major Starknet wallets, including Ready and Braavos.
                                         </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
@@ -230,7 +230,7 @@ export default function FAQContent() {
                                     <AccordionItem value="item-9">
                                         <AccordionTrigger>Are the smart contracts audited?</AccordionTrigger>
                                         <AccordionContent>
-                                            Yes, our core contracts undergo rigorous auditing by top-tier security firms. You can view the reports in the Security & Audits section.
+                                            Yes, our core contracts undergo rigorous auditing by our dev team. You can view the reports in the Security section.
                                         </AccordionContent>
                                     </AccordionItem>
                                 </Accordion>
