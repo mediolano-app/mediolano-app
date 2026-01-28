@@ -22,11 +22,20 @@ import {
   Gem,
   Scroll,
 } from "lucide-react"
+import { LucideIcon } from "lucide-react"
 import Link from "next/link"
+
+interface Feature {
+  icon: LucideIcon
+  title: string
+  description: string
+}
+
+interface FeatureCardProps extends Feature { }
 
 export function MediolanoFrontpage() {
 
-  const FeatureCard = ({ icon: Icon, title, description }: any) => (
+  const FeatureCard = ({ icon: Icon, title, description }: FeatureCardProps) => (
     <div className="group p-6 rounded-2xl border bg-card/20 backdrop-blur-sm hover:bg-card/40 hover:shadow-sm transition-all duration-300">
       <div className="flex items-start gap-4">
         <div className="p-3 rounded-xl bg-primary/5 group-hover:bg-primary/10 transition-colors">
@@ -40,7 +49,7 @@ export function MediolanoFrontpage() {
     </div>
   )
 
-  const features = [
+  const features: Feature[] = [
     {
       icon: Gem,
       title: "Zero Fees Tokenization",

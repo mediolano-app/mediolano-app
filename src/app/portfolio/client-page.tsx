@@ -8,7 +8,7 @@ import { Alert } from "@/components/ui/alert";
 import { CollectionValidator } from "@/lib/types";
 import { CollectionStats } from "@/components/collections/collections-stats";
 import Link from "next/link";
-import { ArrowRight, Grid3X3, Layers, Activity } from "lucide-react";
+import { ArrowRight, Grid3X3, Layers, Activity, Loader2 } from "lucide-react";
 
 export default function PortfolioClientPage() {
     const { address } = useAccount();
@@ -48,7 +48,21 @@ export default function PortfolioClientPage() {
                     <Suspense fallback={<PortfolioSkeleton />}>
                         <div className="space-y-12 container mx-auto">
                             {loading ? (
-                                <StatsSkeleton />
+                                <div className="space-y-8">
+                                    <div className="flex flex-col items-center justify-center space-y-4 py-8 animate-in fade-in duration-500">
+                                        <div className="relative">
+                                            <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+                                            <Loader2 className="h-8 w-8 animate-spin text-primary relative z-10" />
+                                        </div>
+                                        <div className="text-center space-y-1">
+                                            <p className="text-lg font-medium text-foreground">Loading Portfolio</p>
+                                            <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                                                This dapp is permissionless and is directly reading your onchain data from Starknet.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <StatsSkeleton />
+                                </div>
                             ) : (
                                 <CollectionStats
                                     totalCollections={validCollections.length}

@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import AnimatedBackground from "@/components/animated-bg";
 import { Toaster } from "@/components/ui/toaster";
+import { CommandMenu } from "@/components/command-menu";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://ip.mediolano.app'),
@@ -85,6 +86,7 @@ export default function RootLayout({
           >
             <StarknetProvider>
               <Header />
+              <CommandMenu />
               {children}
               <Toaster />
               <Footer />
