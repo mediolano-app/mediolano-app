@@ -36,16 +36,14 @@ export function OwnerTab({ asset }: OwnerTabProps) {
         <CardContent>
           <div className="flex items-start gap-4">
             <div className="flex-1">
-              <h3 className="text-sm font-semibold truncate text-lg">
-                {toText(asset?.owner?.name).startsWith("0x") ? shortenAddress(toText(asset?.owner?.name)) : toText(asset?.owner?.name)}
-              </h3>
 
-              <div className="mt-4 flex gap-2">
+
+              <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="h-8" asChild>
-                  <a href={`/creator/${asset?.owner?.address || asset?.owner?.name}`} target="_blank" rel="noopener noreferrer">
+                  <Link href={`/creator/${asset?.owner?.address || asset?.owner?.name}`}>
                     <Globe className="mr-2 h-4 w-4" />
-                    Profile
-                  </a>
+                    {toText(asset?.owner?.name).startsWith("0x") ? shortenAddress(toText(asset?.owner?.name)) : toText(asset?.owner?.name)}
+                  </Link>
                 </Button>
               </div>
             </div>
@@ -60,17 +58,13 @@ export function OwnerTab({ asset }: OwnerTabProps) {
         <CardContent>
           <div className="flex items-start gap-4">
             <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold truncate text-lg">{toText(asset.author.name).startsWith("0x") ? shortenAddress(toText(asset.author.name)) : toText(asset.author.name)}</h3>
-              </div>
-              <p className="text-sm text-muted-foreground">{asset.author.bio}</p>
 
-              <div className="mt-4">
+              <div className="">
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" className="h-8" asChild>
                     <Link href={`/creator/${asset.author.address || asset.author.name}`}>
                       <Globe className="mr-2 h-4 w-4" />
-                      Profile
+                      {toText(asset.author.name).startsWith("0x") ? shortenAddress(toText(asset.author.name)) : toText(asset.author.name)}
                     </Link>
                   </Button>
                 </div>
