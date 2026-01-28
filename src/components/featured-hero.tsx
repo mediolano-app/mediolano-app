@@ -26,7 +26,7 @@ const DefaultHero = () => (
     <div className="container mx-auto relative overflow-hidden rounded-2xl">
         <Card className="border-0">
             <CardContent className="p-0">
-                <div className="relative h-[600px] md:h-[640px] bg-gradient-to-br from-gray-900/20 to-gray-800/20 flex items-center justify-center">
+                <div className="relative h-[600px] md:h-[640px] bg-gradient-to-br from-blue-500/20 to-rose-600/20 flex items-center justify-center">
                     {/* Minimal abstract background */}
                     <div className="absolute inset-0 overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent opacity-50"></div>
@@ -163,7 +163,7 @@ export function FeaturedHero() {
                                 </div>
                             )}
 
-                            <div className={`absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent transition-all duration-500`} />
+                            <div className={`absolute inset-0 bg-gradient-to-r from-blue-900/20 via-rose-900/20 to-transparent transition-all duration-500`} />
                         </div>
 
                         {/* Content */}

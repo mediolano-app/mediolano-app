@@ -52,8 +52,8 @@ export function MediolanoFrontpage() {
   const features: Feature[] = [
     {
       icon: Gem,
-      title: "Zero Fees Tokenization",
-      description: "Mint with zero fees on IP Creator + Mediolano Protocol.",
+      title: "Public Goods",
+      description: "Mint with zero fees with IP Creator + Mediolano Protocol.",
     },
     {
       icon: Scroll,
@@ -68,17 +68,17 @@ export function MediolanoFrontpage() {
     {
       icon: Users,
       title: "Global Network",
-      description: "Connect and share content worldwide without intermediaries",
+      description: "Connect and share worldwide without intermediaries",
     },
     {
       icon: Zap,
       title: "Total Sovereignty",
-      description: "You control your assets, no centralized authority",
+      description: "Your assets stay in your wallet",
     },
     {
       icon: TrendingUp,
       title: "Censorship Resistance",
-      description: "Immutable proof of ownership secured by decentralized tech",
+      description: "Your IP is protected onchain with Mediolano Protocol",
     },
   ]
 
@@ -89,9 +89,9 @@ export function MediolanoFrontpage() {
       <section className="container mx-auto space-y-10 mt-12">
         <div className="text-center max-w-3xl mx-auto space-y-4">
 
-          <h2 className="text-1xl md:text-3xl text-balance">Built for the Creator Economy</h2>
+          <h2 className="text-1xl md:text-3xl text-balance">Permissionless IP Tokenization</h2>
           <p className="text-lg text-muted-foreground text-pretty leading-relaxed">
-            Free tokenization to protect, showcase, and monetize your intellectual property
+            Zero fees to protect, share, and remix your intellectual property
           </p>
         </div>
 
