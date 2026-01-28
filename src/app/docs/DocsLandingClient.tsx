@@ -226,7 +226,7 @@ export default function DocsLandingClient() {
                                     <ArrowRight className="w-5 h-5 text-muted-foreground -translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300" />
                                 </div>
                                 <h3 className="text-xl font-bold mb-2">How we protect IP?</h3>
-                                <p className="text-sm text-muted-foreground">Defense in Depth.</p>
+                                <p className="text-sm text-muted-foreground">Built for the Integrity Web.</p>
                             </div>
                         </motion.div>
 

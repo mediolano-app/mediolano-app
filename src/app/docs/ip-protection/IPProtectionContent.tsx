@@ -9,7 +9,7 @@ import { AiAgentOverview } from "@/components/docs/ai-agent-overview"
 const tableOfContents = [
     { id: "intro", title: "Introduction", icon: Shield },
     { id: "cryptographic", title: "Cryptographic", icon: Lock },
-    { id: "legal", title: "Legal", icon: Scale },
+    { id: "compliance", title: "Compliance Framework", icon: Scale },
     { id: "social", title: "Social & DAO", icon: Users },
     { id: "technological", title: "Technological", icon: Server },
     { id: "economic", title: "Economic", icon: Coins },
@@ -107,13 +107,13 @@ export default function IPProtectionContent() {
                             <div id="intro" className="mb-16 relative scroll-mt-32">
                                 <div className="inline-flex items-center space-x-2 mb-6 backdrop-blur-md bg-sky-500/10 border border-sky-500/20 px-3 py-1 rounded-full text-sm font-medium text-sky-500">
                                     <Shield className="w-4 h-4" />
-                                    <span>Multi-Layered Protection</span>
+                                    <span>Protocol + Platform</span>
                                 </div>
                                 <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-                                    How does Mediolano protect IP?
+                                    How does Mediolano protect IP
                                 </h1>
                                 <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance">
-                                    We protect your Intellectual Property through a robust "Defense in Depth" strategy, combining immutable cryptography, international legal frameworks, and community governance.
+                                    Mediolano protects your Intellectual Property through a robust "Built for the Integrity Web" strategy, combining immutable cryptography, international legal frameworks, and community governance.
                                 </p>
                             </div>
 
@@ -152,34 +152,54 @@ export default function IPProtectionContent() {
                                 </div>
                             </section>
 
-                            {/* Legal Protection */}
-                            <section id="legal" className="mb-20 scroll-mt-32">
+                            {/* Compliance Framework */}
+                            <section id="compliance" className="mb-20 scroll-mt-32">
                                 <div className="flex items-center space-x-4 mb-8">
                                     <div className="w-12 h-12 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/5 -rotate-2 transition-transform hover:-rotate-3">
                                         <Scale className="w-6 h-6 text-purple-500" />
                                     </div>
-                                    <h2 className="text-3xl font-semibold tracking-tight">Legal Protection</h2>
+                                    <h2 className="text-3xl font-semibold tracking-tight">Compliance Framework</h2>
                                 </div>
                                 <div className="backdrop-blur-sm bg-card/30 border border-border/50 p-6 rounded-2xl">
                                     <p className="text-muted-foreground leading-relaxed mb-6">
-                                        Code is law, but we also respect human law. Mediolano is built to be compliant with international copyright treaties.
+                                        Code is law, but we also respect human law. Mediolano is built to be compliant with international copyright treaties, specifically aligned with the <strong>Berne Convention</strong>.
                                     </p>
-                                    <ul className="space-y-4">
-                                        <li className="flex items-start space-x-3">
-                                            <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                                            <div>
-                                                <span className="text-foreground font-medium">Berne Convention:</span>
-                                                <span className="text-muted-foreground"> Our licensing framework is designed to be recognized in the 180+ countries that are signatories to the Berne Convention for the Protection of Literary and Artistic Works.</span>
-                                            </div>
-                                        </li>
-                                        <li className="flex items-start space-x-3">
-                                            <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                                            <div>
-                                                <span className="text-foreground font-medium">Binding Licenses:</span>
-                                                <span className="text-muted-foreground"> The metadata URI points to legally binding license text (e.g., Creative Commons, NFT License). Minting or purchasing an asset constitutes acceptance of these terms.</span>
-                                            </div>
-                                        </li>
-                                    </ul>
+
+                                    <div className="mb-6">
+                                        <h3 className="text-lg font-medium text-foreground mb-3">The Berne Convention (1886)</h3>
+                                        <p className="text-sm text-muted-foreground mb-4">
+                                            Administered by WIPO, this landmark agreement ensures that creators from member nations receive the same copyright protections abroad as they do in their home countries.
+                                        </p>
+                                        <ul className="space-y-3 text-sm">
+                                            <li className="flex items-start">
+                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-1.5 mr-2 flex-shrink-0" />
+                                                <span><strong>National Treatment:</strong> Works from one member state must be protected in all other member states.</span>
+                                            </li>
+                                            <li className="flex items-start">
+                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-1.5 mr-2 flex-shrink-0" />
+                                                <span><strong>Automatic Protection:</strong> Copyright is granted the moment a work is "fixed". No registration required.</span>
+                                            </li>
+                                            <li className="flex items-start">
+                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-1.5 mr-2 flex-shrink-0" />
+                                                <span><strong>Independence of Protection:</strong> Rights are independent of protection in the country of origin.</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div className="bg-muted/30 p-4 rounded-xl border-l-4 border-purple-500 mb-6">
+                                        <h3 className="text-md font-medium text-foreground mb-2">Minimum Standards</h3>
+                                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                                            <li className="flex items-center"><ChevronRight className="w-3 h-3 text-purple-500 mr-1" /> Protected Works (Art, Science, Literature)</li>
+                                            <li className="flex items-center"><ChevronRight className="w-3 h-3 text-purple-500 mr-1" /> Exclusive Rights (Reproduction, Adaptation)</li>
+                                            <li className="flex items-center"><ChevronRight className="w-3 h-3 text-purple-500 mr-1" /> Moral Rights (Authorship, Integrity)</li>
+                                            <li className="flex items-center"><ChevronRight className="w-3 h-3 text-purple-500 mr-1" /> Duration (Author's Life + 50 years)</li>
+                                        </ul>
+                                    </div>
+
+                                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                                        <Globe className="w-4 h-4 text-purple-500" />
+                                        <span>Recognized in <strong>181 signatory countries</strong> (including most WTO members via TRIPS).</span>
+                                    </div>
                                 </div>
                             </section>
 
