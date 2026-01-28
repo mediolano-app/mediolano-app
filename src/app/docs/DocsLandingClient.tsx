@@ -21,7 +21,8 @@ import {
     Zap,
     ArrowRight,
     Landmark,
-    Globe2
+    Globe2,
+    Scroll
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { AiAgentOverview } from "@/components/docs/ai-agent-overview"
@@ -195,6 +196,21 @@ export default function DocsLandingClient() {
                                 </div>
                                 <h3 className="text-xl font-bold mb-2">Protocol</h3>
                                 <p className="text-sm text-muted-foreground">Architecture & Logic.</p>
+                            </div>
+                        </motion.div>
+
+                        {/* Programmable Licensing */}
+                        <motion.div variants={item} className="group relative overflow-hidden rounded-[2rem] border border-border/50 bg-background/30 backdrop-blur-md hover:bg-background/50 transition-all duration-500">
+                            <Link href="/docs/programmable-licensing" className="absolute inset-0 z-20" />
+                            <div className="p-8">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="p-3 bg-indigo-500/10 rounded-xl text-indigo-500">
+                                        <Scroll className="w-6 h-6" />
+                                    </div>
+                                    <ArrowRight className="w-5 h-5 text-muted-foreground -translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300" />
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">Programmable Licensing</h3>
+                                <p className="text-sm text-muted-foreground">Decentralized Rights.</p>
                             </div>
                         </motion.div>
 

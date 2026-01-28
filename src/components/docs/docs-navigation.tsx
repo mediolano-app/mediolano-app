@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { motion } from "framer-motion"
 import {
     FileText,
     Shield,
@@ -15,13 +17,16 @@ import {
     HelpCircle,
     Landmark,
     Zap,
-    Box
+    ArrowRight,
+    Scroll
 } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 const protocolLinks = [
     { title: "DApp Guide", href: "/docs/dapp-guide", icon: Globe2, desc: "Overview of Mediolano IP Creator" },
     { title: "User Guide", href: "/docs/user-guide", icon: BookOpen, desc: "How-to guides and tutorials" },
     { title: "Developers", href: "/docs/developers", icon: Terminal, desc: "Contracts, SDKs, and tools" },
+    { title: "Programmable Licensing", href: "/docs/programmable-licensing", icon: Scroll, desc: "Decentralized IP Rights" },
     { title: "Mediolano Protocol", href: "/docs/protocol", icon: Network, desc: "Technical architecture" },
     { title: "Security", href: "/docs/security", icon: Shield, desc: "Audits and bug bounties" },
     { title: "FAQ", href: "/docs/faq", icon: HelpCircle, desc: "Common questions" },
@@ -38,76 +43,168 @@ const daoLinks = [
     { title: "Privacy Policy", href: "/docs/privacy-policy", icon: FileText, desc: "Privacy policy" },
 ]
 
+const container = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.05
+        }
+    }
+}
+
+const item = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0 }
+}
+
 export function DocsNavigation() {
+    const pathname = usePathname()
+
     return (
         <div className="mt-24 pt-12 border-t border-border/40">
-            <h3 className="text-2xl font-semibold mb-8">Explore Documentation</h3>
+            <h3 className="text-2xl font-bold mb-8 px-1">Explore Documentation</h3>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-16">
 
                 {/* Protocol & Platform Section */}
-                <div>
-                    <div className="flex items-center space-x-2 mb-6">
-                        <div className="p-1.5 bg-blue-500/10 rounded-lg text-blue-500">
+                <motion.div
+                    variants={container}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, margin: "-50px" }}
+                >
+                    <div className="flex items-center space-x-3 mb-6 px-1">
+                        <div className="p-2 bg-blue-500/10 rounded-xl text-blue-500 ring-1 ring-blue-500/20">
                             <Zap className="w-4 h-4" />
                         </div>
-                        <h4 className="text-lg font-medium text-foreground/80">Protocol & Platform</h4>
+                        <h4 className="text-lg font-semibold text-foreground/90">Protocol & Platform</h4>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                         {protocolLinks.map((link, index) => {
                             const Icon = link.icon
+                            const isActive = pathname === link.href
                             return (
-                                <Link
-                                    key={index}
-                                    href={link.href}
-                                    className="group block p-4 rounded-xl bg-background/40 border border-border/40 hover:bg-background/60 hover:border-primary/20 hover:shadow-md hover:shadow-primary/5 transition-all duration-300"
-                                >
-                                    <div className="flex items-center space-x-3">
-                                        <div className="p-2 bg-primary/5 rounded-lg text-primary/70 group-hover:text-primary group-hover:bg-primary/10 transition-colors duration-300">
-                                            <Icon className="w-4 h-4" />
+                                <motion.div key={index} variants={item}>
+                                    <Link
+                                        href={link.href}
+                                        className={cn(
+                                            "group relative block h-full p-4 rounded-2xl border transition-all duration-300 overflow-hidden",
+                                            isActive
+                                                ? "bg-primary/5 border-primary/30 shadow-md shadow-primary/5"
+                                                : "bg-background/40 border-border/40 hover:bg-background/80 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                                            "bg-gradient-to-br from-primary/5 via-transparent to-transparent"
+                                        )} />
+
+                                        <div className="relative flex items-start space-x-4">
+                                            <div className={cn(
+                                                "p-2.5 rounded-xl transition-all duration-300 group-hover:scale-110",
+                                                isActive
+                                                    ? "bg-primary/10 text-primary"
+                                                    : "bg-muted/50 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                                            )}>
+                                                <Icon className="w-5 h-5" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <h4 className={cn(
+                                                        "font-semibold text-sm transition-colors",
+                                                        isActive ? "text-primary" : "text-foreground group-hover:text-primary"
+                                                    )}>
+                                                        {link.title}
+                                                    </h4>
+                                                    <ArrowRight className={cn(
+                                                        "w-3.5 h-3.5 transition-all duration-300 transform",
+                                                        isActive
+                                                            ? "text-primary translate-x-0 opacity-100"
+                                                            : "text-muted-foreground -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+                                                    )} />
+                                                </div>
+                                                <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed group-hover:text-muted-foreground transition-colors">
+                                                    {link.desc}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h4 className="font-medium text-sm text-foreground mb-0.5 group-hover:text-primary transition-colors">{link.title}</h4>
-                                            <p className="text-xs text-muted-foreground line-clamp-1">{link.desc}</p>
-                                        </div>
-                                    </div>
-                                </Link>
+                                    </Link>
+                                </motion.div>
                             )
                         })}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* DAO & Governance Section */}
-                <div>
-                    <div className="flex items-center space-x-2 mb-6">
-                        <div className="p-1.5 bg-amber-500/10 rounded-lg text-amber-500">
+                <motion.div
+                    variants={container}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ delay: 0.2 }}
+                >
+                    <div className="flex items-center space-x-3 mb-6 px-1">
+                        <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500 ring-1 ring-amber-500/20">
                             <Scale className="w-4 h-4" />
                         </div>
-                        <h4 className="text-lg font-medium text-foreground/80">DAO & Governance</h4>
+                        <h4 className="text-lg font-semibold text-foreground/90">DAO & Governance</h4>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4">
                         {daoLinks.map((link, index) => {
                             const Icon = link.icon
+                            const isActive = pathname === link.href
                             return (
-                                <Link
-                                    key={index}
-                                    href={link.href}
-                                    className="group block p-4 rounded-xl bg-background/40 border border-border/40 hover:bg-background/60 hover:border-amber-500/20 hover:shadow-md hover:shadow-amber-500/5 transition-all duration-300"
-                                >
-                                    <div className="flex items-center space-x-3">
-                                        <div className="p-2 bg-amber-500/5 rounded-lg text-amber-500/70 group-hover:text-amber-500 group-hover:bg-amber-500/10 transition-colors duration-300">
-                                            <Icon className="w-4 h-4" />
+                                <motion.div key={index} variants={item}>
+                                    <Link
+                                        href={link.href}
+                                        className={cn(
+                                            "group relative block h-full p-4 rounded-2xl border transition-all duration-300 overflow-hidden",
+                                            isActive
+                                                ? "bg-amber-500/5 border-amber-500/30 shadow-md shadow-amber-500/5"
+                                                : "bg-background/40 border-border/40 hover:bg-background/80 hover:border-amber-500/20 hover:shadow-lg hover:shadow-amber-500/5"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500",
+                                            "bg-gradient-to-br from-amber-500/5 via-transparent to-transparent"
+                                        )} />
+
+                                        <div className="relative flex items-start space-x-4">
+                                            <div className={cn(
+                                                "p-2.5 rounded-xl transition-all duration-300 group-hover:scale-110",
+                                                isActive
+                                                    ? "bg-amber-500/10 text-amber-500"
+                                                    : "bg-muted/50 text-muted-foreground group-hover:bg-amber-500/10 group-hover:text-amber-500"
+                                            )}>
+                                                <Icon className="w-5 h-5" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <h4 className={cn(
+                                                        "font-semibold text-sm transition-colors",
+                                                        isActive ? "text-amber-500" : "text-foreground group-hover:text-amber-500"
+                                                    )}>
+                                                        {link.title}
+                                                    </h4>
+                                                    <ArrowRight className={cn(
+                                                        "w-3.5 h-3.5 transition-all duration-300 transform",
+                                                        isActive
+                                                            ? "text-amber-500 translate-x-0 opacity-100"
+                                                            : "text-muted-foreground -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+                                                    )} />
+                                                </div>
+                                                <p className="text-xs text-muted-foreground/80 line-clamp-2 leading-relaxed group-hover:text-muted-foreground transition-colors">
+                                                    {link.desc}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h4 className="font-medium text-sm text-foreground mb-0.5 group-hover:text-amber-500 transition-colors">{link.title}</h4>
-                                            <p className="text-xs text-muted-foreground line-clamp-1">{link.desc}</p>
-                                        </div>
-                                    </div>
-                                </Link>
+                                    </Link>
+                                </motion.div>
                             )
                         })}
                     </div>
-                </div>
+                </motion.div>
 
             </div>
         </div>
