@@ -18,7 +18,8 @@ import {
     Landmark,
     Zap,
     ArrowRight,
-    Scroll
+    Scroll,
+    ShieldCheck
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -27,6 +28,7 @@ const protocolLinks = [
     { title: "User Guide", href: "/docs/user-guide", icon: BookOpen, desc: "How-to guides and tutorials" },
     { title: "Developers", href: "/docs/developers", icon: Terminal, desc: "Contracts, SDKs, and tools" },
     { title: "Programmable Licensing", href: "/docs/programmable-licensing", icon: Scroll, desc: "Decentralized IP Rights" },
+    { title: "How does Mediolano protect IP?", href: "/docs/ip-protection", icon: ShieldCheck, desc: "Defense in Depth Strategy" },
     { title: "Mediolano Protocol", href: "/docs/protocol", icon: Network, desc: "Technical architecture" },
     { title: "Security", href: "/docs/security", icon: Shield, desc: "Audits and bug bounties" },
     { title: "FAQ", href: "/docs/faq", icon: HelpCircle, desc: "Common questions" },
