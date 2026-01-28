@@ -26,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { isCollectionReported } from "@/lib/reported-content";
 import Link from "next/link";
 import Image from "next/image";
+import { LazyImage } from "@/components/ui/lazy-image";
 import NFTCard from "@/components/nft-card";
 import {
     useCollectionMetadata,
@@ -41,6 +42,7 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
     const [searchQuery, setSearchQuery] = useState("");
     const [filterType, setFilterType] = useState("all");
     const [copied, setCopied] = useState<string | null>(null);
+    const [imageRatio, setImageRatio] = useState<number | null>(null);
 
     // Use new hooks for fetching data
     const {
@@ -138,7 +140,7 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                     />
 
                     {/*  overlay - Lighter for vividness */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-background/90 backdrop-blur-[2px]" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-background/90 backdrop-blur-[2px]" />
                 </div>
 
                 <div className="relative z-10 container mx-auto px-4 max-w-7xl">
@@ -160,14 +162,24 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                         {/* Top Section: Avatar + Info */}
                         <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
                             {/* Collection Avatar - Larger */}
-                            <div className="flex-shrink-0 relative group">
+                            <div className="flex-shrink-0 relative group w-full max-w-[200px] md:max-w-[300px] mx-auto lg:mx-0">
                                 <div className="absolute -inset-1 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                                <div className="relative h-40 w-40 md:h-72 md:w-72 rounded-2xl overflow-hidden border-[2px] border-white/20 backdrop-blur-xl">
-                                    <Image
+                                <div
+                                    className="relative w-full rounded-2xl overflow-hidden border-[2px] border-white/20 backdrop-blur-xl shadow-2xl transition-all duration-300 ease-in-out bg-black/20"
+                                    style={{ aspectRatio: imageRatio || "1/1" }}
+                                >
+                                    <LazyImage
                                         src={collection.image || "/placeholder.svg"}
                                         alt={collection.name}
                                         fill
                                         className="object-cover"
+                                        priority
+                                        onLoad={(e) => {
+                                            const img = e.currentTarget;
+                                            if (img.naturalWidth && img.naturalHeight) {
+                                                setImageRatio(img.naturalWidth / img.naturalHeight);
+                                            }
+                                        }}
                                     />
                                 </div>
                             </div>

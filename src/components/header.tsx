@@ -30,8 +30,10 @@ export function Header() {
 
           <MobileSidebar />
 
-          <div className="hidden md:block">
-            <ThemeToggle />
+          <div className="mr-4 md:mr-0">
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
           </div>
 
         </div>
