@@ -110,10 +110,10 @@ export default function IPProtectionContent() {
                                     <span>Protocol + Platform</span>
                                 </div>
                                 <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
-                                    How does Mediolano protect IP
+                                    How does Mediolano protect IP?
                                 </h1>
                                 <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance">
-                                    Mediolano protects your Intellectual Property through a robust "Built for the Integrity Web" strategy, combining immutable cryptography, international legal frameworks, and community governance.
+                                    Mediolano protects Intellectual Property through a robust "Built for the Integrity Web" strategy, combining immutable cryptography, international legal frameworks, and community governance.
                                 </p>
                             </div>
 
@@ -217,15 +217,9 @@ export default function IPProtectionContent() {
                                     </p>
                                     <div className="grid md:grid-cols-2 gap-6">
                                         <div className="bg-muted/20 p-4 rounded-xl">
-                                            <h4 className="font-semibold text-foreground mb-2">Community Watch</h4>
+                                            <h4 className="font-semibold text-foreground mb-2">Community Report</h4>
                                             <p className="text-sm">
-                                                The Mediolano community actively monitors for IP infringement. The DAO can vote to flag malicious actors or delist infringing content from the frontend (though the on-chain record remains, tagged as disputed).
-                                            </p>
-                                        </div>
-                                        <div className="bg-muted/20 p-4 rounded-xl">
-                                            <h4 className="font-semibold text-foreground mb-2">Dispute Resolution</h4>
-                                            <p className="text-sm">
-                                                Future roadmap items include decentralized dispute resolution mechanisms where token holders can serve as jurors for IP conflicts.
+                                                The Mediolano community actively monitors for IP infringement. The DAO can vote to flag malicious actors or delist infringing content from the community and platform.
                                             </p>
                                         </div>
                                     </div>
