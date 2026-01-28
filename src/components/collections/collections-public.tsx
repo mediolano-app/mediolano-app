@@ -36,7 +36,10 @@ import {
   Filter,
   Box,
   X,
+  ExternalLink,
+  Eye,
 } from "lucide-react"
+import { EXPLORER_URL } from "@/services/constants"
 import { ReportAssetDialog } from "@/components/report-asset-dialog"
 
 type SortOption = "date-new" | "date-old" | "name-asc" | "name-desc" | "assets-high" | "assets-low"
@@ -167,10 +170,12 @@ export function CollectionsGrid({ collections, onCollectionClick }: { collection
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button className="gap-1 ml-auto sm:ml-0">
-            <Plus className="h-4 w-4" />
-            <span className="hidden xs:inline">New Collection</span>
-          </Button>
+          <Link href="/create/collection">
+            <Button className="gap-1 ml-auto sm:ml-0">
+              <Plus className="h-4 w-4" />
+              <span className="hidden xs:inline">New Collection</span>
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -311,7 +316,7 @@ function CollectionCard({ collection, nftCount, onReportClick, onCollectionClick
         ) : (
           <h3 className="text-xl font-bold hover:text-primary transition-colors">{collection.name}</h3>
         )}
-        <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
+        <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} nftAddress={collection.nftAddress} />
       </CardHeader>
       <CardContent className="pb-2">
         <p className="text-sm text-muted-foreground line-clamp-2">
@@ -445,7 +450,7 @@ function CollectionListItem({ collection, nftCount, onReportClick, onCollectionC
         )}
       </div>
 
-      <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
+      <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} nftAddress={collection.nftAddress} />
     </div>
   )
 }
@@ -477,7 +482,7 @@ export function FeaturedCollectionCard({ collection, nftCount, onReportClick }: 
               <Link href={`/collections/${collection.nftAddress || String(collection.id)}`}>
                 <h2 className="text-xl md:text-2xl font-bold mb-2 hover:text-primary transition-colors">{collection.name}</h2>
               </Link>
-              <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} />
+              <CollectionActionDropdown collectionId={String(collection.id)} collectionName={collection.name} onReportClick={onReportClick} nftAddress={collection.nftAddress} />
             </div>
             <p className="text-sm text-muted-foreground mb-4 line-clamp-3 md:line-clamp-none">
               {collection.description}
@@ -548,7 +553,11 @@ export function FeaturedCollectionCard({ collection, nftCount, onReportClick }: 
   )
 }
 
-function CollectionActionDropdown({ collectionId, collectionName, onReportClick }: { collectionId: string; collectionName?: string; onReportClick: () => void }) {
+function CollectionActionDropdown({ collectionId, collectionName, onReportClick, nftAddress }: { collectionId: string; collectionName?: string; onReportClick: () => void; nftAddress?: string }) {
+  // Use nftAddress if available, otherwise fallback to collectionId for the explorer link
+  // Assuming the contract address is what we want to rely on for the explorer
+  const addressToUse = nftAddress || collectionId;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -557,13 +566,31 @@ function CollectionActionDropdown({ collectionId, collectionName, onReportClick 
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuItem asChild>
+          <Link href={`/collections/${addressToUse}`} className="cursor-pointer flex items-center">
+            <Eye className="mr-2 h-4 w-4" />
+            View Collection
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link
+            href={`${EXPLORER_URL}/contract/${addressToUse}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cursor-pointer flex items-center"
+          >
+            <ExternalLink className="mr-2 h-4 w-4" />
+            View on Explorer
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation()
             onReportClick()
           }}
-          className="text-destructive focus:text-destructive"
+          className="text-destructive focus:text-destructive cursor-pointer"
         >
           <X className="mr-2 h-4 w-4" />
           Report Collection
