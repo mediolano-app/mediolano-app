@@ -242,13 +242,16 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                   {/* Asset Image - Large Glass Card */}
                   <div className="flex-shrink-0 relative group w-full max-w-[320px] lg:max-w-[400px] mx-auto lg:mx-0">
                     <div className="absolute -inset-1 rounded-2xl" />
-                    <div className="relative aspect-square rounded-2xl overflow-hidden">
+                    <div
+                      className="relative w-full rounded-2xl overflow-hidden shadow-2xl transition-all duration-300 ease-in-out border border-white/10 bg-black/20 backdrop-blur-sm"
+                      style={{ aspectRatio: imageRatio || "1/1" }}
+                    >
                       <LazyImage
                         src={asset?.image || "/placeholder.svg"}
                         fallbackSrc="/background.jpg"
                         alt={asset?.name || "IP Asset"}
                         fill
-                        className="object-contain"
+                        className="object-cover"
                         priority
                         onLoad={(e) => {
                           const img = e.currentTarget;
