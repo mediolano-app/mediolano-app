@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: AssetPageProps): Promise<Meta
   // TODO: Fetch real asset data here for richer SEO
   // For now, using dynamic slug in title
   const title = `Asset ${slug.substring(0, 8)}... | IP Creator`
-  const description = "View and manage this intellectual property asset on Mediolano."
+  const description = "View, share and remix this intellectual property on IP Creator."
 
   return {
     title: title,
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: AssetPageProps): Promise<Meta
     openGraph: {
       title: title,
       description: description,
-      siteName: "Mediolano IP Creator",
+      siteName: "IP Creator",
       type: "website",
     },
     twitter: {

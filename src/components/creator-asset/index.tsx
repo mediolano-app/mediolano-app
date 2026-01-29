@@ -80,7 +80,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
       try {
         await navigator.share({
           title: asset?.name || "Asset",
-          text: `Check out ${asset?.name} on Mediolano`,
+          text: `Check out ${asset?.name} on IP Creator`,
           url: window.location.href,
         })
       } catch (error) {
@@ -125,9 +125,9 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
     return {
       id: asset.id,
       name: asset.name,
-      type: asset.type || "Asset",
+      type: asset.type || "IP",
       creator: {
-        name: rawAsset.collectionName || "Unknown Creator",
+        name: rawAsset.collectionName || "Unknown",
         address: rawAsset.properties?.creator as string || "Unknown",
         avatar: "/placeholder.svg?height=40&width=40",
         verified: true,
@@ -280,7 +280,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                           )}
                         </div>
 
-                        <h1 className="text-4xl lg:text-7xl font-bold drop-shadow-xl tracking-tight leading-tight mb-4 lg:mb-6 break-words">{asset.name}</h1>
+                        <h1 className="text-4xl font-bold drop-shadow-xl tracking-tight leading-tight mb-4 lg:mb-6 break-words text-foreground">{asset.name}</h1>
 
                         {asset.tags && asset.tags.length > 0 && (
                           <div className="flex flex-wrap gap-2 justify-center lg:justify-start mb-6">
@@ -288,7 +288,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                               <Badge
                                 key={index}
                                 variant="secondary"
-                                className="bg-black/30 text-white hover:bg-black/40 border-transparent capitalize backdrop-blur-sm"
+                                className="bg-black/30 text-foreground hover:bg-black/40 border-transparent capitalize backdrop-blur-sm"
                               >
                                 {tag}
                               </Badge>
@@ -296,7 +296,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                           </div>
                         )}
 
-                        <p className="text-lg lg:text-xl text-white/90 max-w-2xl leading-relaxed drop-shadow-md font-medium px-4 lg:px-0 mx-auto lg:mx-0 break-words break-all">
+                        <p className="text-foreground/90 max-w-2xl leading-relaxed drop-shadow-md font-medium px-4 lg:px-0 mx-auto lg:mx-0 break-words break-all">
                           {asset.description}
                         </p>
                       </div>
@@ -308,7 +308,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                           <Button
                             variant="outline"
                             size="lg"
-                            className="flex-1 sm:flex-none border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base px-3"
+                            className="flex-1 sm:flex-none glass transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base px-3"
                             onClick={() => setIsTransferOpen(true)}
                           >
                             <ArrowRightLeft className="h-3.5 w-3.5 lg:h-5 lg:w-5" />
@@ -320,7 +320,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                           <Button
                             variant="outline"
                             size="lg"
-                            className="w-full border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base px-3"
+                            className="w-full glass transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base text-foreground px-3"
                           >
                             <Palette className="h-3.5 w-3.5 lg:h-5 lg:w-5" />
                             Remix
@@ -331,7 +331,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                           <Button
                             variant="outline"
                             size="lg"
-                            className="w-full border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base px-3"
+                            className="w-full glass transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base text-foreground px-3"
                           >
                             <History className="h-3.5 w-3.5 lg:h-5 lg:w-5" />
                             Provenance
@@ -341,7 +341,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-10 w-10 text-white hover:bg-white/20 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shrink-0"
+                          className="h-10 w-10 glass rounded-full text-foreground"
                           onClick={handleShare}
                         >
                           <Share2 className="h-5 w-5" />
@@ -351,7 +351,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-10 w-10 text-white hover:bg-white/20 rounded-full bg-white/5 backdrop-blur-md border border-white/10"
+                            className="h-10 w-10 glass rounded-full text-foreground"
                             onClick={() => setIsReportOpen(true)}
                             title="Report Asset"
                           >
@@ -366,7 +366,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-10 w-10 text-white hover:bg-white/20 rounded-full bg-white/5 backdrop-blur-md border border-white/10"
+                              className="h-10 w-10 glass rounded-full text-foreground"
                               title="View on Explorer"
                             >
                               <ExternalLink className="h-5 w-5" />
@@ -381,7 +381,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
             </div>
 
             {/* Main Content Area - Tabs */}
-            <div className="container mx-auto px-4 pb-16 max-w-7xl relative z-20">
+            <div className="container mx-auto px-4 pt-8 pb-16 max-w-7xl relative z-20">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column: Tabs & Details (Spans 2 cols) */}
                 <div className="lg:col-span-2 space-y-8">
@@ -401,7 +401,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     </div>
                     <div className="glass-card p-4 rounded-xl bg-background/50 backdrop-blur-md border border-border/50">
                       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Status</p>
-                      <Badge variant="secondary" className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">Protected</Badge>
+                      <Badge variant="secondary" className="text-foreground">Onchain</Badge>
                     </div>
                   </div>
 
