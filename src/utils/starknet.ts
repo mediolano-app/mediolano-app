@@ -15,7 +15,7 @@ export async function mintToken(account: Account): Promise<string> {
   const provider = new RpcProvider({ nodeUrl });
 
 
-  const contract = new Contract(ipcollectionABI, COLLECTION_CONTRACT_ADDRESS, provider);
+  const contract = new Contract({ abi: ipcollectionABI, address: COLLECTION_CONTRACT_ADDRESS });
 
   contract.connect(account);
 

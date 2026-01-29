@@ -1,5 +1,5 @@
 import { pinata } from "@/services/config/server.config";
-import { IPFS_URL } from "@/services/constants";
+import { IPFS_URL } from "@/lib/constants";
 import { useState, useCallback } from "react";
 
 export interface IpfsMetadata {

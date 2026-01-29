@@ -183,7 +183,6 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
     const provider = new RpcProvider({ nodeUrl: RPC_URL });
     const targetTokenId = BigInt(tokenId);
 
-    console.log(`[Provenance] Fetching events for Token ID: ${tokenId}`);
 
     const fetchAllRegistryEvents = async () => {
       try {
@@ -219,10 +218,8 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
             const low = BigInt(collectionIdResult[0]);
             const high = BigInt(collectionIdResult[1]);
             collectionId = low + (high << 128n);
-            console.log(`[Provenance] Contract ${contractAddress} maps to Collection ID: ${collectionId}`);
           } else if (collectionIdResult && collectionIdResult.length === 1) {
             collectionId = BigInt(collectionIdResult[0]);
-            console.log(`[Provenance] Contract ${contractAddress} maps to Collection ID (low only): ${collectionId}`);
           }
         } catch (e) {
           console.warn(`[Provenance] Failed to fetch collection ID for ${contractAddress} with both selectors`, e);
@@ -239,7 +236,6 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
           chunk_size: 1000,
         });
 
-        console.log(`[Provenance] Found ${response.events?.length || 0} registry events`);
         return { events: response.events || [], collectionId };
       } catch (err: any) {
         console.error("[Provenance] Registry/Collection Fetch Error:", err.message || err);
@@ -257,7 +253,6 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
           keys: [[STANDARD_TRANSFER_SELECTOR]],
           chunk_size: 1000,
         });
-        console.log(`[Provenance] Found ${response.events?.length || 0} contract events for ${contractAddr}`);
         return response.events || [];
       } catch (err: any) {
         console.error(`[Provenance] Contract Event Fetch Error for ${contractAddr}:`, err.message || err);

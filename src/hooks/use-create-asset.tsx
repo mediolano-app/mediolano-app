@@ -9,7 +9,7 @@ import { Abi } from "starknet";
 import { ipCollectionAbi } from "@/abis/ip_collection";
 import {
   COLLECTION_CONTRACT_ADDRESS,
-} from "@/services/constants";
+} from "@/lib/constants";
 import { useToast } from "./use-toast";
 
 export interface ICreateAsset {

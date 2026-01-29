@@ -30,7 +30,7 @@ export interface IPFSMetadata {
   pages?: number;
   authors?: string[];
   publisher?: string;
-  [key: string]: unknown; 
+  [key: string]: unknown;
 }
 
 export interface AssetType {
@@ -41,11 +41,11 @@ export interface AssetType {
   ipfsCid?: string;
   metadataUrl?: string;
   type?: string;
-  creator: string | { name: string; address: string }; 
-  owner: string | { name: string; address: string }; 
-  registrationDate?: string; 
+  creator: string | { name: string; address: string };
+  owner: string | { name: string; address: string };
+  registrationDate?: string;
   attributes?: Array<{ trait_type: string; value: string }>;
-  [key: string]: unknown; 
+  [key: string]: unknown;
 }
 
 export interface EnhancedAsset extends AssetType {
@@ -70,57 +70,55 @@ export const IPFS_GATEWAYS = [
  */
 export async function fetchIPFSMetadata(cid: string, bypassCache = false): Promise<IPFSMetadata | null> {
   if (!cid) return null;
-  
+
   if (!bypassCache) {
     const cachedData = localStorage.getItem(`${CACHE_PREFIX}${cid}`);
     if (cachedData) {
       try {
         const { data, timestamp } = JSON.parse(cachedData);
-        
+
         if (Date.now() - timestamp < CACHE_EXPIRY) {
-          console.log(`Using cached IPFS metadata for ${cid}`);
           return data as IPFSMetadata;
         } else {
-          console.log(`Cache expired for ${cid}, fetching fresh data`);
         }
       } catch (e) {
         console.warn(`Failed to parse cached metadata for ${cid}:`, e);
       }
     }
   }
-  
+
   for (const gateway of IPFS_GATEWAYS) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); 
-      
-      const response = await fetch(`${gateway}${cid}`, { 
-        signal: controller.signal 
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(`${gateway}${cid}`, {
+        signal: controller.signal
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!response.ok) {
         console.warn(`Gateway ${gateway} returned ${response.status} for ${cid}`);
-        continue; 
+        continue;
       }
-      
+
       const metadata = await response.json();
-      
+
       const cacheEntry = {
         data: metadata,
         timestamp: Date.now()
       };
-      
+
       localStorage.setItem(`${CACHE_PREFIX}${cid}`, JSON.stringify(cacheEntry));
-      console.log(`Successfully fetched and cached metadata for ${cid} using ${gateway}`);
-      
+
+
       return metadata as IPFSMetadata;
     } catch (error) {
       console.warn(`Error fetching from ${gateway}${cid}:`, error);
     }
   }
-  
+
   console.error(`All IPFS gateways failed for ${cid}`);
   return null;
 }
@@ -140,7 +138,7 @@ export function getKnownCids(): Record<string, string> {
       console.warn('Failed to parse cached CIDs, regenerating');
     }
   }
-  
+
 
   const cids = {
     "1": "QmT7fTAgtScnXy1WGHYfzWrZfTsZEWPXbZqRPKqsYbifF1", // Arte digital
@@ -150,9 +148,9 @@ export function getKnownCids(): Record<string, string> {
     "5": "QmWnSQ3oRrYa9GyYaUCKQ5amL1z2Q1LFMYVM8Rkd3r9Kj2", // Patent
     // Add more if is necessary 
   };
-  
+
   localStorage.setItem('known-ipfs-cids', JSON.stringify(cids));
-  
+
   return cids;
 }
 
@@ -164,12 +162,12 @@ export function getKnownCids(): Record<string, string> {
  */
 export function combineData(ipfsData: IPFSMetadata | null, mockData: AssetType): AssetType {
   if (!ipfsData) return mockData;
-  
+
   // Combinar los datos, priorizando los datos de IPFS
   const result: AssetType = {
     ...mockData,
-    ...(ipfsData as Partial<AssetType>), 
-    id: mockData.id, 
+    ...(ipfsData as Partial<AssetType>),
+    id: mockData.id,
     creator: ipfsData.creator || mockData.creator,
     owner: mockData.owner, // Mantener el owner actual
     image: ipfsData.image || mockData.image,
@@ -177,11 +175,11 @@ export function combineData(ipfsData: IPFSMetadata | null, mockData: AssetType):
     type: ipfsData.type || mockData.type,
     registrationDate: ipfsData.registrationDate || mockData.registrationDate
   };
-  
+
   if (mockData.ipfsCid) {
     result.ipfsCid = mockData.ipfsCid;
   }
-  
+
   return result;
 }
 
@@ -198,14 +196,14 @@ export async function loadIPFSMetadataInBackground(
 ): Promise<void> {
   const assetsWithCids = assets.filter(asset => asset.ipfsCid);
   if (assetsWithCids.length === 0) return;
-  
+
   const batches = [];
   for (let i = 0; i < assetsWithCids.length; i += batchSize) {
     batches.push(assetsWithCids.slice(i, i + batchSize));
   }
-  
+
   let updatedAssets: EnhancedAsset[] = [...assets] as EnhancedAsset[];
-  
+
   for (const batch of batches) {
     const processedBatch = await Promise.all(
       batch.map(async (asset) => {
@@ -214,18 +212,18 @@ export async function loadIPFSMetadataInBackground(
           return combineData(metadata, asset) as EnhancedAsset;
         } catch (error) {
           console.error(`Failed to load metadata for asset ${asset.id}:`, error);
-          return asset as EnhancedAsset; 
+          return asset as EnhancedAsset;
         }
       })
     );
-    
+
     updatedAssets = updatedAssets.map(asset => {
       const processed = processedBatch.find(a => a.id === asset.id);
       return processed || asset;
     });
-    
+
     updateCallback(updatedAssets);
-    
+
     if (batches.indexOf(batch) < batches.length - 1) {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
@@ -239,7 +237,6 @@ export async function loadIPFSMetadataInBackground(
 export function clearIPFSCache(cid?: string): void {
   if (cid) {
     localStorage.removeItem(`${CACHE_PREFIX}${cid}`);
-    console.log(`Cleared cache for ${cid}`);
   } else {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -317,6 +314,6 @@ export function processIPFSHashToUrl(input: string, fallbackUrl: string): string
     return processedUrl;
   }
 
-  console.log("IPFS input not recognized, using fallback:", fallbackUrl);
+
   return fallbackUrl || "";
 }

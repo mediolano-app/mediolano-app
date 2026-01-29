@@ -1,0 +1,164 @@
+next.config.ts(4,3): error TS2353: Object literal may only specify known properties, and 'eslint' does not exist in type 'NextConfig'.
+src/app/account/page.tsx(446,71): error TS2554: Expected 1 arguments, but got 3.
+src/components/asset/overview-tab.tsx(33,43): error TS2339: Property 'nftAddress' does not exist on type 'DisplayAsset'.
+src/components/asset/overview-tab.tsx(163,50): error TS2339: Property 'description' does not exist on type '{ name: string; image: string; attributes: { trait_type: string; value: string; }[]; id: string; licenseTerms: string; collection: string; blockchain: string; tokenStandard: string; contract: any; author: { ...; }; licenseType: string; owner: string; version: string; } | { ...; }'.
+  Property 'description' does not exist on type '{ name: string; image: string; attributes: { trait_type: string; value: string; }[]; id: string; licenseTerms: string; collection: string; blockchain: string; tokenStandard: string; contract: any; author: { ...; }; licenseType: string; owner: string; version: string; }'.
+src/components/assets/AssetDashboard.tsx(22,69): error TS2339: Property 'category' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(27,82): error TS2339: Property 'isVisible' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(35,46): error TS2339: Property 'category' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(38,54): error TS2339: Property 'isVisible' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(39,54): error TS2339: Property 'isVisible' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(88,83): error TS2322: Type '(string | undefined)[]' is not assignable to type 'string[]'.
+  Type 'string | undefined' is not assignable to type 'string'.
+    Type 'undefined' is not assignable to type 'string'.
+src/components/assets/AssetDashboard.tsx(105,35): error TS2339: Property 'externalUrl' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(114,37): error TS2339: Property 'category' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(114,83): error TS2339: Property 'category' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(128,44): error TS2339: Property 'isVisible' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(131,28): error TS2339: Property 'externalUrl' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(131,49): error TS2339: Property 'tokenId' does not exist on type 'Asset'.
+src/components/assets/AssetDashboard.tsx(133,112): error TS2339: Property 'externalUrl' does not exist on type 'Asset'.
+src/components/assets/AssetFetcher.tsx(2,10): error TS2724: '"@/lib/start-data"' has no exported member named 'Assets'. Did you mean 'assets'?
+src/components/assets/AssetLicensings.tsx(25,68): error TS2339: Property 'licensing' does not exist on type 'Asset'.
+src/components/assets/AssetOverview.tsx(21,36): error TS2339: Property 'rarity' does not exist on type 'Asset'.
+src/components/assets/AssetOverview.tsx(43,20): error TS2339: Property 'attributes' does not exist on type 'Asset'.
+src/components/assets/AssetOverview.tsx(43,49): error TS7006: Parameter 'attr' implicitly has an 'any' type.
+src/components/assets/AssetOverview.tsx(43,55): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/assets/AssetsRelatedCarousel.tsx(28,27): error TS2339: Property 'id' does not exist on type 'Asset'.
+src/components/assets/AssetsRelatedCarousel.tsx(29,81): error TS2339: Property 'id' does not exist on type 'Asset'.
+src/components/assets/AssetsRelatedCarousel.tsx(63,76): error TS2339: Property 'name' does not exist on type 'string'.
+src/components/assets/AssetsRelatedCarousel.tsx(65,41): error TS2339: Property 'id' does not exist on type 'Asset'.
+src/components/assets/nft-card.tsx(77,12): error TS2678: Type '"Trademark"' is not comparable to type 'IPType'.
+src/components/assets/nft-card.tsx(93,7): error TS2353: Object literal may only specify known properties, and 'Trademark' does not exist in type 'Record<IPType, string>'.
+src/components/assets/nft-card.tsx(101,30): error TS7053: Element implicitly has an 'any' type because expression of type '"Other"' can't be used to index type 'Record<IPType, string>'.
+  Property 'Other' does not exist on type 'Record<IPType, string>'.
+src/components/create-ip/AssetsTab.tsx(2,15): error TS2614: Module '"@/app/create/asset/page"' has no exported member 'FormValues'. Did you mean to use 'import FormValues from "@/app/create/asset/page"' instead?
+src/components/create-ip/DetailsTab.tsx(2,15): error TS2614: Module '"@/app/create/asset/page"' has no exported member 'FormValues'. Did you mean to use 'import FormValues from "@/app/create/asset/page"' instead?
+src/components/create-ip/RightsTab.tsx(2,15): error TS2614: Module '"@/app/create/asset/page"' has no exported member 'FormValues'. Did you mean to use 'import FormValues from "@/app/create/asset/page"' instead?
+src/components/create-ip/SummaryCard.tsx(14,15): error TS2614: Module '"@/app/create/asset/page"' has no exported member 'FormValues'. Did you mean to use 'import FormValues from "@/app/create/asset/page"' instead?
+src/components/create-ip/SummaryCard.tsx(67,44): error TS7006: Parameter 'tag' implicitly has an 'any' type.
+src/components/create-ip/SummaryCard.tsx(67,49): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/components/create-ip/TransactionDrawer.tsx(29,15): error TS2614: Module '"@/app/create/asset/page"' has no exported member 'FormValues'. Did you mean to use 'import FormValues from "@/app/create/asset/page"' instead?
+src/components/create-ip/TransactionDrawer.tsx(117,54): error TS7006: Parameter 'tag' implicitly has an 'any' type.
+src/components/create-ip/TransactionDrawer.tsx(117,59): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/components/discover/start-hero.tsx(111,34): error TS2322: Type '{ hidden: { opacity: number; y: number; }; visible: (i: number) => { opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }; }' is not assignable to type 'Variants'.
+  Property 'visible' is incompatible with index signature.
+    Type '(i: number) => { opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type 'Variant'.
+      Type '(i: number) => { opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type 'TargetResolver'.
+        Type '{ opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type 'string | TargetAndTransition'.
+          Type '{ opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type 'TargetAndTransition'.
+            Type '{ opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type '{ transition?: Transition<any> | undefined; transitionEnd?: ResolvedValues | undefined; }'.
+              Types of property 'transition' are incompatible.
+                Type '{ duration: number; delay: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+                  Type '{ duration: number; delay: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+                    Type '{ duration: number; delay: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+                      Types of property 'ease' are incompatible.
+                        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+                          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+                            Type 'number[]' is not assignable to type 'Easing[]'.
+                              Type 'number' is not assignable to type 'Easing'.
+src/components/discover/start-hero.tsx(126,34): error TS2322: Type '{ hidden: { opacity: number; y: number; }; visible: (i: number) => { opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }; }' is not assignable to type 'Variants'.
+  Property 'visible' is incompatible with index signature.
+    Type '(i: number) => { opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type 'Variant'.
+      Type '(i: number) => { opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type 'TargetResolver'.
+        Type '{ opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type 'string | TargetAndTransition'.
+          Type '{ opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type 'TargetAndTransition'.
+            Type '{ opacity: number; y: number; transition: { duration: number; delay: number; ease: number[]; }; }' is not assignable to type '{ transition?: Transition<any> | undefined; transitionEnd?: ResolvedValues | undefined; }'.
+              Types of property 'transition' are incompatible.
+                Type '{ duration: number; delay: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+                  Type '{ duration: number; delay: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+                    Type '{ duration: number; delay: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+                      Types of property 'ease' are incompatible.
+                        Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+                          Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+                            Type 'number[]' is not assignable to type 'Easing[]'.
+                              Type 'number' is not assignable to type 'Easing'.
+src/components/profile/FeaturedItens.tsx(2,31): error TS2307: Cannot find module '@/lib/dataMktUserProfile' or its corresponding type declarations.
+src/components/profile/FeaturedItens.tsx(11,29): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/components/profile/ItemOffers.tsx(1,24): error TS2307: Cannot find module '@/lib/dataMktUserProfile' or its corresponding type declarations.
+src/components/profile/ItemOffers.tsx(23,28): error TS7006: Parameter 'offer' implicitly has an 'any' type.
+src/components/profile/Items.tsx(2,23): error TS2307: Cannot find module '@/lib/dataMktUserProfile' or its corresponding type declarations.
+src/components/profile/Items.tsx(11,21): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/components/profile/user-profile.tsx(2,22): error TS2307: Cannot find module '@/lib/dataMktUserProfile' or its corresponding type declarations.
+src/components/profile/user-profile.tsx(26,34): error TS7006: Parameter 'link' implicitly has an 'any' type.
+src/components/profile/user-profile.tsx(26,40): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/profile/UserActivities.tsx(1,28): error TS2307: Cannot find module '@/lib/dataMktUserProfile' or its corresponding type declarations.
+src/components/profile/UserActivities.tsx(25,32): error TS7006: Parameter 'activity' implicitly has an 'any' type.
+src/components/remix/remix-asset-dialog.tsx(49,3): error TS2353: Object literal may only specify known properties, and 'Trademark' does not exist in type 'Record<IPType, any>'.
+src/components/remix/remix-asset-dialog.tsx(104,7): error TS2322: Type 'string' is not assignable to type 'LicenseType'.
+src/components/ui/pagination.tsx(49,4): error TS2322: Type '{ ref?: LegacyRef<HTMLAnchorElement> | undefined; key?: Key | null | undefined; download?: any; href?: string | undefined; hrefLang?: string | undefined; ... 281 more ...; className: string; }' is not assignable to type 'LinkProps<any>'.
+  Types of property 'href' are incompatible.
+    Type 'string | undefined' is not assignable to type 'Url'.
+      Type 'undefined' is not assignable to type 'Url'.
+src/components/widgets/DashboardPreview.tsx(7,81): error TS2307: Cannot find module '@/lib/mockDashboardPreviewData' or its corresponding type declarations.
+src/components/widgets/DashboardPreview.tsx(92,58): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/components/widgets/DashboardPreview.tsx(127,54): error TS7006: Parameter 'collection' implicitly has an 'any' type.
+src/components/widgets/DashboardPreview.tsx(157,33): error TS7006: Parameter 'nft' implicitly has an 'any' type.
+src/components/widgets/DashboardPreview.tsx(209,44): error TS7006: Parameter 'transaction' implicitly has an 'any' type.
+src/components/widgets/DashboardPreview.tsx(247,40): error TS7006: Parameter 'collection' implicitly has an 'any' type.
+src/components/widgets/LaunchSlider.tsx(6,30): error TS2307: Cannot find module '@/lib/mockLaunchData' or its corresponding type declarations.
+src/components/widgets/LaunchSlider.tsx(57,32): error TS7006: Parameter 'launch' implicitly has an 'any' type.
+src/components/widgets/LaunchSlider.tsx(57,40): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/widgets/LaunchSlider.tsx(131,28): error TS7006: Parameter '_' implicitly has an 'any' type.
+src/components/widgets/LaunchSlider.tsx(131,31): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/components/widgets/UsersCollections.tsx(31,28): error TS2339: Property 'ip_ids' does not exist on type 'CallResult'.
+  Property 'ip_ids' does not exist on type 'string'.
+src/hooks/useActivities.ts(193,33): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/hooks/useActivities.ts(214,56): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/hooks/useActivities.ts(222,33): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/hooks/useActivities.ts(423,41): error TS2322: Type '"remix"' is not assignable to type '"mint" | "collection" | "transfer"'.
+src/hooks/useBlockchainPortfolio.ts(94,9): error TS2554: Expected 1 arguments, but got 3.
+src/hooks/useBlockchainPortfolio.ts(199,5): error TS2322: Type '{ id: string; name: string; description: string; image: string; tokenId: string; collection: { id: string; name: string; description: string; floorPrice: number; image: string; itemCount: number; }; price: number; rarity: string; attributes: { ...; }[]; createdAt: string; }[]' is not assignable to type 'NFT[]'.
+  Type '{ id: string; name: string; description: string; image: string; tokenId: string; collection: { id: string; name: string; description: string; floorPrice: number; image: string; itemCount: number; }; price: number; rarity: string; attributes: { ...; }[]; createdAt: string; }' is not assignable to type 'NFT'.
+    Types of property 'collection' are incompatible.
+      Type '{ id: string; name: string; description: string; floorPrice: number; image: string; itemCount: number; }' is missing the following properties from type 'Collection': nftAddress, owner, isActive, totalMinted, and 7 more.
+src/hooks/useBlockchainPortfolio.ts(225,5): error TS2322: Type '{ id: string; name: string; description: string; floorPrice: number; image: string; itemCount: number; }[]' is not assignable to type 'Collection[]'.
+  Type '{ id: string; name: string; description: string; floorPrice: number; image: string; itemCount: number; }' is missing the following properties from type 'Collection': nftAddress, owner, isActive, totalMinted, and 7 more.
+src/hooks/usePaymasterMarketplace.ts(8,34): error TS2307: Cannot find module '@/abis/ip_market' or its corresponding type declarations.
+src/hooks/usePaymasterTransaction.ts(173,56): error TS2345: Argument of type 'AccountInterface' is not assignable to parameter of type 'Account'.
+  Type 'AccountInterface' is missing the following properties from type 'Account': transactionVersion, paymaster, defaultTipType, getNonceSafe, and 24 more.
+src/hooks/usePaymasterTransaction.ts(224,9): error TS2322: Type 'ArraySignatureType | SignatureType[]' is not assignable to type 'string[]'.
+  Type 'SignatureType[]' is not assignable to type 'string[]'.
+    Type 'SignatureType' is not assignable to type 'string'.
+src/hooks/useSmartContract.ts(38,5): error TS2322: Type '{ name: string; type: string; inputs: { name: string; type: string; }[]; outputs: { name: string; type: string; }[]; }[]' is not assignable to type 'readonly (AbiImpl | AbiInterface | AbiConstructor | AbiFunction | AbiStruct | AbiEnum | AbiEvent)[]'.
+  Type '{ name: string; type: string; inputs: { name: string; type: string; }[]; outputs: { name: string; type: string; }[]; }' is not assignable to type 'AbiImpl | AbiInterface | AbiConstructor | AbiFunction | AbiStruct | AbiEnum | AbiEvent'.
+    Type '{ name: string; type: string; inputs: { name: string; type: string; }[]; outputs: { name: string; type: string; }[]; }' is not assignable to type 'AbiImpl | AbiInterface | AbiFunction | AbiStruct | AbiEnum | AbiEventStruct | AbiEventEnum'.
+      Property 'state_mutability' is missing in type '{ name: string; type: string; inputs: { name: string; type: string; }[]; outputs: { name: string; type: string; }[]; }' but required in type 'AbiFunction'.
+src/hooks/useSmartContract.ts(39,5): error TS2322: Type 'string' is not assignable to type '`0x${string}`'.
+src/hooks/useUserActivities.ts(195,78): error TS18048: 'owner' is possibly 'undefined'.
+src/hooks/useUserActivities.ts(202,33): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/hooks/useUserActivities.ts(223,56): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/hooks/useUserActivities.ts(226,81): error TS18048: 'operator' is possibly 'undefined'.
+src/hooks/useUserActivities.ts(235,33): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/hooks/useUserActivities.ts(441,41): error TS2322: Type '"remix"' is not assignable to type '"mint" | "collection" | "transfer"'.
+src/lib/mockFfeatureData.ts(9,41): error TS2749: 'IconProps' refers to a value, but is being used as a type here. Did you mean 'typeof IconProps'?
+src/lib/mockupAssets.ts(5,3): error TS2740: Type '{ id: string; name: string; description: string; floorPrice: number; }' is missing the following properties from type 'Collection': image, nftAddress, owner, isActive, and 9 more.
+src/lib/mockupAssets.ts(11,3): error TS2740: Type '{ id: string; name: string; description: string; floorPrice: number; }' is missing the following properties from type 'Collection': image, nftAddress, owner, isActive, and 9 more.
+src/lib/mockupAssets.ts(18,3): error TS2740: Type '{ id: string; name: string; description: string; floorPrice: number; }' is missing the following properties from type 'Collection': image, nftAddress, owner, isActive, and 9 more.
+src/lib/mockupAssets.ts(24,3): error TS2740: Type '{ id: string; name: string; description: string; floorPrice: number; }' is missing the following properties from type 'Collection': image, nftAddress, owner, isActive, and 9 more.
+src/lib/mockupAssets.ts(30,3): error TS2740: Type '{ id: string; name: string; description: string; floorPrice: number; }' is missing the following properties from type 'Collection': image, nftAddress, owner, isActive, and 9 more.
+src/lib/mockupAssets.ts(47,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(81,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(100,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(116,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(132,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(148,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(164,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(185,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(201,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(218,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(234,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(251,5): error TS2322: Type 'Collection' is not assignable to type 'string'.
+src/lib/mockupAssets.ts(263,11): error TS2339: Property 'licensing' does not exist on type 'Asset'.
+src/lib/mockupAssets.ts(274,11): error TS2339: Property 'licensing' does not exist on type 'Asset'.
+src/lib/mockupAssets.ts(302,39): error TS2339: Property 'id' does not exist on type 'Asset'.
+src/lib/mockupAssets.ts(306,52): error TS2339: Property 'id' does not exist on type 'string'.
+src/lib/start-data.ts(9,3): error TS2305: Module '"@/types/asset"' has no exported member 'User'.
+src/lib/start-data.ts(113,14): error TS2741: Property 'recentViews' is missing in type '{ totalAssets: number; totalValue: string; createdAssets: number; licensedAssets: number; protectionLevel: number; }' but required in type 'PortfolioStats'.
+src/lib/start-data.ts(171,45): error TS2367: This comparison appears to be unintentional because the types '{ id: string; username: string; name: string; avatar: string; verified: boolean; wallet: string; }' and 'string' have no overlap.

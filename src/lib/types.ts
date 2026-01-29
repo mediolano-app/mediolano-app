@@ -62,9 +62,9 @@ export class CollectionValidator {
     }
 
     const requiredFields = [
-      'id', 'name', 'description', 'image', 'nftAddress', 
-      'owner', 'isActive', 'totalMinted', 'totalBurned', 
-      'totalTransfers', 'lastMintTime', 'lastBurnTime', 
+      'id', 'name', 'description', 'image', 'nftAddress',
+      'owner', 'isActive', 'totalMinted', 'totalBurned',
+      'totalTransfers', 'lastMintTime', 'lastBurnTime',
       'lastTransferTime', 'itemCount', 'totalSupply', 'baseUri'
     ];
 
@@ -309,59 +309,60 @@ export type IPType =
   | "Custom"
   | "Generic";
 
-  
+
 export interface DisplayAsset {
-    id: string;
-    tags: string[];
-    tokenId: number;
+  id: string;
+  tags: string[];
+  tokenId: number;
+  name: string;
+  author: {
     name: string;
-    author: {
-      name: string;
-      address: string;
-      avatar: string;
-      verified: boolean;
-      bio: string;
-      website: string;
-    };
-    creator: {
-      name: string;
-      address: string;
-      avatar: string;
-      verified: boolean;
-      bio: string;
-      website: string;
-    };
-    owner: {
-      name: string;
-      address: string;
-      avatar: string;
-      verified: boolean;
-      acquired: string;
-    };
-    description: string;
-    template: string;
-    image: string;
-    createdAt: string;
-    collection: string;
-    blockchain: string;
-    tokenStandard: string;
-    licenseType: string;
-    licenseDetails: string;
-    version: string;
-    commercialUse: boolean;
-    modifications: boolean;
-    attribution: boolean;
-    licenseTerms: string;
-    contract: string;
-    attributes: Array<{ trait_type: string; value: string }>;
-    licenseInfo: {
-      type: string;
-      terms: string;
-      allowCommercial: boolean;
-      allowDerivatives: boolean;
-      requireAttribution: boolean;
-      royaltyPercentage: number;
-    };
-    ipfsCid?: string;
+    address: string;
+    avatar: string;
+    verified: boolean;
+    bio: string;
+    website: string;
+  };
+  creator: {
+    name: string;
+    address: string;
+    avatar: string;
+    verified: boolean;
+    bio: string;
+    website: string;
+  };
+  owner: {
+    name: string;
+    address: string;
+    avatar: string;
+    verified: boolean;
+    acquired: string;
+  };
+  description: string;
+  template: string;
+  image: string;
+  createdAt: string;
+  collection: string;
+  blockchain: string;
+  tokenStandard: string;
+  licenseType: string;
+  licenseDetails: string;
+  version: string;
+  commercialUse: boolean;
+  modifications: boolean;
+  attribution: boolean;
+  licenseTerms: string;
+  contract: string;
+  attributes: Array<{ trait_type: string; value: string }>;
+  licenseInfo: {
     type: string;
-  }
+    terms: string;
+    allowCommercial: boolean;
+    allowDerivatives: boolean;
+    requireAttribution: boolean;
+    royaltyPercentage: number;
+  };
+  ipfsCid?: string;
+  type: string;
+  collectionId?: string;
+}

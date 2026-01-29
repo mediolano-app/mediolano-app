@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useMemo, useState } from "react";
+import { use, useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card"; // Added missing import
@@ -14,13 +14,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IPTypeInfo } from "@/components/ip-type-info";
+import { Collection } from "@/lib/types";
 import { OverviewTab } from "@/components/asset/overview-tab";
 import { LicenseTab } from "@/components/asset/license-tab";
 import { OwnerTab } from "@/components/asset/owner-tab";
 import { AssetTimelineTab } from "./creator-asset-timeline-tab";
 import { ReportAssetDialog } from "@/components/report-asset-dialog";
 import { useAsset } from "@/hooks/use-asset";
-import { useGetAllCollections } from "@/hooks/use-collection";
+import { useGetCollection } from "@/hooks/use-collection";
 import { AssetLoadingState } from "@/components/asset/asset-loading-state";
 import { AssetErrorBoundary } from "@/components/asset/asset-error-boundary";
 import { normalizeStarknetAddress } from "@/lib/utils";
@@ -161,12 +162,28 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
       return false;
     }
   }, [address, asset?.owner?.address]);
-  const { collections } = useGetAllCollections();
-  const matchedCollection = useMemo(() => {
-    if (!collections || !nftAddress) return undefined;
-    const target = String(nftAddress).toLowerCase();
-    return collections.find(c => normalizeStarknetAddress(String(c.nftAddress || "")) === target);
-  }, [collections, nftAddress]);
+  /* 
+   * Optimization: Fetch only the specific collection instead of scanning all.
+   * We get the collectionId (number/string) from the asset hook now.
+   */
+  const { fetchCollection } = useGetCollection();
+  const [matchedCollection, setMatchedCollection] = useState<Collection | undefined>(undefined);
+
+  useEffect(() => {
+    let mounted = true;
+    if (asset?.collectionId) {
+      fetchCollection(asset.collectionId)
+        .then(col => {
+          if (mounted) setMatchedCollection(col);
+        })
+        .catch(err => {
+          console.warn("Failed to fetch collection details:", err);
+        });
+    } else {
+      setMatchedCollection(undefined);
+    }
+    return () => { mounted = false; };
+  }, [asset?.collectionId, fetchCollection]);
 
 
   return (

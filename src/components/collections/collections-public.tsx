@@ -39,7 +39,7 @@ import {
   ExternalLink,
   Eye,
 } from "lucide-react"
-import { EXPLORER_URL } from "@/services/constants"
+import { EXPLORER_URL } from "@/lib/constants"
 import { ReportAssetDialog } from "@/components/report-asset-dialog"
 
 type SortOption = "date-new" | "date-old" | "name-asc" | "name-desc" | "assets-high" | "assets-low"

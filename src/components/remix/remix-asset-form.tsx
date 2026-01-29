@@ -36,7 +36,7 @@ import { useAsset } from "@/hooks/use-asset"
 import { useGetCollections } from "@/hooks/use-collection"
 import { useIpfsUpload } from "@/hooks/useIpfs"
 import { ipCollectionAbi } from "@/abis/ip_collection"
-import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants"
+import { COLLECTION_CONTRACT_ADDRESS } from "@/lib/constants"
 import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer"
 import { IMintResult } from "@/hooks/use-create-asset"
 

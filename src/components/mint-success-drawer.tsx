@@ -17,7 +17,7 @@ import { Separator } from "@/components/ui/separator"
 import { CheckCircle2, Sparkles, ExternalLink, FolderOpen, Share2, ArrowRight, Loader2, Library, Copy, Upload, XCircle } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import type { IMintResult } from "@/hooks/use-create-asset"
-import { EXPLORER_URL } from "@/services/constants"
+import { EXPLORER_URL } from "@/lib/constants"
 import { shortenAddress } from "@/lib/utils"
 import Image from "next/image"
 

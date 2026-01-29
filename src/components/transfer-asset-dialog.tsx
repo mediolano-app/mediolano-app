@@ -25,7 +25,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useSendTransaction } from "@starknet-react/core"
 import { COLLECTION_NFT_ABI } from "@/abis/ip_nft"
 import { shortenAddress } from "@/lib/utils"
-import { EXPLORER_URL } from "@/services/constants"
+import { EXPLORER_URL } from "@/lib/constants"
 
 export interface TransferableAsset {
   id: string

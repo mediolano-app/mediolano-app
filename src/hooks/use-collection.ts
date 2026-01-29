@@ -6,7 +6,7 @@ import {
 } from "@starknet-react/core";
 import { Abi } from "starknet";
 import { ipCollectionAbi } from "@/abis/ip_collection";
-import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
+import { COLLECTION_CONTRACT_ADDRESS } from "@/lib/constants";
 import { fetchOneByOne } from "@/lib/utils";
 import { isCollectionReported } from "@/lib/reported-content";
 
@@ -238,11 +238,7 @@ export function useCollection(): UseCollectionReturn {
         // Use up to 31 characters, or the full cleanSymbol if it's shorter, fallback to 'COLL' if empty
         const symbol = cleanSymbol || "COLL";
 
-        console.log("Creating collection with params:", {
-          name: formData.name,
-          symbol: symbol,
-          base_uri: formData.base_uri,
-        });
+
 
         // Prepare contract call - pass strings directly as ByteArray parameters
         const contractCall = contract.populate("create_collection", [
@@ -251,7 +247,7 @@ export function useCollection(): UseCollectionReturn {
           formData.base_uri, // base_uri as ByteArray
         ]);
 
-        console.log("Contract call prepared:", contractCall);
+
 
         // Execute the transaction
         const response = await createCollectionSend([contractCall]);

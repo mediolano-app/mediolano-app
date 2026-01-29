@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useContract, useProvider } from "@starknet-react/core";
 import { Abi, shortString } from "starknet";
 import { ipCollectionAbi } from "@/abis/ip_collection";
-import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
+import { COLLECTION_CONTRACT_ADDRESS } from "@/lib/constants";
 import type { Collection } from "@/lib/types";
 import { fetchIPFSMetadata, processIPFSHashToUrl } from "@/utils/ipfs";
 import type { TokenData, PortfolioStats, UserActivity } from "./use-portfolio";

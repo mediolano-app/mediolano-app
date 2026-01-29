@@ -36,14 +36,14 @@ import {
   CoverImageUploaderRef,
 } from "@/components/media-uploader";
 import { useIpfsUpload } from "@/hooks/useIpfs";
-import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
+import { COLLECTION_CONTRACT_ADDRESS } from "@/lib/constants";
 import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer";
 import { useProvider } from "@starknet-react/core";
 import { num, hash, Contract } from "starknet";
 import { ipCollectionAbi } from "../../abis/ip_collection";
 
 // Debugging ABI import
-console.log("CreateCollection: Loaded ABI", { ipCollectionAbi });
+
 
 export default function CreateCollectionView({
   isModalMode,
@@ -145,25 +145,20 @@ export default function CreateCollectionView({
       } else {
         // Use image URL (external URL or default placeholder)
         const currentImageUrl = uploaderRef.current?.getImageUrl() || "/placeholder.svg";
-        console.log("Uploading image from URL to IPFS:", currentImageUrl);
+
         result = await uploadImageFromUrl(currentImageUrl, submitData, "coverImage");
       }
 
       setProgress(40);
 
-      console.log("Upload result:", result);
-      console.log("Metadata URL:", result?.metadataUrl);
-
       // Validate that we have a valid metadata URL
       if (!result || !result.metadataUrl) {
         throw new Error("Failed to upload metadata to IPFS. Please try again.");
       }
-      console.log("Upload Complete. Proceeding to Mint.");
 
       // Step 2: Create collection on-chain
       setCreationStep("processing");
       setProgress(60);
-      console.log("Step: Minting collection on-chain...");
 
       const txHash = await createCollection({
         base_uri: result.metadataUrl,
@@ -171,15 +166,11 @@ export default function CreateCollectionView({
         symbol: formData.name, // Using name as symbol for simplicity or derive it
       });
 
-      console.log("Mint Initiated, Hash:", txHash);
-
       if (txHash) {
         setTxHash(txHash);
 
         // Wait for transaction to be accepted to get the event
-        console.log("Waiting for transaction receipt...");
         const receipt = await provider.waitForTransaction(txHash);
-        console.log("Receipt received:", receipt);
 
         // Default to listing page fallback
         let collectionId = "collections";
@@ -191,7 +182,6 @@ export default function CreateCollectionView({
 
         if (receipt.isSuccess() && 'events' in receipt) {
           const events = receipt.events;
-          console.log("Transaction Events:", events);
 
           // Find the event emitted by our contract
           // We look for an event that has enough data to be CollectionCreated
@@ -215,29 +205,25 @@ export default function CreateCollectionView({
           }
 
           if (creationEvent) {
-            console.log("Found Creation Event:", creationEvent);
             if (creationEvent.data && creationEvent.data.length > 0) {
               const low = creationEvent.data[0];
               collectionId = num.toBigInt(low).toString();
-              console.log("Parsed Collection ID:", collectionId);
             }
           }
         }
 
         // Fallback: If event parsing failed (collectionId is still "collections"), fetch robustly from chain
         if (collectionId === "collections" && walletAddress) {
-          console.log("Event parsing failed, fetching user collections from chain...");
           try {
             // Use static imports
             if (!ipCollectionAbi) {
-              console.error("ipCollectionAbi is undefined!");
               throw new Error("Internal error: Contract ABI not loaded");
             }
-            const contract = new Contract(ipCollectionAbi, COLLECTION_CONTRACT_ADDRESS, provider);
+            const contract = new Contract({ abi: ipCollectionAbi, address: COLLECTION_CONTRACT_ADDRESS });
+            contract.connect(provider);
 
             // call list_user_collections
             const userCollections = await contract.list_user_collections(walletAddress);
-            console.log("User collections:", userCollections);
 
             if (userCollections && userCollections.length > 0) {
               // It returns valid array of u256 (as objects or bigints depending on provider/version)
@@ -251,10 +237,9 @@ export default function CreateCollectionView({
               } else {
                 collectionId = num.toBigInt(lastId).toString();
               }
-              console.log("Fetched Last Collection ID:", collectionId);
             }
           } catch (err) {
-            console.error("Fallback fetch failed:", err);
+            // Fallback fetch failed
           }
         }
 
@@ -264,25 +249,22 @@ export default function CreateCollectionView({
         if (collectionId !== "collections") {
           try {
             if (!ipCollectionAbi) {
-              console.error("ipCollectionAbi is undefined!");
               throw new Error("Contract ABI missing");
             }
-            const contract = new Contract(ipCollectionAbi, COLLECTION_CONTRACT_ADDRESS, provider);
-            console.log("Fetching collection details for ID:", collectionId);
+            const contract = new Contract({ abi: ipCollectionAbi, address: COLLECTION_CONTRACT_ADDRESS });
+            contract.connect(provider);
 
             // get_collection returns [Collection] struct
             const collectionData = await contract.get_collection(collectionId);
-            console.log("Collection Data:", collectionData);
 
             // Extract ip_nft address
             if (collectionData && collectionData.ip_nft) {
               // ip_nft is a ContractAddress (felt)
               const addressBigInt = num.toBigInt(collectionData.ip_nft);
               collectionAddressForLink = "0x" + addressBigInt.toString(16);
-              console.log("Resolved Collection Address:", collectionAddressForLink);
             }
           } catch (err) {
-            console.error("Failed to fetch collection address:", err);
+            // Failed to fetch collection address
           }
         }
 
@@ -296,7 +278,7 @@ export default function CreateCollectionView({
 
       setProgress(100);
       setCreationStep("success");
-      console.log("Collection creation flow complete.");
+
 
       toast({
         title: "Collection Created!",
@@ -446,7 +428,7 @@ export default function CreateCollectionView({
 
                   <CoverImageUploader
                     ref={uploaderRef}
-                    onChange={(url, file) => console.log(url, file)}
+                    onChange={(url, file) => { }}
                   />
                 </CardContent>
                 <CardFooter className="flex justify-between">

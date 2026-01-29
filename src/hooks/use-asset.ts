@@ -265,7 +265,14 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
               return owned;
             });
           // Ensure owner is a hex string
-          const owner = ownerRaw ? `0x${BigInt(ownerRaw).toString(16)}` as `0x${string}` : undefined;
+          let owner: `0x${string}` | undefined;
+          if (ownerRaw) {
+            try {
+              owner = `0x${BigInt(ownerRaw as any).toString(16)}` as `0x${string}`;
+            } catch (e) {
+              console.warn("Error parsing owner:", e);
+            }
+          }
 
           // token URI
           const uriRaw = await (
@@ -285,10 +292,21 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
             });
           const tokenURI = String(uriRaw || "");
 
-          return { owner, tokenURI };
+          // collection ID
+          const collectionIdRaw = await (
+            contract as unknown as {
+              get_collection_id?: () => Promise<unknown>;
+            }
+          )
+            .get_collection_id?.()
+            .catch(() => null);
+
+          const collectionId = collectionIdRaw ? String(collectionIdRaw) : undefined;
+
+          return { owner, tokenURI, collectionId };
         })(),
         onchainTimeout,
-      ])) as { owner: `0x${string}`; tokenURI: string };
+      ])) as { owner: `0x${string}`; tokenURI: string; collectionId?: string };
 
       // Step 2: Fetch IPFS metadata
       setLoadingState((prev) => ({
@@ -376,7 +394,7 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
         tags: metadata?.tags as string[] | undefined,
         collectionName: metadata?.collectionName as string | undefined,
         licenseType: metadata?.licenseType as string | undefined,
-        collectionId: metadata?.collection as string | undefined,
+        collectionId: onchainData.collectionId || metadata?.collection as string | undefined,
       };
 
       setAsset(next);
