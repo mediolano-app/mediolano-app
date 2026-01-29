@@ -1,7 +1,6 @@
 import { Metadata } from 'next'
 import { CreatorHeader } from '@/components/creator/creator-header'
 import { CreatorNavigation } from '@/components/creator/creator-navigation'
-import { CreatorDataProvider } from '@/components/creator/creator-data-context'
 
 type Props = {
     params: Promise<{ slug: string }>
@@ -30,6 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 }
 
+import { CreatorDataProvider } from '@/components/creator/creator-data-context'
+
 export default async function CreatorLayout({
     children,
     params,
@@ -42,7 +43,7 @@ export default async function CreatorLayout({
     return (
         <CreatorDataProvider slug={slug}>
             <div className="min-h-screen flex flex-col bg-background">
-                <CreatorHeader />
+                <CreatorHeader address={slug} />
                 <CreatorNavigation />
                 <main className="flex-1">
                     {children}

@@ -1,180 +1,159 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-    CheckCircle,
-    Globe,
-    Copy,
-    Check,
-} from "lucide-react"
-import { useCreatorData } from "./creator-data-context"
-import { ShareButton } from "@/components/share-button"
+import { useMemo } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Share2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetCollections } from "@/hooks/use-collection";
 
-export function CreatorHeader() {
-    const [copiedAddress, setCopiedAddress] = useState(false)
+interface CreatorHeaderProps {
+    address: string;
+}
 
-    const {
-        creatorInfo,
-        headerImage,
-        avatarImage,
-        assetsLoading,
-        collectionsLoading
-    } = useCreatorData()
+export function CreatorHeader({ address }: CreatorHeaderProps) {
+    // 1. Fetch collections directly
+    const { collections, loading } = useGetCollections(address as `0x${string}`);
 
-    const isLoading = assetsLoading || collectionsLoading
+    // 2. Strict Image Logic: Find first valid image that IS NOT a placeholder
+    const { headerImage, avatarImage } = useMemo(() => {
+        let foundImage: string | null = null;
 
-    const handleCopyAddress = async () => {
-        try {
-            await navigator.clipboard.writeText(creatorInfo.address)
-            setCopiedAddress(true)
-            setTimeout(() => setCopiedAddress(false), 2000)
-        } catch (error) {
-            console.error("Failed to copy address:", error)
+        // Search for valid image in collections
+        const validCollection = collections.find(c =>
+            c.image &&
+            typeof c.image === 'string' &&
+            c.image !== "" &&
+            !c.image.includes("placeholder")
+        );
+
+        if (validCollection) {
+            foundImage = validCollection.image;
         }
+
+        return {
+            headerImage: foundImage,
+            avatarImage: foundImage // Use same image for avatar for now if valid
+        };
+    }, [collections]);
+
+    // 3. Handlers
+    const displayName = `${address.slice(0, 6)}...${address.slice(-4)}`;
+
+    const handleShare = () => {
+        if (typeof navigator !== 'undefined') {
+            if (navigator.share) {
+                navigator.share({
+                    title: `Creator ${displayName}`,
+                    url: window.location.href,
+                }).catch(() => { });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+            }
+        }
+    };
+
+    if (loading) {
+        return <HeaderSkeleton />;
     }
 
     return (
-        <div className="relative overflow-hidden -mt-[88px] pt-[120px] pb-12 z-0">
-            {/*  Background with gradient overlay */}
-            <div className="absolute inset-0 z-0">
-                {/* 
-                    Prevent Flash: Only show background layers when NOT loading.
-                    If loading, show a subtle skeleton/dark bg to prevent "flash" of default gradient.
-                */}
-                {isLoading ? (
-                    <div className="absolute inset-0 bg-background/80 animate-pulse" />
+        <div className="relative overflow-hidden -mt-[88px] pt-[150px] pb-24 min-h-[400px] flex flex-col justify-center bg-background">
+
+            {/* --- Background Layer --- */}
+            <div className="absolute inset-0 z-0 select-none pointer-events-none">
+                {/* 1. Base Gradient (Always present) */}
+                <div className="absolute inset-0 bg-gradient-to-br from-background via-background/90 to-background" />
+
+                {/* 2. Dynamic Image OR Premium Gradient Fallback */}
+                {headerImage ? (
+                    <Image
+                        src={headerImage}
+                        alt="Background"
+                        fill
+                        className="object-cover opacity-40 blur-[80px] scale-110 saturate-150"
+                        priority
+                        sizes="100vw"
+                    />
                 ) : (
-                    <>
-                        {/* Base gradient - Only show if NO header image to avoid "double background" muddy look */}
-                        {!headerImage && (
-                            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20" />
-                        )}
-
-                        {/* Dynamic image background (if available) */}
-                        {headerImage && (
-                            <Image
-                                src={headerImage}
-                                alt="Creator Background"
-                                fill
-                                className="object-cover opacity-60 blur-xl scale-110"
-                                priority
-                                sizes="100vw"
-                            />
-                        )}
-
-                        {/*  overlay - adjusted for text readability */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-black/30 opacity-90" />
-                    </>
+                    // Premium Fallback Gradient (Aurora / Mesh style)
+                    <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/40 via-secondary/20 to-transparent blur-3xl" />
                 )}
+
+                {/* 3. Overlay for text legibility */}
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
             </div>
 
-            {/* Hero Content */}
-            <div className="relative z-10 container mx-auto px-4">
-                <div className="flex flex-col lg:flex-row items-start gap-8">
-                    {/* Avatar with Glassmorphism Border */}
-                    <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-                        {/* Mobile: h-32/w-32 -> h-40/w-40 to increase size as requested */}
-                        <div className="relative">
-                            <div className="absolute -inset-1 bg-gradient-to-br from-primary/50 to-secondary/50 rounded-full blur-md opacity-75" />
-                            <Avatar className="h-40 w-40 lg:h-48 lg:w-48 border-2 border-white/20 shadow-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl">
-                                <AvatarImage
+            {/* --- Content Layer --- */}
+            <div className="relative z-10 container mx-auto px-4 max-w-7xl">
+                <div className="flex flex-col items-center justify-center gap-8 text-center pt-8">
+
+                    {/* Avatar */}
+                    <div className="relative group">
+                        {/* Glow effect behind avatar */}
+                        <div className={`absolute -inset-4 rounded-full blur-2xl opacity-40 transition-opacity duration-1000 ${avatarImage ? "bg-primary/50" : "bg-gradient-to-r from-primary to-secondary"
+                            }`} />
+
+                        <div className="relative h-32 w-32 md:h-40 md:w-40 rounded-full overflow-hidden border-[3px] border-background/50 shadow-2xl backdrop-blur-sm bg-background/50">
+                            {avatarImage ? (
+                                <Image
                                     src={avatarImage}
-                                    alt={creatorInfo.name}
-                                    className="object-cover"
+                                    alt={displayName}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                    priority
                                 />
-                                <AvatarFallback className="text-white text-3xl lg:text-4xl font-bold bg-gradient-to-br from-primary to-secondary">
-                                    {creatorInfo.name.slice(0, 2).toUpperCase()}
-                                </AvatarFallback>
-                            </Avatar>
-                        </div>
-
-                        {/* Mobile-only basic info */}
-                        <div className="mt-4 lg:hidden w-full max-w-sm">
-                            <div className="flex items-center justify-center gap-2 mb-3">
-                                <h1 className="text-2xl font-bold text-white drop-shadow-md">{creatorInfo.name}</h1>
-                                {creatorInfo.verified && <CheckCircle className="h-6 w-6 text-primary" />}
-                            </div>
-
-                            {/* Tags */}
-                            <div className="flex flex-wrap justify-center gap-2 mb-4">
-                                {creatorInfo.specialties.slice(0, 2).map((specialty: string) => (
-                                    <Badge
-                                        key={specialty}
-                                        variant="secondary"
-                                        className="bg-white/10 text-white border-white/10 backdrop-blur-md hover:bg-white/20 transition-colors"
-                                    >
-                                        {specialty}
-                                    </Badge>
-                                ))}
-                            </div>
-
-                            {/* Mobile Bio - Clean */}
-                            {creatorInfo.bio && (
-                                <p className="text-white/80 text-sm text-center mb-6 leading-relaxed line-clamp-3">
-                                    {creatorInfo.bio}
-                                </p>
-                            )}
-
-                            {/* Redesigned Mobile Actions */}
-                            <div className="flex items-center justify-center gap-3">
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    className="h-10 bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md flex-1 max-w-[160px]"
-                                    onClick={handleCopyAddress}
-                                >
-                                    {copiedAddress ? (
-                                        <>
-                                            <Check className="h-4 w-4 mr-2" />
-                                            Copied
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Copy className="h-4 w-4 mr-2" />
-                                            Copy Address
-                                        </>
-                                    )}
-                                </Button>
-
-                                <div className="h-10 w-10 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-md rounded-md cursor-pointer transition-colors">
-                                    <ShareButton />
+                            ) : (
+                                // Elegant Gradient Avatar Fallback
+                                <div className="w-full h-full bg-gradient-to-tr from-primary/10 via-primary/5 to-secondary/10 flex items-center justify-center">
+                                    <div className="w-full h-full absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/10 to-transparent opacity-50" />
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Main Info - Desktop */}
-                    <div className="hidden lg:block flex-1 text-white">
-                        <div className="flex items-center gap-3 mb-4">
-                            <h1 className="text-4xl xl:text-5xl font-bold drop-shadow-lg">{creatorInfo.name}</h1>
-                            {creatorInfo.verified && <CheckCircle className="h-8 w-8 text-primary" />}
+                    {/* Info */}
+                    <div className="flex flex-col items-center gap-5 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-backwards">
+                        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground drop-shadow-sm font-sans">
+                            {displayName}
+                        </h1>
+
+                        <div className="flex items-center gap-2 px-5 py-2 rounded-full bg-secondary/30 border border-white/5 text-muted-foreground font-mono text-sm backdrop-blur-md">
+                            <span className="w-2 h-2 rounded-full bg-green-500/80 mr-1 animate-pulse" />
+                            {displayName}
                         </div>
 
-                        <p className="text-xl text-white/90 mb-6 max-w-2xl leading-relaxed drop-shadow-sm">{creatorInfo.bio}</p>
-
-                        <div className="flex flex-wrap gap-2 mb-6">
-                            {creatorInfo.specialties.map((specialty: string) => (
-                                <Badge
-                                    key={specialty}
-                                    className="bg-white/10 text-white border-white/20 backdrop-blur-xl text-sm px-3 py-1 hover:bg-white/20 transition-colors"
-                                >
-                                    {specialty}
-                                </Badge>
-                            ))}
+                        <div className="mt-2">
+                            <Button
+                                variant="outline"
+                                size="lg"
+                                onClick={handleShare}
+                                className="h-11 px-8 border-primary/20 hover:bg-primary/5 hover:border-primary/50 hover:text-primary transition-all duration-300 rounded-full bg-background/20 backdrop-blur-sm"
+                            >
+                                <Share2 className="mr-2 h-4 w-4" />
+                                Share Profile
+                            </Button>
                         </div>
                     </div>
 
-                    {/* Action Buttons (Formerly Stats Cards) - Desktop */}
-                    <div className="hidden lg:flex flex-col gap-3 w-full xl:w-auto xl:min-w-[240px] mt-6 lg:mt-0 lg:self-center">
-                        <ShareButton />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function HeaderSkeleton() {
+    return (
+        <div className="relative overflow-hidden -mt-[88px] pt-[150px] pb-24 min-h-[400px] flex flex-col justify-center bg-background">
+            <div className="relative z-10 container mx-auto px-4 max-w-7xl">
+                <div className="flex flex-col items-center justify-center gap-8">
+                    <Skeleton className="h-32 w-32 md:h-40 md:w-40 rounded-full border-4 border-background" />
+                    <div className="flex flex-col items-center gap-4 w-full max-w-md">
+                        <Skeleton className="h-10 w-64 rounded-xl" />
+                        <Skeleton className="h-8 w-40 rounded-full" />
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }

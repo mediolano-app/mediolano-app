@@ -42,7 +42,7 @@ interface CreatorData {
 
     // Derived data for header
     headerImage: string | null
-    avatarImage: string
+    avatarImage: string | null
 
     // Refresh functions
     refetchCollections: () => void
@@ -102,7 +102,7 @@ export function CreatorDataProvider({ slug, children }: CreatorDataProviderProps
         return {
             name: creator?.name || `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`,
             address: creator?.address || walletAddress,
-            avatar: creator?.avatar || "/placeholder.svg",
+            avatar: creator?.avatar || "",
             verified: creator?.verified || false,
             bio: creator?.bio || "onchain creator",
             website: creator?.website || "",
@@ -115,21 +115,24 @@ export function CreatorDataProvider({ slug, children }: CreatorDataProviderProps
         }
     }, [slug, walletAddress])
 
-    // Determine dynamic header image from first asset or collection
+    // Determine dynamic header image from first valid asset or collection
     const headerImage = useMemo(() => {
-        const firstAsset = standardTokens[0]
-        if (firstAsset?.image && firstAsset.image !== "/placeholder.svg") {
-            return firstAsset.image
+        const validAsset = standardTokens.find(t => t.image && t.image !== "/placeholder.svg");
+        if (validAsset) {
+            return validAsset.image || null;
         }
-        if (collections.length > 0 && collections[0].image && collections[0].image !== "/placeholder.svg") {
-            return collections[0].image
+
+        const validCollection = collections.find(c => c.image && c.image !== "/placeholder.svg");
+        if (validCollection) {
+            return validCollection.image || null;
         }
-        return null
+
+        return null;
     }, [standardTokens, collections])
 
     // Avatar image with fallback
     const avatarImage = useMemo(() => {
-        return headerImage || creatorInfo.avatar || "/placeholder.svg"
+        return headerImage || creatorInfo.avatar || null
     }, [headerImage, creatorInfo.avatar])
 
     const value: CreatorData = {
