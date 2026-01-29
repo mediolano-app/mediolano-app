@@ -10,11 +10,11 @@ export async function mintToken(account: Account): Promise<string> {
     throw new Error("Alchemy API Key is not set in the environment variables.");
   }
 
-  
-  const nodeUrl = `https://starknet-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
+
+  const nodeUrl = `https://starknet-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
   const provider = new RpcProvider({ nodeUrl });
 
-  
+
   const contract = new Contract(ipcollectionABI, COLLECTION_CONTRACT_ADDRESS, provider);
 
   contract.connect(account);

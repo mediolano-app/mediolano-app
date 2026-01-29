@@ -3,17 +3,18 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { CollectionsGrid, FeaturedCollectionCard } from "@/components/collections/collections-public"
+import { CollectionsGrid } from "@/components/collections/collections-public"
 import { Skeleton } from "@/components/ui/skeleton"
 import { usePaginatedCollections } from "@/hooks/use-collection"
 import { ReportAssetDialog } from "@/components/report-asset-dialog"
 import { Grid3X3, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 
 export default function CollectionsPage() {
   const router = useRouter();
   const { collections, loading, loadingMore, error, hasMore, loadMore } = usePaginatedCollections(12);
-  const featuredCollectionId = "5";
+
   const [reportDialogState, setReportDialogState] = useState<{ isOpen: boolean; collectionId: string; collectionName: string }>({
     isOpen: false,
     collectionId: "",
@@ -45,55 +46,44 @@ export default function CollectionsPage() {
         )}
 
         {/* Show collections when loaded successfully */}
-        {!loading && !error && collections && collections.length > 0 && (() => {
-          // Find featured collection otherwise use the first collection
-          const featuredCollection = collections.find(c => c.id.toString() === featuredCollectionId) || collections[0];
-          const remainingCollections = collections.find(c => c.id.toString() === featuredCollectionId)
-            ? collections.filter(c => c.id.toString() !== featuredCollectionId)
-            : collections.slice(1);
+        {!loading && !error && collections && collections.length > 0 && (
+          <div className="mb-10">
+            {/* collections in grid */}
+            <div className="mt-8">
+              <CollectionsGrid collections={collections} />
 
-          return (
-            <div className="mb-10">
+              {!hasMore && collections.length > 0 && (
+                <div className="mt-16 text-center text-muted-foreground pb-10">
+                  <Badge variant="outline" className="text-muted-foreground">You have reached the end of the Protocol</Badge>
+                </div>
+              )}
 
-              {/* collections in grid */}
-              {remainingCollections.length > 0 && (
-                <div className="mt-8">
-                  <CollectionsGrid collections={remainingCollections} />
-
-                  {!hasMore && remainingCollections.length > 0 && (
-                    <div className="mt-16 text-center text-muted-foreground pb-10">
-                      <p>You have reached the end of the list</p>
-                    </div>
-                  )}
-
-                  {hasMore && (
-                    <div className="mt-12 mb-10 text-center">
-                      <Button
-                        variant="secondary"
-                        size="lg"
-                        onClick={() => loadMore()}
-                        disabled={loadingMore}
-                        className="min-w-[200px] h-12 text-md font-medium shadow-sm transition-all hover:shadow-md"
-                      >
-                        {loadingMore ? (
-                          <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin text-primary" />
-                            Loading more...
-                          </>
-                        ) : (
-                          "Load More Collections"
-                        )}
-                      </Button>
-                      <p className="mt-4 text-xs text-muted-foreground">
-                        Displaying {remainingCollections.length} collections
-                      </p>
-                    </div>
-                  )}
+              {hasMore && (
+                <div className="mt-12 mb-10 text-center">
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    onClick={() => loadMore()}
+                    disabled={loadingMore}
+                    className="min-w-[200px] h-12 text-md font-medium shadow-sm transition-all hover:shadow-md"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin text-primary" />
+                        Loading more...
+                      </>
+                    ) : (
+                      "Load More Collections"
+                    )}
+                  </Button>
+                  <p className="mt-4 text-xs text-muted-foreground">
+                    Displaying {collections.length} collections
+                  </p>
                 </div>
               )}
             </div>
-          );
-        })()}
+          </div>
+        )}
 
         {/* Show no collections message */}
         {!loading && !error && (!collections || collections.length === 0) && (

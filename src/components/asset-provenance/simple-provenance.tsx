@@ -162,7 +162,7 @@ export function SimpleProvenance({ events, compact = false }: SimpleProvenancePr
                                                 <Copy className="h-2.5 w-2.5" />
                                             </Button>
                                             <a
-                                                href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online"}/tx/${event.transactionHash}`}
+                                                href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://voyager.online"}/tx/${event.transactionHash}`}
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 className="ml-1 hover:text-primary transition-colors"

@@ -1,7 +1,7 @@
 import { useEvents, useBlockNumber, useAccount } from "@starknet-react/core";
 import { BlockTag, RpcProvider, hash, num } from "starknet";
 import { useMemo, useEffect, useState, useCallback } from "react";
-import { CONTRACT_ADDRESS } from "@/lib/constants";
+import { CONTRACT_ADDRESS, START_BLOCK } from "@/lib/constants";
 import { normalizeStarknetAddress, toHexString } from "@/lib/utils";
 
 export function useMyTransferEvents() {
@@ -230,7 +230,7 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
 
         const response = await provider.getEvents({
           address: registryAddress,
-          from_block: { block_number: 1861690 },
+          from_block: { block_number: START_BLOCK },
           to_block: "latest",
           keys: [[
             REGISTRY_TOKEN_MINTED_SELECTOR,
@@ -252,7 +252,7 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
         const normalizedContractAddress = normalizeStarknetAddress(contractAddr);
         const response = await provider.getEvents({
           address: normalizedContractAddress,
-          from_block: { block_number: 0 }, // Start from block 0 for contract events
+          from_block: { block_number: START_BLOCK }, // Start from predefined block
           to_block: "latest",
           keys: [[STANDARD_TRANSFER_SELECTOR]],
           chunk_size: 1000,

@@ -44,7 +44,7 @@ export function useCreatorAssets(address?: string, pageSize: number = 20): UseCr
 
             // Fetch NFTs using Alchemy Starknet NFT API
             // Reference: https://docs.alchemy.com/reference/getnftsforowner-starknet
-            let url = `https://starknet-sepolia.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner?owner=${address}&contractAddresses[]=${contractAddress}&withMetadata=true&pageSize=${pageSize}`;
+            let url = `https://starknet-mainnet.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner?owner=${address}&contractAddresses[]=${contractAddress}&withMetadata=true&pageSize=${pageSize}`;
 
             if (isLoadMore && pageKey) {
                 url += `&pageKey=${pageKey}`;

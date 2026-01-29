@@ -109,7 +109,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
     const fetchEventsInRange = useCallback(async (fromBlock: number, toBlock: number) => {
         if (!ALCHEMY_API_KEY || !COLLECTION_ADDRESS) return [];
 
-        const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || `https://starknet-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
+        const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || `https://starknet-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
         const provider = new RpcProvider({ nodeUrl: rpcUrl });
 
         const rangeEvents: ParsedEvent[] = [];
@@ -191,7 +191,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
         if (allParsedEvents.length === 0) setLoading(true);
 
         try {
-            const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || `https://starknet-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
+            const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || `https://starknet-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`;
             const provider = new RpcProvider({ nodeUrl: rpcUrl });
 
             let currentToBlock = lastScannedBlock;

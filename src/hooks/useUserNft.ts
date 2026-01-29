@@ -32,7 +32,7 @@ export const useUserNFTs = () => {
                 }
 
                 // Fetch NFTs using Alchemy Starknet NFT API
-                const url = `https://starknet-sepolia.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner?owner=${address}&contractAddresses[]=${contractAddress}&withMetadata=true`;
+                const url = `https://starknet-mainnet.g.alchemy.com/nft/v3/${apiKey}/getNFTsForOwner?owner=${address}&contractAddresses[]=${contractAddress}&withMetadata=true`;
 
                 const response = await fetch(url, {
                     method: 'GET',

@@ -5,6 +5,8 @@ import type { IPType } from "./types";
 // Contract addresses
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS as `0x${string}`;
 
+export const START_BLOCK = process.env.NEXT_PUBLIC_STARKNET_NETWORK === "mainnet" ? 6204232 : 1861690;
+
 // AVNU Paymaster Configuration
 export const AVNU_PAYMASTER_CONFIG = {
   API_BASE_URL: "https://starknet.api.avnu.fi/paymaster/v1",

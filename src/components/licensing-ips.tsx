@@ -607,7 +607,7 @@ export function IPLicensing() {
               Transaction Hash: {submissionStatus.txHash}
             </p>
             <Link
-              href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online"}/tx/${submissionStatus.txHash}`}
+              href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://voyager.online"}/tx/${submissionStatus.txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 hover:underline text-sm"

@@ -1,10 +1,10 @@
 const { RpcProvider } = require("starknet");
 
 async function main() {
-    const rpcUrl = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/tOTwt1ug3YNOsaPjinDvS";
+    const rpcUrl = "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_10/tOTwt1ug3YNOsaPjinDvS";
     const provider = new RpcProvider({ nodeUrl: rpcUrl });
 
-    const contractAddress = "0x03990b145bec2bb3d3143e7cb3b8a89a72272cf562d2b0278f38e3357cbc976f";
+    const contractAddress = "0x05e73b7be06d82beeb390a0e0d655f2c9e7cf519658e04f05d9c690ccc41da03";
 
     // Selectors
     const selectors = [

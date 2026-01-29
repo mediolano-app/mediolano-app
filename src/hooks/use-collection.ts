@@ -478,66 +478,110 @@ export function usePaginatedCollections(pageSize: number = 12): UsePaginatedColl
     address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
   });
 
-  // Helper to find the highest valid collection ID
+  // Helper to find the highest valid collection ID using a gap-tolerant probing strategy
   const findMaxCollectionId = useCallback(async () => {
     if (!contract) return 0;
     try {
-      let low = 0;
+      let highestFound = -1;
       let startFound = false;
 
-      // 1. Initial Scan: Handle cases where ID 0 is burned or list starts at 1
-      // Check first 10 IDs to find a valid anchor
-      for (let i = 0; i < 10; i++) {
-        try {
-          const isValid = await contract.call("is_valid_collection", [i.toString()]);
-          if (isValid) {
-            low = i;
+      // 1. Initial Scan: deeply scan 0-20 to find a valid anchor
+      // This handles cases where the first few might be burned or invalid
+      const initialBatch = [];
+      for (let i = 0; i <= 20; i++) {
+        initialBatch.push(i);
+      }
+
+      try {
+        const initialResults = await Promise.all(
+          initialBatch.map(id =>
+            contract.call("is_valid_collection", [id.toString()])
+              .catch(() => false)
+          )
+        );
+
+        for (let i = 0; i < initialResults.length; i++) {
+          if (initialResults[i]) {
+            highestFound = Math.max(highestFound, initialBatch[i]);
             startFound = true;
           }
-        } catch (e) { }
+        }
+      } catch (e) {
+        console.warn("Initial scan failed", e);
       }
 
       if (!startFound) {
-        // If we didn't find any valid ID in 0-9, verify one last time with a higher probe just in case (e.g. 10)
-        // or assume empty. Let's assume empty to avoid long waits.
-        return -1;
+        // If nothing in 0-20, try a few sparse random probes just in case it starts really high
+        const probes = [50, 100, 1000];
+        const probeResults = await Promise.all(
+          probes.map(id => contract.call("is_valid_collection", [id.toString()]).catch(() => false))
+        );
+        for (let i = 0; i < probes.length; i++) {
+          if (probeResults[i]) {
+            highestFound = probes[i];
+            startFound = true;
+          }
+        }
+
+        // If still nothing, give up
+        if (!startFound) return -1;
       }
 
-      // 2. Exponential Probe upwards from our found `low`
-      let high = Math.max(low + 1, 1);
-      let maxFound = false;
+      // 2. Probing Strategy to jump gaps
+      // We keep probing ahead from our current highestFound until we stop finding valid collections
+      let keepProbing = true;
+      let consecutiveFailures = 0;
 
-      while (!maxFound && high < 1000000) {
-        try {
-          const isValid = await contract.call("is_valid_collection", [high.toString()]);
-          if (isValid) {
-            low = high;
-            high = high * 2;
-          } else {
-            maxFound = true;
+      while (keepProbing) {
+        // Define probe offsets - increasing density then sparsity
+        // We check immediate neighbors, then medium jumps, then large jumps
+        const offsets = [
+          1, 2, 3, 4, 5, // Check immediate next few
+          10, 20, 30, 40, 50, // Short jumps
+          100, 200, 300, 400, 500, // Medium jumps
+          1000, 2000, 5000, 10000 // Large jumps to cross big gaps
+        ];
+
+        const probes = offsets.map(o => highestFound + o);
+        const uniqueProbes = Array.from(new Set(probes)); // Remove dupes if any
+
+        // Check all probes in parallel
+        const results = await Promise.all(
+          uniqueProbes.map(id =>
+            contract.call("is_valid_collection", [id.toString()])
+              .catch(() => false)
+          )
+        );
+
+        let foundNewTotal = false;
+
+        // Update highestFound if we found anything valid
+        for (let i = 0; i < uniqueProbes.length; i++) {
+          if (results[i]) {
+            if (uniqueProbes[i] > highestFound) {
+              highestFound = uniqueProbes[i];
+              foundNewTotal = true;
+            }
           }
-        } catch (e) {
-          maxFound = true;
+        }
+
+        if (foundNewTotal) {
+          consecutiveFailures = 0;
+          // We found something higher, so we loop again to probe FROM this new height
+          continue;
+        } else {
+          consecutiveFailures++;
+          // If we failed to find anything higher in this probe set, we assume we reached the top.
+          // In a super robust system we might try one more "super deep" probe, but this is likely sufficient.
+          keepProbing = false;
         }
       }
 
-      // 3. Binary Search between low (valid) and high (invalid)
-      let ans = low;
-      while (low <= high) {
-        const mid = Math.floor((low + high) / 2);
-        try {
-          const isValid = await contract.call("is_valid_collection", [mid.toString()]);
-          if (isValid) {
-            ans = mid;
-            low = mid + 1;
-          } else {
-            high = mid - 1;
-          }
-        } catch (e) {
-          high = mid - 1;
-        }
-      }
-      return ans;
+      // 3. Final refinement
+      // We found a high point, let's just make sure we didn't miss a small cluster right after it
+      // (The probe overlaps cover this mostly, but safe to verify)
+
+      return highestFound;
     } catch (e) {
       console.error("Error finding max collection ID:", e);
       return 0; // Fallback

@@ -2,9 +2,9 @@
 import { RpcProvider } from "starknet";
 
 const ALCHEMY_API_KEY = "tOTwt1ug3YNOsaPjinDvS";
-const COLLECTION_ADDRESS = "0x03990b145bec2bb3d3143e7cb3b8a89a72272cf562d2b0278f38e3357cbc976f";
+const COLLECTION_ADDRESS = "0x05e73b7be06d82beeb390a0e0d655f2c9e7cf519658e04f05d9c690ccc41da03";
 const TOKEN_MINTED_SELECTOR = "0x3e517dedbc7bae62d4ace7e3dfd33255c4a7fe7c1c6f53c725d52b45f9c5a00";
-const RPC_URL = `https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/${ALCHEMY_API_KEY}`;
+const RPC_URL = `https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_10/${ALCHEMY_API_KEY}`;
 const BLOCK_WINDOW_SIZE = 50000;
 
 // User provided: 0x60bb4536c3db677637eda4e2f14c1d22d01d3dfd9e592c62ba7a36e749726cc-1

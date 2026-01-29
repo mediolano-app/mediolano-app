@@ -72,7 +72,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
   const [copied, setCopied] = useState(false)
   const [imageRatio, setImageRatio] = useState<number | null>(null)
 
-  const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online";
+  const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://voyager.online";
   const tokenId = Number(tokenIdStr?.trim());
 
   const handleShare = async () => {

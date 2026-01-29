@@ -2,7 +2,7 @@
 const { RpcProvider, hash, num } = require("starknet");
 
 async function main() {
-    const provider = new RpcProvider({ nodeUrl: "https://starknet-sepolia.g.alchemy.com/v2/tOTwt1ug3YNOsaPjinDvS" });
+    const provider = new RpcProvider({ nodeUrl: "https://starknet-mainnet.g.alchemy.com/v2/tOTwt1ug3YNOsaPjinDvS" });
     const targetBlock = 5652710;
 
     console.log("Inspecting block:", targetBlock);

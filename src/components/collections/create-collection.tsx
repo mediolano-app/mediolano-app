@@ -40,7 +40,10 @@ import { COLLECTION_CONTRACT_ADDRESS } from "@/services/constants";
 import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer";
 import { useProvider } from "@starknet-react/core";
 import { num, hash, Contract } from "starknet";
-import { ipCollectionAbi } from "@/abis/ip_collection";
+import { ipCollectionAbi } from "../../abis/ip_collection";
+
+// Debugging ABI import
+console.log("CreateCollection: Loaded ABI", { ipCollectionAbi });
 
 export default function CreateCollectionView({
   isModalMode,
@@ -226,6 +229,10 @@ export default function CreateCollectionView({
           console.log("Event parsing failed, fetching user collections from chain...");
           try {
             // Use static imports
+            if (!ipCollectionAbi) {
+              console.error("ipCollectionAbi is undefined!");
+              throw new Error("Internal error: Contract ABI not loaded");
+            }
             const contract = new Contract(ipCollectionAbi, COLLECTION_CONTRACT_ADDRESS, provider);
 
             // call list_user_collections
@@ -256,6 +263,10 @@ export default function CreateCollectionView({
 
         if (collectionId !== "collections") {
           try {
+            if (!ipCollectionAbi) {
+              console.error("ipCollectionAbi is undefined!");
+              throw new Error("Contract ABI missing");
+            }
             const contract = new Contract(ipCollectionAbi, COLLECTION_CONTRACT_ADDRESS, provider);
             console.log("Fetching collection details for ID:", collectionId);
 
