@@ -77,11 +77,11 @@ export function CreatorHeader({ address }: CreatorHeaderProps) {
                     />
                 ) : (
                     // Premium Fallback Gradient (Aurora / Mesh style)
-                    <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/40 via-secondary/20 to-transparent blur-3xl" />
+                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/30 via-secondary/20 to-transparent blur-3xl" />
                 )}
 
                 {/* 3. Overlay for text legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
             </div>
 
             {/* --- Content Layer --- */}
@@ -94,7 +94,7 @@ export function CreatorHeader({ address }: CreatorHeaderProps) {
                         <div className={`absolute -inset-4 rounded-full blur-2xl opacity-40 transition-opacity duration-1000 ${avatarImage ? "bg-primary/50" : "bg-gradient-to-r from-primary to-secondary"
                             }`} />
 
-                        <div className="relative h-32 w-32 md:h-40 md:w-40 rounded-full overflow-hidden border-[3px] border-background/50 shadow-2xl backdrop-blur-sm bg-background/50">
+                        <div className="relative h-64 w-64 rounded-full overflow-hidden border-[3px] border-background/50 shadow-2xl backdrop-blur-sm bg-background/50">
                             {avatarImage ? (
                                 <Image
                                     src={avatarImage}
@@ -114,14 +114,11 @@ export function CreatorHeader({ address }: CreatorHeaderProps) {
 
                     {/* Info */}
                     <div className="flex flex-col items-center gap-5 max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-backwards">
-                        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground drop-shadow-sm font-sans">
+                        <h1 className="text-3xl font-bold tracking-tight text-foreground drop-shadow-sm font-sans">
                             {displayName}
                         </h1>
 
-                        <div className="flex items-center gap-2 px-5 py-2 rounded-full bg-secondary/30 border border-white/5 text-muted-foreground font-mono text-sm backdrop-blur-md">
-                            <span className="w-2 h-2 rounded-full bg-green-500/80 mr-1 animate-pulse" />
-                            {displayName}
-                        </div>
+
 
                         <div className="mt-2">
                             <Button
