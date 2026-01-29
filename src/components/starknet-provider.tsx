@@ -13,7 +13,6 @@ import { RpcProvider } from "starknet";
 
 interface NetworkContextType {
   currentNetwork: 'mainnet' | 'sepolia';
-  switchNetwork: (network: 'mainnet' | 'sepolia') => void;
   networkConfig: {
     chainId: string;
     name: string;
@@ -32,12 +31,15 @@ export const useNetwork = () => {
 };
 
 export function StarknetProvider({ children }: { children: React.ReactNode }) {
-  const [currentNetwork, setCurrentNetwork] = useState<'mainnet' | 'sepolia'>('sepolia');
   const { connectors } = useInjectedConnectors({
     recommended: [argent(), braavos()],
     includeRecommended: "onlyIfNoConnectors",
     order: "alphabetical",
   });
+
+  // Determine network from environment variable, default to sepolia
+  const networkEnv = process.env.NEXT_PUBLIC_STARKNET_NETWORK === 'mainnet' ? 'mainnet' : 'sepolia';
+  const currentNetwork = networkEnv;
 
   const networkConfigs = {
     mainnet: {
@@ -52,11 +54,6 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Switch network function
-  const switchNetwork = (network: 'mainnet' | 'sepolia') => {
-    setCurrentNetwork(network);
-  };
-
   // Get current network config
   const networkConfig = networkConfigs[currentNetwork];
 
@@ -68,11 +65,10 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
   return (
     <NetworkContext.Provider value={{
       currentNetwork,
-      switchNetwork,
       networkConfig
     }}>
       <StarknetConfig
-        chains={[sepolia, mainnet]}
+        chains={[currentNetwork === 'mainnet' ? mainnet : sepolia]}
         provider={providerFactory}
         connectors={connectors}
         explorer={voyager}

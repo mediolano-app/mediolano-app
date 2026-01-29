@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 const WalletConnect = dynamic(() => import("./header/wallet-connect").then(mod => mod.WalletConnect), {
   ssr: false,
 });
-import { NetworkSwitcher } from '@/components/header/network-switcher';
 import { ThemeToggle } from "@/components/header/theme-toggle"
 import { Logo } from "@/components/header/logo"
 

@@ -16,7 +16,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { useNetwork } from "@/components/starknet-provider";
-import { NetworkSwitcher } from "./network-switcher";
 import { StarknetkitConnector, useStarknetkitConnectModal } from "starknetkit";
 
 export function WalletConnect() {
@@ -24,7 +23,7 @@ export function WalletConnect() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const [open, setOpen] = useState(false);
-  const { currentNetwork, switchNetwork, networkConfig } = useNetwork();
+  const { currentNetwork, networkConfig } = useNetwork();
 
   const { starknetkitConnectModal } = useStarknetkitConnectModal({
     connectors: connectors as StarknetkitConnector[],
@@ -50,14 +49,6 @@ export function WalletConnect() {
     setOpen(false);
   };
 
-  // Handle network switch - disconnect user first
-  const handleNetworkSwitch = async (newNetwork: 'mainnet' | 'sepolia') => {
-    if (isConnected) {
-      await handleDisconnect();
-    }
-    switchNetwork(newNetwork);
-  };
-
   // Determine display address
   const displayAddress = address;
 
@@ -79,11 +70,10 @@ export function WalletConnect() {
           </DialogHeader>
           <div className="grid gap-4">
             <div className="flex gap-4 items-center justify-between">
-              <NetworkSwitcher />
               <Button
                 variant="destructive"
                 onClick={handleDisconnect}
-                className="flex items-center"
+                className="flex items-center w-full"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Disconnect
