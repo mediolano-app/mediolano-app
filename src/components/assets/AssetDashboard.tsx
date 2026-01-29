@@ -85,70 +85,70 @@ export default function AssetDashboard({ initialAssets }: { initialAssets: Asset
       <h1 className="text-2xl font-bold mb-4">Asset Visibility Dashboard</h1>
 
       <Card className="p-8 bg-background/80 mb-20">
-      <AssetFilters onFilterChange={handleFilterChange} categories={categories} collections={collections} />
-      <div className="mt-4 overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Collection</TableHead>
-              <TableHead>Visibility</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredAssets.map((asset) => (
-              <TableRow key={asset.id}>
-                <TableCell className="font-medium">
-                  <Link
-                    href={asset.externalUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center hover:underline"
-                  >
-                    {asset.name}
-                    <ExternalLink className="ml-1 h-4 w-4" />
-                  </Link>
-                </TableCell>
-                <TableCell>{asset.category && <Badge variant="secondary">{asset.category}</Badge>}</TableCell>
-                <TableCell>
-                  {asset.collection && (
-                    <Link
-                      href={`https://opensea.io/collection/${asset.collection.toLowerCase().replace(/\s+/g, "-")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:underline"
-                    >
-                      {asset.collection}
-                    </Link>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Switch checked={asset.isVisible} onCheckedChange={() => toggleVisibility(asset.id)} />
-                </TableCell>
-                <TableCell>
-                  {asset.externalUrl && asset.tokenId && (
-                    <Link
-                      href={`https://starkscan.io/token/${asset.externalUrl.split("/")[5]}?a=${asset.tokenId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      View on Explorer
-                    </Link>
-                  )}
-                </TableCell>
+        <AssetFilters onFilterChange={handleFilterChange} categories={categories} collections={collections} />
+        <div className="mt-4 overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Collection</TableHead>
+                <TableHead>Visibility</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="mt-4">
-        <Button onClick={saveChanges} disabled={isSaving}>
-          {isSaving ? "Saving..." : "Save Changes"}
-        </Button>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {filteredAssets.map((asset) => (
+                <TableRow key={asset.id}>
+                  <TableCell className="font-medium">
+                    <Link
+                      href={asset.externalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center hover:underline"
+                    >
+                      {asset.name}
+                      <ExternalLink className="ml-1 h-4 w-4" />
+                    </Link>
+                  </TableCell>
+                  <TableCell>{asset.category && <Badge variant="secondary">{asset.category}</Badge>}</TableCell>
+                  <TableCell>
+                    {asset.collection && (
+                      <Link
+                        href={`https://opensea.io/collection/${asset.collection.toLowerCase().replace(/\s+/g, "-")}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {asset.collection}
+                      </Link>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Switch checked={asset.isVisible} onCheckedChange={() => toggleVisibility(asset.id)} />
+                  </TableCell>
+                  <TableCell>
+                    {asset.externalUrl && asset.tokenId && (
+                      <Link
+                        href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online"}/contract/${asset.externalUrl.split("/")[5]}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        View on Explorer
+                      </Link>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <div className="mt-4">
+          <Button onClick={saveChanges} disabled={isSaving}>
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
       </Card>
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerContent>

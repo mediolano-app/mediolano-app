@@ -48,7 +48,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
     sepolia: {
       chainId: sepolia.id.toString(),
       name: 'Starknet Sepolia',
-      explorerUrl: 'https://sepolia.starkscan.co'
+      explorerUrl: process.env.NEXT_PUBLIC_EXPLORER_URL || 'https://sepolia.voyager.online'
     }
   };
 
