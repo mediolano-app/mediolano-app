@@ -130,7 +130,7 @@ export default function AssetDashboard({ initialAssets }: { initialAssets: Asset
                   <TableCell>
                     {asset.externalUrl && asset.tokenId && (
                       <Link
-                        href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online"}/contract/${asset.externalUrl.split("/")[5]}`}
+                        href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online"}/nft/${asset.externalUrl.split("/")[5]}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"

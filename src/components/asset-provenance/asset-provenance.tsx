@@ -414,7 +414,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
             </div>
 
             <Button className="w-full h-14 rounded-2xl font-bold bg-foreground text-background hover:bg-foreground/90 transition-all shadow-lg" asChild>
-              <a href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online"}/contract/${asset.contract}`} target="_blank" rel="noreferrer">
+              <a href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online"}/nft/${asset.contract}`} target="_blank" rel="noreferrer">
                 <Shield className="h-4 w-4 mr-3" />
                 Onchain Registry
               </a>

@@ -575,7 +575,7 @@ function CollectionActionDropdown({ collectionId, collectionName, onReportClick,
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
-            href={`${EXPLORER_URL}/contract/${addressToUse}`}
+            href={`${EXPLORER_URL}/nft-contract/${addressToUse}`}
             target="_blank"
             rel="noopener noreferrer"
             className="cursor-pointer flex items-center"

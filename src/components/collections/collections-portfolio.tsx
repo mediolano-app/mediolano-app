@@ -377,7 +377,7 @@ function CollectionActionDropdown({ collectionId }: { collectionId: string }) {
             const explorerUrl = process.env.NEXT_PUBLIC_EXPLORER_URL
             const collectionAddress = collectionId // or use collection.address if available
             if (explorerUrl && collectionAddress) {
-              window.open(`${explorerUrl}/contract/${collectionAddress}`, "_blank")
+              window.open(`${explorerUrl}/nft-contract/${collectionAddress}`, "_blank")
             }
 
           }}

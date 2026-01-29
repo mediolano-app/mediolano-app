@@ -211,7 +211,7 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                                             Share
                                         </Button>
                                         <a
-                                            href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online"}/contract/${collection.nftAddress}`}
+                                            href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.voyager.online"}/nft-contract/${collection.nftAddress}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
