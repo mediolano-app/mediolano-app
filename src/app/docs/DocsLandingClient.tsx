@@ -364,7 +364,7 @@ export default function DocsLandingClient() {
 
                 <AiAgentOverview
                     title="Mediolano Protocol System Context"
-                    summary="Mediolano is a permissionless, Starknet-based protocol for programmable intellectual property. It serves as the foundation for the Integrity Web, enabling on-chain IP registration, flexible licensing modules, and immutable provenance tracking. Designed for autonomy, it allows AI agents to register self-generated content and manage IP rights programmatically."
+                    summary="Mediolano is a permissionless, Starknet-based protocol for programmable intellectual property. It serves as the foundation for Programmable IP on the Integrity Web, enabling on-chain IP registration, flexible licensing modules, and immutable provenance tracking. Designed for autonomy, it allows AI agents to register self-generated content and manage IP rights programmatically."
                     roles={["IP Creator", "IP Consumer", "Module Developer", "DAO Governance"]}
                     contracts={[
                         { name: "IPCollection Core", address: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS || "0x...", network: "Starknet Mainnet" }

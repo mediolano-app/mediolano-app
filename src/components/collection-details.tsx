@@ -20,6 +20,8 @@ import {
     Eye,
     AlertTriangle,
     Loader2,
+    FileText,
+    User,
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -188,7 +190,7 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                             <div className="flex-1 text-white text-center lg:text-left flex flex-col justify-center h-full pt-4">
                                 <div className="flex flex-col gap-4">
                                     <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-2">
-                                        <h1 className="text-5xl lg:text-7xl font-bold drop-shadow-xl tracking-tight leading-none">{collection.name}</h1>
+                                        <h1 className="text-5xl font-bold tracking-tight text-foreground leading-none">{collection.name}</h1>
                                         {collection.type && (
                                             <Badge variant="outline" className="bg-white/10 text-white border-white/20 backdrop-blur-md px-3 py-1 text-base">
                                                 {collection.type}
@@ -196,19 +198,18 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                                         )}
                                     </div>
 
-                                    <p className="text-xl md:text-2xl text-white/90 max-w-3xl leading-relaxed drop-shadow-md font-medium">
+                                    <p className="text-xl text-foreground font-medium">
                                         {collection.description || "No description available."}
                                     </p>
 
                                     <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-4">
                                         <Button
                                             variant="outline"
-                                            size="lg"
-                                            className="border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all text-base px-6 h-12"
+                                            size="icon"
+                                            className="glass text-foreground"
                                             onClick={handleShare}
                                         >
-                                            <Share2 className="h-5 w-5 mr-2" />
-                                            Share
+                                            <Share2 className="h-6 w-6" />
                                         </Button>
                                         <a
                                             href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://voyager.online"}/nft-contract/${collection.nftAddress}`}
@@ -217,11 +218,10 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                                         >
                                             <Button
                                                 variant="outline"
-                                                size="lg"
-                                                className="border-white/30 text-white hover:bg-white/20 backdrop-blur-xl bg-white/10 transition-all text-base px-6 h-12"
+                                                size="icon"
+                                                className="glass text-foreground"
                                             >
-                                                <ExternalLink className="h-5 w-5 mr-2" />
-                                                Explorer
+                                                <ExternalLink className="h-6 w-6" />
                                             </Button>
                                         </a>
                                     </div>
@@ -231,28 +231,28 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
 
                         {/* Bottom Section: Stats Widget - Moved below */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 mt-4">
-                            <div className="bg-black/20 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-black/30 transition-all duration-300">
+                            <div className="glass p-6">
                                 <div className="flex flex-col">
-                                    <p className="text-sm font-medium text-white/70 mb-2 uppercase tracking-wider">Total Assets</p>
-                                    <p className="text-3xl md:text-4xl font-bold text-white">{collection.itemCount || 0}</p>
+                                    <p className="text-sm font-medium text-foreground mb-2 uppercase tracking-wider">Total Assets</p>
+                                    <p className="text-3xl md:text-4xl font-bold text-foreground">{collection.itemCount || 0}</p>
                                 </div>
                             </div>
-                            <div className="bg-black/20 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-black/30 transition-all duration-300">
+                            <div className="glass p-6">
                                 <div className="flex flex-col">
-                                    <p className="text-sm font-medium text-white/70 mb-2 uppercase tracking-wider">Total Minted</p>
-                                    <p className="text-3xl md:text-4xl font-bold text-white">{collection.totalMinted || 0}</p>
+                                    <p className="text-sm font-medium text-foreground mb-2 uppercase tracking-wider">Total Minted</p>
+                                    <p className="text-3xl md:text-4xl font-bold text-foreground">{collection.totalMinted || 0}</p>
                                 </div>
                             </div>
-                            <div className="bg-black/20 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-black/30 transition-all duration-300">
+                            <div className="glass p-6">
                                 <div className="flex flex-col">
-                                    <p className="text-sm font-medium text-white/70 mb-2 uppercase tracking-wider">Floor Price</p>
-                                    <p className="text-3xl md:text-4xl font-bold text-white">--</p>
+                                    <p className="text-sm font-medium text-foreground mb-2 uppercase tracking-wider">Floor Price</p>
+                                    <p className="text-3xl md:text-4xl font-bold text-foreground">--</p>
                                 </div>
                             </div>
-                            <div className="bg-black/20 backdrop-blur-lg border border-white/10 rounded-2xl p-6 hover:bg-black/30 transition-all duration-300">
+                            <div className="glass p-6">
                                 <div className="flex flex-col">
-                                    <p className="text-sm font-medium text-white/70 mb-2 uppercase tracking-wider">Owners</p>
-                                    <p className="text-3xl md:text-4xl font-bold text-white">--</p>
+                                    <p className="text-sm font-medium text-foreground mb-2 uppercase tracking-wider">Owners</p>
+                                    <p className="text-3xl md:text-4xl font-bold text-foreground">--</p>
                                 </div>
                             </div>
                         </div>
@@ -260,8 +260,8 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
 
                     {/* Contract and Creator Details - Inline or minimal */}
                     <div className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start items-center text-sm text-white/80 font-medium">
-                        <div className="flex items-center bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-                            <span className="mr-2">Contract:</span>
+                        <div className="flex items-center glass text-foreground px-3 py-1.5">
+                            <span className="mr-2"><FileText className="h-4 w-4" /></span>
                             <button
                                 onClick={() => handleCopy(collection.nftAddress, "address")}
                                 className="font-mono hover:text-white transition-colors flex items-center"
@@ -273,8 +273,8 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                         </div>
 
                         {!creator && collection.owner && (
-                            <div className="flex items-center bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
-                                <span className="mr-2">Owner:</span>
+                            <div className="flex items-center glass text-foreground px-3 py-1.5">
+                                <span className="mr-2"><User className="h-4 w-4" /></span>
                                 <Link href={`/creator/${collection.owner}`} className="font-mono hover:text-white transition-colors hover:underline">
                                     {collection.owner.substring(0, 6)}...
                                 </Link>
