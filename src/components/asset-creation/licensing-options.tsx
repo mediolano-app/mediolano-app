@@ -2,12 +2,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Shield, Globe, FileText, CreativeCommons } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 
 interface LicensingOptionsProps {
@@ -76,36 +74,48 @@ export function LicensingOptions({ formState, updateFormField }: LicensingOption
       </CardHeader>
       <CardContent className="space-y-6">
         {/* License Type Selection */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           <Label className="text-base font-medium">License Type</Label>
-          <RadioGroup
+          <Select
             value={formState.licenseType || "all-rights-reserved"}
             onValueChange={(value) => updateFormField("licenseType", value)}
-            className="space-y-3"
           >
-            {licenseTypes.map((license) => {
-              const IconComponent = license.icon
-              return (
-                <div key={license.id} className="flex items-start space-x-3">
-                  <RadioGroupItem value={license.id} id={license.id} className="mt-1" />
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor={license.id} className="font-medium cursor-pointer">
-                        {license.name}
-                      </Label>
-                      {license.recommended && (
-                        <Badge variant="secondary" className="text-xs">
-                          Recommended
-                        </Badge>
-                      )}
+            <SelectTrigger className="h-12">
+              <SelectValue placeholder="Select license type" />
+            </SelectTrigger>
+            <SelectContent>
+              {licenseTypes.map((license) => {
+                const IconComponent = license.icon
+                return (
+                  <SelectItem key={license.id} value={license.id} className="py-3">
+                    <div className="flex items-center gap-2 text-left">
+                      <IconComponent className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-medium flex items-center gap-2">
+                          {license.name}
+                          {license.recommended && (
+                            <Badge variant="secondary" className="text-[10px] h-4 px-1">
+                              Recommended
+                            </Badge>
+                          )}
+                        </span>
+                        <span className="text-xs text-muted-foreground line-clamp-1">
+                          {license.description}
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">{license.description}</p>
-                  </div>
-                  <IconComponent className="h-5 w-5 text-muted-foreground mt-0.5" />
-                </div>
-              )
-            })}
-          </RadioGroup>
+                  </SelectItem>
+                )
+              })}
+            </SelectContent>
+          </Select>
+          <div className="text-sm text-muted-foreground mt-2 p-3 bg-muted/30 rounded-md border flex gap-3 items-start">
+            <selectedLicense.icon className="h-5 w-5 mt-0.5 text-primary" />
+            <div>
+              <p className="font-medium text-foreground">{selectedLicense.name}</p>
+              <p>{selectedLicense.description}</p>
+            </div>
+          </div>
         </div>
 
         {/* Custom License Terms */}
@@ -126,8 +136,8 @@ export function LicensingOptions({ formState, updateFormField }: LicensingOption
         )}
 
         {/* Geographic Scope */}
-        <div className="space-y-2">
-          <Label className="text-base font-medium flex items-center gap-2">
+        <div className="space-y-2 pt-2 border-t mt-6">
+          <Label className="text-base font-medium flex items-center gap-2 pt-4">
             <Globe className="h-4 w-4" />
             Geographic Protection Scope
           </Label>
@@ -215,23 +225,6 @@ export function LicensingOptions({ formState, updateFormField }: LicensingOption
             />
             <p className="text-sm text-muted-foreground">
               Define rights regarding Artificial Intelligence training and data usage.
-            </p>
-          </div>
-        </div>
-
-        {/* License Summary */}
-        <div className="p-4 bg-muted/30 rounded-lg border">
-          <h4 className="font-medium mb-2">License Summary</h4>
-          <div className="space-y-1 text-sm">
-            <p>
-              <span className="font-medium">Type:</span> {selectedLicense.name}
-            </p>
-            <p>
-              <span className="font-medium">Scope:</span>{" "}
-              {geographicScopes.find((s) => s.value === (formState.geographicScope || "worldwide"))?.label}
-            </p>
-            <p>
-              <span className="font-medium">Protection:</span> Blockchain-verified ownership and timestamp
             </p>
           </div>
         </div>

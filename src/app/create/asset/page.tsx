@@ -2,9 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Loader } from "lucide-react";
+import { FileText, Loader, Settings2 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { AssetPreview } from "@/components/asset-creation/asset-preview";
-import { AssetFormCore } from "@/components/asset-creation/asset-form-core";
+import { AssetBasicInfo } from "@/components/asset-creation/asset-basic-info";
+import { TemplateSelector } from "@/components/asset-creation/template-selector";
+import { AssetDetails } from "@/components/asset-creation/asset-details";
 import { LicensingOptions } from "@/components/asset-creation/licensing-options";
 import { TemplateSpecificFields } from "@/components/asset-creation/template-specific-fields";
 import { TemplateInfoCard } from "@/components/asset-creation/template-info-card";
@@ -52,7 +60,7 @@ export default function CreateAssetPage() {
   const { createAsset, isCreating } = useCreateAsset();
   const { checkOwnership } = useIsCollectionOwner();
   // Initialize form
-  const { formState, updateFormField, handleFileChange, canSubmit } =
+  const { formState, updateFormField, handleFileChange, handleFeaturedImageChange, canSubmit } =
     useAssetForm();
   const {
     collections,
@@ -122,7 +130,8 @@ export default function CreateAssetPage() {
     const metadata = {
       name: formState.title,
       description: formState.description,
-      external_url: "",
+      external_url: formState.externalUrl,
+      image: "", // Will be filled by IPFS upload result
       attributes: [
         { trait_type: "Type", value: formState.assetType },
         { trait_type: "Creator", value: formState.creator },
@@ -138,6 +147,11 @@ export default function CreateAssetPage() {
         { trait_type: "Grant-back Clause", value: formState.grantBack || "None" },
         { trait_type: "AI & Data Mining Policy", value: formState.aiRights || "Unspecified" },
         { trait_type: "Tags", value: formState.tags.join(", ") },
+        // Add template specific fields as attributes
+        ...Object.entries(formState.metadataFields).map(([key, value]) => ({
+          trait_type: key,
+          value: value
+        }))
       ],
     };
 
@@ -159,6 +173,9 @@ export default function CreateAssetPage() {
 
       //Upload media and metadata.
       setMintProgress(10);
+
+      // Upload featured image if available, otherwise media file
+      // Note: We need to handle this logic in useIpfsUpload or here
       const result = await uploadToIpfs(formState?.mediaFile as File, metadata);
       setMintProgress(50);
 
@@ -269,41 +286,105 @@ export default function CreateAssetPage() {
         <main className="container mx-auto p-4 max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Main Content */}
-            <div className="lg:col-span-3 space-y-6">
-              {/* Core Asset Form */}
-              <AssetFormCore
-                refetchCollections={reload}
-                collectionError={collection_error}
-                isLoadingCollections={collection_loading}
-                collections={collections || []}
-                openCollectionModal={() => setOpenCollection(true)}
-                formState={formState}
-                updateFormField={updateFormField}
-                handleFileChange={handleFileChange}
-                templates={templates}
-                selectedTemplate={selectedTemplate}
-                onTemplateChange={handleTemplateChange}
-                showTemplateSelector={true}
-                onCreatorFieldChange={handleCreatorFieldChange}
-              />
+            <div className="lg:col-span-3 space-y-8">
 
-              {/* Template-Specific Fields */}
-              {selectedTemplate && (
-                <TemplateSpecificFields
-                  template={selectedTemplate}
-                  formState={formState}
-                  updateFormField={updateFormField}
-                />
-              )}
+              <Accordion type="multiple" defaultValue={["basic-info"]} className="w-full space-y-4">
 
-              {/* Licensing Options */}
-              <LicensingOptions
-                formState={formState}
-                updateFormField={updateFormField}
-              />
+                {/* 1. Basic Information (Top Priority) */}
+                <AccordionItem value="basic-info" className="glass">
+                  <AccordionTrigger className="hover:no-underline px-4 py-4 text-xl font-semibold">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      <span>Asset Info</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-6 pt-2">
+                    <AssetBasicInfo
+                      formState={formState}
+                      updateFormField={updateFormField}
+                      handleFileChange={handleFileChange}
+                      collections={collections || []}
+                      isLoadingCollections={collection_loading}
+                      collectionError={collection_error}
+                      refetchCollections={reload}
+                      openCollectionModal={() => setOpenCollection(true)}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* 2. Asset Type Selection */}
+                <AccordionItem value="ip-type" className="glass">
+                  <AccordionTrigger className="hover:no-underline px-4 py-4 text-xl font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Settings2 className="h-5 w-5 text-primary" />
+                      <span>IP Type</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-6 pt-2">
+                    <TemplateSelector
+                      templates={templates}
+                      selectedTemplateId={formState.assetType}
+                      onTemplateChange={handleTemplateChange}
+                    />
+                    {selectedTemplate && (
+                      <div id="template-fields" className="pt-4 border-t mt-4">
+                        <h3 className="text-lg font-medium mb-4 flex items-center gap-2 text-muted-foreground">
+                          {selectedTemplate.name} Metadata
+                        </h3>
+                        <TemplateSpecificFields
+                          template={selectedTemplate}
+                          formState={formState}
+                          updateFormField={updateFormField}
+                        />
+                      </div>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* 3. Advanced Configuration */}
+                <AccordionItem value="advanced-info" className="glass">
+                  <AccordionTrigger className="hover:no-underline px-4 py-4 text-xl font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Settings2 className="h-5 w-5 text-primary" />
+                      <span>Advanced Information</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-6 pt-2 space-y-8">
+                    {/* 3.1 Asset Details (Categorization) */}
+                    <div id="asset-details" className="pt-2">
+                      <h3 className="text-lg font-medium mb-4 flex items-center gap-2 text-muted-foreground">
+                        Categorization
+                      </h3>
+                      <AssetDetails
+                        formState={formState}
+                        updateFormField={updateFormField}
+                      />
+                    </div>
+
+
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* 4. Licensing Options */}
+                <AccordionItem value="licensing" className="glass">
+                  <AccordionTrigger className="hover:no-underline px-4 py-4 text-xl font-semibold">
+                    <div className="flex items-center gap-2">
+                      <Settings2 className="h-5 w-5 text-primary" />
+                      <span>Programmable Licensing</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-6 pt-2">
+                    <LicensingOptions
+                      formState={formState}
+                      updateFormField={updateFormField}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+              </Accordion>
 
               {/* Submit Button */}
-              <div className="flex justify-end pt-6">
+              <div className="flex justify-end pt-2">
                 <Button
                   onClick={handleSubmit}
                   disabled={
@@ -315,7 +396,7 @@ export default function CreateAssetPage() {
                     loading
                   }
                   size="lg"
-                  className="px-8"
+                  className="px-10 h-12 text-lg shadow-lg hover:shadow-xl transition-all rounded-full"
                 >
                   {loading && <Loader className="animate-spin h-5 w-5 mr-2" />}
                   {loading ? (upload_loading ? "Uploading..." : isCreating ? "Minting..." : "Processing") : "Create Asset"}

@@ -70,126 +70,6 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
     return formState.metadataFields?.[field] || ""
   }
 
-  // Featured Image Upload Logic
-  const [isDragOver, setIsDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const files = e.dataTransfer.files;
-    if (files.length > 0 && onFeaturedImageChange) {
-      onFeaturedImageChange(files[0]);
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0 && onFeaturedImageChange) {
-      onFeaturedImageChange(files[0]);
-    }
-  };
-
-  const RenderFeaturedImageUpload = () => {
-    if (!onFeaturedImageChange) return null;
-
-    return (
-      <div className="space-y-4 md:col-span-2 pt-6 border-t mt-4">
-        <div>
-          <Label className="text-base font-semibold flex items-center gap-2">
-            <ImageIcon className="h-4 w-4" />
-            Featured Image / Cover Art
-          </Label>
-          <p className="text-sm text-muted-foreground mt-1">
-            Upload a cover image for your asset (JPG, PNG, WEBP). This is recommended for all asset types.
-            {!formState.featuredImage && (
-              <span className="text-xs block mt-1 text-amber-600 dark:text-amber-400">
-                If not provided, the main file will be used (valid only for image assets).
-              </span>
-            )}
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          {!formState.featuredImage ? (
-            <div
-              className={cn(
-                "border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer",
-                isDragOver
-                  ? "border-primary bg-primary/5"
-                  : "border-muted-foreground/25 hover:border-primary/50"
-              )}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-base font-medium mb-2">
-                Drop your cover image here
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                or click to browse
-              </p>
-              <Button variant="outline" size="sm" type="button">Choose File</Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                className="hidden"
-                onChange={handleFileSelect}
-                accept="image/*"
-              />
-            </div>
-          ) : (
-            <div className="relative">
-              <div className="flex items-center gap-4 p-4 border rounded-lg bg-muted/30">
-                <div className="flex-shrink-0">
-                  {formState.featuredImagePreviewUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={formState.featuredImagePreviewUrl}
-                      alt="Preview"
-                      className="w-16 h-16 object-cover rounded-lg bg-background"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                      <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">
-                    {formState.featuredImage.name}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {(formState.featuredImage.size / 1024 / 1024).toFixed(2)} MB
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  type="button"
-                  onClick={() => onFeaturedImageChange(null)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
 
   const renderAudioFields = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -276,16 +156,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
           onChange={(e) => updateMetadataField("youtubeUrl", e.target.value)}
         />
       </div>
-      <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="externalUrl">External Audio URL (Generic)</Label>
-        <Input
-          id="externalUrl"
-          placeholder="e.g., https://soundcloud.com/..."
-          value={getMetadataValue("externalUrl")}
-          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
-        />
-      </div>
-      <RenderFeaturedImageUpload />
+
     </div>
   )
 
@@ -346,16 +217,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
           <Label htmlFor="allowPrints">Allow commercial printing and reproduction</Label>
         </div>
       </div>
-      <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="externalUrl">Portfolio / High-Res URL</Label>
-        <Input
-          id="externalUrl"
-          placeholder="e.g., https://artstation.com/..."
-          value={getMetadataValue("externalUrl")}
-          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
-        />
-      </div>
-      <RenderFeaturedImageUpload />
+
     </div>
   )
 
@@ -433,16 +295,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
           onChange={(e) => updateMetadataField("youtubeUrl", e.target.value)}
         />
       </div>
-      <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="externalUrl">External Video URL (Generic)</Label>
-        <Input
-          id="externalUrl"
-          placeholder="e.g., https://vimeo.com/..."
-          value={getMetadataValue("externalUrl")}
-          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
-        />
-      </div>
-      <RenderFeaturedImageUpload />
+
     </div>
   )
 
@@ -510,7 +363,6 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
           <Label htmlFor="allowModifications">Allow modifications and derivative works</Label>
         </div>
       </div>
-      <RenderFeaturedImageUpload />
     </div>
   )
 
@@ -579,7 +431,6 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
           rows={3}
         />
       </div>
-      <RenderFeaturedImageUpload />
     </div>
   )
 
@@ -648,16 +499,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
           <Label htmlFor="allowTranslations">Allow translations to other languages</Label>
         </div>
       </div>
-      <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="externalUrl">Document URL</Label>
-        <Input
-          id="externalUrl"
-          placeholder="e.g., https://example.com/doc.pdf"
-          value={getMetadataValue("externalUrl")}
-          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
-        />
-      </div>
-      <RenderFeaturedImageUpload />
+
     </div>
   )
 
@@ -691,16 +533,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
           rows={3}
         />
       </div>
-      <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="externalUrl">External Link</Label>
-        <Input
-          id="externalUrl"
-          placeholder="e.g., https://example.com"
-          value={getMetadataValue("externalUrl")}
-          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
-        />
-      </div>
-      <RenderFeaturedImageUpload />
+
     </div>
   )
 
@@ -811,13 +644,11 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
           id="software"
           placeholder="e.g., Lightroom, Photoshop"
           value={getMetadataValue("software")}
+          onChange={(e) => updateMetadataField("software", e.target.value)}
         />
       </div>
-      <RenderFeaturedImageUpload />
     </div>
   )
-
-
 
   const renderPostsFields = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -918,15 +749,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
         />
       </div>
 
-      <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="externalUrl">Other Reference URL</Label>
-        <Input
-          id="externalUrl"
-          placeholder="e.g., https://your-blog.com/..."
-          value={getMetadataValue("externalUrl")}
-          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
-        />
-      </div>
+
     </div>
   )
 
@@ -936,18 +759,18 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
         return renderAudioFields()
       case "art":
         return renderArtFields()
-      case "photography":
-        return renderPhotographyFields()
       case "video":
         return renderVideoFields()
-      case "posts":
-        return renderPostsFields()
+      case "documents":
+        return renderDocumentFields()
       case "software":
         return renderSoftwareFields()
       case "nft":
         return renderNFTFields()
-      case "documents":
-        return renderDocumentFields()
+      case "photography":
+        return renderPhotographyFields()
+      case "posts":
+        return renderPostsFields()
       default:
         return renderDefaultFields()
     }
@@ -959,13 +782,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
         <CardTitle className="flex items-center gap-2">
           <IconComponent className="h-5 w-5" />
           {template.name} Details
-          <Badge variant="outline" className="ml-auto">
-            {template.category}
-          </Badge>
         </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Specialized fields optimized for {template.name.toLowerCase()} intellectual property registration.
-        </p>
       </CardHeader>
       <CardContent>{renderTemplateFields()}</CardContent>
     </Card>

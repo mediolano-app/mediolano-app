@@ -800,13 +800,18 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
               <RenderField label="Aspect Ratio" value={asText(typeData.aspectRatio)} />
             </div>
 
-            {(asText(typeData.director) || asText(typeData.releaseDate)) && (
+            {(asText((typeData as Record<string, unknown>).director) || asText((typeData as Record<string, unknown>).releaseDate)) && (
+              <div className="grid grid-cols-2 gap-4">
+                <RenderField label="Director" value={asText((typeData as Record<string, unknown>).director)} />
+                <RenderField label="Release Date" value={asText((typeData as Record<string, unknown>).releaseDate)} icon={Calendar} />
+              </div>
+            )}
 
-              <SmartLinks links={[
-                { platform: "youtube", url: asText(typeData.youtubeUrl) },
-              ].filter(l => l.url)} />
+            <SmartLinks links={[
+              { platform: "youtube", url: asText(typeData.youtubeUrl) },
+            ].filter(l => l.url)} />
 
-{
+            {
               ((isStringArray(typeData.cast) && typeData.cast.length > 0) || asText(typeData.language) || (isStringArray(typeData.subtitles) && typeData.subtitles.length > 0)) && (
                 <RenderSection label="Cast & Language">
                   <div className="grid grid-cols-1 gap-4 w-full">

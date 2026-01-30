@@ -3,11 +3,18 @@
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Loader, FileText } from "lucide-react"
+import { Loader, FileText, Settings2 } from "lucide-react"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 import { AssetPreview } from "@/components/asset-creation/asset-preview"
 import { AssetConfirmation } from "@/components/asset-creation/asset-confirmation"
-import { AssetFormCore } from "@/components/asset-creation/asset-form-core"
+import { AssetBasicInfo } from "@/components/asset-creation/asset-basic-info"
+import { AssetDetails } from "@/components/asset-creation/asset-details"
 import { LicensingOptions } from "@/components/asset-creation/licensing-options"
 import { TemplateInfoCard } from "@/components/asset-creation/template-info-card"
 import { TemplateSpecificFields } from "@/components/asset-creation/template-specific-fields"
@@ -309,34 +316,88 @@ export default function CreateAssetFromTemplate() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
-            {/* Core Asset Form */}
-            <AssetFormCore
-              formState={formState}
-              updateFormField={updateFormField}
-              handleFileChange={handleFileChange}
-              templates={templates}
-              selectedTemplate={template}
-              onTemplateChange={handleTemplateChange}
-              showTemplateSelector={false}
-              onCreatorFieldChange={handleCreatorFieldChange}
-              // Collection props
-              collections={collections || []}
-              isLoadingCollections={collection_loading}
-              collectionError={collection_error}
-              refetchCollections={reload}
-              openCollectionModal={() => setOpenCollection(true)}
-            />
 
-            {/* Template-Specific Fields */}
-            <TemplateSpecificFields
-              template={template}
-              formState={formState}
-              updateFormField={updateFormField}
-              onFeaturedImageChange={handleFeaturedImageChange}
-            />
+            <Accordion type="multiple" defaultValue={["basic-info", "ip-type"]} className="w-full space-y-4">
 
-            {/* Licensing Options */}
-            <LicensingOptions formState={formState} updateFormField={updateFormField} />
+              {/* 1. Basic Information (Top Priority) */}
+              <AccordionItem value="basic-info" className="border rounded-xl bg-card shadow-sm px-2">
+                <AccordionTrigger className="hover:no-underline px-4 py-4 text-xl font-semibold">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <span>Basic Information</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pb-6 pt-2">
+                  <AssetBasicInfo
+                    formState={formState}
+                    updateFormField={updateFormField}
+                    handleFileChange={handleFileChange}
+                    collections={collections || []}
+                    isLoadingCollections={collection_loading}
+                    collectionError={collection_error}
+                    refetchCollections={reload}
+                    openCollectionModal={() => setOpenCollection(true)}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 2. IP Type (Template Specifics) */}
+              <AccordionItem value="ip-type" className="border rounded-xl bg-card shadow-sm px-2">
+                <AccordionTrigger className="hover:no-underline px-4 py-4 text-xl font-semibold">
+                  <div className="flex items-center gap-2">
+                    <Settings2 className="h-5 w-5 text-primary" />
+                    <span>{template.name} Details</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pb-6 pt-2">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {template.description}
+                  </p>
+                  <TemplateSpecificFields
+                    template={template}
+                    formState={formState}
+                    updateFormField={updateFormField}
+                    onFeaturedImageChange={handleFeaturedImageChange}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 3. Advanced Configuration */}
+              <AccordionItem value="advanced-info" className="border rounded-xl bg-card shadow-sm px-2">
+                <AccordionTrigger className="hover:no-underline px-4 py-4 text-xl font-semibold">
+                  <div className="flex items-center gap-2">
+                    <Settings2 className="h-5 w-5 text-primary" />
+                    <span>Advanced Information</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pb-6 pt-2">
+                  <h3 className="text-lg font-medium mb-4 flex items-center gap-2 text-muted-foreground">
+                    Categorization
+                  </h3>
+                  <AssetDetails
+                    formState={formState}
+                    updateFormField={updateFormField}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* 4. Licensing Options */}
+              <AccordionItem value="licensing" className="border rounded-xl bg-card shadow-sm px-2">
+                <AccordionTrigger className="hover:no-underline px-4 py-4 text-xl font-semibold">
+                  <div className="flex items-center gap-2">
+                    <Settings2 className="h-5 w-5 text-primary" />
+                    <span>Licensing & Rights</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pb-6 pt-2">
+                  <LicensingOptions
+                    formState={formState}
+                    updateFormField={updateFormField}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+
+            </Accordion>
 
             {/* Submit Button */}
             <div className="flex justify-end pt-6">

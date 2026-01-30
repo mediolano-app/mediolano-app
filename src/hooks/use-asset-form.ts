@@ -6,6 +6,7 @@ export interface AssetFormState {
   // Basic fields
   title: string
   description: string
+  externalUrl: string
   tags: string[]
   collection: string
   collectionName?: string
@@ -37,6 +38,7 @@ export interface AssetFormState {
 const initialState: AssetFormState = {
   title: "",
   description: "",
+  externalUrl: "",
   tags: [],
   collection: "",
   collectionName: "",
