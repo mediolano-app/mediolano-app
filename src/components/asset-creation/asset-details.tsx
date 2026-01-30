@@ -41,54 +41,52 @@ export function AssetDetails({
     }
 
     return (
-        <Card className="border shadow-sm">
-            <CardContent className="space-y-6">
+        <div className="space-y-6 mt-4">
 
-                {/* Creator */}
-                <div className="space-y-2 mt-4">
-                    <Label htmlFor="creator" className="text-base font-medium flex items-center gap-2">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        Creator
-                    </Label>
-                    <Input
-                        id="creator"
-                        placeholder="Creator name or address"
-                        value={formState.creator}
-                        onChange={(e) => updateFormField("creator", e.target.value)}
-                        className="h-12"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                        Defaults to your wallet address.
-                    </p>
-                </div>
+            {/* Creator */}
+            <div className="space-y-2">
+                <Label htmlFor="creator" className="text-base font-medium flex items-center gap-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    Creator
+                </Label>
+                <Input
+                    id="creator"
+                    placeholder="Creator name or address"
+                    value={formState.creator}
+                    onChange={(e) => updateFormField("creator", e.target.value)}
+                    className="h-12"
+                />
+                <p className="text-xs text-muted-foreground">
+                    Defaults to your wallet address.
+                </p>
+            </div>
 
-                {/* Tags */}
-                <div className="space-y-3">
-                    <Label className="text-base font-medium flex items-center gap-2">
-                        <Tag className="h-4 w-4 text-muted-foreground" />
-                        Tags
-                    </Label>
-                    <div className="flex flex-wrap gap-2 min-h-[2.5rem] p-2 rounded-md bg-muted/10 border border-muted-foreground/10">
-                        {formState.tags.length === 0 && (
-                            <span className="text-sm text-muted-foreground p-1">No tags added</span>
-                        )}
-                        {formState.tags.map((tag) => (
-                            <Badge key={tag} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
-                                {tag}
-                                <X
-                                    className="h-3 w-3 cursor-pointer hover:text-red-500 transition-colors"
-                                    onClick={() => removeTag(tag)}
-                                />
-                            </Badge>
-                        ))}
-                    </div>
-                    <Input
-                        placeholder="Type tag and press Enter"
-                        onKeyDown={handleTagKeyPress}
-                        className="h-12"
-                    />
+            {/* Tags */}
+            <div className="space-y-3">
+                <Label className="text-base font-medium flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-muted-foreground" />
+                    Tags
+                </Label>
+                <div className="flex flex-wrap gap-2 min-h-[2.5rem] p-2 rounded-md bg-muted/10 border border-muted-foreground/10">
+                    {formState.tags.length === 0 && (
+                        <span className="text-sm text-muted-foreground p-1">No tags added</span>
+                    )}
+                    {formState.tags.map((tag) => (
+                        <Badge key={tag} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
+                            {tag}
+                            <X
+                                className="h-3 w-3 cursor-pointer hover:text-red-500 transition-colors"
+                                onClick={() => removeTag(tag)}
+                            />
+                        </Badge>
+                    ))}
                 </div>
-            </CardContent>
-        </Card>
+                <Input
+                    placeholder="Type tag and press Enter"
+                    onKeyDown={handleTagKeyPress}
+                    className="h-12"
+                />
+            </div>
+        </div>
     )
 }

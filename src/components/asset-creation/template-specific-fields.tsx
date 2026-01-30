@@ -777,14 +777,8 @@ export function TemplateSpecificFields({ template, formState, updateFormField, o
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <IconComponent className="h-5 w-5" />
-          {template.name} Details
-        </CardTitle>
-      </CardHeader>
-      <CardContent>{renderTemplateFields()}</CardContent>
-    </Card>
+    <div className="space-y-4">
+      {renderTemplateFields()}
+    </div>
   )
 }
