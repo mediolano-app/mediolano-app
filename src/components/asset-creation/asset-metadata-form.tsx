@@ -167,7 +167,7 @@ export function AssetMetadataForm({ formState, updateFormField, template }: Asse
             key: "tokenStandard",
             label: "Token Standard",
             type: "select",
-            options: ["ERC-721", "ERC-1155", "SPL", "Other"],
+            options: ["ERC-721"],
           },
           { key: "mintDate", label: "Mint Date", type: "date" },
           { key: "totalSupply", label: "Total Supply", type: "number", placeholder: "e.g., 1 for unique NFT" },

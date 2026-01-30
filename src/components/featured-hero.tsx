@@ -68,7 +68,7 @@ const DefaultHero = () => (
 );
 
 export function FeaturedHero() {
-    const { collections, loading } = useFeaturedCollections([1, 2, 3]);
+    const { collections, loading } = useFeaturedCollections([1, 2, 4]);
     const [currentSlide, setCurrentSlide] = useState(0)
     const [isTransitioning, setIsTransitioning] = useState(false)
 

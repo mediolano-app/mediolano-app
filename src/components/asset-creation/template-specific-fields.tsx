@@ -378,9 +378,6 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="erc721">ERC-721</SelectItem>
-            <SelectItem value="erc1155">ERC-1155</SelectItem>
-            <SelectItem value="spl">SPL Token</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>
       </div>
