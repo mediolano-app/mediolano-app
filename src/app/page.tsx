@@ -1,6 +1,7 @@
 'use client';
 
 import { FeaturedHero } from "@/components/featured-hero"
+import { AnnouncementBanner } from "@/components/announcement-banner"
 import dynamic from "next/dynamic";
 
 const MediolanoFrontpage = dynamic(() => import("@/components/mediolano-frontpage").then(mod => mod.MediolanoFrontpage), {
@@ -14,6 +15,7 @@ export default function Home() {
     <div className="grid">
       <main className="flex flex-col row-start-2 p-6">
         <FeaturedHero />
+        <AnnouncementBanner />
         <MediolanoFrontpage />
       </main>
     </div>
