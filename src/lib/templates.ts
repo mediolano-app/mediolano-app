@@ -6,7 +6,7 @@ export const templates = [
     description: "Create a custom intellectual property asset with flexible metadata",
     color: "slate",
     category: "other",
-    features: ["Flexible schema", "Custom validation", "Adaptive forms"],
+    features: ["Flexible schema", "Friendly forms", "Custom Licensing"],
   },
   {
     id: "audio",
@@ -15,7 +15,7 @@ export const templates = [
     description: "Register audio files, music, sound effects, podcasts, and other audio content.",
     color: "blue",
     category: "media",
-    features: ["Audio waveform analysis", "Genre detection", "Royalty tracking"],
+    features: ["Audio details", "Featured Media", "Spotify/Youtube Links"],
   },
   {
     id: "art",
@@ -24,7 +24,7 @@ export const templates = [
     description: "Register digital or physical artwork, illustrations, paintings, and other visual creations.",
     color: "purple",
     category: "media",
-    features: ["Color palette extraction", "Style classification", "Provenance tracking"],
+    features: ["Provenance", "Open source", "Transparency"],
   },
   {
     id: "nft",
@@ -33,7 +33,7 @@ export const templates = [
     description: "Register non-fungible tokens and blockchain-based digital assets.",
     color: "teal",
     category: "blockchain",
-    features: ["Multi-chain support", "Rarity scoring", "Market analytics"],
+    features: ["Token Standard", "Custom metadata", "Interoperability"],
   },
   {
     id: "video",
@@ -42,7 +42,16 @@ export const templates = [
     description: "Register video content, films, animations, and other moving image media.",
     color: "red",
     category: "media",
-    features: ["Video analysis", "Thumbnail generation", "Quality metrics"],
+    features: ["Video details", "Thumbnail setup", "Youtube Links"],
+  },
+  {
+    id: "photography",
+    name: "Photography",
+    icon: "Camera",
+    description: "Register high-quality photography, with camera settings and equipment details.",
+    color: "orange",
+    category: "media",
+    features: ["Camera Metadata", "EXIF Details", "Location Data"],
   },
   {
     id: "software",
@@ -51,7 +60,7 @@ export const templates = [
     description: "Register software applications, code, algorithms, and digital tools.",
     color: "violet",
     category: "tech",
-    features: ["Code analysis", "Dependency tracking", "Version control"],
+    features: ["Code details", "Code repository"],
   },
   {
     id: "documents",
@@ -60,7 +69,7 @@ export const templates = [
     description: "Register written documents, contracts, agreements, and other text-based content.",
     color: "gray",
     category: "legal",
-    features: ["Text extraction", "Version tracking", "Digital signatures"],
+    features: ["Document details", "Version"],
   },
   {
     id: "patents",
@@ -69,7 +78,7 @@ export const templates = [
     description: "Register patents, inventions, and novel technological solutions.",
     color: "amber",
     category: "legal",
-    features: ["Prior art search", "Classification assistance", "Filing support"],
+    features: ["Patent details", "Patent classification"],
   },
   {
     id: "posts",
@@ -78,7 +87,7 @@ export const templates = [
     description: "Register social media posts, articles, and other short-form content.",
     color: "sky",
     category: "media",
-    features: ["Engagement tracking", "Sentiment analysis", "Viral detection"],
+    features: ["Post details", "Wordpress Links", "Censorship Resistance"],
   },
   {
     id: "publications",
@@ -87,7 +96,7 @@ export const templates = [
     description: "Register books, journals, magazines, and other published materials.",
     color: "indigo",
     category: "media",
-    features: ["ISBN validation", "Citation generation", "Distribution tracking"],
+    features: ["Publication setup", "Wordpress Links", "Censorship Resistance"],
   },
   {
     id: "rwa",
@@ -96,16 +105,7 @@ export const templates = [
     description: "Register real-world assets that have been tokenized or digitally represented.",
     color: "emerald",
     category: "blockchain",
-    features: ["Asset valuation", "Ownership verification", "Transfer tracking"],
-  },
-  {
-    id: "custom",
-    name: "Custom",
-    icon: "Settings",
-    description: "Create a custom template for your unique intellectual property needs.",
-    color: "slate",
-    category: "other",
-    features: ["Flexible schema", "Custom validation", "Adaptive forms"],
+    features: ["Asset details", "Proof of Ownership", "Provenance"],
   },
 ]
 

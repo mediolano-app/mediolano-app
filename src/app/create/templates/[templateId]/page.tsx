@@ -64,7 +64,14 @@ export default function CreateAssetFromTemplate() {
   const template = getTemplateById(templateId)
 
   // Initialize form with template-specific defaults
-  const { formState, updateFormField, handleFileChange, canSubmit } = useAssetForm({
+  // Initialize form with template-specific defaults
+  const {
+    formState,
+    updateFormField,
+    handleFileChange,
+    handleFeaturedImageChange,
+    canSubmit
+  } = useAssetForm({
     assetType: templateId,
   })
 
@@ -179,7 +186,7 @@ export default function CreateAssetFromTemplate() {
 
       // 4. Upload media and metadata to IPFS
       setMintProgress(10)
-      const result = await uploadToIpfs(formState.mediaFile as File, metadata)
+      const result = await uploadToIpfs(formState.mediaFile as File, metadata, formState.featuredImage)
       setMintProgress(50)
 
       // 5. Make contract call
@@ -321,7 +328,12 @@ export default function CreateAssetFromTemplate() {
             />
 
             {/* Template-Specific Fields */}
-            <TemplateSpecificFields template={template} formState={formState} updateFormField={updateFormField} />
+            <TemplateSpecificFields
+              template={template}
+              formState={formState}
+              updateFormField={updateFormField}
+              onFeaturedImageChange={handleFeaturedImageChange}
+            />
 
             {/* Licensing Options */}
             <LicensingOptions formState={formState} updateFormField={updateFormField} />

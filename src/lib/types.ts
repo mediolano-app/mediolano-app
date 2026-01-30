@@ -301,6 +301,7 @@ export type IPType =
   | "Documents"
   | "NFT"
   | "Video"
+  | "Photography"
   | "Patents"
   | "Posts"
   | "Publications"

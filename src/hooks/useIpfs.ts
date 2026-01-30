@@ -85,6 +85,7 @@ export function useIpfsUpload() {
     async (
       file: File,
       metadata: any,
+      featuredImage?: File | null,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       _imageKey?: string
     ) => {
@@ -97,7 +98,7 @@ export function useIpfsUpload() {
       const progressInterval = simulateProgress();
 
       try {
-        // Upload file
+        // Upload file (Main Asset)
         const fileSignedUrl = await getSignedUrl();
         const fileUpload = await pinata.upload.public
           .file(file)
@@ -106,11 +107,24 @@ export function useIpfsUpload() {
         const assetUrl = `${IPFS_URL}/ipfs/${fileUpload.cid}`;
         setFileUrl(uploadedFileUrl);
 
+        let uploadedFeaturedImageUrl = null;
+        if (featuredImage) {
+          const featuredImageSignedUrl = await getSignedUrl();
+          const featuredImageUpload = await pinata.upload.public
+            .file(featuredImage)
+            .url(featuredImageSignedUrl);
+          uploadedFeaturedImageUrl = `ipfs://${featuredImageUpload.cid}`;
+        }
+
         // Upload metadata
         const metadataWithImage = {
           ...metadata,
           assetUrl: assetUrl,
-          image: uploadedFileUrl,
+          // If featured image exists, use it as 'image', otherwise use the main file (assuming it might be an image or we fallback)
+          image: uploadedFeaturedImageUrl || uploadedFileUrl,
+          // If we have a featured image AND the main file is not the image (e.g. video/audio), we should set animation_url
+          // Standard: image = static preview, animation_url = multimedia
+          ...(featuredImage ? { animation_url: uploadedFileUrl } : {}),
         };
 
         const result = await uploadMetadataToIpfs(metadataWithImage);

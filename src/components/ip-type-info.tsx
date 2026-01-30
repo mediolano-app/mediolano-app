@@ -23,7 +23,9 @@ import {
   Hash,
   FileCode,
   Database,
+  Camera,
 } from "lucide-react"
+import { SmartLinks, SmartLink } from "@/components/asset/smart-links"
 import { cn } from "@/lib/utils"
 import { fetchIPFSMetadata, getKnownCids, combineData, AssetType, IPFSMetadata } from "@/utils/ipfs"
 import { determineIPType } from "@/utils/ip-type-detection"
@@ -65,6 +67,8 @@ type AudioData = {
   isrc?: string
   instruments?: string
   containsSamples?: boolean
+  spotifyUrl?: string
+  youtubeUrl?: string
 }
 
 type ArtData = {
@@ -107,6 +111,7 @@ type VideoData = {
   language?: string
   subtitles?: string[]
   allowClips?: boolean
+  youtubeUrl?: string
 }
 
 type PostsData = {
@@ -128,6 +133,11 @@ type PostsData = {
   creator?: string
   registration_date?: string
   Tags?: string
+  instagramUrl?: string
+  tiktokUrl?: string
+  youtubeUrl?: string
+  facebookUrl?: string
+  xUrl?: string
 }
 
 type SoftwareData = {
@@ -142,6 +152,23 @@ type SoftwareData = {
   sourceCodeRepository?: string
   apiDocumentation?: string
   allowModifications?: boolean
+}
+
+type PhotographyData = {
+  camera?: string
+  lens?: string
+  iso?: string
+  aperture?: string
+  shutterSpeed?: string
+  focalLength?: string
+  whiteBalance?: string
+  flash?: string
+  resolution?: string
+  location?: string
+  takenDate?: string
+  software?: string
+  exposureMode?: string
+  fileFormat?: string
 }
 
 const toNumber = (v: unknown): number | undefined => {
@@ -174,7 +201,9 @@ const pickAudio = (d: IPTypeDataType): AudioData => ({
   publisher: asText(d.publisher),
   isrc: asText(d.isrc),
   instruments: asText(d.instruments),
-  containsSamples: toBoolean(d.containsSamples)
+  containsSamples: toBoolean(d.containsSamples),
+  spotifyUrl: asText(d.spotifyUrl),
+  youtubeUrl: asText(d.youtubeUrl)
 })
 
 const pickArt = (d: IPTypeDataType): ArtData => ({
@@ -216,7 +245,8 @@ const pickVideo = (d: IPTypeDataType): VideoData => ({
   aspectRatio: asText(d.aspectRatio),
   language: asText(d.language),
   subtitles: isStringArray(d.subtitles) ? d.subtitles : [],
-  allowClips: toBoolean(d.allowClips)
+  allowClips: toBoolean(d.allowClips),
+  youtubeUrl: asText(d.youtubeUrl)
 })
 
 const pickPosts = (d: IPTypeDataType): PostsData => ({
@@ -238,6 +268,11 @@ const pickPosts = (d: IPTypeDataType): PostsData => ({
   creator: asText(d.creator),
   registration_date: getField(d as Record<string, unknown>, "registration_date"),
   Tags: getField(d as Record<string, unknown>, "Tags"),
+  instagramUrl: asText(d.instagramUrl),
+  tiktokUrl: asText(d.tiktokUrl),
+  youtubeUrl: asText(d.youtubeUrl),
+  facebookUrl: asText(d.facebookUrl),
+  xUrl: asText(d.xUrl)
 })
 
 const pickSoftware = (d: IPTypeDataType): SoftwareData => ({
@@ -252,6 +287,23 @@ const pickSoftware = (d: IPTypeDataType): SoftwareData => ({
   sourceCodeRepository: asText(d.sourceCodeRepository),
   apiDocumentation: asText(d.apiDocumentation),
   allowModifications: toBoolean(d.allowModifications)
+})
+
+const pickPhotography = (d: IPTypeDataType): PhotographyData => ({
+  camera: asText(d.camera),
+  lens: asText(d.lens),
+  iso: asText(d.iso),
+  aperture: asText(d.aperture),
+  shutterSpeed: asText(d.shutterSpeed),
+  focalLength: asText(d.focalLength),
+  whiteBalance: asText(d.whiteBalance),
+  flash: asText(d.flash),
+  resolution: asText(d.resolution),
+  location: asText(d.location),
+  takenDate: asText(d.takenDate),
+  software: asText(d.software),
+  exposureMode: asText(d.exposureMode),
+  fileFormat: asText(d.fileFormat),
 })
 
 
@@ -364,6 +416,8 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         return pickPosts(typeData) as PostsData
       case "Software":
         return pickSoftware(typeData) as SoftwareData
+      case "Photography":
+        return pickPhotography(typeData) as PhotographyData
       default:
         return typeData
     }
@@ -395,6 +449,8 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
         return Building
       case "Software":
         return Code
+      case "Photography":
+        return Camera
       case "Custom":
         return Settings
       default:
@@ -465,6 +521,12 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
           bgLight: "bg-violet-50 dark:bg-violet-950/30",
           text: "text-violet-600 dark:text-violet-400",
           border: "border-violet-200 dark:border-violet-800",
+        }
+      case "Photography":
+        return {
+          bgLight: "bg-orange-50 dark:bg-orange-950/30",
+          text: "text-orange-600 dark:text-orange-400",
+          border: "border-orange-200 dark:border-orange-800",
         }
       case "Custom":
         return {
@@ -598,6 +660,11 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                 </div>
               </RenderSection>
             )}
+
+            <SmartLinks links={[
+              { platform: "spotify", url: asText(typeData.spotifyUrl) },
+              { platform: "youtube", url: asText(typeData.youtubeUrl) },
+            ].filter(l => l.url)} />
 
             {renderExternalLinkButton()}
           </div>
@@ -734,46 +801,45 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
             </div>
 
             {(asText(typeData.director) || asText(typeData.releaseDate)) && (
-              <RenderSection label="Production Details">
-                <div className="grid grid-cols-1 gap-4 w-full">
-                  <RenderField label="Director" value={asText(typeData.director)} />
-                  <RenderField label="Release Date" value={asText(typeData.releaseDate)} icon={Calendar} />
-                </div>
-              </RenderSection>
-            )}
 
-            {((isStringArray(typeData.cast) && typeData.cast.length > 0) || asText(typeData.language) || (isStringArray(typeData.subtitles) && typeData.subtitles.length > 0)) && (
-              <RenderSection label="Cast & Language">
-                <div className="grid grid-cols-1 gap-4 w-full">
-                  {isStringArray(typeData.cast) && typeData.cast.length > 0 && (
-                    <RenderField label="Cast" value="">
-                      <div className="flex flex-wrap gap-1">
-                        {typeData.cast.map((actor, index) => (
-                          <Badge key={index} variant="outline">
-                            {actor}
-                          </Badge>
-                        ))}
-                      </div>
-                    </RenderField>
-                  )}
-                  <RenderField label="Language" value={asText(typeData.language)} />
-                  {isStringArray(typeData.subtitles) && typeData.subtitles.length > 0 && (
-                    <RenderField label="Subtitles" value="">
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {typeData.subtitles.map((language, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {language}
-                          </Badge>
-                        ))}
-                      </div>
-                    </RenderField>
-                  )}
-                </div>
-              </RenderSection>
-            )}
+              <SmartLinks links={[
+                { platform: "youtube", url: asText(typeData.youtubeUrl) },
+              ].filter(l => l.url)} />
+
+{
+              ((isStringArray(typeData.cast) && typeData.cast.length > 0) || asText(typeData.language) || (isStringArray(typeData.subtitles) && typeData.subtitles.length > 0)) && (
+                <RenderSection label="Cast & Language">
+                  <div className="grid grid-cols-1 gap-4 w-full">
+                    {isStringArray(typeData.cast) && typeData.cast.length > 0 && (
+                      <RenderField label="Cast" value="">
+                        <div className="flex flex-wrap gap-1">
+                          {typeData.cast.map((actor, index) => (
+                            <Badge key={index} variant="outline">
+                              {actor}
+                            </Badge>
+                          ))}
+                        </div>
+                      </RenderField>
+                    )}
+                    <RenderField label="Language" value={asText(typeData.language)} />
+                    {isStringArray(typeData.subtitles) && typeData.subtitles.length > 0 && (
+                      <RenderField label="Subtitles" value="">
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {typeData.subtitles.map((language, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {language}
+                            </Badge>
+                          ))}
+                        </div>
+                      </RenderField>
+                    )}
+                  </div>
+                </RenderSection>
+              )
+            }
 
             {renderExternalLinkButton()}
-          </div>
+          </div >
         )
 
       case "Posts":
@@ -939,6 +1005,62 @@ export function IPTypeInfo({ asset }: IPTypeInfoProps) {
                   )}
                 </div>
               </div>
+            )}
+
+            {renderExternalLinkButton()}
+          </div>
+        )
+
+
+
+      case "Photography":
+        return (
+          <div className="space-y-4">
+            <div className={cn("rounded-lg p-4", colorClasses.bgLight)}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Camera className={colorClasses.text} />
+                  <h3 className="font-medium">Photography</h3>
+                </div>
+                <Badge variant="outline" className={cn(colorClasses.border, colorClasses.text)}>
+                  {asText((typeData as Record<string, unknown>).fileFormat) || "Digital"}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <RenderField label="Camera" value={asText((typeData as Record<string, unknown>).camera)} />
+              <RenderField label="Lens" value={asText((typeData as Record<string, unknown>).lens)} />
+              <RenderField label="Date Taken" value={asText((typeData as Record<string, unknown>).takenDate)} icon={Calendar} />
+              <RenderField label="Location" value={asText((typeData as Record<string, unknown>).location)} />
+            </div>
+
+            {(asText((typeData as Record<string, unknown>).iso) || asText((typeData as Record<string, unknown>).aperture) || asText((typeData as Record<string, unknown>).shutterSpeed) || asText((typeData as Record<string, unknown>).focalLength)) && (
+              <RenderSection label="Camera Settings">
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  <RenderField label="ISO" value={asText((typeData as Record<string, unknown>).iso)} />
+                  <RenderField label="Aperture" value={asText((typeData as Record<string, unknown>).aperture)} />
+                  <RenderField label="Shutter Speed" value={asText((typeData as Record<string, unknown>).shutterSpeed)} />
+                  <RenderField label="Focal Length" value={asText((typeData as Record<string, unknown>).focalLength)} />
+                </div>
+              </RenderSection>
+            )}
+
+            {(asText((typeData as Record<string, unknown>).exposureMode) || asText((typeData as Record<string, unknown>).whiteBalance) || asText((typeData as Record<string, unknown>).flash)) && (
+              <RenderSection label="Additional Settings">
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  <RenderField label="Exposure Mode" value={asText((typeData as Record<string, unknown>).exposureMode)} />
+                  <RenderField label="White Balance" value={asText((typeData as Record<string, unknown>).whiteBalance)} />
+                  <RenderField label="Flash" value={asText((typeData as Record<string, unknown>).flash)} />
+                  <RenderField label="Resolution" value={asText((typeData as Record<string, unknown>).resolution)} />
+                </div>
+              </RenderSection>
+            )}
+
+            {asText((typeData as Record<string, unknown>).software) && (
+              <RenderSection label="Post-Processing">
+                <RenderField label="Software Used" value={asText((typeData as Record<string, unknown>).software)} />
+              </RenderSection>
             )}
 
             {renderExternalLinkButton()}

@@ -15,6 +15,8 @@ export interface AssetFormState {
   // Media
   mediaFile?: File | null
   mediaPreviewUrl?: string | null
+  featuredImage?: File | null
+  featuredImagePreviewUrl?: string | null
 
   // Licensing
   licenseType: string
@@ -85,6 +87,23 @@ export function useAssetForm(defaultValues?: Partial<AssetFormState>) {
     }
   }, [])
 
+  const handleFeaturedImageChange = useCallback((file: File | null) => {
+    if (file) {
+      const previewUrl = URL.createObjectURL(file)
+      setFormState((prev) => ({
+        ...prev,
+        featuredImage: file,
+        featuredImagePreviewUrl: previewUrl,
+      }))
+    } else {
+      setFormState((prev) => ({
+        ...prev,
+        featuredImage: null,
+        featuredImagePreviewUrl: null,
+      }))
+    }
+  }, [])
+
   const canSubmit = useCallback(() => {
     return !!(formState.title && formState.description && formState.mediaFile)
   }, [formState.title, formState.description, formState.mediaFile])
@@ -93,6 +112,7 @@ export function useAssetForm(defaultValues?: Partial<AssetFormState>) {
     formState,
     updateFormField,
     handleFileChange,
+    handleFeaturedImageChange,
     canSubmit,
   }
 }

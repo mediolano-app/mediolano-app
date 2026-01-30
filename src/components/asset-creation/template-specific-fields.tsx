@@ -1,7 +1,11 @@
 "use client"
+// template-specific-fields.tsx
+import { useState, useRef } from "react"
+import { cn } from "@/lib/utils"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
@@ -19,15 +23,21 @@ import {
   Building,
   Award,
   Settings,
+  Camera,
+  Image as ImageIcon,
+  XCircle,
+  Upload,
+  X,
 } from "lucide-react"
 
 interface TemplateSpecificFieldsProps {
   template: any
   formState: any
   updateFormField: (field: string, value: any) => void
+  onFeaturedImageChange?: (file: File | null) => void
 }
 
-export function TemplateSpecificFields({ template, formState, updateFormField }: TemplateSpecificFieldsProps) {
+export function TemplateSpecificFields({ template, formState, updateFormField, onFeaturedImageChange }: TemplateSpecificFieldsProps) {
   const getIconForTemplate = (templateId: string) => {
     const icons: Record<string, any> = {
       audio: Music,
@@ -40,6 +50,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
       publications: BookOpen,
       rwa: Building,
       patents: Award,
+      photography: Camera,
       custom: Settings,
     }
     return icons[templateId] || FileText
@@ -57,6 +68,127 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
 
   const getMetadataValue = (field: string) => {
     return formState.metadataFields?.[field] || ""
+  }
+
+  // Featured Image Upload Logic
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && onFeaturedImageChange) {
+      onFeaturedImageChange(files[0]);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0 && onFeaturedImageChange) {
+      onFeaturedImageChange(files[0]);
+    }
+  };
+
+  const RenderFeaturedImageUpload = () => {
+    if (!onFeaturedImageChange) return null;
+
+    return (
+      <div className="space-y-4 md:col-span-2 pt-6 border-t mt-4">
+        <div>
+          <Label className="text-base font-semibold flex items-center gap-2">
+            <ImageIcon className="h-4 w-4" />
+            Featured Image / Cover Art
+          </Label>
+          <p className="text-sm text-muted-foreground mt-1">
+            Upload a cover image for your asset (JPG, PNG, WEBP). This is recommended for all asset types.
+            {!formState.featuredImage && (
+              <span className="text-xs block mt-1 text-amber-600 dark:text-amber-400">
+                If not provided, the main file will be used (valid only for image assets).
+              </span>
+            )}
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          {!formState.featuredImage ? (
+            <div
+              className={cn(
+                "border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer",
+                isDragOver
+                  ? "border-primary bg-primary/5"
+                  : "border-muted-foreground/25 hover:border-primary/50"
+              )}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-base font-medium mb-2">
+                Drop your cover image here
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                or click to browse
+              </p>
+              <Button variant="outline" size="sm" type="button">Choose File</Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                onChange={handleFileSelect}
+                accept="image/*"
+              />
+            </div>
+          ) : (
+            <div className="relative">
+              <div className="flex items-center gap-4 p-4 border rounded-lg bg-muted/30">
+                <div className="flex-shrink-0">
+                  {formState.featuredImagePreviewUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={formState.featuredImagePreviewUrl}
+                      alt="Preview"
+                      className="w-16 h-16 object-cover rounded-lg bg-background"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
+                      <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">
+                    {formState.featuredImage.name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {(formState.featuredImage.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  type="button"
+                  onClick={() => onFeaturedImageChange(null)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
   }
 
   const renderAudioFields = () => (
@@ -127,7 +259,25 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
         </div>
       </div>
       <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="externalUrl">External Audio URL</Label>
+        <Label htmlFor="spotifyUrl">Spotify Link</Label>
+        <Input
+          id="spotifyUrl"
+          placeholder="e.g., https://open.spotify.com/track/..."
+          value={getMetadataValue("spotifyUrl")}
+          onChange={(e) => updateMetadataField("spotifyUrl", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="youtubeUrl">YouTube Link</Label>
+        <Input
+          id="youtubeUrl"
+          placeholder="e.g., https://youtube.com/watch?v=..."
+          value={getMetadataValue("youtubeUrl")}
+          onChange={(e) => updateMetadataField("youtubeUrl", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="externalUrl">External Audio URL (Generic)</Label>
         <Input
           id="externalUrl"
           placeholder="e.g., https://soundcloud.com/..."
@@ -135,6 +285,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
         />
       </div>
+      <RenderFeaturedImageUpload />
     </div>
   )
 
@@ -204,6 +355,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
         />
       </div>
+      <RenderFeaturedImageUpload />
     </div>
   )
 
@@ -273,14 +425,24 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
         </div>
       </div>
       <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="externalUrl">Video URL</Label>
+        <Label htmlFor="youtubeUrl">YouTube Video Link</Label>
+        <Input
+          id="youtubeUrl"
+          placeholder="e.g., https://youtube.com/watch?v=..."
+          value={getMetadataValue("youtubeUrl")}
+          onChange={(e) => updateMetadataField("youtubeUrl", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="externalUrl">External Video URL (Generic)</Label>
         <Input
           id="externalUrl"
-          placeholder="e.g., https://youtube.com/..."
+          placeholder="e.g., https://vimeo.com/..."
           value={getMetadataValue("externalUrl")}
           onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
         />
       </div>
+      <RenderFeaturedImageUpload />
     </div>
   )
 
@@ -348,6 +510,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           <Label htmlFor="allowModifications">Allow modifications and derivative works</Label>
         </div>
       </div>
+      <RenderFeaturedImageUpload />
     </div>
   )
 
@@ -416,6 +579,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           rows={3}
         />
       </div>
+      <RenderFeaturedImageUpload />
     </div>
   )
 
@@ -493,6 +657,7 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
         />
       </div>
+      <RenderFeaturedImageUpload />
     </div>
   )
 
@@ -535,6 +700,233 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
           onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
         />
       </div>
+      <RenderFeaturedImageUpload />
+    </div>
+  )
+
+  const renderPhotographyFields = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-2">
+        <Label htmlFor="camera">Camera Model</Label>
+        <Input
+          id="camera"
+          placeholder="e.g., Canon EOS R5, Sony A7IV"
+          value={getMetadataValue("camera")}
+          onChange={(e) => updateMetadataField("camera", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="lens">Lens</Label>
+        <Input
+          id="lens"
+          placeholder="e.g., 24-70mm f/2.8"
+          value={getMetadataValue("lens")}
+          onChange={(e) => updateMetadataField("lens", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="fileFormat">File Format</Label>
+        <Select value={getMetadataValue("fileFormat")} onValueChange={(value) => updateMetadataField("fileFormat", value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select format" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="raw">RAW</SelectItem>
+            <SelectItem value="jpeg">JPEG</SelectItem>
+            <SelectItem value="tiff">TIFF</SelectItem>
+            <SelectItem value="png">PNG</SelectItem>
+            <SelectItem value="film">Film Scan</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="resolution">Resolution</Label>
+        <Input
+          id="resolution"
+          placeholder="e.g., 45MP, 8192x5464"
+          value={getMetadataValue("resolution")}
+          onChange={(e) => updateMetadataField("resolution", e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="iso">ISO</Label>
+        <Input
+          id="iso"
+          placeholder="e.g., 100, 400, 1600"
+          value={getMetadataValue("iso")}
+          onChange={(e) => updateMetadataField("iso", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="aperture">Aperture</Label>
+        <Input
+          id="aperture"
+          placeholder="e.g., f/1.8, f/5.6"
+          value={getMetadataValue("aperture")}
+          onChange={(e) => updateMetadataField("aperture", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="shutterSpeed">Shutter Speed</Label>
+        <Input
+          id="shutterSpeed"
+          placeholder="e.g., 1/200, 30s"
+          value={getMetadataValue("shutterSpeed")}
+          onChange={(e) => updateMetadataField("shutterSpeed", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="focalLength">Focal Length</Label>
+        <Input
+          id="focalLength"
+          placeholder="e.g., 35mm, 85mm"
+          value={getMetadataValue("focalLength")}
+          onChange={(e) => updateMetadataField("focalLength", e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="takenDate">Date Taken</Label>
+        <Input
+          id="takenDate"
+          type="date"
+          value={getMetadataValue("takenDate")}
+          onChange={(e) => updateMetadataField("takenDate", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="location">Location</Label>
+        <Input
+          id="location"
+          placeholder="e.g., New York, NY"
+          value={getMetadataValue("location")}
+          onChange={(e) => updateMetadataField("location", e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="software">Post-Processing Software</Label>
+        <Input
+          id="software"
+          placeholder="e.g., Lightroom, Photoshop"
+          value={getMetadataValue("software")}
+        />
+      </div>
+      <RenderFeaturedImageUpload />
+    </div>
+  )
+
+
+
+  const renderPostsFields = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-2">
+        <Label htmlFor="platform">Platform</Label>
+        <Select value={getMetadataValue("platform")} onValueChange={(value) => updateMetadataField("platform", value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select platform" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="instagram">Instagram</SelectItem>
+            <SelectItem value="tiktok">TikTok</SelectItem>
+            <SelectItem value="youtube">YouTube</SelectItem>
+            <SelectItem value="facebook">Facebook</SelectItem>
+            <SelectItem value="x">X (Twitter)</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="publicationDate">Publication Date</Label>
+        <Input
+          id="publicationDate"
+          type="date"
+          value={getMetadataValue("publicationDate")}
+          onChange={(e) => updateMetadataField("publicationDate", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="category">Category</Label>
+        <Input
+          id="category"
+          placeholder="e.g., Lifestyle, Tech, News"
+          value={getMetadataValue("category")}
+          onChange={(e) => updateMetadataField("category", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="wordCount">Word/Character Count</Label>
+        <Input
+          id="wordCount"
+          type="number"
+          placeholder="e.g., 280"
+          value={getMetadataValue("wordCount")}
+          onChange={(e) => updateMetadataField("wordCount", e.target.value)}
+        />
+      </div>
+
+      {/* Social Links */}
+      <div className="space-y-2 md:col-span-2 pt-4">
+        <Label className="text-base font-semibold">Social Links</Label>
+        <p className="text-sm text-muted-foreground mb-4">Add direct links to your social media presence.</p>
+      </div>
+
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="instagramUrl">Instagram Link</Label>
+        <Input
+          id="instagramUrl"
+          placeholder="https://instagram.com/..."
+          value={getMetadataValue("instagramUrl")}
+          onChange={(e) => updateMetadataField("instagramUrl", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="tiktokUrl">TikTok Link</Label>
+        <Input
+          id="tiktokUrl"
+          placeholder="https://tiktok.com/@..."
+          value={getMetadataValue("tiktokUrl")}
+          onChange={(e) => updateMetadataField("tiktokUrl", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="youtubeUrl">YouTube Link</Label>
+        <Input
+          id="youtubeUrl"
+          placeholder="https://youtube.com/..."
+          value={getMetadataValue("youtubeUrl")}
+          onChange={(e) => updateMetadataField("youtubeUrl", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="facebookUrl">Facebook Link</Label>
+        <Input
+          id="facebookUrl"
+          placeholder="https://facebook.com/..."
+          value={getMetadataValue("facebookUrl")}
+          onChange={(e) => updateMetadataField("facebookUrl", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="xUrl">X (Twitter) Link</Label>
+        <Input
+          id="xUrl"
+          placeholder="https://x.com/..."
+          value={getMetadataValue("xUrl")}
+          onChange={(e) => updateMetadataField("xUrl", e.target.value)}
+        />
+      </div>
+
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="externalUrl">Other Reference URL</Label>
+        <Input
+          id="externalUrl"
+          placeholder="e.g., https://your-blog.com/..."
+          value={getMetadataValue("externalUrl")}
+          onChange={(e) => updateMetadataField("externalUrl", e.target.value)}
+        />
+      </div>
     </div>
   )
 
@@ -544,8 +936,12 @@ export function TemplateSpecificFields({ template, formState, updateFormField }:
         return renderAudioFields()
       case "art":
         return renderArtFields()
+      case "photography":
+        return renderPhotographyFields()
       case "video":
         return renderVideoFields()
+      case "posts":
+        return renderPostsFields()
       case "software":
         return renderSoftwareFields()
       case "nft":

@@ -9,7 +9,7 @@ export function determineIPType(asset: AssetType, metadata?: IPFSMetadata | null
   // Prefer asset.type if valid
   const allowed: IPType[] = ALLOWED_IP_TYPES
   if (asset?.type && allowed.includes(asset.type as IPType)) {
-    return asset.type as IPType 
+    return asset.type as IPType
   }
 
   // Try metadata-based detection if provided
@@ -22,6 +22,7 @@ export function determineIPType(asset: AssetType, metadata?: IPFSMetadata | null
     if (attrType?.value && typeof attrType.value === 'string') {
       const v = attrType.value.toLowerCase()
       if (v === 'art' || v === 'artwork') return 'Art'
+      if (v === 'photography' || v === 'photo') return 'Photography'
       if (v === 'audio' || v === 'music') return 'Audio'
       if (v === 'video' || v === 'film' || v === 'movie') return 'Video'
       if (v === 'software' || v === 'app' || v === 'application') return 'Software'
@@ -36,6 +37,7 @@ export function determineIPType(asset: AssetType, metadata?: IPFSMetadata | null
     if (metadata.type && typeof metadata.type === 'string') {
       const t = metadata.type.trim().toLowerCase()
       if (/(^|\b)(art|digital art|painting|illustration)($|\b)/.test(t)) return 'Art'
+      if (/(^|\b)(photography|photo|camera)($|\b)/.test(t)) return 'Photography'
       if (/(^|\b)(audio|music|sound)($|\b)/.test(t)) return 'Audio'
       if (/(^|\b)(video|film|movie)($|\b)/.test(t)) return 'Video'
       if (/(^|\b)(software|code|app|application)($|\b)/.test(t)) return 'Software'
@@ -48,7 +50,7 @@ export function determineIPType(asset: AssetType, metadata?: IPFSMetadata | null
     }
 
     if (metadata.medium === 'Digital Art' || metadata.medium === 'Physical Art' ||
-        metadata.medium === 'Painting' || metadata.medium === 'Illustration') {
+      metadata.medium === 'Painting' || metadata.medium === 'Illustration') {
       return 'Art'
     }
 
@@ -81,6 +83,7 @@ export function determineIPType(asset: AssetType, metadata?: IPFSMetadata | null
     if (v === "post" || v === "posts") return "Posts"
     if (v === "audio" || v === "music") return "Audio"
     if (v === "art" || v === "artwork") return "Art"
+    if (v === 'photography' || v === 'photo') return 'Photography'
     if (v === "video" || v === "film") return "Video"
     if (v === "document" || v === "documents") return "Documents"
     if (v === "software" || v === "app") return "Software"

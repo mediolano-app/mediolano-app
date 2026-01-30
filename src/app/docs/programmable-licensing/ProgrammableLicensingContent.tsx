@@ -216,9 +216,9 @@ export default function ProgrammableLicensingContent() {
                                         Intellectual Property should be tradable. When you sell a Mediolano IP Asset on a secondary market, the license travels with it (unless specified otherwise).
                                     </p>
                                     <div className="bg-muted/20 p-4 rounded-xl mb-4">
-                                        <h4 className="font-semibold text-foreground mb-1">EIP-2981 Royalty Standard</h4>
+                                        <h4 className="font-semibold text-foreground mb-1">EIP-721 Standard</h4>
                                         <p className="text-sm text-muted-foreground">
-                                            Mediolano implements the EIP-2981 royalty standard. Creators set their royalty percentage at minting. Marketplaces that respect this standard will automatically payout royalties to the original creator on every resale.
+                                            Mediolano implements the EIP-721 standard.
                                         </p>
                                     </div>
                                 </div>
