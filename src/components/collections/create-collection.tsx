@@ -41,6 +41,7 @@ import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-dra
 import { useProvider } from "@starknet-react/core";
 import { num, hash, Contract } from "starknet";
 import { ipCollectionAbi } from "../../abis/ip_collection";
+import { useNetwork } from "@/components/starknet-provider";
 
 // Debugging ABI import
 
@@ -54,8 +55,9 @@ export default function CreateCollectionView({
   const uploaderRef = useRef<CoverImageUploaderRef>(null);
   const { createCollection, isCreating, error: hookError } = useCollection();
   const { toast } = useToast();
-  const { address: walletAddress } = useAccount();
+  const { address: walletAddress, chainId } = useAccount();
   const { provider } = useProvider();
+  const { networkConfig } = useNetwork();
 
   // Form State
   const [formData, setFormData] = useState<CollectionFormData>({
@@ -87,6 +89,16 @@ export default function CreateCollectionView({
       toast({
         title: "Wallet not connected",
         description: "Please connect your wallet to create a collection.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check Network
+    if (chainId && BigInt(chainId).toString() !== networkConfig.chainId) {
+      toast({
+        title: "Wrong Network",
+        description: `Please switch to ${networkConfig.name} to create a collection.`,
         variant: "destructive",
       });
       return;
@@ -141,7 +153,7 @@ export default function CreateCollectionView({
 
       if (file) {
         // Upload file to IPFS
-        result = await uploadToIpfs(file, submitData, "coverImage");
+        result = await uploadToIpfs(file, submitData, null);
       } else {
         // Use image URL (external URL or default placeholder)
         const currentImageUrl = uploaderRef.current?.getImageUrl() || "/placeholder.svg";

@@ -14,13 +14,14 @@ import {
 import {
   Wallet,
   LogOut,
+  AlertCircle
 } from "lucide-react";
 import { useNetwork } from "@/components/starknet-provider";
 import { StarknetkitConnector, useStarknetkitConnectModal } from "starknetkit";
 
 export function WalletConnect() {
   const { connectAsync, connectors } = useConnect();
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chainId } = useAccount();
   const { disconnect } = useDisconnect();
   const [open, setOpen] = useState(false);
   const { currentNetwork, networkConfig } = useNetwork();
@@ -52,13 +53,16 @@ export function WalletConnect() {
   // Determine display address
   const displayAddress = address;
 
+  // Network check
+  const isWrongNetwork = isConnected && chainId && BigInt(chainId).toString() !== networkConfig.chainId;
+
   if (isConnected) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="w-full glass">
+          <Button variant={isWrongNetwork ? "destructive" : "outline"} className={`w-full glass ${isWrongNetwork ? "bg-red-500/20 border-red-500 text-red-500 hover:bg-red-500/30" : ""}`}>
             <Wallet className="h-4 w-4 mr-2" />
-            {displayAddress?.slice(0, 6)}
+            {isWrongNetwork ? "Wrong Network" : displayAddress?.slice(0, 6)}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
@@ -69,6 +73,17 @@ export function WalletConnect() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
+            {isWrongNetwork && (
+              <div className="alert alert-error bg-red-900/20 border-red-900 text-red-200">
+                <AlertCircle className="h-4 w-4" />
+                <p className="text-sm font-semibold">
+                  Wrong Network Detected
+                </p>
+                <p className="text-xs">
+                  Please switch your wallet to <span className="font-bold">{networkConfig.name}</span> to continue using the app.
+                </p>
+              </div>
+            )}
             <div className="flex gap-4 items-center justify-between">
               <Button
                 variant="destructive"

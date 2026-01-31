@@ -12,8 +12,8 @@ export async function generateMetadata({ params }: AssetPageProps): Promise<Meta
 
   // TODO: Fetch real asset data here for richer SEO
   // For now, using dynamic slug in title
-  const title = `Asset ${slug.substring(0, 8)}... | IP Creator`
-  const description = "View, share and remix this intellectual property on IP Creator."
+  const title = `IP ${slug.substring(0, 8)}...`
+  const description = "View, share and remix Programmable IP"
 
   return {
     title: title,
