@@ -112,14 +112,14 @@ export function MintSuccessDrawer({
                 Creation Successful
               </>
             )}
-            {error && "Error Creating Asset"}
+            {error && step !== "success" && "Error Creating Asset"}
           </DrawerTitle>
           <DrawerDescription className="text-sm text-center mt-1">
             {step === "idle" && "Please review the details below before confirming the transaction."}
             {step === "uploading" && "Securely storing your metadata and assets on IPFS."}
             {step === "processing" && "Please confirm the transaction in your wallet."}
             {step === "success" && "Your intellectual property is now secured onchain."}
-            {error && "There was a problem creating your asset."}
+            {error && step !== "success" && "There was a problem creating your asset."}
           </DrawerDescription>
         </DrawerHeader>
 
@@ -278,8 +278,8 @@ export function MintSuccessDrawer({
             </div>
           )}
 
-          {/* ERROR STATE */}
-          {error && (
+          {/* ERROR STATE - Only show if not in success state */}
+          {error && step !== "success" && (
             <div className="flex flex-col items-center justify-center space-y-4 py-8">
               <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center animate-in zoom-in duration-300">
                 <XCircle className="h-8 w-8 text-red-500" />
@@ -327,7 +327,7 @@ export function MintSuccessDrawer({
             </div>
           )}
 
-          {error && (
+          {error && step !== "success" && (
             <Button variant="ghost" className="w-full" onClick={() => onOpenChange(false)}>
               Close
             </Button>
