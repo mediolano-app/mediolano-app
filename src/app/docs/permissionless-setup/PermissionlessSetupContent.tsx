@@ -124,7 +124,7 @@ export default function PermissionlessSetupContent() {
                                     Permissionless Setup
                                 </h1>
                                 <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl text-balance">
-                                    A guide to help human users and AI agents run Mediolano IP Creator locally or deploy their own instance.
+                                    A guide to help run Mediolano IP Creator locally or deploy your own instance.
                                 </p>
                             </div>
 

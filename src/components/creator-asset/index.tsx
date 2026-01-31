@@ -325,7 +325,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                           <Button
                             variant="outline"
                             size="lg"
-                            className="flex-1 sm:flex-none glass transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base px-3"
+                            className="flex-1 sm:flex-none glass text-foreground transition-all gap-1.5 min-w-[90px] h-10 lg:h-11 text-xs lg:text-base px-3"
                             onClick={() => setIsTransferOpen(true)}
                           >
                             <ArrowRightLeft className="h-3.5 w-3.5 lg:h-5 lg:w-5" />

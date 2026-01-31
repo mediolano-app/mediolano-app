@@ -34,6 +34,7 @@ import Image from "next/image"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 import { motion, AnimatePresence } from "framer-motion"
+import Link from "next/link"
 
 interface ProvenanceEvent {
   id: string
@@ -394,16 +395,30 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <h3 className="text-2xl font-black text-foreground">Digital Fingerprint</h3>
+            <h3 className="text-2xl font-black text-foreground">Proof of Ownership</h3>
             <p className="text-muted-foreground font-light leading-relaxed max-w-md">
-              Each asset is assigned a unique cryptographic hash, ensuring integrity.
+              Each asset is immutable, secured by a unique cryptographic hash, ensuring integrity.
             </p>
+            <Button className="w-full h-14 rounded-2xl font-bold bg-foreground text-background hover:bg-foreground/90 transition-all shadow-lg" asChild>
+              <Link href={`/proof-of-ownership/${asset.contract}`}>
+                <Shield className="h-4 w-4 mr-3" />
+                View Proof of Ownership
+              </Link>
+            </Button>
           </div>
 
           <div className="space-y-6">
+
+            <Button variant="outline" className="w-full h-14 rounded-2xl" asChild>
+              <Link href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://voyager.online"}/nft/${asset.contract}`} target="_blank" rel="noreferrer">
+                <ExternalLink className="h-4 w-4 mr-3" />
+                View asset on External Explorer
+              </Link>
+            </Button>
+
             <div className="bg-background/80 border border-border rounded-2xl p-6 group hover:border-primary/30 transition-all duration-500">
               <div className="flex items-center justify-between mb-3 px-1">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Hash</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Metadata</span>
                 <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-primary" onClick={() => handleCopy(asset.fingerprint, "fp")}>
                   {copied === "fp" ? "COPIED" : "COPY"}
                 </Button>
@@ -413,12 +428,7 @@ export function AssetProvenance({ asset, events, showActions = true, compact = f
               </code>
             </div>
 
-            <Button className="w-full h-14 rounded-2xl font-bold bg-foreground text-background hover:bg-foreground/90 transition-all shadow-lg" asChild>
-              <a href={`${process.env.NEXT_PUBLIC_EXPLORER_URL || "https://voyager.online"}/nft/${asset.contract}`} target="_blank" rel="noreferrer">
-                <Shield className="h-4 w-4 mr-3" />
-                Onchain Registry
-              </a>
-            </Button>
+
           </div>
         </div>
       </section>
