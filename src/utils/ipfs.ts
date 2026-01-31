@@ -155,29 +155,29 @@ export function getKnownCids(): Record<string, string> {
 }
 
 /**
- * Mix the mockdata with ipfsdata if is necessary
+ * Mix the dappData with ipfsdata if is necessary
  * @param {IPFSMetadata} ipfsData 
- * @param {AssetType} mockData
+ * @param {AssetType} dappData
  * @returns {AssetType}
  */
-export function combineData(ipfsData: IPFSMetadata | null, mockData: AssetType): AssetType {
-  if (!ipfsData) return mockData;
+export function combineData(ipfsData: IPFSMetadata | null, dappData: AssetType): AssetType {
+  if (!ipfsData) return dappData;
 
   // Combinar los datos, priorizando los datos de IPFS
   const result: AssetType = {
-    ...mockData,
+    ...dappData,
     ...(ipfsData as Partial<AssetType>),
-    id: mockData.id,
-    creator: ipfsData.creator || mockData.creator,
-    owner: mockData.owner, // Mantener el owner actual
-    image: ipfsData.image || mockData.image,
-    attributes: ipfsData.attributes || mockData.attributes,
-    type: ipfsData.type || mockData.type,
-    registrationDate: ipfsData.registrationDate || mockData.registrationDate
+    id: dappData.id,
+    creator: ipfsData.creator || dappData.creator,
+    owner: dappData.owner, // Mantener el owner actual
+    image: ipfsData.image || dappData.image,
+    attributes: ipfsData.attributes || dappData.attributes,
+    type: ipfsData.type || dappData.type,
+    registrationDate: ipfsData.registrationDate || dappData.registrationDate
   };
 
-  if (mockData.ipfsCid) {
-    result.ipfsCid = mockData.ipfsCid;
+  if (dappData.ipfsCid) {
+    result.ipfsCid = dappData.ipfsCid;
   }
 
   return result;

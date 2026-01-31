@@ -30,7 +30,7 @@ import { cn } from "@/lib/utils"
 import { fetchIPFSMetadata, getKnownCids, combineData, AssetType, IPFSMetadata } from "@/utils/ipfs"
 import { determineIPType } from "@/utils/ip-type-detection"
 import { IPType } from "@/lib/types"
-import { mockIPTypeData } from "@/lib/mockData"
+import { mockIPTypeData } from "@/lib/dapp-data"
 
 
 export type IPTypeDataType = Record<string, unknown>;
