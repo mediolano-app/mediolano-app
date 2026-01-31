@@ -90,19 +90,19 @@ export function MintSuccessDrawer({
 
   return (
     <Drawer open={isOpen} onOpenChange={handleOpenChange}>
-      <DrawerContent className="w-full max-w-lg mx-auto rounded-t-xl mobile-padding max-h-[90vh]">
+      <DrawerContent className="w-full max-w-lg mx-auto rounded-t-xl mobile-padding max-h-[90vh] bg-card">
         <DrawerHeader className="text-center">
           <DrawerTitle className="text-xl flex items-center justify-center gap-2">
             {step === "idle" && "Review Asset Details"}
             {step === "uploading" && (
               <>
-                <Upload className="h-5 w-5 animate-pulse text-primary" />
+                <Upload className="h-5 w-5 animate-pulse text-foreground" />
                 Uploading Assets
               </>
             )}
             {step === "processing" && (
               <>
-                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                <Loader2 className="h-5 w-5 animate-spin text-foreground" />
                 Minting Asset
               </>
             )}
@@ -195,7 +195,7 @@ export function MintSuccessDrawer({
                 <div className="relative mx-auto w-16 h-16 flex items-center justify-center">
                   <div className="absolute inset-0 border-4 border-muted rounded-full"></div>
                   <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  {step === "uploading" ? <Upload className="h-6 w-6 text-primary" /> : <Loader2 className="h-6 w-6 text-primary" />}
+                  {step === "uploading" ? <Upload className="h-6 w-6 text-foreground" /> : <Loader2 className="h-6 w-6 text-foreground" />}
                 </div>
 
                 <div>
@@ -267,7 +267,7 @@ export function MintSuccessDrawer({
                       href={`${EXPLORER_URL}/tx/${mintResult.transactionHash}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-mono text-xs hover:underline flex items-center text-primary bg-primary/10 px-2 py-1 rounded hover:bg-primary/20 transition-colors"
+                      className="font-mono text-xs hover:underline flex items-center text-foreground bg-primary/10 px-2 py-1 rounded hover:bg-primary/20 transition-colors"
                     >
                       {shortenAddress(mintResult.transactionHash)}
                       <ExternalLink className="h-3 w-3 ml-1" />

@@ -68,7 +68,7 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
       networkConfig
     }}>
       <StarknetConfig
-        chains={[currentNetwork === 'mainnet' ? mainnet : sepolia]}
+        chains={[mainnet, sepolia]}
         provider={providerFactory}
         connectors={connectors}
         explorer={voyager}
