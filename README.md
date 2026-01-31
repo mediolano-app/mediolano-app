@@ -1,7 +1,7 @@
 ![mediolano-programmable-ip-integrity-web-feature-image](https://github.com/user-attachments/assets/3fd36f9c-a766-41ec-b217-08c5e2054b90)
 
 > [!IMPORTANT]
-> Mediolano dapp is in constant development. Use for testing purposes only. 
+> Mediolano dapp is live on Starknet mainnet for tests. 
 
 Quick links:
 - [IP Creator Dapp](https://ip.mediolano.app)
@@ -27,6 +27,8 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 - **Programmable IP**: Transform creative works (images, music, videos, AI models, research papers) into programmable digital assets that can be managed, tracked, and monetized.
 
+-**Mediolano Protocol**: Programmable IP foundation of the Integrity Web. A high-performance, modular infrastructure for programmable intellectual property onchain.
+
 - **Remix & Derivatives**: Enable creative remixing of intellectual property while maintaining clear lineage and attribution through smart contracts.
 
 - **Proof of Ownership**: Generate blockchain-verified certificates of authorship and ownership, providing a cryptographically secure claim to your IP.
@@ -41,7 +43,7 @@ Mediolano aims to serve as the intellectual property provider for the integrity 
 
 ## IP Creator Dapp Architecture
 
-The IP Creator Dapp is built as permissionless, decentralized application leveraging the full power of Starknet and web3 to provide a seamless user experience.
+The IP Creator Dapp is built as permissionless, decentralized application leveraging the full power of Starknet and web3 to provide trully ownership.
 
 ### Technical Stack
 
