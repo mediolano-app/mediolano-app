@@ -9,10 +9,10 @@ export const metadata: Metadata = {
         title: "Constitution | Mediolano DAO",
         description: "The governing principles of the Mediolano Tokenized IP Protocol.",
         url: 'https://ip.mediolano.app/docs/dao-constitution',
-        siteName: 'Mediolano IP Creator',
+        siteName: 'IP Creator',
         images: [
             {
-                url: '/mediolano-logo-dark.png',
+                url: '/app-card.jpg',
                 width: 1200,
                 height: 630,
                 alt: 'Mediolano Constitution',

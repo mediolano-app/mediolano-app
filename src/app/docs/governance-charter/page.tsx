@@ -9,10 +9,10 @@ export const metadata: Metadata = {
     title: "Governance Charter | Mediolano DAO",
     description: "How Mediolano DAO works. Proposals, Voting, and Treasury.",
     url: 'https://ip.mediolano.app/docs/governance-charter',
-    siteName: 'Mediolano IP Creator',
+    siteName: 'IP Creator',
     images: [
       {
-        url: '/mediolano-logo-dark.png',
+        url: '/app-card.jpg',
         width: 1200,
         height: 630,
         alt: 'Mediolano Governance Charter',

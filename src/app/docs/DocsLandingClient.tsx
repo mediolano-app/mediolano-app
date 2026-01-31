@@ -170,6 +170,21 @@ export default function DocsLandingClient() {
                             </div>
                         </motion.div>
 
+                        {/* Permissionless Setup */}
+                        <motion.div variants={item} className="group relative overflow-hidden rounded-[2rem] border border-border/50 bg-background/30 backdrop-blur-md hover:bg-background/50 transition-all duration-500">
+                            <Link href="/docs/permissionless-setup" className="absolute inset-0 z-20" />
+                            <div className="p-8">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="p-3 bg-pink-500/10 rounded-xl text-pink-500">
+                                        <Terminal className="w-6 h-6" />
+                                    </div>
+                                    <ArrowRight className="w-5 h-5 text-muted-foreground -translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300" />
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">Permissionless Setup</h3>
+                                <p className="text-sm text-muted-foreground">Run & Deploy Locally.</p>
+                            </div>
+                        </motion.div>
+
                         {/* User Guide */}
                         <motion.div variants={item} className="group relative overflow-hidden rounded-[2rem] border border-border/50 bg-background/30 backdrop-blur-md hover:bg-background/50 transition-all duration-500">
                             <Link href="/docs/user-guide" className="absolute inset-0 z-20" />

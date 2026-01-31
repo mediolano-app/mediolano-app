@@ -3,16 +3,16 @@ import type { Metadata } from "next"
 import FAQContent from "@/app/docs/faq/FAQContent"
 
 export const metadata: Metadata = {
-    title: "FAQ | Mediolano IP Creator",
+    title: "FAQ | IP Creator",
     description: "Frequently Asked Questions about Mediolano, IP tokenization, fees, and more.",
     openGraph: {
-        title: "FAQ | Mediolano IP Creator",
+        title: "FAQ | IP Creator",
         description: "Find answers to your questions about the Integrity Web and Programmable IP.",
         url: 'https://ip.mediolano.app/docs/faq',
-        siteName: 'Mediolano IP Creator',
+        siteName: 'IP Creator',
         images: [
             {
-                url: '/mediolano-logo-dark.png',
+                url: '/app-card.jpg',
                 width: 1200,
                 height: 630,
                 alt: 'Mediolano FAQ',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: "FAQ | Mediolano IP Creator",
+        title: "FAQ | IP Creator",
         description: "Find answers to your questions about the Integrity Web and Programmable IP.",
         images: ['/mediolano-logo-dark.png'],
     },

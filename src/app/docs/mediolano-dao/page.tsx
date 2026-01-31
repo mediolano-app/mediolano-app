@@ -3,16 +3,16 @@ import type { Metadata } from "next"
 import MediolanoDAOContent from "@/app/docs/mediolano-dao/MediolanoDAOContent"
 
 export const metadata: Metadata = {
-    title: "Mediolano DAO | Mediolano IP Creator",
+    title: "Mediolano DAO | IP Creator",
     description: "Ensuring transparency, permissionless participation, and truly decentralized governance for the Integrity Web.",
     openGraph: {
-        title: "Mediolano DAO | Mediolano IP Creator",
+        title: "Mediolano DAO | IP Creator",
         description: "Decentralized Autonomous Organization. Governance, Mission, and Values.",
         url: 'https://ip.mediolano.app/docs/mediolano-dao',
-        siteName: 'Mediolano IP Creator',
+        siteName: 'IP Creator',
         images: [
             {
-                url: '/mediolano-logo-dark.png',
+                url: '/app-card.jpg',
                 width: 1200,
                 height: 630,
                 alt: 'Mediolano DAO',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: "Mediolano DAO | Mediolano IP Creator",
+        title: "Mediolano DAO | IP Creator",
         description: "Decentralized Autonomous Organization. Governance, Mission, and Values.",
         images: ['/mediolano-logo-dark.png'],
     },

@@ -27,10 +27,11 @@ const protocolLinks = [
     { title: "DApp Guide", href: "/docs/dapp-guide", icon: Globe2, desc: "Overview of Mediolano IP Creator" },
     { title: "User Guide", href: "/docs/user-guide", icon: BookOpen, desc: "How-to guides and tutorials" },
     { title: "Developers", href: "/docs/developers", icon: Terminal, desc: "Contracts, SDKs, and tools" },
-    { title: "Programmable Licensing", href: "/docs/programmable-licensing", icon: Scroll, desc: "Decentralized IP Rights" },
+    { title: "Permissionless Setup", href: "/docs/permissionless-setup", icon: Terminal, desc: "Run and deploy locally" },
     { title: "How does Mediolano protect IP?", href: "/docs/ip-protection", icon: ShieldCheck, desc: "Built for the Integrity Web" },
     { title: "Mediolano Protocol", href: "/docs/protocol", icon: Network, desc: "Technical architecture" },
-    { title: "Security", href: "/docs/security", icon: Shield, desc: "Audits and bug bounties" },
+    { title: "Programmable Licensing", href: "/docs/programmable-licensing", icon: Scroll, desc: "Decentralized IP Rights" },
+    { title: "Security", href: "/docs/security", icon: Shield, desc: "Security and Verification" },
     { title: "FAQ", href: "/docs/faq", icon: HelpCircle, desc: "Common questions" },
 ]
 

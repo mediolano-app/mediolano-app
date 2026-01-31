@@ -3,16 +3,16 @@ import type { Metadata } from "next"
 import ComplianceGuidelinesContent from "@/app/docs/compliance-guidelines/ComplianceGuidelinesContent"
 
 export const metadata: Metadata = {
-  title: "Compliance Guidelines | Mediolano IP Creator",
+  title: "Compliance Guidelines | IP Creator",
   description: "Our approach to regulatory compliance, including KYC/AML, securities regulations, and intellectual property rights.",
   openGraph: {
-    title: "Compliance Guidelines | Mediolano IP Creator",
+    title: "Compliance Guidelines | IP Creator",
     description: "Navigating the intersection of blockchain technology, IP law, and global regulations.",
     url: 'https://ip.mediolano.app/docs/compliance-guidelines',
-    siteName: 'Mediolano IP Creator',
+    siteName: 'IP Creator',
     images: [
       {
-        url: '/mediolano-logo-dark.png',
+        url: '/app-card.jpg',
         width: 1200,
         height: 630,
         alt: 'Mediolano Compliance',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Compliance Guidelines | Mediolano IP Creator",
+    title: "Compliance Guidelines | IP Creator",
     description: "Navigating the intersection of blockchain technology, IP law, and global regulations.",
     images: ['/mediolano-logo-dark.png'],
   },

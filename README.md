@@ -83,7 +83,7 @@ graph TD
 - [X] MIP Mobile @ Android Google Play **25.09**
 - [X] MIP Mobile @ iPhone iOS App Store **25.12**
 - [X] Mediolano Collections Protocol @ Starknet Mainnet **25.12**
-- [ ] Mediolano Dapp @ Starknet Mainnet **26.01**
+- [X] Mediolano Dapp @ Starknet Mainnet **26.01**
 
 
 ## Get involved

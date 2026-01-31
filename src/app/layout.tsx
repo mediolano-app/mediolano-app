@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     description: 'Create, manage, and protect your intellectual property on Starknet. Programmable IP assets with provenance tracking and ownership verification.',
     images: [
       {
-        url: '/mediolano-logo-dark.png',
+        url: '/app-card.jpg',
         width: 1200,
         height: 630,
         alt: 'IP Creator',
