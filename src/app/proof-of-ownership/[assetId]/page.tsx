@@ -39,7 +39,7 @@ export default function ProofOfOwnershipPage({ params }: ProofOfOwnershipPagePro
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-background/50">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-muted-foreground animate-pulse">Verifying ownership...</p>
@@ -50,7 +50,7 @@ export default function ProofOfOwnershipPage({ params }: ProofOfOwnershipPagePro
 
   if (assetError || !asset) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-b from-background to-background/50">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center space-y-6 glass-card p-8 rounded-2xl">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-muted/50 flex items-center justify-center backdrop-blur-sm">
             <ShieldCheck className="h-8 w-8 text-muted-foreground" />
@@ -108,12 +108,12 @@ export default function ProofOfOwnershipPage({ params }: ProofOfOwnershipPagePro
   } as any
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen text-foreground">
       <div className="container mx-auto px-4 py-8 sm:py-16 max-w-5xl">
         <div className="text-center mb-12 space-y-4">
           <Badge variant="outline" className="mb-4 border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400">
             <ShieldCheck className="w-3 h-3 mr-1" />
-            Official Certificate
+            Onchain Certificate
           </Badge>
 
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
