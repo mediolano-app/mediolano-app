@@ -289,6 +289,95 @@ export function useGetAllCollections(): UseGetAllCollectionsReturn {
     address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
   });
 
+  // Helper to find the highest valid collection ID using a gap-tolerant probing strategy
+  const findMaxCollectionId = useCallback(async () => {
+    if (!contract) return 0;
+    try {
+      let highestFound = -1;
+      let startFound = false;
+
+      // 1. Initial Scan: deeply scan 0-20 to find a valid anchor
+      const initialBatch = [];
+      for (let i = 0; i <= 20; i++) {
+        initialBatch.push(i);
+      }
+
+      try {
+        const initialResults = await Promise.all(
+          initialBatch.map(id =>
+            contract.call("is_valid_collection", [id.toString()])
+              .catch(() => false)
+          )
+        );
+
+        for (let i = 0; i < initialResults.length; i++) {
+          if (initialResults[i]) {
+            highestFound = Math.max(highestFound, initialBatch[i]);
+            startFound = true;
+          }
+        }
+      } catch (e) {
+        console.warn("Initial scan failed", e);
+      }
+
+      if (!startFound) {
+        const probes = [50, 100, 1000];
+        const probeResults = await Promise.all(
+          probes.map(id => contract.call("is_valid_collection", [id.toString()]).catch(() => false))
+        );
+        for (let i = 0; i < probes.length; i++) {
+          if (probeResults[i]) {
+            highestFound = probes[i];
+            startFound = true;
+          }
+        }
+        if (!startFound) return -1;
+      }
+
+      // 2. Probing Strategy
+      let keepProbing = true;
+      while (keepProbing) {
+        const offsets = [
+          1, 2, 3, 4, 5,
+          10, 20, 30, 40, 50,
+          100, 200, 300, 400, 500,
+          1000, 2000, 5000, 10000
+        ];
+
+        const probes = offsets.map(o => highestFound + o);
+        const uniqueProbes = Array.from(new Set(probes));
+
+        const results = await Promise.all(
+          uniqueProbes.map(id =>
+            contract.call("is_valid_collection", [id.toString()])
+              .catch(() => false)
+          )
+        );
+
+        let foundNewTotal = false;
+        for (let i = 0; i < uniqueProbes.length; i++) {
+          if (results[i]) {
+            if (uniqueProbes[i] > highestFound) {
+              highestFound = uniqueProbes[i];
+              foundNewTotal = true;
+            }
+          }
+        }
+
+        if (foundNewTotal) {
+          continue;
+        } else {
+          keepProbing = false;
+        }
+      }
+
+      return highestFound;
+    } catch (e) {
+      console.error("Error finding max collection ID:", e);
+      return 0;
+    }
+  }, [contract]);
+
   const loadCollections = useCallback(async () => {
     if (!contract) {
       setLoading(false);
@@ -298,39 +387,56 @@ export function useGetAllCollections(): UseGetAllCollectionsReturn {
     setLoading(true);
     setError(null);
 
-
     try {
-      const collections: number[] = [];
-      for (let i = 0; i < 50; i++) {
-        try {
-          const isValid = await contract.call("is_valid_collection", [i]);
-          if (isValid && !isCollectionReported(i.toString())) {
-            collections.push(i);
+      const maxId = await findMaxCollectionId();
+
+      // If no collections found
+      if (maxId < 0) {
+        setCollections([]);
+        setLoading(false);
+        return;
+      }
+
+      // Scan all potential IDs from 0 to maxId
+      const allIds = Array.from({ length: maxId + 1 }, (_, i) => i);
+      const BATCH_SIZE = 50;
+      const validIds: number[] = [];
+
+      for (let i = 0; i < allIds.length; i += BATCH_SIZE) {
+        const batch = allIds.slice(i, i + BATCH_SIZE);
+        const results = await Promise.all(
+          batch.map(id => contract.call("is_valid_collection", [id.toString()]).catch(() => false))
+        );
+
+        results.forEach((isValid, index) => {
+          if (isValid && !isCollectionReported(batch[index].toString())) {
+            validIds.push(batch[index]);
           }
-        } catch (e) {
-          // If we hit an error, we might have hit the end of the collection IDs
-          break;
-        }
+        });
       }
 
       const collectionsData = await Promise.all(
-        collections.map(async (id) => {
-          const collection = await contract.call("get_collection", [id.toString()]);
-          const collectionStat = await contract.call("get_collection_stats", [id.toString()]);
-          const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
-
-
-          return await processCollectionMetadata(id.toString(), metadata);
+        validIds.map(async (id) => {
+          try {
+            const collection = await contract.call("get_collection", [id.toString()]);
+            const collectionStat = await contract.call("get_collection_stats", [id.toString()]);
+            const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
+            return await processCollectionMetadata(id.toString(), metadata);
+          } catch (e) {
+            console.warn(`Error fetching collection ${id}`, e);
+            return null;
+          }
         })
       );
-      setCollections(collectionsData);
+
+      setCollections(collectionsData.filter(c => c !== null) as Collection[]);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch collections");
     } finally {
       setLoading(false);
     }
-  }, [contract]);
+  }, [contract, findMaxCollectionId]);
 
   useEffect(() => {
     loadCollections();
