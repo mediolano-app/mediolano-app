@@ -1,13 +1,11 @@
+
 "use client"
 
 import { useState, useMemo } from "react"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
+import { Card } from "@/components/ui/card"
 import { ActivityCard } from "@/components/activity-card"
 import { useActivities } from "@/hooks/useActivities"
 import {
@@ -15,7 +13,6 @@ import {
   Search,
   Filter,
   RefreshCw,
-  Sparkles,
   X,
   Loader2,
   AlertCircle
@@ -23,12 +20,11 @@ import {
 
 export default function ActivitiesPage() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [activeTab, setActiveTab] = useState("all") // "all" | "personal" (personal not implemented fully without wallet connection)
   const [activityTypeFilter, setActivityTypeFilter] = useState("all")
 
+  // Load more initially for grid
   const { activities, loading, loadingMore, error, hasMore, loadMore, refresh } = useActivities(12);
 
-  // Client-side filtering of *loaded* activities
   const filteredActivities = useMemo(() => {
     let result = activities;
 
@@ -46,194 +42,153 @@ export default function ActivitiesPage() {
       result = result.filter((activity) => activity.type === activityTypeFilter);
     }
 
-    // "Personal" tab logic would require connecting wallet address. 
-    // For now, if "personal", we can just show empty or all?
-    // Let's hide the Personal tab if not connected or just show all for now/TODO.
-    // Assuming "personal" means "My Activity".
-    // Since we don't have global user state here easily without context, I'll ignore "personal" filtering 
-    // or assume the user wants to see *their* address which we don't have.
-    // I will disable the "Personal" tab or just leave it acting like "All" with a todo?
-    // Better: Remove the tabs if they don't add value now, or keep "All Activities" as default.
-    // I'll keep the UI but "Your Activity" will be empty or show a "Connect Wallet" state if I had time.
-    // For this refactor, I'll just filter if activeTab is 'personal' but since I don't have the address...
-    // I will just disable the tab trigger for now or remove it from the logic.
-
     return result;
-  }, [activities, searchQuery, activityTypeFilter, activeTab]);
+  }, [activities, searchQuery, activityTypeFilter]);
+
+  const activityTypes = ["all", "mint", "transfer", "remix", "collection"];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px] pointer-events-none fixed" />
 
-
-      <main className="container mx-auto px-4 py-8 md:py-12 lg:py-16 space-y-8 md:space-y-12">
-        {/* Hero Section */}
-        <div className="text-center space-y-4 md:space-y-6 max-w-4xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary/10 border border-primary/20">
-            <span className="text-xs text-primary">Mediolano Protocol</span>
+      <main className="container relative mx-auto px-4 py-12 md:py-20 space-y-12 max-w-7xl">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row gap-8 items-start md:items-end justify-between">
+          <div className="space-y-4 max-w-2xl">
+            <Badge variant="outline" className="rounded-full px-4 py-1.5 border-primary/20 bg-primary/5 text-primary">
+              <span className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Live Feed
+              </span>
+            </Badge>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/60">
+              Protocol Activity
+            </h1>
+            <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+              Explorer the pulse of the Mediolano ecosystem. Track live mints, collections, and asset transfers occurring on Starknet.
+            </p>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Onchain Activity
-          </h1>
-          <p className="text-base text-muted-foreground leading-relaxed px-4">
-            Discover, engage, and connect with our community
-          </p>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full border bg-background/50 backdrop-blur text-sm text-muted-foreground shadow-sm">
+              <span className="font-semibold text-foreground">{activities.length}</span>
+              <span>events loaded</span>
+            </div>
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={refresh}
+              disabled={loading}
+              className="rounded-full h-10 w-10 shrink-0 hover:bg-primary/10 hover:text-primary transition-colors"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading && !loadingMore ? "animate-spin" : ""}`} />
+            </Button>
+          </div>
         </div>
 
-        {/* Filters Bar */}
-        <Card className="glass">
-          <div className="p-3 md:p-4 lg:p-6">
-            <div className="flex flex-col gap-3 md:gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search loaded activities..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-background/50 border-border/50"
-                />
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                <Select value={activityTypeFilter} onValueChange={setActivityTypeFilter}>
-                  <SelectTrigger className="w-full sm:w-[140px] bg-background/50 border-border/50">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="mint">Mint</SelectItem>
-                    <SelectItem value="transfer">Transfer</SelectItem>
-                    <SelectItem value="remix">Remix</SelectItem>
-                    <SelectItem value="collection">Collection</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button
-                  variant="outline"
-                  size="default"
-                  onClick={refresh}
-                  disabled={loading}
-                  className="flex-1 sm:flex-initial bg-transparent"
-                >
-                  <RefreshCw className={`h-4 w-4 ${loading && !loadingMore ? "animate-spin" : ""}`} />
-                </Button>
-              </div>
+        {/* Controls Section */}
+        <div className="space-y-6 sticky top-20 z-30 bg-background/80 backdrop-blur-xl p-1 -m-1 rounded-2xl md:static md:bg-transparent md:p-0">
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search */}
+            <div className="relative flex-1 group">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <Input
+                placeholder="Search by asset, user, or details..."
+                className="pl-10 h-11 bg-background border-border/60 focus:border-primary/30 hover:border-border transition-all shadow-sm rounded-xl"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
 
-            {(searchQuery || activityTypeFilter !== "all") && (
-              <div className="flex flex-wrap gap-2 mt-3 md:mt-4 pt-3 md:pt-4 border-t border-border/50">
-                <span className="text-sm text-muted-foreground">Active filters:</span>
-                {searchQuery && (
-                  <Badge variant="secondary" className="gap-1">
-                    Search: {searchQuery}
-                    <X
-                      className="h-3 w-3 cursor-pointer hover:text-destructive"
-                      onClick={() => setSearchQuery("")}
-                    />
-                  </Badge>
-                )}
-                {activityTypeFilter !== "all" && (
-                  <Badge variant="secondary" className="gap-1">
-                    Type: {activityTypeFilter}
-                    <X
-                      className="h-3 w-3 cursor-pointer hover:text-destructive"
-                      onClick={() => setActivityTypeFilter("all")}
-                    />
-                  </Badge>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setSearchQuery("")
-                    setActivityTypeFilter("all")
-                  }}
-                  className="h-6 px-2 text-xs"
+            {/* Type Filters */}
+            <div className="flex flex-wrap gap-2 p-1 bg-muted/30 rounded-xl border border-border/40">
+              {activityTypes.map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setActivityTypeFilter(type)}
+                  className={`
+                      px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 capitalize
+                      ${activityTypeFilter === type
+                      ? "bg-background text-foreground shadow-sm ring-1 ring-border/50"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"}
+                    `}
                 >
-                  Clear all
-                </Button>
-              </div>
-            )}
+                  {type}
+                </button>
+              ))}
+            </div>
           </div>
-        </Card>
+        </div>
 
-        {/* Activity Feed */}
-        <div className="space-y-6">
-          {/* Removed Tabs for now as "Personal" requires detailed auth context not present here, keeping simple list */}
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              Latest Activities
-            </h2>
-          </div>
-
-          {error && (
-            <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive flex items-center gap-2">
-              <AlertCircle className="h-4 w-4" />
-              <p>{error}</p>
-              <Button variant="link" onClick={refresh} className="h-auto p-0 ml-2">Try Again</Button>
-            </div>
-          )}
-
-          {loading && !loadingMore && activities.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 space-y-4">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              <p className="text-muted-foreground">Loading blockchain activities...</p>
-            </div>
-          ) : filteredActivities.length === 0 && !loading ? (
-            <Card className="border-dashed">
-              <div className="p-8 md:p-12 text-center space-y-4">
-                <Activity className="h-10 md:h-12 w-10 md:w-12 mx-auto text-muted-foreground/50" />
-                <div className="space-y-2">
-                  <p className="text-base md:text-lg font-medium">No activities found</p>
-                  <p className="text-sm text-muted-foreground">Try adjusting your filters</p>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearchQuery("")
-                    setActivityTypeFilter("all")
-                  }}
-                >
-                  Clear Filters
-                </Button>
+        {/* Content Feed */}
+        <div className="min-h-[400px]">
+          {error ? (
+            <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-8 text-center space-y-3">
+              <div className="inline-flex p-3 rounded-full bg-destructive/10 text-destructive mb-2">
+                <AlertCircle className="h-6 w-6" />
               </div>
-            </Card>
+              <h3 className="text-lg font-semibold text-destructive">Failed to load activity</h3>
+              <p className="text-muted-foreground">{error}</p>
+              <Button onClick={refresh} variant="outline" className="mt-4">Retry Connection</Button>
+            </div>
+          ) : loading && !loadingMore && activities.length === 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-[340px] rounded-xl bg-muted/20 animate-pulse" />
+              ))}
+            </div>
+          ) : filteredActivities.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 border-2 border-dashed rounded-3xl border-muted">
+              <div className="p-4 rounded-full bg-muted/30 text-muted-foreground">
+                <Activity className="h-8 w-8" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xl font-medium">No results found</h3>
+                <p className="text-muted-foreground">Try adjusting your filters or search query</p>
+              </div>
+              <Button
+                variant="ghost"
+                onClick={() => { setSearchQuery(""); setActivityTypeFilter("all"); }}
+                className="mt-2"
+              >
+                Clear all filters
+              </Button>
+            </div>
           ) : (
-            <>
-              <div className="grid gap-4 md:gap-6">
+            <div className="space-y-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredActivities.map((activity) => (
-                  <ActivityCard key={activity.id} activity={activity} />
+                  <div key={activity.id} className="animate-in fade-in zoom-in-95 duration-500 fill-mode-backwards">
+                    <ActivityCard activity={activity} />
+                  </div>
                 ))}
               </div>
 
-              {/* Load More Pagination */}
               {hasMore && (
-                <div className="flex justify-center pt-8">
+                <div className="flex justify-center py-8">
                   <Button
-                    variant="outline"
                     size="lg"
+                    variant="secondary"
                     onClick={loadMore}
                     disabled={loadingMore}
-                    className="min-w-[200px]"
+                    className="min-w-[180px] rounded-full shadow-lg hover:shadow-xl transition-all"
                   >
                     {loadingMore ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Loading more...
+                        Fetching more...
                       </>
                     ) : (
-                      "Load More Activities"
+                      "View Older Activity"
                     )}
                   </Button>
                 </div>
               )}
-              {!hasMore && activities.length > 0 && (
-                <p className="text-center text-muted-foreground text-sm pt-8">You have reached the end of the activity feed.</p>
-              )}
-            </>
+            </div>
           )}
         </div>
+
       </main>
     </div>
   )

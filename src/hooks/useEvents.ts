@@ -412,7 +412,7 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
           id: txHash,
           type,
           title: type === "mint" ? "Asset Minted" : "Asset Transferred",
-          description: type === "mint" ? `Original IP Asset minted (Source: ${source})` : `Ownership transferred on-chain (Source: ${source})`,
+          description: type === "mint" ? `Programmable IP minted (Source: ${source})` : `Ownership transferred on-chain (Source: ${source})`,
           from: normalizeStarknetAddress(from),
           to: normalizeStarknetAddress(to),
           timestamp,

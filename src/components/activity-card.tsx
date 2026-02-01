@@ -1,11 +1,9 @@
+
 "use client"
 
 import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Plus, Send, Shield, GitBranch, Activity as ActivityIcon, ArrowRight } from "lucide-react"
-import Link from "next/link"
+import { Plus, Send, Shield, GitBranch, Activity as ActivityIcon } from "lucide-react"
 import { AddressLink } from "@/components/ui/address-link"
 import Image from "next/image"
 import { format } from "date-fns"
@@ -71,18 +69,22 @@ const getActivityColor = (type: string) => {
 }
 
 const formatTimeAgo = (timestamp: string) => {
-  const now = new Date()
-  const time = new Date(timestamp)
-  const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60))
+  try {
+    const now = new Date()
+    const time = new Date(timestamp)
+    const diffInMinutes = Math.floor((now.getTime() - time.getTime()) / (1000 * 60))
 
-  if (diffInMinutes < 1) return "Just now"
-  if (diffInMinutes < 60) return `${diffInMinutes}m ago`
-  const diffInHours = Math.floor(diffInMinutes / 60)
-  if (diffInHours < 24) return `${diffInHours}h ago`
-  const diffInDays = Math.floor(diffInHours / 24)
-  if (diffInDays < 7) return `${diffInDays}d ago`
-  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)}w ago`
-  return format(time, "MMM d")
+    if (diffInMinutes < 1) return "Just now"
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    if (diffInHours < 24) return `${diffInHours}h ago`
+    const diffInDays = Math.floor(diffInHours / 24)
+    if (diffInDays < 7) return `${diffInDays}d ago`
+    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)}w ago`
+    return format(time, "MMM d")
+  } catch (e) {
+    return "Recent"
+  }
 }
 
 export function ActivityCard({ activity }: ActivityCardProps) {
@@ -91,68 +93,53 @@ export function ActivityCard({ activity }: ActivityCardProps) {
   const timeAgo = formatTimeAgo(activity.timestamp)
 
   return (
-    <Card className="group hover:shadow-lg hover:border-primary/20 transition-all duration-300 glass-card overflow-hidden">
-      <div className="flex flex-col sm:flex-row gap-4 p-4">
-        <div
-          className="relative w-full sm:w-24 h-32 sm:h-24 flex-shrink-0 overflow-hidden rounded-lg bg-muted/50 group-hover:shadow-md transition-all duration-300"
-        >
-          <Image
-            src={activity.assetImage || `/placeholder.svg?height=96&width=96&text=${activity.assetName}`}
-            alt={activity.assetName}
-            fill
-            className="object-cover group-hover:scale-110 transition-transform duration-500"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <Card className="group flex flex-col h-full overflow-hidden border-border/40 bg-card/40 backdrop-blur-sm hover:border-primary/20 hover:shadow-lg transition-all duration-300">
+
+      {/* Header: User & Action - Timeline Feel */}
+      <div className="flex items-center gap-3 p-4 pb-3 border-b border-border/10">
+        <div className={`p-2 rounded-full flex-shrink-0 ${colors.badge.split(' ')[0]}`}>
+          <Icon className={`h-4 w-4 ${colors.icon}`} />
         </div>
-
-        <div className="flex-1 flex flex-col justify-between gap-3 min-w-0">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2.5 flex-1 min-w-0">
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Badge className={`${colors.badge} border-0 h-5 gap-1 px-1.5`}>
-                    <Icon className="h-8 w-8" />
-                    <span className="capitalize font-medium text-lg">{activity.type}</span>
-                  </Badge>
-                  <span>•</span>
-                  <span>{timeAgo}</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <div className="space-y-1.5">
-
+        <div className="flex flex-col min-w-0">
+          <div className="flex items-center gap-2">
             <AddressLink
               address={activity.user}
-              showFull={true}
-              className="font-medium text-sm block truncate"
-            >
-              {activity.user}
-            </AddressLink>
-            <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{activity.details}</p>
-            <h4>{activity.assetName}</h4>
+              className="font-semibold text-sm hover:text-primary transition-colors truncate max-w-[120px]"
+              showFull={false}
+            />
+            <span className="text-muted-foreground text-xs">•</span>
+            <span className="text-xs text-muted-foreground font-medium">{timeAgo}</span>
           </div>
-
-          {/*
-          <div className="flex items-center justify-end pt-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 gap-2 text-xs font-medium group/btn hover:bg-primary/10 hover:text-primary"
-              asChild
-            >
-              <Link href={`/asset/${activity.assetId}`}>
-                <span>View Asset</span>
-                <ArrowRight className="h-3.5 w-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-              </Link>
-            </Button>
+          <div className="text-xs text-muted-foreground capitalize">
+            {activity.type === 'collection' ? 'Created Collection' : `Performed ${activity.type}`}
           </div>
-          */}
-
         </div>
+      </div>
+
+      {/* Body: Full Width Image */}
+      <div className="relative w-full aspect-square bg-muted/20 border-y border-border/10">
+        <Image
+          src={activity.assetImage || `/placeholder.svg?height=400&width=400&text=${activity.assetName}`}
+          alt={activity.assetName}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-700"
+        />
+      </div>
+
+      {/* Footer: Metadata */}
+      <div className="flex flex-col flex-1 p-4 gap-2">
+        <div className="flex items-start justify-between gap-2">
+          <h4 className="font-semibold tracking-tight text-base line-clamp-1 group-hover:text-primary transition-colors">
+            {activity.assetName}
+          </h4>
+          <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-normal opacity-70">
+            #{activity.tokenId || '0'}
+          </Badge>
+        </div>
+
+        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+          {activity.details}
+        </p>
       </div>
     </Card>
   )

@@ -9,9 +9,11 @@ const COLLECTION_ADDRESS = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS;
 
 // Event selectors
 const TOKEN_MINTED_SELECTOR = "0x3e517dedbc7bae62d4ace7e3dfd33255c4a7fe7c1c6f53c725d52b45f9c5a00";
-const COLLECTION_CREATED_SELECTOR = "0x2f241bb3f752d1fb3ac68c703d92bb418a7a7c165f066fdb2d90094b5d95f0e";
+const COLLECTION_CREATED_SELECTOR = "0xfca650bfd622aeae91aa1471499a054e4c7d3f0d75fbcb98bdb3bbb0358b0c";
 const TOKEN_TRANSFERRED_SELECTOR = "0x3ddaa3f2d17cc7984d82075aa171282e6fff4db61944bf218f60678f95e2567";
+const TRANSFER_SELECTOR = "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9"; // Standard Transfer
 
+const START_BLOCK = 6204232; // First collection deployed block
 const BLOCK_WINDOW_SIZE = 50000; // Scan 50k blocks at a time
 
 export interface UserActivity {
@@ -127,7 +129,8 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
                     keys: [[
                         TOKEN_MINTED_SELECTOR,
                         COLLECTION_CREATED_SELECTOR,
-                        TOKEN_TRANSFERRED_SELECTOR
+                        TOKEN_TRANSFERRED_SELECTOR,
+                        TRANSFER_SELECTOR
                     ]],
                     from_block: { block_number: fromBlock },
                     to_block: { block_number: toBlock },
@@ -192,6 +195,7 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
                             const collectionName = parseByteArray(dataIter);
 
                             // Filter: Only include if owner is the connected user
+                            if (!owner) continue;
                             const normalizedOwner = normalizeStarknetAddress(owner.toLowerCase());
                             if (normalizedOwner !== normalizedWallet) continue;
 
@@ -199,7 +203,7 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
                                 id: `${event.transaction_hash}-${collectionId}`,
                                 type: "collection",
                                 collectionId,
-                                owner,
+                                owner: owner || "",
                                 descriptor: collectionName,
                                 txHash: event.transaction_hash,
                                 blockNumber: event.block_number || 0
@@ -220,6 +224,8 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
 
                             const operator = dataIter.next().value;
                             const tsHex = dataIter.next().value;
+                            if (!operator || !tsHex) continue;
+
                             const timestamp = parseInt(tsHex, 16);
 
                             // Filter: Only include if operator (sender/recipient) is the connected user
@@ -237,6 +243,36 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
                                 blockNumber: event.block_number || 0,
                                 rawTimestamp: timestamp
                             });
+                        } else if (eventKey === TRANSFER_SELECTOR) {
+                            // Standard Transfer(from, to, tokenId)
+                            const fromAddress = event.keys[1];
+                            const toAddress = event.keys[2];
+
+                            const tIdLow = dataIter.next().value;
+                            const tIdHigh = dataIter.next().value;
+
+                            if (fromAddress && toAddress && tIdLow && tIdHigh) {
+                                const tokenId = (BigInt(tIdLow) + (BigInt(tIdHigh) << 128n)).toString();
+                                if (BigInt(fromAddress) === 0n) continue; // Ignore mints
+
+                                // Filter: Only include if from or to is the connected user
+                                const normalizedFrom = normalizeStarknetAddress(fromAddress.toLowerCase());
+                                const normalizedTo = normalizeStarknetAddress(toAddress.toLowerCase());
+
+                                if (normalizedFrom !== normalizedWallet && normalizedTo !== normalizedWallet) continue;
+
+                                rangeEvents.push({
+                                    id: `${event.transaction_hash}-${tokenId}-transfer`,
+                                    type: "transfer",
+                                    collectionId: "0",
+                                    collectionAddress: COLLECTION_ADDRESS || "",
+                                    tokenId,
+                                    owner: fromAddress,
+                                    recipient: toAddress,
+                                    txHash: event.transaction_hash,
+                                    blockNumber: event.block_number || 0
+                                });
+                            }
                         }
 
                     } catch (e) {
@@ -283,8 +319,8 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
             let attempts = 0;
             const maxAttempts = 10;
 
-            while (newEvents.length < targetCount && attempts < maxAttempts && currentToBlock > 0) {
-                const currentFromBlock = Math.max(0, currentToBlock - BLOCK_WINDOW_SIZE);
+            while (newEvents.length < targetCount && attempts < maxAttempts && currentToBlock > START_BLOCK) {
+                const currentFromBlock = Math.max(START_BLOCK, currentToBlock - BLOCK_WINDOW_SIZE);
 
                 const windowEvents = await fetchEventsInRange(currentFromBlock, currentToBlock);
                 newEvents.push(...windowEvents);
@@ -292,7 +328,7 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
                 currentToBlock = currentFromBlock - 1;
                 attempts++;
 
-                if (currentToBlock < 0) {
+                if (currentToBlock < START_BLOCK) {
                     setHasMoreBlocks(false);
                     break;
                 }
@@ -311,7 +347,7 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
                     }
                     return Array.from(uniqueMap.values()).sort((a, b) => b.blockNumber - a.blockNumber);
                 });
-            } else if (currentToBlock <= 0) {
+            } else if (currentToBlock <= START_BLOCK) {
                 setHasMoreBlocks(false);
             }
 
@@ -407,7 +443,7 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
                 const batch = toFetch.slice(i, i + batchSize);
 
                 await Promise.all(batch.map(async ({ event: parsed, index }) => {
-                    let activityType = parsed.type;
+                    let activityType: UserActivity["type"] = parsed.type;
                     let assetName = parsed.descriptor || (parsed.tokenId ? `Asset #${parsed.tokenId}` : "Unknown");
                     let assetImage = "/placeholder.svg";
                     let details = "";
@@ -416,9 +452,12 @@ export function useUserActivities(walletAddress: string, pageSize: number = 20):
                         details = "Created a new collection";
                         assetName = parsed.descriptor || `Collection #${parsed.collectionId}`;
                     } else if (activityType === "transfer") {
-                        details = "Transferred an asset";
+                        details = `Transferred asset to ${shortString.encodeShortString("")}`;
+                        if (parsed.recipient) {
+                            details = `Transferred to ${parsed.recipient.slice(0, 6)}...${parsed.recipient.slice(-4)}`;
+                        }
                     } else {
-                        details = "Minted a new asset";
+                        details = "Programmable IP";
                     }
 
                     if (parsed.type === "mint" && parsed.metadataUri) {

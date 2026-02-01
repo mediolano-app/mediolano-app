@@ -10,9 +10,11 @@ const COLLECTION_ADDRESS = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS;
 
 // Event selectors
 const TOKEN_MINTED_SELECTOR = "0x3e517dedbc7bae62d4ace7e3dfd33255c4a7fe7c1c6f53c725d52b45f9c5a00";
-const COLLECTION_CREATED_SELECTOR = "0x2f241bb3f752d1fb3ac68c703d92bb418a7a7c165f066fdb2d90094b5d95f0e";
+const COLLECTION_CREATED_SELECTOR = "0xfca650bfd622aeae91aa1471499a054e4c7d3f0d75fbcb98bdb3bbb0358b0c";
 const TOKEN_TRANSFERRED_SELECTOR = "0x3ddaa3f2d17cc7984d82075aa171282e6fff4db61944bf218f60678f95e2567";
+const TRANSFER_SELECTOR = "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9"; // Standard Transfer
 
+const START_BLOCK = 6204232; // First collection deployed block
 const BLOCK_WINDOW_SIZE = 50000; // Scan 50k blocks at a time
 
 export interface Activity {
@@ -125,7 +127,8 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                     keys: [[
                         TOKEN_MINTED_SELECTOR,
                         COLLECTION_CREATED_SELECTOR,
-                        TOKEN_TRANSFERRED_SELECTOR
+                        TOKEN_TRANSFERRED_SELECTOR,
+                        TRANSFER_SELECTOR
                     ]],
                     from_block: { block_number: fromBlock },
                     to_block: { block_number: toBlock },
@@ -197,7 +200,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                             });
 
                         } else if (eventKey === TOKEN_TRANSFERRED_SELECTOR) {
-                            // TokenTransferred
+                            // Custom TokenTransferred
                             const cIdLow = dataIter.next().value;
                             const cIdHigh = dataIter.next().value;
                             if (!cIdLow || !cIdHigh) continue;
@@ -211,6 +214,8 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
 
                             const operator = dataIter.next().value;
                             const tsHex = dataIter.next().value;
+                            if (!operator || !tsHex) continue; // Ensure they are defined
+
                             const timestamp = parseInt(tsHex, 16);
 
                             rangeEvents.push({
@@ -224,6 +229,40 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                                 blockNumber: event.block_number || 0,
                                 rawTimestamp: timestamp
                             });
+                        } else if (eventKey === TRANSFER_SELECTOR) {
+                            // Standard Transfer(from, to, tokenId)
+                            // Usually: keys=[Selector, from, to], data=[tokenId_low, tokenId_high]
+                            const fromAddress = event.keys[1] as string;
+                            const toAddress = event.keys[2] as string;
+
+                            // If from/to are not in keys (unindexed), they might be in data.
+                            // But standard usually indexes them.
+                            // Let's assume keys structure.
+
+                            // Data should have token_id (u256 -> 2 felts)
+                            const tIdLow = dataIter.next().value;
+                            const tIdHigh = dataIter.next().value;
+
+                            if (fromAddress && toAddress && tIdLow && tIdHigh) {
+                                const tokenId = (BigInt(tIdLow) + (BigInt(tIdHigh) << 128n)).toString();
+
+                                // Ignore mints (from 0x0) as we have TokenMinted
+                                if (BigInt(fromAddress) === 0n) continue;
+
+                                rangeEvents.push({
+                                    id: `${event.transaction_hash}-${tokenId}-transfer`,
+                                    type: "transfer",
+                                    collectionId: "0", // Unknown without querying
+                                    collectionAddress: COLLECTION_ADDRESS || "", // It's this contract
+                                    tokenId,
+                                    owner: fromAddress, // "From" or "To"? The activity is usually "User X transferred to Y" or "User Y received from X"
+                                    // For now let's set 'owner' as the sender (initiator)
+                                    // But wait, the UI displays "user" as the actor.
+                                    recipient: toAddress,
+                                    txHash: event.transaction_hash,
+                                    blockNumber: event.block_number || 0
+                                });
+                            }
                         }
 
                     } catch (e) {
@@ -270,8 +309,8 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
             let attempts = 0;
             const maxAttempts = 10;
 
-            while (newEvents.length < targetCount && attempts < maxAttempts && currentToBlock > 0) {
-                const currentFromBlock = Math.max(0, currentToBlock - BLOCK_WINDOW_SIZE);
+            while (newEvents.length < targetCount && attempts < maxAttempts && currentToBlock > START_BLOCK) {
+                const currentFromBlock = Math.max(START_BLOCK, currentToBlock - BLOCK_WINDOW_SIZE);
 
                 const windowEvents = await fetchEventsInRange(currentFromBlock, currentToBlock);
                 newEvents.push(...windowEvents);
@@ -279,7 +318,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                 currentToBlock = currentFromBlock - 1;
                 attempts++;
 
-                if (currentToBlock < 0) {
+                if (currentToBlock < START_BLOCK) {
                     setHasMoreBlocks(false);
                     break;
                 }
@@ -298,7 +337,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                     }
                     return Array.from(uniqueMap.values()).sort((a, b) => b.blockNumber - a.blockNumber);
                 });
-            } else if (currentToBlock <= 0) {
+            } else if (currentToBlock <= START_BLOCK) {
                 setHasMoreBlocks(false);
             }
 
@@ -389,7 +428,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                 const batch = toFetch.slice(i, i + batchSize);
 
                 await Promise.all(batch.map(async ({ event: parsed, index }) => {
-                    let activityType = parsed.type;
+                    let activityType: Activity["type"] = parsed.type;
                     let assetName = parsed.descriptor || (parsed.tokenId ? `Asset #${parsed.tokenId}` : "Unknown");
                     let assetImage = "/placeholder.svg";
                     let details = "";
@@ -398,9 +437,12 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                         details = "Created a new collection";
                         assetName = parsed.descriptor || `Collection #${parsed.collectionId}`;
                     } else if (activityType === "transfer") {
-                        details = "Transferred an asset";
+                        details = `Transferred asset to ${shortString.encodeShortString("")}`; // We don't have recipient name easily
+                        if (parsed.recipient) {
+                            details = `Transferred to ${parsed.recipient.slice(0, 6)}...${parsed.recipient.slice(-4)}`;
+                        }
                     } else {
-                        details = "Minted a new asset";
+                        details = "Programmable IP minted";
                     }
 
                     if (parsed.type === "mint" && parsed.metadataUri) {
