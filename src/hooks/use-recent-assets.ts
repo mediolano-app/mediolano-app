@@ -12,8 +12,11 @@ const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 const COLLECTION_ADDRESS = process.env.NEXT_PUBLIC_COLLECTION_CONTRACT_ADDRESS;
 
 // TokenMinted event selector
+import { REGISTRY_START_BLOCK } from "@/lib/constants";
+
+// TokenMinted event selector
 const TOKEN_MINTED_SELECTOR = "0x3e517dedbc7bae62d4ace7e3dfd33255c4a7fe7c1c6f53c725d52b45f9c5a00";
-const START_BLOCK = 6204232; // First collection deployed block
+// const START_BLOCK = 6204232; // First collection deployed block -- Replaced by REGISTRY_START_BLOCK
 const BLOCK_WINDOW_SIZE = 50000; // Scan 50k blocks at a time
 
 export interface RecentAsset {
@@ -210,8 +213,8 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
             let attempts = 0;
             const maxAttempts = 10;
 
-            while (newEvents.length < targetCount && attempts < maxAttempts && currentToBlock > START_BLOCK) {
-                const currentFromBlock = Math.max(START_BLOCK, currentToBlock - BLOCK_WINDOW_SIZE);
+            while (newEvents.length < targetCount && attempts < maxAttempts && currentToBlock > REGISTRY_START_BLOCK) {
+                const currentFromBlock = Math.max(REGISTRY_START_BLOCK, currentToBlock - BLOCK_WINDOW_SIZE);
 
                 // console.log(`Scanning window: ${currentFromBlock} - ${currentToBlock}`);
 
@@ -221,13 +224,13 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                 currentToBlock = currentFromBlock - 1;
                 attempts++;
 
-                if (currentToBlock < START_BLOCK) {
+                if (currentToBlock < REGISTRY_START_BLOCK) {
                     setHasMoreBlocks(false);
                     break;
                 }
             }
 
-            if (currentToBlock <= START_BLOCK) {
+            if (currentToBlock <= REGISTRY_START_BLOCK) {
                 setHasMoreBlocks(false);
             }
 

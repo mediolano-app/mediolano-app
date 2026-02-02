@@ -14,7 +14,9 @@ const COLLECTION_CREATED_SELECTOR = "0xfca650bfd622aeae91aa1471499a054e4c7d3f0d7
 const TOKEN_TRANSFERRED_SELECTOR = "0x3ddaa3f2d17cc7984d82075aa171282e6fff4db61944bf218f60678f95e2567";
 const TRANSFER_SELECTOR = "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9"; // Standard Transfer
 
-const START_BLOCK = 6204232; // First collection deployed block
+import { REGISTRY_START_BLOCK } from "@/lib/constants";
+
+const START_BLOCK = 6204232; // First collection deployed block -- Replaced by REGISTRY_START_BLOCK
 const BLOCK_WINDOW_SIZE = 50000; // Scan 50k blocks at a time
 
 export interface Activity {
@@ -174,7 +176,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                                 tokenId,
                                 owner,
                                 metadataUri,
-                                txHash: event.transaction_hash,
+                                txHash: event.transaction_hash || "",
                                 blockNumber: event.block_number || 0
                             });
 
@@ -195,7 +197,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                                 collectionId,
                                 owner,
                                 descriptor: collectionName,
-                                txHash: event.transaction_hash,
+                                txHash: event.transaction_hash || "",
                                 blockNumber: event.block_number || 0
                             });
 
@@ -225,7 +227,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                                 collectionAddress,
                                 tokenId,
                                 owner: operator,
-                                txHash: event.transaction_hash,
+                                txHash: event.transaction_hash || "",
                                 blockNumber: event.block_number || 0,
                                 rawTimestamp: timestamp
                             });
@@ -259,7 +261,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                                     // For now let's set 'owner' as the sender (initiator)
                                     // But wait, the UI displays "user" as the actor.
                                     recipient: toAddress,
-                                    txHash: event.transaction_hash,
+                                    txHash: event.transaction_hash || "",
                                     blockNumber: event.block_number || 0
                                 });
                             }
@@ -309,8 +311,8 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
             let attempts = 0;
             const maxAttempts = 10;
 
-            while (newEvents.length < targetCount && attempts < maxAttempts && currentToBlock > START_BLOCK) {
-                const currentFromBlock = Math.max(START_BLOCK, currentToBlock - BLOCK_WINDOW_SIZE);
+            while (newEvents.length < targetCount && attempts < maxAttempts && currentToBlock > REGISTRY_START_BLOCK) {
+                const currentFromBlock = Math.max(REGISTRY_START_BLOCK, currentToBlock - BLOCK_WINDOW_SIZE);
 
                 const windowEvents = await fetchEventsInRange(currentFromBlock, currentToBlock);
                 newEvents.push(...windowEvents);
@@ -318,7 +320,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                 currentToBlock = currentFromBlock - 1;
                 attempts++;
 
-                if (currentToBlock < START_BLOCK) {
+                if (currentToBlock < REGISTRY_START_BLOCK) {
                     setHasMoreBlocks(false);
                     break;
                 }
@@ -337,7 +339,7 @@ export function useActivities(pageSize: number = 20): UseActivitiesReturn {
                     }
                     return Array.from(uniqueMap.values()).sort((a, b) => b.blockNumber - a.blockNumber);
                 });
-            } else if (currentToBlock <= START_BLOCK) {
+            } else if (currentToBlock <= REGISTRY_START_BLOCK) {
                 setHasMoreBlocks(false);
             }
 

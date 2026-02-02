@@ -137,9 +137,11 @@ export default function CreatorActivitiesPage() {
                     </Card>
                 ) : (
                     <>
-                        <div className="grid gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {filteredActivities.map((activity) => (
-                                <ActivityCard key={activity.id} activity={activity} />
+                                <div key={activity.id} className="animate-in fade-in zoom-in-95 duration-500 fill-mode-backwards">
+                                    <ActivityCard activity={activity} />
+                                </div>
                             ))}
                         </div>
 
