@@ -67,15 +67,15 @@ function AssetCardItemComponent({ asset }: { asset: RecentAsset }) {
                                 {asset.name}
                             </h3>
                         </Link>
-                        <Badge variant="outline" className="font-mono text-[10px] shrink-0">
-                            #{asset.tokenId}
-                        </Badge>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <Link href={`/collections/${asset.collectionAddress}`} className="hover:underline truncate max-w-[70%] font-medium text-foreground/80">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+                        <Link href={`/collections/${asset.collectionAddress}`} className="hover:underline truncate max-w-[60%] font-medium text-foreground/80">
                             {asset.collectionName || `Collection #${asset.collectionId}`}
                         </Link>
+                        <Badge variant="secondary" className="text-[10px] shrink-0 font-normal text-muted-foreground bg-secondary/50 hover:bg-secondary/70">
+                            {asset.ipType || "Asset"}
+                        </Badge>
                     </div>
                 </div>
 

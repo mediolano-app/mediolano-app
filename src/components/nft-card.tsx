@@ -11,29 +11,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   MoreVertical,
   ExternalLink,
   Share2,
   Flag,
   Send,
-  CheckCircle,
   GitBranch,
   Shield,
+  Check,
 } from "lucide-react";
-import Image from "next/image";
 import { LazyImage } from "@/components/ui/lazy-image";
 import Link from "next/link";
 import { TransferAssetDialog } from "@/components/transfer-asset-dialog";
 import { ReportAssetDialog } from "@/components/report-asset-dialog";
-import { RemixButton } from "@/components/remix/remix-button";
 import type { Asset } from "@/types/asset";
 import { useAccount } from "@starknet-react/core";
 
 interface NFTCardProps {
   asset: Asset;
   view?: "grid" | "list";
+}
+
+function formatAddress(address: string) {
+  if (!address) return "Unknown";
+  if (address.length < 10) return address;
+  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
 }
 
 function NFTCard({ asset, view = "grid" }: NFTCardProps) {
@@ -93,21 +96,17 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                       </h3>
                     </Link>
                     <div className="flex items-center gap-2 mt-1">
-                      <Avatar className="h-5 w-5">
-                        <AvatarImage
-                          src={`/placeholder-40x40.png?text=${asset.creator.substring(0, 2)}`}
-                          alt={asset.creator}
-                        />
-                        <AvatarFallback className="text-xs">
-                          {asset.creator.substring(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <Link href={`/creator/${asset.creator}`} className="text-sm text-muted-foreground hover:text-primary transition-colors hover:underline">
-                        {asset.creator}
+                      <Link href={`/creator/${asset.creator}`} className="text-sm text-muted-foreground hover:text-primary transition-colors hover:underline font-mono">
+                        {formatAddress(asset.creator)}
                       </Link>
-                      {asset.verified && (
-                        <CheckCircle className="h-4 w-4 text-blue-600" />
-                      )}
+
+                      <Link
+                        href={`/proof-of-ownership/${asset.id}`}
+                        className="text-muted-foreground hover:text-blue-500 transition-colors"
+                        title="View Proof of Ownership"
+                      >
+                        <Shield className="h-4 w-4" />
+                      </Link>
                     </div>
                     <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
                       {asset.description}
@@ -161,11 +160,6 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                     <Badge variant="outline" className="text-xs">
                       {asset.type}
                     </Badge>
-                    {asset.collection && (
-                      <Badge variant="secondary" className="text-xs">
-                        {asset.collection}
-                      </Badge>
-                    )}
                   </div>
                   <span className="text-xs text-muted-foreground">
                     {asset.registrationDate}
@@ -216,68 +210,57 @@ function NFTCard({ asset, view = "grid" }: NFTCardProps) {
                 className="object-cover group-hover:scale-105 transition-transform duration-200"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
-              <div className="absolute top-3 left-3">
-                {/* 
-                <Badge variant="secondary" className="bg-white/90 text-black">
-                  {asset.type}
-                </Badge>
-                 */}
-              </div>
-
             </div>
           </Link>
 
           {/* Asset Info */}
           <div className="p-4 space-y-3">
+
             <div className="space-y-2">
               <Link href={`/asset/${asset.id}`}>
                 <h3 className="font-semibold text-lg hover:text-primary transition-colors line-clamp-1">
                   {asset.name}
                 </h3>
               </Link>
-              <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage
-                    src={`/placeholder-40x40.png?text=${asset.creator.substring(0, 2)}`}
-                    alt={asset.creator}
-                  />
-                  <AvatarFallback className="text-xs">
-                    {asset.creator.substring(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex items-center gap-1 min-w-0">
-                  <Link href={`/creator/${asset.creator}`} className="text-sm text-muted-foreground truncate hover:text-primary transition-colors hover:underline">
-                    {asset.creator}
-                  </Link>
-                  {asset.verified && (
-                    <CheckCircle className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                  )}
+              <p className="text-sm text-muted-foreground line-clamp-2 h-10">
+                {asset.description || "No description provided."}
+              </p>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex flex-col">
+                    <span className="text-xs text-muted-foreground">Creator</span>
+                    <Link href={`/creator/${asset.creator}`} className="text-sm text-foreground truncate hover:text-primary transition-colors hover:underline font-mono">
+                      {formatAddress(asset.creator)}
+                    </Link>
+                  </div>
                 </div>
+                <Link
+                  href={`/proof-of-ownership/${asset.id}`}
+                  className="text-blue-500 hover:text-blue-600 transition-colors bg-blue-500/10 p-1.5 rounded-full"
+                  title="View Proof of Ownership"
+                >
+                  <Shield className="h-4 w-4" />
+                </Link>
               </div>
             </div>
 
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {asset.description}
-            </p>
 
             <div className="flex items-center justify-between">
               <div className="flex flex-wrap gap-1">
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="secondary" className="text-xs text-muted-foreground bg-secondary/50 hover:bg-secondary/70 transition-colors">
                   {asset.type}
                 </Badge>
-                {asset.collection && (
-                  <Badge variant="secondary" className="text-xs">
-                    {asset.collection.substring(0, 6)}...
-                    {asset.collection.substring(asset.collection.length - 3)}
-                  </Badge>
-                )}
               </div>
-              <span className="text-xs text-muted-foreground">
-                {asset.registrationDate}
-              </span>
+              {asset.licenseType && (
+                <Badge variant="secondary" className="text-xs text-muted-foreground bg-secondary/50 hover:bg-secondary/70 transition-colors">
+                  {asset.licenseType}
+                </Badge>
+              )}
             </div>
 
-            <div className="flex gap-2 pt-2">
+
+            <div className="flex gap-2 pt-2 border-t mt-3">
               <Link href={`/asset/${asset.id}`} className="flex-1">
                 <Button variant="outline" size="sm" className="w-full">
                   View

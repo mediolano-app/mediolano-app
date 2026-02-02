@@ -28,6 +28,7 @@ export interface RecentAsset {
     blockNumber?: number;
     collectionAddress: string;
     collectionName?: string;
+    ipType?: string;
 }
 
 export interface UseRecentAssetsReturn {
@@ -361,6 +362,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                 await Promise.all(batch.map(async ({ event: parsed, index }) => {
                     let name = `Asset #${parsed.tokenId}`;
                     let image = "/placeholder.svg";
+                    let ipType = "Asset";
 
                     if (parsed.metadataUri) {
                         // Check if it's likely an IPFS CID or ipfs:// URI
@@ -374,8 +376,24 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
 
                             const metadata = await fetchIPFSMetadata(cid);
                             if (metadata) {
+                                // console.log("Fetched IPFS metadata for CID:", cid, metadata);
                                 name = metadata.name || name;
                                 image = processIPFSHashToUrl(metadata.image || "/placeholder.svg", "/placeholder.svg");
+
+                                // info: Try to extract type from attributes (OpenSea standard)
+                                let extractedType = metadata.type;
+                                if (metadata.attributes && Array.isArray(metadata.attributes)) {
+                                    const typeAttr = metadata.attributes.find(
+                                        (attr: any) => attr.trait_type === "Type" || attr.trait_type === "Asset Type"
+                                    );
+                                    if (typeAttr) {
+                                        extractedType = typeAttr.value;
+                                    }
+                                }
+                                ipType = extractedType || "Asset";
+                                // console.log("Extracted IP Type:", ipType);
+                            } else {
+                                // console.log("Failed to fetch metadata for CID:", cid);
                             }
                         } else {
                             // Direct HTTP fetch for non-IPFS URIs
@@ -387,6 +405,18 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                                     const metadata = await res.json();
                                     name = metadata.name || name;
                                     image = processIPFSHashToUrl(metadata.image || "/placeholder.svg", "/placeholder.svg");
+
+                                    // info: Try to extract type from attributes
+                                    let extractedType = metadata.type;
+                                    if (metadata.attributes && Array.isArray(metadata.attributes)) {
+                                        const typeAttr = metadata.attributes.find(
+                                            (attr: any) => attr.trait_type === "Type" || attr.trait_type === "Asset Type"
+                                        );
+                                        if (typeAttr) {
+                                            extractedType = typeAttr.value;
+                                        }
+                                    }
+                                    ipType = extractedType || "Asset";
                                 }
                             } catch {
                                 // Continue with default values
@@ -406,6 +436,7 @@ export function useRecentAssets(pageSize: number = 50): UseRecentAssetsReturn {
                         blockNumber: parsed.blockNumber,
                         collectionAddress: parsed.collectionAddress,
                         collectionName: parsed.collectionName,
+                        ipType,
                     } as RecentAsset;
                 }));
             }
