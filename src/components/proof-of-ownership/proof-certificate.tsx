@@ -68,7 +68,7 @@ export function ProofCertificate({ asset }: ProofCertificateProps) {
     }
   }
 
-  const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://sepolia.starkscan.co"
+  const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://starkscan.co"
 
   return (
     <div className="space-y-6 w-full animate-in fade-in duration-700 slide-in-from-bottom-4">

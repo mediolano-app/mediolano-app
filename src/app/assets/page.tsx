@@ -56,6 +56,20 @@ export default function AssetsPage() {
             <main className="container mx-auto px-4 py-8">
 
                 <div>
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+                            <Box className="h-5 w-5" />
+                            IP Assets
+                        </h2>
+                        {totalCount > 0 && (
+                            <span className="text-sm text-muted-foreground">
+                                {searchQuery
+                                    ? `${filteredAssets.length} of ${totalCount} assets`
+                                    : `${assets.length} of ${totalCount} assets`
+                                }
+                            </span>
+                        )}
+                    </div>
                     <div className="py-4">
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                             <div className="relative flex-1">
@@ -82,20 +96,7 @@ export default function AssetsPage() {
 
                 {/* Assets Grid */}
                 <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-                            <Box className="h-5 w-5" />
-                            IP Assets
-                        </h2>
-                        {totalCount > 0 && (
-                            <span className="text-sm text-muted-foreground">
-                                {searchQuery
-                                    ? `${filteredAssets.length} of ${totalCount} assets`
-                                    : `${assets.length} of ${totalCount} assets`
-                                }
-                            </span>
-                        )}
-                    </div>
+
 
                     {error && (
                         <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive flex items-center gap-2">

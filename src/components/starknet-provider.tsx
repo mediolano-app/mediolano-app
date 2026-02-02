@@ -37,8 +37,8 @@ export function StarknetProvider({ children }: { children: React.ReactNode }) {
     order: "alphabetical",
   });
 
-  // Determine network from environment variable, default to sepolia
-  const networkEnv = process.env.NEXT_PUBLIC_STARKNET_NETWORK === 'mainnet' ? 'mainnet' : 'sepolia';
+  // Determine network from environment variable, default to mainnet
+  const networkEnv = process.env.NEXT_PUBLIC_STARKNET_NETWORK === 'sepolia' ? 'sepolia' : 'mainnet';
   const currentNetwork = networkEnv;
 
   const networkConfigs = {

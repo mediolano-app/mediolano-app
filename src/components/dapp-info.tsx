@@ -19,7 +19,7 @@ export default function DappInfo() {
   // Mockup data for app information
   const appInfo = {
     name: "Mediolano",
-    version: "0.1.2 Testnet",
+    version: "0.2.0 Mainnet",
     description: "Mediolano is a decentralized application for creators and organizations to protect and make money from their intellectual property, powered on Starknet.",
     features: [
       "Open-Source",
@@ -35,8 +35,8 @@ export default function DappInfo() {
 
   return (
     <div className="fixed bottom-4 right-4 flex flex-col gap-4 z-10">
-     
-     {/*      <Button
+
+      {/*      <Button
         variant="outline"
         size="icon"
         className="rounded-full shadow transition-colors hover:bg-card hover:text-primary-foreground"
@@ -62,10 +62,10 @@ export default function DappInfo() {
           <div className="mx-auto w-full max-w-4xl">
             <DrawerHeader>
               <DrawerTitle className="text-2xl font-bold">
-              {appInfo.name}
-              <Badge variant="secondary" className="mt-2">Dapp Preview</Badge>
-                
-                </DrawerTitle>
+                {appInfo.name}
+                <Badge variant="secondary" className="mt-2">Dapp Preview</Badge>
+
+              </DrawerTitle>
               <Button
                 variant="ghost"
                 size="icon"
@@ -81,16 +81,16 @@ export default function DappInfo() {
               <p className="mt-4">{appInfo.description}</p>
               <div className="mt-2">
                 <span className="text-sm">Features:</span>
-                
-                  {appInfo.features.map((feature, index) => (
-                    <Badge className='p-2 m-2' key={index} variant="outline">{feature}</Badge>
-                    
-                  ))}
-               
+
+                {appInfo.features.map((feature, index) => (
+                  <Badge className='p-2 m-2' key={index} variant="outline">{feature}</Badge>
+
+                ))}
+
               </div>
             </div>
             <DrawerFooter>
-               {/*<Button className="w-full" onClick={() => setIsOpen(false)}>Close</Button>*/}
+              {/*<Button className="w-full" onClick={() => setIsOpen(false)}>Close</Button>*/}
             </DrawerFooter>
           </div>
         </DrawerContent>

@@ -301,12 +301,20 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
             .get_collection_id?.()
             .catch(() => null);
 
-          const collectionId = collectionIdRaw ? String(collectionIdRaw) : undefined;
+          // contract name (as collection name fallback)
+          const contractNameRaw = await (
+            contract as unknown as {
+              name?: () => Promise<unknown>;
+            }
+          ).name?.().catch(() => null);
 
-          return { owner, tokenURI, collectionId };
+          const collectionId = collectionIdRaw ? String(collectionIdRaw) : undefined;
+          const contractName = contractNameRaw ? String(contractNameRaw) : undefined;
+
+          return { owner, tokenURI, collectionId, contractName };
         })(),
         onchainTimeout,
-      ])) as { owner: `0x${string}`; tokenURI: string; collectionId?: string };
+      ])) as { owner: `0x${string}`; tokenURI: string; collectionId?: string; contractName?: string };
 
       // Step 2: Fetch IPFS metadata
       setLoadingState((prev) => ({
@@ -392,7 +400,7 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
         tokenURI: onchainData.tokenURI,
         ipfsCid,
         tags: metadata?.tags as string[] | undefined,
-        collectionName: metadata?.collectionName as string | undefined,
+        collectionName: (metadata?.collectionName as string) || onchainData.contractName,
         licenseType: metadata?.licenseType as string | undefined,
         collectionId: onchainData.collectionId || metadata?.collection as string | undefined,
       };
@@ -517,11 +525,16 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
       (attr) => attr.trait_type?.toLowerCase() === "ip version"
     );
 
+    const collectionAttribute = asset.attributes?.find(
+      (attr) => attr.trait_type?.toLowerCase() === "collection"
+    );
+
     // Extract creator and collection from properties
     const creator = asset.properties?.creator || tokenOwnerAddress;
     const collection =
       asset.properties?.collection ||
       asset.collectionName ||
+      collectionAttribute?.value ||
       asset.collectionId ||
       "";
 
@@ -584,7 +597,7 @@ export function useAsset(nftAddress?: `0x${string}`, tokenIdInput?: number) {
         royaltyPercentage: 5,
       },
       ipfsCid: asset.ipfsCid,
-      type: asset.type || "",
+      type: asset.type || licenseAttributeType?.value || "",
     } as DisplayAsset;
   }, [asset]);
 

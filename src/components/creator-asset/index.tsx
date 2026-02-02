@@ -186,6 +186,17 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
   }, [asset?.collectionId, fetchCollection]);
 
 
+  const collectionDisplayName = useMemo(() => {
+    if (matchedCollection?.name) {
+      return `${matchedCollection.name}${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}`
+    }
+    // Only show asset.collection if it exists and looks like a name (not an ID or number)
+    if (asset?.collection && isNaN(Number(asset.collection))) {
+      return asset.collection
+    }
+    return "Loading..."
+  }, [matchedCollection, asset])
+
   return (
     <AssetErrorBoundary onRetry={reload}>
       <div className="min-h-screen text-foreground bg-background">
@@ -285,9 +296,9 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                     <div className="flex flex-col gap-6">
                       <div>
                         <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-4">
-                          {(matchedCollection?.name || asset.collection) && (
+                          {collectionDisplayName !== "Loading..." && (
                             <Badge className="bg-white/10 text-white hover:bg-white/20 border-white/20 backdrop-blur-md px-3 py-1 text-sm h-7">
-                              {matchedCollection?.name ? `${matchedCollection.name}${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}` : asset.collection}
+                              {collectionDisplayName}
                             </Badge>
                           )}
                           {asset.type && (
@@ -434,9 +445,7 @@ export default function CreatorAssetPage({ params }: AssetPageProps) {
                         <div className="p-6">
                           <OverviewTab asset={{
                             ...asset!,
-                            collection: matchedCollection?.name
-                              ? `${matchedCollection.name}${matchedCollection.symbol ? ` (${matchedCollection.symbol})` : ''}`
-                              : asset!.collection,
+                            collection: collectionDisplayName,
                             contract: asset!.contract || nftAddress
                           }} />
                         </div>

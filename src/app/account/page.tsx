@@ -189,7 +189,7 @@ const INITIAL_USER_PROFILE: UserProfile = {
 };
 
 // Utility function to generate Starknet explorer links
-const getStarknetExplorerUrl = (txHash: string, network: "mainnet" | "sepolia" = "sepolia") => {
+const getStarknetExplorerUrl = (txHash: string, network: "mainnet" | "sepolia" = "mainnet") => {
   if (network === "mainnet") {
     return `https://voyager.online/tx/${txHash}`
   }

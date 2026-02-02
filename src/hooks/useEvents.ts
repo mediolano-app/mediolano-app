@@ -107,7 +107,7 @@ export function useAssetTransferEvents(contractAddress: string, tokenId: string)
   }, [contractAddress]);
 
   const blockNumber = useBlockNumber();
-  const fromBlock = 0;
+  const fromBlock = START_BLOCK;
   const toBlock = BlockTag.LATEST;
   const pageSize = 1000;
 
