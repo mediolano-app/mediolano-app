@@ -94,7 +94,7 @@ export function CreatorHeader({ address }: CreatorHeaderProps) {
                         <div className={`absolute -inset-4 rounded-full blur-2xl opacity-40 transition-opacity duration-1000 ${avatarImage ? "bg-primary/50" : "bg-gradient-to-r from-primary to-secondary"
                             }`} />
 
-                        <div className="relative h-64 w-64 rounded-full overflow-hidden border-[3px] border-background/50 shadow-2xl backdrop-blur-sm bg-background/50">
+                        <div className="relative h-64 w-64 rounded-full overflow-hidden shadow-2xl backdrop-blur-sm bg-background/50">
                             {avatarImage ? (
                                 <Image
                                     src={avatarImage}

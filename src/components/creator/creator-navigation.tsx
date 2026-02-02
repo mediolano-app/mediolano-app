@@ -37,7 +37,7 @@ export function CreatorNavigation() {
     return (
         <div className="sticky top-0 z-30">
             {/*  Navigation Bar */}
-            <div className="bg-background/80 backdrop-blur-xl border-b border-white/10 supports-[backdrop-filter]:bg-background/60">
+            <div className="bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
                 <div className="container mx-auto px-4">
                     <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar" aria-label="Creator sections">
                         {tabs.map((tab) => {

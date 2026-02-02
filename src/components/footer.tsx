@@ -77,8 +77,7 @@ export function Footer() {
   return (
     <>
       <ContactDialog open={isContactOpen} onOpenChange={setIsContactOpen} />
-
-      <footer className="w-full bg-background/40 backdrop-blur-xl border-t border-border/50">
+      <footer className="w-full bg-background/40 backdrop-blur-xl border-t border-background/50">
         <div className="container mx-auto px-6 py-12 md:py-16">
 
           {/* Top Feature Links */}

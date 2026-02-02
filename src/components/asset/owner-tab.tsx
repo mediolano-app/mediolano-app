@@ -1,7 +1,4 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Users, PlusCircle, Globe } from "lucide-react"
+import { ExternalLink } from "lucide-react"
 import { shortenAddress } from "@/lib/utils"
 import Link from "next/link"
 
@@ -28,53 +25,36 @@ const toText = (value: unknown): string => (value === undefined || value === nul
 
 export function OwnerTab({ asset }: OwnerTabProps) {
   return (
-    <div className="space-y-6">
-      <Card className="glass">
-        <CardHeader>
-          <CardTitle>Owner</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-start gap-4">
-            <div className="flex-1">
+    <div className="flex flex-col gap-4">
+      {/* Owner Row */}
+      <div className="flex items-center justify-between group">
+        <div className="flex flex-col min-w-0">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Owner</span>
+          <Link
+            href={`/creator/${asset?.owner?.address || asset?.owner?.name}`}
+            className="font-semibold text-sm truncate hover:text-primary transition-colors flex items-center gap-1.5"
+          >
+            {toText(asset?.owner?.name).startsWith("0x") ? shortenAddress(toText(asset?.owner?.name)) : toText(asset?.owner?.name)}
+            <ExternalLink className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
+          </Link>
+        </div>
+      </div>
 
+      <div className="h-px bg-border/50 w-full" />
 
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="h-8" asChild>
-                  <Link href={`/creator/${asset?.owner?.address || asset?.owner?.name}`}>
-                    <Globe className="mr-2 h-4 w-4" />
-                    {toText(asset?.owner?.name).startsWith("0x") ? shortenAddress(toText(asset?.owner?.name)) : toText(asset?.owner?.name)}
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="glass">
-        <CardHeader>
-          <CardTitle>Creator</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-start gap-4">
-            <div className="flex-1">
-
-              <div className="">
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="h-8" asChild>
-                    <Link href={`/creator/${asset.author.address || asset.author.name}`}>
-                      <Globe className="mr-2 h-4 w-4" />
-                      {toText(asset.author.name).startsWith("0x") ? shortenAddress(toText(asset.author.name)) : toText(asset.author.name)}
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-
+      {/* Creator Row */}
+      <div className="flex items-center justify-between group">
+        <div className="flex flex-col min-w-0">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Creator</span>
+          <Link
+            href={`/creator/${asset.author.address || asset.author.name}`}
+            className="font-semibold text-sm truncate hover:text-primary transition-colors flex items-center gap-1.5"
+          >
+            {toText(asset.author.name).startsWith("0x") ? shortenAddress(toText(asset.author.name)) : toText(asset.author.name)}
+            <ExternalLink className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
+          </Link>
+        </div>
+      </div>
     </div>
   )
 } 

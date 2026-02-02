@@ -55,42 +55,57 @@ export default function AssetsPage() {
         <div className="min-h-screen">
             <main className="container mx-auto px-4 py-8">
 
-                <div>
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
-                            <Box className="h-5 w-5" />
-                            IP Assets
-                        </h2>
+                <div className="relative mb-12">
+                    {/* Hero Background Effect */}
+                    <div className="absolute inset-0 -z-10 overflow-hidden rounded-3xl">
+                        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+                        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+                    </div>
+
+                    <div className="relative flex flex-col md:flex-row items-end justify-between gap-6">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-primary/80 mb-1">
+                                <Sparkles className="h-4 w-4" />
+                                <span className="text-xs font-semibold uppercase tracking-wider">Explore</span>
+                            </div>
+                            <h1 className="tracking-tight text-foreground text-3xl">
+                                IP Assets
+                            </h1>
+
+                        </div>
+
                         {totalCount > 0 && (
-                            <span className="text-sm text-muted-foreground">
-                                {searchQuery
-                                    ? `${filteredAssets.length} of ${totalCount} assets`
-                                    : `${assets.length} of ${totalCount} assets`
-                                }
-                            </span>
+                            <div className="flex items-center gap-2 px-4 py-2 bg-secondary/30 backdrop-blur-md rounded-full border border-border/50">
+                                <Box className="h-4 w-4 text-blue-600" />
+                                <span className="font-semibold">{totalCount}</span>
+                                <span className="text-muted-foreground text-sm">Assets</span>
+                            </div>
                         )}
                     </div>
-                    <div className="py-4">
-                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                            <div className="relative flex-1">
-                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+                    <div className="mt-8 flex flex-col md:flex-row gap-4 items-stretch md:items-center">
+                        <div className="relative flex-1 group">
+                            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-xl blur-sm transition-opacity opacity-0 group-hover:opacity-100" />
+                            <div className="relative">
+                                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
                                 <Input
-                                    placeholder="Search assets by name or ID..."
+                                    placeholder="Search by name, ID, or collection..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 bg-background/50 border-border/50"
+                                    className="pl-12 h-12 text-base bg-background/50 border-input/50 focus:border-primary/50 focus:ring-primary/20 rounded-xl shadow-sm transition-all"
                                 />
                             </div>
-                            <Button
-                                variant="outline"
-                                size="default"
-                                onClick={refresh}
-                                disabled={loading}
-                                className="sm:w-auto bg-transparent"
-                            >
-                                <RefreshCw className={`h-4 w-4 ${loading && !loadingMore ? "animate-spin" : ""}`} />
-                            </Button>
                         </div>
+                        <Button
+                            variant="outline"
+                            size="lg"
+                            onClick={refresh}
+                            disabled={loading}
+                            className="h-12 px-6 border-input/50 bg-background/50 hover:bg-secondary/50 backdrop-blur-sm rounded-xl"
+                        >
+                            <RefreshCw className={`h-5 w-5 mr-2 ${loading && !loadingMore ? "animate-spin" : ""}`} />
+                            Refresh
+                        </Button>
                     </div>
                 </div>
 
