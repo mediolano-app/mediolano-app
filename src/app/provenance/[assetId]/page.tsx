@@ -35,7 +35,10 @@ export default function ProvenancePage({ params }: ProvenancePageProps) {
   // Debug log to check addresses and owner
   console.log(`[ProvenancePage] URL Address: ${contractAddress}, Asset NFT Address: ${asset?.nftAddress}, TokenID: ${tokenId}, Owner: ${asset?.owner}`);
 
-  const { events: provenanceEventsRaw, isLoading: eventsLoading } = useAssetProvenanceEvents(contractAddress, tokenId || "")
+  // Extract collection ID if available from asset (passed as string or undefined)
+  const collectionId = asset?.collectionId;
+
+  const { events: provenanceEventsRaw, isLoading: eventsLoading } = useAssetProvenanceEvents(contractAddress, tokenId || "", collectionId)
 
   const isLoading = assetLoading || eventsLoading
 

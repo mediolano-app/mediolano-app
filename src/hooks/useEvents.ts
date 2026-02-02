@@ -1,7 +1,7 @@
 import { useEvents, useBlockNumber, useAccount } from "@starknet-react/core";
 import { BlockTag, RpcProvider, hash, num } from "starknet";
 import { useMemo, useEffect, useState, useCallback } from "react";
-import { CONTRACT_ADDRESS, START_BLOCK } from "@/lib/constants";
+import { CONTRACT_ADDRESS, START_BLOCK, REGISTRY_START_BLOCK } from "@/lib/constants";
 import { normalizeStarknetAddress, toHexString } from "@/lib/utils";
 
 export function useMyTransferEvents() {
@@ -169,7 +169,7 @@ const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL;
  * Hook for fetching comprehensive provenance events for a specific asset
  * Queries the central Collection Registry (CONTRACT_ADDRESS) for lifecycle events
  */
-export function useAssetProvenanceEvents(contractAddress: string, tokenId: string) {
+export function useAssetProvenanceEvents(contractAddress: string, tokenId: string, knownCollectionId?: string) {
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>(null);
@@ -190,53 +190,85 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
 
         // 1. Get the Collection ID for this asset's contract
         let collectionId = -1n;
-        try {
-          const normalizedContractAddress = normalizeStarknetAddress(contractAddress);
-          let collectionIdResult: string[] | null = null;
 
-          // Try snake_case selector first
+        if (knownCollectionId) {
           try {
-            const entrypointSnake = hash.getSelectorFromName("get_collection_id");
-            collectionIdResult = await provider.callContract({
-              contractAddress: normalizedContractAddress,
-              entrypoint: entrypointSnake,
-              calldata: []
-            });
-          } catch (snakeErr) {
-            console.warn(`[Provenance] 'get_collection_id' failed, trying 'getCollectionId'`, snakeErr);
-            // Try camelCase selector
-            const entrypointCamel = hash.getSelectorFromName("getCollectionId");
-            collectionIdResult = await provider.callContract({
-              contractAddress: normalizedContractAddress,
-              entrypoint: entrypointCamel,
-              calldata: []
-            });
+            collectionId = BigInt(knownCollectionId);
+          } catch (e) {
+            console.warn("[Provenance] Invalid knownCollectionId:", knownCollectionId);
           }
-
-          // Result is u256 (low, high)
-          if (collectionIdResult && collectionIdResult.length >= 2) {
-            const low = BigInt(collectionIdResult[0]);
-            const high = BigInt(collectionIdResult[1]);
-            collectionId = low + (high << 128n);
-          } else if (collectionIdResult && collectionIdResult.length === 1) {
-            collectionId = BigInt(collectionIdResult[0]);
-          }
-        } catch (e) {
-          console.warn(`[Provenance] Failed to fetch collection ID for ${contractAddress} with both selectors`, e);
         }
 
-        const response = await provider.getEvents({
-          address: registryAddress,
-          from_block: { block_number: START_BLOCK },
-          to_block: "latest",
-          keys: [[
-            REGISTRY_TOKEN_MINTED_SELECTOR,
-            REGISTRY_TOKEN_TRANSFERRED_SELECTOR
-          ]],
-          chunk_size: 1000,
-        });
+        if (collectionId === -1n) {
+          try {
+            const normalizedContractAddress = normalizeStarknetAddress(contractAddress);
+            let collectionIdResult: string[] | null = null;
 
-        return { events: response.events || [], collectionId };
+            // Try snake_case selector first
+            try {
+              const entrypointSnake = hash.getSelectorFromName("get_collection_id");
+              collectionIdResult = await provider.callContract({
+                contractAddress: normalizedContractAddress,
+                entrypoint: entrypointSnake,
+                calldata: []
+              });
+            } catch (snakeErr) {
+              // Try camelCase selector
+              const entrypointCamel = hash.getSelectorFromName("getCollectionId");
+              collectionIdResult = await provider.callContract({
+                contractAddress: normalizedContractAddress,
+                entrypoint: entrypointCamel,
+                calldata: []
+              });
+            }
+
+            // Result is u256 (low, high)
+            if (collectionIdResult && collectionIdResult.length >= 2) {
+              const low = BigInt(collectionIdResult[0]);
+              const high = BigInt(collectionIdResult[1]);
+              collectionId = low + (high << 128n);
+            } else if (collectionIdResult && collectionIdResult.length === 1) {
+              collectionId = BigInt(collectionIdResult[0]);
+            }
+          } catch (e) {
+            console.warn(`[Provenance] Failed to fetch collection ID for ${contractAddress} with both selectors`, e);
+          }
+        }
+
+        // STRICT FILTER: If we don't know the collection ID, we CANNOT safely filter Registry events.
+        // Returning mixed events (same Token ID, different Collection) is worse than returning no Registry events.
+        if (collectionId === -1n) {
+          console.warn("[Provenance] Collection ID unknown. Skipping Registry events to avoid data pollution.");
+          return { events: [], collectionId: -1n };
+        }
+
+        const events = [];
+        let continuationToken: string | undefined = undefined;
+        let page = 0;
+        const MAX_PAGES = 50;
+
+        do {
+          const response = await provider.getEvents({
+            address: registryAddress,
+            from_block: { block_number: REGISTRY_START_BLOCK },
+            to_block: "latest",
+            keys: [[
+              REGISTRY_TOKEN_MINTED_SELECTOR,
+              REGISTRY_TOKEN_TRANSFERRED_SELECTOR
+            ]],
+            chunk_size: 1000,
+            continuation_token: continuationToken
+          });
+
+          if (response.events) {
+            events.push(...response.events);
+          }
+
+          continuationToken = response.continuation_token;
+          page++;
+        } while (continuationToken && page < MAX_PAGES);
+
+        return { events, collectionId };
       } catch (err: any) {
         console.error("[Provenance] Registry/Collection Fetch Error:", err.message || err);
         return { events: [], collectionId: -1n };
@@ -246,14 +278,31 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
     const fetchAllContractEvents = async (contractAddr: string) => {
       try {
         const normalizedContractAddress = normalizeStarknetAddress(contractAddr);
-        const response = await provider.getEvents({
-          address: normalizedContractAddress,
-          from_block: { block_number: START_BLOCK }, // Start from predefined block
-          to_block: "latest",
-          keys: [[STANDARD_TRANSFER_SELECTOR]],
-          chunk_size: 1000,
-        });
-        return response.events || [];
+
+        const events = [];
+        let continuationToken: string | undefined = undefined;
+        let page = 0;
+        const MAX_PAGES = 50;
+
+        do {
+          const response = await provider.getEvents({
+            address: normalizedContractAddress,
+            from_block: { block_number: START_BLOCK }, // Start from predefined block
+            to_block: "latest",
+            keys: [[STANDARD_TRANSFER_SELECTOR]],
+            chunk_size: 1000,
+            continuation_token: continuationToken
+          });
+
+          if (response.events) {
+            events.push(...response.events);
+          }
+
+          continuationToken = response.continuation_token;
+          page++;
+        } while (continuationToken && page < MAX_PAGES);
+
+        return events;
       } catch (err: any) {
         console.error(`[Provenance] Contract Event Fetch Error for ${contractAddr}:`, err.message || err);
         return [];
@@ -267,8 +316,7 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
       const allRawEvents = [...registryRawEvents, ...contractRawEvents];
 
       if (targetCollectionId === -1n && registryRawEvents.length > 0) {
-        // If we have registry events but couldn't resolve collection ID, it's ambiguous.
-        // For now, we'll proceed with contract events only if collection ID is unknown.
+        // Double check: if we skipped registry events above, this logic is moot, but safe to keep.
         console.warn("[Provenance] Collection ID not resolved. Filtering registry events might be inaccurate.");
       }
 
@@ -297,12 +345,14 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
         if (eventSelector === REGISTRY_TOKEN_MINTED_SELECTOR && data.length >= 5) {
           source = 'registry';
           const eventCollectionId = BigInt(data[0]) + (BigInt(data[1]) << 128n);
-          // Fallback: If we don't know the collection ID (-1n), we accept ALL events for this Token ID.
-          // This handles cases where the asset contract doesn't support get_collection_id.
-          if (eventCollectionId === targetCollectionId || targetCollectionId === -1n) {
+
+          // Strict check: We ONLY match if collection ID matches strictly.
+          // Since we skip fetching if targetCollectionId is -1n, this comparison assumes targetCollectionId is valid.
+          if (eventCollectionId === targetCollectionId) {
             const tokenLow = BigInt(data[2]);
             const tokenHigh = BigInt(data[3]);
             const eventTokenId = tokenLow + (tokenHigh << 128n);
+            const targetTokenId = BigInt(tokenId); // re-parse for safety
 
             if (eventTokenId === targetTokenId) {
               match = true;
@@ -317,10 +367,11 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
           source = 'registry';
           const eventCollectionId = BigInt(data[0]) + (BigInt(data[1]) << 128n);
 
-          if (eventCollectionId === targetCollectionId || targetCollectionId === -1n) {
+          if (eventCollectionId === targetCollectionId) {
             const tokenLow = BigInt(data[2]);
             const tokenHigh = BigInt(data[3]);
             const eventTokenId = tokenLow + (tokenHigh << 128n);
+            const targetTokenId = BigInt(tokenId);
 
             if (eventTokenId === targetTokenId) {
               match = true;
@@ -337,6 +388,7 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
             const tokenLow = BigInt(keys[3]);
             const tokenHigh = keys.length > 4 ? BigInt(keys[4]) : 0n;
             const eventTokenId = tokenLow + (tokenHigh << 128n);
+            const targetTokenId = BigInt(tokenId);
 
             if (eventTokenId === targetTokenId) {
               match = true;
@@ -388,7 +440,8 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
         txEvents.sort((a, b) => {
           if (a.type === "mint" && b.type !== "mint") return -1;
           if (a.type !== "mint" && b.type === "mint") return 1;
-          // Both are transfers, prioritize registry over contract
+          // Both are transfers, prioritize registry over contract (IF and ONLY IF we trust registry)
+          // Since we strictly filter registry now, we trust it.
           if (a.type === "transfer" && b.type === "transfer") {
             if (a.source === 'registry' && b.source === 'contract') return -1;
             if (a.source === 'contract' && b.source === 'registry') return 1;
@@ -428,7 +481,7 @@ export function useAssetProvenanceEvents(contractAddress: string, tokenId: strin
     } finally {
       setIsLoading(false);
     }
-  }, [tokenId, contractAddress]);
+  }, [tokenId, contractAddress, knownCollectionId]);
 
   useEffect(() => {
     fetchProvenance();

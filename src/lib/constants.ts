@@ -11,6 +11,7 @@ export const IPFS_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || "https://gateway.
 export const EXPLORER_URL = process.env.NEXT_PUBLIC_EXPLORER_URL || "https://voyager.online";
 
 export const START_BLOCK = process.env.NEXT_PUBLIC_STARKNET_NETWORK === "mainnet" ? 6204232 : 1861690;
+export const REGISTRY_START_BLOCK = process.env.NEXT_PUBLIC_STARKNET_NETWORK === "mainnet" ? 4924753 : 1861690;
 
 // AVNU Paymaster Configuration
 export const AVNU_PAYMASTER_CONFIG = {
