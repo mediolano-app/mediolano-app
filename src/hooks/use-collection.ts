@@ -26,9 +26,6 @@ export interface CollectionFormData {
   type: string;
   visibility: string;
   coverImage?: string;
-  enableVersioning: boolean;
-  allowComments: boolean;
-  requireApproval: boolean;
 }
 
 export interface CollectionMetadata {
@@ -409,7 +406,7 @@ export function useGetAllCollections(): UseGetAllCollectionsReturn {
         );
 
         results.forEach((isValid, index) => {
-          if (isValid && !isCollectionReported(batch[index].toString())) {
+          if (isValid) {
             validIds.push(batch[index]);
           }
         });
@@ -429,7 +426,11 @@ export function useGetAllCollections(): UseGetAllCollectionsReturn {
         })
       );
 
-      setCollections(collectionsData.filter(c => c !== null) as Collection[]);
+      setCollections(
+        collectionsData
+          .filter(c => c !== null)
+          .filter(c => !isCollectionReported(c!.nftAddress)) as Collection[]
+      );
 
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch collections");
@@ -515,14 +516,14 @@ export function useGetCollections(walletAddress?: `0x${string}`): UseGetCollecti
         }
       );
 
-      const filteredIds = ids.filter(id => !isCollectionReported(id));
+      const filteredIds = ids;
 
       const results = await fetchOneByOne(
         filteredIds.map((id) => () => fetchCollection(id)),
         700
       );
 
-      setCollections(results);
+      setCollections(results.filter(c => !isCollectionReported(c.nftAddress)));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch collections"
@@ -725,7 +726,7 @@ export function usePaginatedCollections(pageSize: number = 12): UsePaginatedColl
 
         // Filter valid IDs that are not reported
         const validIds = validityResults
-          .filter(r => r.valid && !isCollectionReported(r.id.toString()))
+          .filter(r => r.valid)
           .map(r => r.id);
 
         if (validIds.length > 0) {
@@ -751,7 +752,7 @@ export function usePaginatedCollections(pageSize: number = 12): UsePaginatedColl
           // But Promise.all preserves order of input array! 
           // So they are already in desc order of ID.
 
-          newCollections.push(...validDetails);
+          newCollections.push(...validDetails.filter(c => !isCollectionReported(c.nftAddress)));
         }
 
       } catch (e) {
@@ -874,7 +875,7 @@ export function useFeaturedCollections(featuredIds: number[] = []): UseGetAllCol
       const promises = featuredIds.map(async (id) => {
         try {
           const isValid = await contract.call("is_valid_collection", [id.toString()]);
-          if (isValid && !isCollectionReported(id.toString())) {
+          if (isValid) {
             const collection = await contract.call("get_collection", [id.toString()]);
             const collectionStat = await contract.call("get_collection_stats", [id.toString()]);
             const metadata = { id, ...collection, ...collectionStat } as CollectionMetadata;
@@ -888,7 +889,9 @@ export function useFeaturedCollections(featuredIds: number[] = []): UseGetAllCol
       });
 
       const results = await Promise.all(promises);
-      const validCollections = results.filter((c): c is Collection => c !== null);
+      const validCollections = results
+        .filter((c): c is Collection => c !== null)
+        .filter(c => !isCollectionReported(c.nftAddress));
 
       setCollections(validCollections);
     } catch (err) {

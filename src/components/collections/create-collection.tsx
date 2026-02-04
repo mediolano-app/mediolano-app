@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useCollection, CollectionFormData } from "@/hooks/use-collection";
@@ -67,9 +67,6 @@ export default function CreateCollectionView({
     type: "art",
     visibility: "public",
     coverImage: undefined,
-    enableVersioning: true,
-    allowComments: false,
-    requireApproval: false,
   });
 
   // Drawer & Progress State
@@ -80,6 +77,7 @@ export default function CreateCollectionView({
   const [error, setError] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [mintResult, setMintResult] = useState<any>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -305,9 +303,6 @@ export default function CreateCollectionView({
         type: "art",
         visibility: "public",
         coverImage: undefined,
-        enableVersioning: true,
-        allowComments: false,
-        requireApproval: false,
       });
       uploaderRef.current?.clear();
 
@@ -440,7 +435,9 @@ export default function CreateCollectionView({
 
                   <CoverImageUploader
                     ref={uploaderRef}
-                    onChange={(url, file) => { }}
+                    onChange={(url, file) => {
+                      setCoverPreview(url || null);
+                    }}
                   />
                 </CardContent>
                 <CardFooter className="flex justify-between">
@@ -465,120 +462,99 @@ export default function CreateCollectionView({
             </form>
           </div>
 
+          {/* Live Preview Sidebar */}
           <div className="lg:col-span-1">
-            <div className="space-y-6">
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle>Collection Settings</CardTitle>
+            <div className="space-y-6 sticky top-8">
+              {/* Live Preview Card */}
+              <Card className="glass-card overflow-hidden">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Live Preview</CardTitle>
                   <CardDescription>
-                    Configure additional settings for your collection
+                    See how your collection will appear
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Enable Versioning</p>
-                      <p className="text-sm text-muted-foreground">
-                        Track changes to assets in this collection
-                      </p>
-                    </div>
-                    <Switch
-                      checked={formData.enableVersioning}
-                      onCheckedChange={(checked) =>
-                        handleInputChange("enableVersioning", checked)
-                      }
-                    />
+                <CardContent className="p-0">
+                  {/* Preview Image */}
+                  <div className="relative aspect-video bg-gradient-to-br from-primary/20 via-primary/10 to-background">
+                    {coverPreview ? (
+                      <img
+                        src={coverPreview}
+                        alt="Collection preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <FolderPlus className="w-12 h-12 text-muted-foreground/50 mx-auto mb-2" />
+                          <p className="text-sm text-muted-foreground">No cover image</p>
+                        </div>
+                      </div>
+                    )}
+                    {/* Type Badge */}
+                    {formData.type && (
+                      <div className="absolute top-3 left-3">
+                        <span className="px-2 py-1 text-xs font-medium bg-background/80 backdrop-blur-sm rounded-full border border-border/50 capitalize">
+                          {formData.type}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  {/* Preview Details */}
+                  <div className="p-4 space-y-3">
                     <div>
-                      <p className="font-medium">Open Edition</p>
-                      <p className="text-sm text-muted-foreground">
-                        Enable collaborative minting
+                      <h3 className="font-semibold text-lg truncate">
+                        {formData.name || "Untitled Collection"}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                        {formData.description || "No description provided"}
                       </p>
                     </div>
-                    <Switch
-                      checked={formData.allowComments}
-                      onCheckedChange={(checked) =>
-                        handleInputChange("allowComments", checked)
-                      }
-                    />
-                  </div>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">Require Approval</p>
-                      <p className="text-sm text-muted-foreground">
-                        Require approval for new assets
-                      </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="px-2 py-0.5 bg-muted rounded-full">
+                        {formData.visibility === "public" ? "Public" : "Private"}
+                      </span>
+                      <span>•</span>
+                      <span>0 assets</span>
                     </div>
-                    <Switch
-                      checked={formData.requireApproval}
-                      onCheckedChange={(checked) =>
-                        handleInputChange("requireApproval", checked)
-                      }
-                    />
                   </div>
                 </CardContent>
               </Card>
 
+              {/* Collection Guide */}
               <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle>Collection Guide</CardTitle>
-                  <CardDescription>
-                    Apply templates to standardize asset creation
-                  </CardDescription>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Quick Guide</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Tabs defaultValue="recommended">
-                    <TabsList className="w-full">
-                      <TabsTrigger value="recommended" className="flex-1">
-                        Collections?
-                      </TabsTrigger>
-                      <TabsTrigger value="custom" className="flex-1">
-                        Checklist
-                      </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="recommended" className="space-y-2 mt-2">
-                      <div className="p-2 border rounded-md flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">
-                            What is a IP collection?
-                          </p>
-                          <p className="mt-4 text-sm text-muted-foreground">
-                            A Programmable IP Collection (Non-Fungible Token
-                            collection) is essentially a series of
-                            blockchain-based assets, each with unique
-                            identifying programmable code and metadata.
-                          </p>
-                          <p className="mt-4 text-sm text-muted-foreground mt-1">
-                            Collections allow you to group related assets
-                            together, making it easier to manage and interact
-                            with them.
-                          </p>
-                        </div>
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="custom" className="mt-2">
-                      <div className="p-2 border rounded-md flex items-center justify-between">
-                        <div>
-                          <p className="font-medium mb-1">
-                            Collections Checklist
-                          </p>
-                          <p className="text-xs text-muted-foreground mb-2">
-                            Making the most of your collection page helps others
-                            better understand your project.
-                          </p>
-                          <ul className="list-disc list-inside text-xs space-y-1 text-muted-foreground">
-                            <li>Choose a collection name</li>
-                            <li>Fill in your collection details</li>
-                            <li>Add image (upload file or provide URL)</li>
-                            <li>Configure collection settings</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
+                <CardContent className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-xs font-medium text-primary">1</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Name your collection</p>
+                      <p className="text-xs text-muted-foreground">Choose a memorable name</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-xs font-medium text-primary">2</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Add a description</p>
+                      <p className="text-xs text-muted-foreground">Tell others about your collection</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <span className="text-xs font-medium text-primary">3</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Upload cover image</p>
+                      <p className="text-xs text-muted-foreground">Make your collection stand out</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -605,7 +581,6 @@ export default function CreateCollectionView({
           Symbol: formData.symbol || "MIP",
           Type: formData.type,
           Visibility: formData.visibility,
-          "Versioning Supported": formData.enableVersioning ? "Yes" : "No"
         }}
       />
     </div>

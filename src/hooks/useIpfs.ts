@@ -164,6 +164,11 @@ export function useIpfsUpload() {
       try {
         let uploadedFileUrl = imageUrl;
 
+        // Normalize URL if it starts with www.
+        if (imageUrl.startsWith("www.")) {
+          imageUrl = `https://${imageUrl}`;
+        }
+
         // Only call server API if it's a full URL (not a relative path like /placeholder.svg)
         if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
           // Call server-side API to fetch and upload image

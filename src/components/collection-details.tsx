@@ -26,6 +26,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { isCollectionReported } from "@/lib/reported-content";
+import { ReportCollectionDialog } from "@/components/report-collection-dialog";
 import Link from "next/link";
 import Image from "next/image";
 import { LazyImage } from "@/components/ui/lazy-image";
@@ -45,6 +46,7 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
     const [filterType, setFilterType] = useState("all");
     const [copied, setCopied] = useState<string | null>(null);
     const [imageRatio, setImageRatio] = useState<number | null>(null);
+    const [reportOpen, setReportOpen] = useState(false);
 
     // Use new hooks for fetching data
     const {
@@ -146,10 +148,10 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                 </div>
 
                 <div className="relative z-10 container mx-auto px-4 max-w-7xl">
-                    {collection && isCollectionReported(collection.id.toString()) && (
+                    {collection && isCollectionReported(collection.nftAddress) && (
                         <Alert
                             variant="destructive"
-                            className="mb-8 border-destructive/50 bg-destructive/10 text-destructive dark:border-destructive/50 backdrop-blur-md"
+                            className="mb-8 border-destructive/50 bg-destructive/10 text-foreground dark:border-destructive/50 backdrop-blur-md"
                         >
                             <AlertTriangle className="h-4 w-4" />
                             <AlertTitle>Reported Content</AlertTitle>
@@ -224,6 +226,15 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                                                 <ExternalLink className="h-6 w-6" />
                                             </Button>
                                         </a>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="glass text-foreground"
+                                            onClick={() => setReportOpen(true)}
+                                            title="Report Collection"
+                                        >
+                                            <AlertTriangle className="h-6 w-6" />
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
@@ -348,6 +359,14 @@ export default function CollectionDetails({ collectionAddress }: CollectionDetai
                     )}
                 </div>
             </main>
+
+            <ReportCollectionDialog
+                open={reportOpen}
+                onOpenChange={setReportOpen}
+                collectionId={collection.nftAddress}
+                collectionName={collection.name}
+                collectionOwner={collection.owner}
+            />
         </div>
     );
 }

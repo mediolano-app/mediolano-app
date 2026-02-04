@@ -301,9 +301,15 @@ export function processIPFSHashToUrl(input: string, fallbackUrl: string): string
   }
 
 
+  // Handle www. prefix
+  if (processedUrl.startsWith("www.")) {
+    return `https://${processedUrl}`;
+  }
+
   // Already a normal http(s) URL (non-gateway or direct IPFS path)
   if (processedUrl.startsWith("http")) {
     const cidMatch = processedUrl.match(/\/ipfs\/([a-zA-Z0-9]+)/);
+    // Only flag as invalid if it explicitly looks like a BROKEN IPFS url (very short alphanumeric after /ipfs/)
     if (cidMatch && cidMatch[1].length < 34) {
       console.log(
         `Invalid IPFS gateway URL - CID too short (${cidMatch[1].length} chars):`,
