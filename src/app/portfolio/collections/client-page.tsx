@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Grid3X3, ArrowLeft } from "lucide-react";
-import { usePortfolio } from "@/hooks/use-portfolio";
+import { useGetCollections } from "@/hooks/use-collection";
 import { useAccount } from "@starknet-react/core";
 import { Alert } from "@/components/ui/alert";
 import { CollectionValidator } from "@/lib/types";
@@ -18,7 +18,7 @@ const CollectionsPortfolioGrid = dynamic(() =>
 
 export default function CollectionsClientPage() {
     const { address } = useAccount();
-    const { collections, loading, error } = usePortfolio();
+    const { collections, loading, error } = useGetCollections(address);
 
     // Validate collections before passing to components
     const validCollections = collections.filter(collection => {

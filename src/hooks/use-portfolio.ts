@@ -121,7 +121,7 @@ export function usePortfolio(): PortfolioData & { refetch: () => void } {
     recentActivity: []
   });
 
-  const { collections, loading: collectionsLoading, error: collectionsError, reload: reloadCollections } = useGetAllCollections();
+  const { collections, loading: collectionsLoading, error: collectionsError, reload: reloadCollections } = useGetCollections(address);
   const { provider } = useProvider();
 
   const { contract: managerContract } = useContract({

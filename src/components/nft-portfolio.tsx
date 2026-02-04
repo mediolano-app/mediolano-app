@@ -49,7 +49,6 @@ import {
 } from "lucide-react"
 import NFTCard from "./asset-card"
 import { PortfolioStats } from "./portfolio-stats"
-import { NFTLicensings } from "./nft-licensings"
 import { useMIP } from "@/hooks/contracts/use-mip"
 import { pinataClient } from "@/utils/pinataClient"
 import { useReadContract } from "@starknet-react/core";
@@ -235,7 +234,6 @@ export default function NFTPortfolio() {
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="all">My IP Collection</TabsTrigger>
-          <TabsTrigger value="licensings" disabled>Licensings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
@@ -285,9 +283,7 @@ export default function NFTPortfolio() {
           </div>
         </TabsContent>
 
-        <TabsContent value="licensings" className="space-y-4">
-          <NFTLicensings />
-        </TabsContent>
+
       </Tabs>
     </div>
   )

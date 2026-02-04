@@ -98,8 +98,8 @@ export default function ProofOfOwnershipPage({ params }: ProofOfOwnershipPagePro
     tokenStandard: "ERC-721",
     contract: asset.nftAddress,
     licenseInfo: {
-      type: asset.licenseType || "Personal Use",
-      terms: "Standard License",
+      type: asset.licenseType || "Unknown",
+      terms: "Unknown",
       allowCommercial: false,
       allowDerivatives: true,
       requireAttribution: true,

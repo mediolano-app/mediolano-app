@@ -90,7 +90,7 @@ export function CollectionsGrid({ collections, onCollectionClick }: { collection
   }
 
   // Find featured collections for the featured section
-  const featuredCollections = collections.filter((c) => String(c.id) === "bored-ape" || String(c.id) === "cryptopunks").slice(0, 1)
+  const featuredCollections = collections.filter((c) => String(c.id) === "kalamaha" || String(c.id) === "mizu").slice(0, 1)
   const featuredCollection = featuredCollections.length > 0 ? featuredCollections[0] : null
 
   return (
@@ -246,7 +246,7 @@ function CollectionCard({ collection, nftCount, onReportClick, onCollectionClick
   return (
     <Card
       className={cn(
-        "glass overflow-hidden transition-all cursor-pointer group",
+        "glass-card overflow-hidden transition-all cursor-pointer group",
         onCollectionClick && "hover:ring-2 hover:ring-primary"
       )}
       onClick={onCollectionClick}

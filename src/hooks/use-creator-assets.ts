@@ -84,12 +84,12 @@ export function useCreatorAssets(address?: string, pageSize: number = 20): UseCr
                     owner: address,
                     verified: false, // Default to false as we don't have this info easily
                     image: imageUrl,
-                    collection: metadata.collection || "Unknown Collection",
-                    licenseType: metadata.licenseType || "Personal Use",
+                    collection: metadata.collection || "Unknown",
+                    licenseType: metadata.licenseType || "Unknown",
                     description: metadata.description || "No description available",
                     registrationDate: metadata.date || new Date().toISOString(),
                     value: "0", // Price info not directly available in this endpoint usually
-                    type: metadata.type || "Art", // Default to Art
+                    type: metadata.type || "Unknown", // Default to Art
                     templateType: metadata.templateType || metadata.template_type,
                     templateId: metadata.templateId,
                     metadata: metadata,

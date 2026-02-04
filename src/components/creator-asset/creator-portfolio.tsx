@@ -12,7 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Grid, Search, List, ArrowUpDown, LineChart } from "lucide-react";
 import { useCreatorNFTPortfolio } from "@/hooks/contracts/use-mip";
 import { PortfolioStats } from "../portfolio-stats";
-import { NFTLicensings } from "../nft-licensings";
 import { CreatorNFTCard } from "./creator-nft-card";
 
 import {
@@ -131,9 +130,6 @@ export default function CreatorNFTPortfolio() {
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="all">Collections</TabsTrigger>
-          <TabsTrigger value="licensings" disabled>
-            Remixes
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
@@ -154,7 +150,7 @@ export default function CreatorNFTPortfolio() {
                   key={index}
                   isFiltered={true}
                   metadata={meta}
-                  setMetadata={() => {}}
+                  setMetadata={() => { }}
                   status="Protected"
                 />
               ))}
@@ -162,9 +158,7 @@ export default function CreatorNFTPortfolio() {
           )}
         </TabsContent>
 
-        <TabsContent value="licensings" className="space-y-4">
-          {/*<NFTLicensings />*/}
-        </TabsContent>
+
       </Tabs>
     </div>
   );

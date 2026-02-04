@@ -108,29 +108,22 @@ function resolveIpfsUrl(url: string): string {
 }
 
 function mapStringToLicenseType(value: string): LicenseType {
-  switch (value?.toLowerCase()) {
-    case "cc-by":
-    case "cc-by-sa":
-    case "creative commons":
-      return "Creative Commons";
-    case "commercial":
-    case "commercial use":
-      return "Commercial Use";
-    case "personal":
-    case "personal use":
-      return "Personal Use";
-    case "exclusive":
-    case "exclusive rights":
-    case "all-rights-reserved":
-      return "Exclusive Rights";
-    case "mit":
-    case "apache-2.0":
-    case "gpl-3.0":
-    case "open source":
-      return "Open Source";
-    default:
-      return "Personal Use"; // Default fallback
+  const normalized = value?.toLowerCase() || "";
+
+  if (normalized === "cc-by" || normalized === "creative commons") return "cc-by";
+  if (normalized === "cc-by-sa") return "cc-by-sa";
+  if (normalized === "cc-by-nc") return "cc-by-nc";
+
+  if (normalized === "all-rights-reserved" || normalized === "exclusive rights" || normalized === "exclusive") {
+    return "all-rights-reserved";
   }
+
+  // Legacy/Other mappings
+  if (normalized.includes("commercial")) return "custom"; // "Commercial Use" -> Custom
+  if (normalized.includes("personal")) return "all-rights-reserved"; // "Personal Use" -> All Rights Reserved (closest safe default)
+  if (normalized.includes("open source") || normalized === "mit" || normalized === "apache-2.0") return "custom";
+
+  return "all-rights-reserved"; // Default fallback
 }
 
 export function useCollectionMetadata(collectionAddress: string) {

@@ -70,7 +70,7 @@ export default function CollectionsPage() {
                     {loadingMore ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin text-primary" />
-                        Loading more...
+                        Loading onchain...
                       </>
                     ) : (
                       "Load More Collections"
@@ -92,9 +92,9 @@ export default function CollectionsPage() {
               <Grid3X3 className="h-10 w-10 text-muted-foreground/50" />
             </div>
             <div className="space-y-2 max-w-md">
-              <h3 className="text-xl font-bold">No collections found</h3>
+              <h3 className="text-xl font-bold">Onchain collections</h3>
               <p className="text-muted-foreground">
-                There are no collections available yet. Be the first to create one!
+                No collections found onchain yet.
               </p>
             </div>
             <Button asChild size="lg" className="mt-4">
@@ -119,12 +119,12 @@ function CollectionsSkeleton() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 justify-between">
-        <Skeleton className="h-10 w-full sm:w-[350px]" />
+        <Skeleton className="glass h-10 w-full sm:w-[350px]" />
         <div className="flex gap-2">
-          <Skeleton className="h-10 w-10" />
-          <Skeleton className="h-10 w-10" />
-          <Skeleton className="h-10 w-10" />
-          <Skeleton className="h-10 w-36" />
+          <Skeleton className="glass h-10 w-10" />
+          <Skeleton className="glass h-10 w-10" />
+          <Skeleton className="glass h-10 w-10" />
+          <Skeleton className="glass h-10 w-36" />
         </div>
       </div>
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">

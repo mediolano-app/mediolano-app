@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Shield, Globe, FileText, CreativeCommons } from "lucide-react"
+import { Globe } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
 interface LicensingOptionsProps {
@@ -13,50 +13,9 @@ interface LicensingOptionsProps {
   updateFormField: (field: string, value: any) => void
 }
 
-const licenseTypes = [
-  {
-    id: "all-rights-reserved",
-    name: "All Rights Reserved",
-    description: "Full copyright protection. You retain all rights to your work.",
-    icon: Shield,
-    recommended: true,
-  },
-  {
-    id: "cc-by",
-    name: "Creative Commons BY",
-    description: "Others can distribute, remix, and build upon your work, with attribution.",
-    icon: CreativeCommons,
-  },
-  {
-    id: "cc-by-sa",
-    name: "Creative Commons BY-SA",
-    description: "Others can remix and build upon your work with attribution and same license.",
-    icon: CreativeCommons,
-  },
-  {
-    id: "cc-by-nc",
-    name: "Creative Commons BY-NC",
-    description: "Others can use your work non-commercially with attribution.",
-    icon: CreativeCommons,
-  },
-  {
-    id: "custom",
-    name: "Custom License",
-    description: "Define your own licensing terms and conditions.",
-    icon: FileText,
-    recommended: false,
-  },
-]
+import { licenseTypes, geographicScopes } from "@/types/asset"
 
-const geographicScopes = [
-  { value: "worldwide", label: "Worldwide" },
-  { value: "us", label: "United States" },
-  { value: "eu", label: "European Union" },
-  { value: "uk", label: "United Kingdom" },
-  { value: "canada", label: "Canada" },
-  { value: "australia", label: "Australia" },
-  { value: "other", label: "Other" },
-]
+
 
 export function LicensingOptions({ formState, updateFormField }: LicensingOptionsProps) {
   const selectedLicense = licenseTypes.find((license) => license.id === formState.licenseType) || licenseTypes[0]

@@ -1,3 +1,5 @@
+import { Shield, CreativeCommons, FileText, Globe } from "lucide-react";
+
 export interface Asset {
   id: string;
   name: string;
@@ -324,14 +326,57 @@ export type IPType =
   | "RWA"
   | "Software"
   | "NFT"
-  | "Custom";
+  | "Post";
 
-export type LicenseType =
-  | "Creative Commons"
-  | "Commercial Use"
-  | "Personal Use"
-  | "Exclusive Rights"
-  | "Open Source";
+export const licenseTypes = [
+  {
+    id: "all-rights-reserved",
+    name: "All Rights Reserved",
+    description: "Full copyright protection. You retain all rights to your work.",
+    icon: Shield,
+    recommended: true,
+  },
+  {
+    id: "cc-by",
+    name: "Creative Commons BY",
+    description: "Others can distribute, remix, and build upon your work, with attribution.",
+    icon: CreativeCommons,
+    recommended: false,
+  },
+  {
+    id: "cc-by-sa",
+    name: "Creative Commons BY-SA",
+    description: "Others can remix and build upon your work with attribution and same license.",
+    icon: CreativeCommons,
+    recommended: false,
+  },
+  {
+    id: "cc-by-nc",
+    name: "Creative Commons BY-NC",
+    description: "Others can use your work non-commercially with attribution.",
+    icon: CreativeCommons,
+    recommended: false,
+  },
+  {
+    id: "custom",
+    name: "Custom License",
+    description: "Define your own licensing terms and conditions.",
+    icon: FileText,
+    recommended: false,
+  },
+] as const;
+
+export const geographicScopes = [
+  { value: "worldwide", label: "Worldwide" },
+  { value: "us", label: "United States" },
+  { value: "eu", label: "European Union" },
+  { value: "uk", label: "United Kingdom" },
+  { value: "canada", label: "Canada" },
+  { value: "australia", label: "Australia" },
+  { value: "other", label: "Other" },
+] as const;
+
+export type LicenseType = typeof licenseTypes[number]["id"];
 
 export interface Creator {
   id: string;
@@ -360,7 +405,7 @@ export interface Creator {
 export interface OwnershipRecord {
   owner: string;
   acquiredDate: string;
-  transferType: "Creation" | "Purchase" | "License" | "Gift";
+  transferType: "Creation" | "Purchase" | "License" | "Gift" | "Received";
 }
 
 export interface LicensingTerms {

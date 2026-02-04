@@ -122,7 +122,7 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
     const isOwner = true; // Since this is "My Assets", the user is the owner.
 
     return (
-        <Card className="overflow-hidden group glass">
+        <Card className="overflow-hidden group glass-card">
             <Link href={`/asset/${nftAddress}-${asset.token_id}`}>
                 <div className="aspect-square relative bg-muted/50 overflow-hidden cursor-pointer">
                     <Image
@@ -153,7 +153,6 @@ function AssetCard({ asset, collectionName, nftAddress }: { asset: TokenData; co
                 <div className="pt-2 flex gap-2">
                     <Button asChild variant="outline" size="sm" className="flex-1 h-8 text-xs gap-1">
                         <Link href={`/asset/${nftAddress}-${asset.token_id}`}>
-                            <Box className="mr-2 h-4 w-4" />
                             View Asset
                         </Link>
                     </Button>

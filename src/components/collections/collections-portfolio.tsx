@@ -236,7 +236,7 @@ function CollectionCard({ collection }: CollectionCardProps) {
           </div>
           <div className="flex items-center gap-1 text-sm">
             <Box className="h-4 w-4 text-muted-foreground" />
-            <span>IP Type</span>
+            <span>{collection.type || "Art"}</span>
           </div>
         </div>
       </CardFooter>

@@ -39,6 +39,7 @@ import { ipCollectionAbi } from "@/abis/ip_collection"
 import { COLLECTION_CONTRACT_ADDRESS } from "@/lib/constants"
 import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer"
 import { IMintResult } from "@/hooks/use-create-asset"
+import { licenseTypes, geographicScopes } from "@/types/asset"
 
 const remixTypes = [
     {
@@ -61,43 +62,7 @@ const remixTypes = [
     },
 ]
 
-const licenseOptions = [
-    {
-        id: "property-rights",
-        name: "Property Rights",
-        description: "You own all rights to the work",
-        allowCommercial: true,
-        allowDerivatives: true,
-    },
-    {
-        id: "cc-by",
-        name: "Creative Commons BY",
-        description: "Attribution required",
-        allowCommercial: true,
-        allowDerivatives: true,
-    },
-    {
-        id: "cc-by-sa",
-        name: "Creative Commons BY-SA",
-        description: "Attribution + Share Alike",
-        allowCommercial: true,
-        allowDerivatives: true,
-    },
-    {
-        id: "cc-by-nc",
-        name: "Creative Commons BY-NC",
-        description: "Attribution + Non-Commercial",
-        allowCommercial: false,
-        allowDerivatives: true,
-    },
-    {
-        id: "mit",
-        name: "MIT License",
-        description: "Permissive open source license",
-        allowCommercial: true,
-        allowDerivatives: true,
-    },
-]
+
 
 interface RemixAssetFormProps {
     nftAddress: string
@@ -158,6 +123,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
         requireAttribution: true,
         tags: "",
         // Extended License
+        geographicScope: "worldwide",
         territory: "",
         fieldOfUse: "",
         licenseDuration: "perpetual",
@@ -199,7 +165,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
     // Utility 
     const getCompatibleLicense = (originalLicense: string) => {
         if (originalLicense.includes("Creative Commons")) return "cc-by"
-        if (originalLicense.includes("MIT")) return "mit"
+        if (originalLicense.includes("MIT")) return "custom"
         return "cc-by" // Default
     }
 
@@ -278,12 +244,14 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                     { trait_type: "Original Asset", value: `${nftAddress}-${tokenId}` },
                     { trait_type: "Original Creator", value: originalAsset?.creator?.name || originalAsset?.creator?.address || "Unknown" },
                     { trait_type: "Original Asset Address", value: nftAddress },
-                    { trait_type: "License", value: licenseOptions.find(l => l.id === formData.license)?.name || "Unknown" },
+                    { trait_type: "License", value: formData.license },
                     { trait_type: "Commercial Use", value: formData.allowCommercial ? "True" : "False" },
                     { trait_type: "Remixed From", value: `${nftAddress}` },
                     {
                         trait_type: "Geographic Scope",
-                        value: formData.territory ? `Restricted - ${formData.territory}` : "Worldwide"
+                        value: formData.geographicScope === "custom" || formData.geographicScope === "other" || formData.geographicScope === "eu"
+                            ? `${formData.geographicScope} - ${formData.territory}`
+                            : formData.geographicScope
                     },
                     { trait_type: "License Duration", value: formData.licenseDuration || "Perpetual" },
                     { trait_type: "Field of Use", value: formData.fieldOfUse || "Unrestricted" },
@@ -405,7 +373,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
     }
 
     const getSelectedLicense = () => {
-        return licenseOptions.find((license) => license.id === formData.license)
+        return licenseTypes.find((license) => license.id === formData.license)
     }
 
     if (assetLoading) {
@@ -678,7 +646,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                                     <SelectValue placeholder="Select a license" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {licenseOptions.map((license) => (
+                                    {licenseTypes.map((license) => (
                                         <SelectItem key={license.id} value={license.id}>
                                             <div>
                                                 <div className="font-medium">{license.name}</div>
@@ -690,15 +658,36 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                             </Select>
                         </div>
 
-                        {/* Specific Territory */}
-                        <div className="space-y-2">
-                            <Label htmlFor="territory" className="text-sm font-medium">Specific Territory (Optional)</Label>
-                            <Input
-                                id="territory"
-                                placeholder="Worldwide if left empty, or e.g. Germany, France..."
-                                value={formData.territory}
-                                onChange={(e) => setFormData((prev) => ({ ...prev, territory: e.target.value }))}
-                            />
+                        {/* Geographic Scope */}
+                        <div className="space-y-3">
+                            <Label>Geographic Protection Scope</Label>
+                            <Select
+                                value={formData.geographicScope}
+                                onValueChange={(value) => setFormData((prev) => ({ ...prev, geographicScope: value }))}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select geographic scope" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {geographicScopes.map((scope) => (
+                                        <SelectItem key={scope.value} value={scope.value}>
+                                            {scope.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {(formData.geographicScope === "other" || formData.geographicScope === "custom" || formData.geographicScope === "eu") && (
+                                <div className="space-y-2">
+                                    <Label htmlFor="territory" className="text-sm font-medium">Specific Territory</Label>
+                                    <Input
+                                        id="territory"
+                                        placeholder="e.g. Germany, France, Japan..."
+                                        value={formData.territory}
+                                        onChange={(e) => setFormData((prev) => ({ ...prev, territory: e.target.value }))}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         {/* Field of Use */}
@@ -798,7 +787,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 previewImage={drawerPreviewImage}
                 data={{
                     "Remix Type": remixTypes.find(t => t.id === formData.remixType)?.name || "Unknown",
-                    "License": licenseOptions.find(l => l.id === formData.license)?.name || "Unknown",
+                    "License": licenseTypes.find(l => l.id === formData.license)?.name || "Unknown",
                     "Collection": selectedCollection?.name || "Unknown"
                 }}
             />
