@@ -14,7 +14,9 @@ import {
   PlusCircle,
   Moon,
   Sun,
-  Laptop
+  Laptop,
+  GitBranch,
+  ArrowRightLeft
 } from "lucide-react"
 
 import {
@@ -41,8 +43,15 @@ export function CommandMenu() {
       }
     }
 
+    const openMenu = () => setOpen(true)
+
     document.addEventListener("keydown", down)
-    return () => document.removeEventListener("keydown", down)
+    document.addEventListener("openCommandMenu", openMenu)
+
+    return () => {
+      document.removeEventListener("keydown", down)
+      document.removeEventListener("openCommandMenu", openMenu)
+    }
   }, [])
 
   const runCommand = React.useCallback((command: () => unknown) => {
@@ -63,6 +72,14 @@ export function CommandMenu() {
           <CommandItem onSelect={() => runCommand(() => router.push("/create/collection"))}>
             <LayoutGrid className="mr-2 h-4 w-4" />
             <span>Create Collection</span>
+          </CommandItem>
+          <CommandItem onSelect={() => runCommand(() => router.push("/create/remix"))}>
+            <GitBranch className="mr-2 h-4 w-4" />
+            <span>Create Remix</span>
+          </CommandItem>
+          <CommandItem onSelect={() => runCommand(() => router.push("/transfer"))}>
+            <ArrowRightLeft className="mr-2 h-4 w-4" />
+            <span>Transfer Asset</span>
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push("/portfolio"))}>
             <User className="mr-2 h-4 w-4" />
