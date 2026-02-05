@@ -4,17 +4,15 @@ import React, { useState, useEffect, useMemo } from "react"
 import { useAccount, useContract, useSendTransaction, useProvider } from "@starknet-react/core"
 import { useRouter } from "next/navigation"
 import { Abi, num, hash } from "starknet"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Slider } from "@/components/ui/slider"
-import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
     ArrowLeft,
@@ -28,6 +26,9 @@ import {
     Loader2,
     Plus,
     ExternalLink,
+    FileText,
+    Globe,
+    Layers
 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -40,6 +41,7 @@ import { COLLECTION_CONTRACT_ADDRESS } from "@/lib/constants"
 import { MintSuccessDrawer, MintDrawerStep } from "@/components/mint-success-drawer"
 import { IMintResult } from "@/hooks/use-create-asset"
 import { licenseTypes, geographicScopes } from "@/types/asset"
+import { cn, shortenAddress } from "@/lib/utils"
 
 const remixTypes = [
     {
@@ -62,19 +64,9 @@ const remixTypes = [
     },
 ]
 
-
-
 interface RemixAssetFormProps {
     nftAddress: string
     tokenId: number
-}
-
-// Helper to truncate long addresses
-const formatAddress = (address?: string) => {
-    if (!address) return "Unknown"
-    // If it's short already, return as is
-    if (address.length < 12) return address
-    return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
 
 export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
@@ -104,6 +96,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
     const [creationStep, setCreationStep] = useState<MintDrawerStep>("idle")
     const [progress, setProgress] = useState(0)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [transactionHash, setTransactionHash] = useState<string | null>(null)
     const [mintError, setMintError] = useState<string | null>(null)
     const [mintResult, setMintResult] = useState<IMintResult | null>(null)
@@ -302,11 +295,13 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 let mintedId = "";
                 // @ts-ignore
                 const tokenMintedSelector = hash.getSelectorFromName("TokenMinted");
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const transferSelector = hash.getSelectorFromName("Transfer");
 
                 // @ts-ignore
                 if (receipt.events) {
                     // @ts-ignore
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const event = receipt.events.find((e: any) =>
                         e.keys?.[0] === transferSelector ||
                         e.keys?.[0] === tokenMintedSelector
@@ -368,14 +363,6 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
         return formData.name && formData.description && formData.remixType && formData.license && selectedCollectionId
     }
 
-    const getSelectedRemixType = () => {
-        return remixTypes.find((type) => type.id === formData.remixType)
-    }
-
-    const getSelectedLicense = () => {
-        return licenseTypes.find((license) => license.id === formData.license)
-    }
-
     if (assetLoading) {
         return (
             <div className="flex items-center justify-center min-h-[50vh]">
@@ -386,12 +373,15 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
 
     if (assetError || !originalAsset) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center space-y-4">
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="text-center space-y-4 p-8 glass-card max-w-md mx-auto">
+                    <div className="h-16 w-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlertDescription className="h-8 w-8 text-red-500" />
+                    </div>
                     <h1 className="text-3xl font-bold">Asset Not Found</h1>
-                    <p className="text-muted-foreground">Original asset could not be loaded.</p>
+                    <p className="text-muted-foreground">Original asset could not be loaded or network issue.</p>
                     <Link href="/">
-                        <Button>
+                        <Button className="glass-button">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to Home
                         </Button>
@@ -402,201 +392,249 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left Column - Original Asset Reference */}
-            <div className="lg:col-span-1">
-                <div className="sticky top-24 space-y-6">
-                    {/* Original Asset Card */}
-                    <Card className="glass-card">
-                        <CardHeader>
-                            <CardTitle className="flex items-center justify-between gap-2">
-                                <div className="flex items-center gap-2">
-                                    <GitBranch className="h-5 w-5" />
+            <div className="lg:col-span-4 space-y-6">
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                >
+                    <div className="glass-card overflow-hidden">
+                        <div className="p-6 border-b border-white/5 space-y-2">
+                            <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                    <GitBranch className="h-4 w-4" />
                                     Original Asset
                                 </div>
                                 <Link href={`/asset/${nftAddress}-${tokenId}`} target="_blank">
-                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-white/10 rounded-full">
                                         <ExternalLink className="h-4 w-4" />
                                         <span className="sr-only">View Original</span>
                                     </Button>
                                 </Link>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="aspect-square relative bg-gradient-to-br from-muted/50 to-muted rounded-lg overflow-hidden">
-                                <Image
-                                    src={originalAsset.image || "/placeholder.svg"}
-                                    alt={originalAsset.name || "Asset"}
-                                    fill
-                                    className="object-cover"
-                                    sizes="(max-width: 1024px) 100vw, 33vw"
-                                />
+                            </div>
+                            <h2 className="font-bold text-xl line-clamp-1">{originalAsset.name}</h2>
+                        </div>
+
+                        <div className="aspect-square relative bg-white/5">
+                            <Image
+                                src={originalAsset.image || "/placeholder.svg"}
+                                alt={originalAsset.name || "Asset"}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 1024px) 100vw, 33vw"
+                            />
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            <div className="space-y-1">
+                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">License Model</span>
+                                <div className="flex items-center gap-2 p-2 rounded-lg bg-white/5 border border-white/10">
+                                    <FileText className="h-4 w-4 text-primary" />
+                                    <span className="text-sm font-medium">
+                                        {/* Correctly traversing attributes for license type */}
+                                        {originalAsset.attributes?.find(a => a.trait_type === "License Type")?.value || originalAsset.licenseType || 'Unknown'}
+                                    </span>
+                                </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <h2 className="font-semibold line-clamp-1">{originalAsset.name}</h2>
-                            </div>
-
-                            <div className="space-y-2">
-                                <h4 className="font-medium text-sm">License: {originalAsset.licenseType || 'Unknown'}</h4>
-                                <Badge variant="outline">This license allows remixing with proper attribution.</Badge>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Attribution Notice */}
-                    <Alert className="glass-card">
-                        <Info className="h-4 w-4" />
-                        <AlertDescription>
-                            Your remix will automatically include attribution to the original asset and creator.
-                        </AlertDescription>
-                    </Alert>
-                </div>
+                            <Alert className="glass bg-primary/10 border-primary/20">
+                                <Info className="h-4 w-4 text-primary" />
+                                <AlertDescription className="text-xs text-primary/80 ml-2">
+                                    Remixes automatically attribute the original creator.
+                                </AlertDescription>
+                            </Alert>
+                        </div>
+                    </div>
+                </motion.div>
             </div>
 
             {/* Right Column - Remix Form */}
-            <div className="lg:col-span-2 space-y-8 bg-card/20 no-border rounded-xl p-4">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="lg:col-span-8 space-y-8"
+            >
 
                 {/* Collection Selection */}
-                <Card className="glass-card">
-                    <CardHeader>
-                        <CardTitle>Destination Collection</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-2">
-                            <Label htmlFor="collection">Select Collection</Label>
-                            <div className="flex gap-2">
-                                <Select
-                                    value={selectedCollectionId}
-                                    onValueChange={setSelectedCollectionId}
-                                >
-                                    <SelectTrigger className="flex-1">
-                                        <SelectValue placeholder="Select a collection" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {collections.map((collection) => (
-                                            <SelectItem key={collection.id.toString()} value={collection.id.toString()}>
-                                                {collection.name}
-                                            </SelectItem>
-                                        ))}
-                                        {collectionsLoading && (
-                                            <div className="p-2 text-sm text-muted-foreground text-center flex items-center justify-center gap-2">
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                                Loading...
-                                            </div>
-                                        )}
-                                        {!collectionsLoading && collections.length === 0 && (
-                                            <div className="p-2 text-sm text-muted-foreground text-center">
-                                                No collections found
-                                            </div>
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                                <Button variant="outline" size="icon" asChild>
-                                    <Link href="/create/collection" target="_blank">
-                                        <Plus className="h-4 w-4" />
-                                    </Link>
-                                </Button>
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                Select an existing collection to mint your remix into, or create a new one.
-                            </p>
+                <div className="glass-card p-6 md:p-8 space-y-6">
+                    <div className="space-y-1">
+                        <h3 className="text-lg font-bold flex items-center gap-2">
+                            <Layers className="h-5 w-5 text-primary" />
+                            Destination Collection
+                        </h3>
+                        <p className="text-sm text-muted-foreground">Where should this remix live?</p>
+                    </div>
+
+                    <div className="flex gap-4 items-start">
+                        <div className="flex-1 space-y-2">
+                            <Label htmlFor="collection" className="sr-only">Select Collection</Label>
+                            <Select
+                                value={selectedCollectionId}
+                                onValueChange={setSelectedCollectionId}
+                            >
+                                <SelectTrigger className="h-12 bg-white/5 border-white/10 focus:ring-primary/50">
+                                    <SelectValue placeholder="Select a collection..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {collections.map((collection) => (
+                                        <SelectItem key={collection.id.toString()} value={collection.id.toString()}>
+                                            {collection.name}
+                                        </SelectItem>
+                                    ))}
+                                    {collectionsLoading && (
+                                        <div className="p-2 text-sm text-muted-foreground text-center flex items-center justify-center gap-2">
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            Loading...
+                                        </div>
+                                    )}
+                                    {!collectionsLoading && collections.length === 0 && (
+                                        <div className="p-2 text-sm text-muted-foreground text-center">
+                                            No collections found
+                                        </div>
+                                    )}
+                                </SelectContent>
+                            </Select>
                         </div>
-                    </CardContent>
-                </Card>
+                        <Button variant="outline" size="icon" className="h-12 w-12 shrink-0 glass-button" asChild title="Create New Collection">
+                            <Link href="/create/collection" target="_blank">
+                                <Plus className="h-5 w-5" />
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
 
                 {/* Remix Type Selection */}
-                <Card className="glass-card">
-                    <CardHeader>
-                        <CardTitle>Remix Type</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <RadioGroup
-                            value={formData.remixType}
-                            onValueChange={(value) => setFormData((prev) => ({ ...prev, remixType: value }))}
-                        >
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {remixTypes.map((type) => (
-                                    <div key={type.id} className="flex items-center space-x-2">
-                                        <RadioGroupItem value={type.id} id={type.id} />
-                                        <Label htmlFor={type.id} className="flex-1 cursor-pointer">
-                                            <div className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <type.icon className="h-4 w-4" />
-                                                    <span className="font-medium">{type.name}</span>
-                                                </div>
-                                                <p className="text-xs text-muted-foreground">{type.description}</p>
-                                            </div>
-                                        </Label>
+                <div className="glass-card p-6 md:p-8 space-y-6">
+                    <div className="space-y-1">
+                        <h3 className="text-lg font-bold flex items-center gap-2">
+                            <GitBranch className="h-5 w-5 text-primary" />
+                            Remix Type
+                        </h3>
+                        <p className="text-sm text-muted-foreground">How have you modified the work?</p>
+                    </div>
+
+                    <RadioGroup
+                        value={formData.remixType}
+                        onValueChange={(value) => setFormData((prev) => ({ ...prev, remixType: value }))}
+                        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                    >
+                        {remixTypes.map((type) => (
+                            <Label
+                                key={type.id}
+                                htmlFor={type.id}
+                                className={cn(
+                                    "cursor-pointer relative overflow-hidden rounded-xl border-2 p-4 transition-all hover:bg-white/5",
+                                    formData.remixType === type.id
+                                        ? "border-primary bg-primary/5 text-primary shadow-sm"
+                                        : "border-transparent bg-white/5 hover:border-white/20"
+                                )}
+                            >
+                                <RadioGroupItem value={type.id} id={type.id} className="sr-only" />
+                                <div className="space-y-3">
+                                    <div className={cn(
+                                        "h-10 w-10 rounded-full flex items-center justify-center transition-colors",
+                                        formData.remixType === type.id ? "bg-primary text-primary-foreground" : "bg-white/10"
+                                    )}>
+                                        <type.icon className="h-5 w-5" />
                                     </div>
-                                ))}
-                            </div>
-                        </RadioGroup>
-                    </CardContent>
-                </Card>
+                                    <div className="space-y-1">
+                                        <div className="font-semibold text-sm">{type.name}</div>
+                                        <p className="text-xs text-muted-foreground leading-snug">{type.description}</p>
+                                    </div>
+                                </div>
+                            </Label>
+                        ))}
+                    </RadioGroup>
+                </div>
 
                 {/* File Upload */}
-                <Card className="glass-card">
-                    <CardHeader>
-                        <CardTitle>
-                            Upload Your Remix
-                            <span className="ml-2 text-sm text-muted-foreground font-normal">(Optional)</span>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div
-                            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25"
-                                }`}
-                            onDragEnter={handleDrag}
-                            onDragLeave={handleDrag}
-                            onDragOver={handleDrag}
-                            onDrop={handleDrop}
-                        >
-                            {uploadedFile ? (
-                                <div className="space-y-4">
-                                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto" />
-                                    <div>
-                                        <p className="font-medium">{uploadedFile.name}</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                                        </p>
-                                    </div>
-                                    <Button type="button" variant="outline" onClick={() => setUploadedFile(null)}>
-                                        Remove File
-                                    </Button>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    <Upload className="h-12 w-12 text-muted-foreground mx-auto" />
-                                    <div>
-                                        <p className="font-medium">Drop your file here or click to browse</p>
-                                        <p className="text-sm text-muted-foreground">Supports images, audio, video, and documents</p>
-                                        <p className="text-xs text-muted-foreground">If skipped, existing asset image will be used.</p>
-                                    </div>
-                                    <input
-                                        type="file"
-                                        className="hidden"
-                                        id="file-upload"
-                                        onChange={(e) => handleFileUpload(e.target.files)}
-                                        accept="image/*,audio/*,video/*,.pdf,.doc,.docx"
-                                    />
-                                    <Button type="button" variant="outline" asChild>
-                                        <label htmlFor="file-upload" className="cursor-pointer">
-                                            Choose File
-                                        </label>
-                                    </Button>
-                                </div>
-                            )}
+                <div className="glass-card p-6 md:p-8 space-y-6">
+                    <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-bold flex items-center gap-2">
+                                <Upload className="h-5 w-5 text-primary" />
+                                Upload Your Remix
+                            </h3>
+                            <Badge variant="secondary" className="font-normal text-xs bg-white/10 text-muted-foreground">Optional</Badge>
                         </div>
-                    </CardContent>
-                </Card>
+                        <p className="text-sm text-muted-foreground">If skipped, we&apos;ll use the original asset image.</p>
+                    </div>
+
+                    <div
+                        className={cn(
+                            "border-2 border-dashed rounded-xl p-10 text-center transition-all duration-300 ease-in-out",
+                            dragActive ? "border-primary bg-primary/10 scale-[1.01]" : "border-white/10 bg-white/5 hover:border-white/20",
+                            uploadedFile ? "border-green-500/50 bg-green-500/5" : ""
+                        )}
+                        onDragEnter={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDragOver={handleDrag}
+                        onDrop={handleDrop}
+                    >
+                        {uploadedFile ? (
+                            <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
+                                {uploadedFile.type.startsWith("image/") || uploadedFile.type.startsWith("img") ? (
+                                    <div className="relative h-48 w-full max-w-[300px] mx-auto rounded-lg overflow-hidden border border-white/10 shadow-lg mb-4">
+                                        <Image
+                                            src={uploadedFile.previewUrl}
+                                            alt={uploadedFile.name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="h-16 w-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto text-green-500">
+                                        <CheckCircle className="h-8 w-8" />
+                                    </div>
+                                )}
+                                <div>
+                                    <p className="font-medium text-lg">{uploadedFile.name}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                                    </p>
+                                </div>
+                                <Button type="button" variant="outline" onClick={() => setUploadedFile(null)} className="glass-button">
+                                    Replace File
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="h-16 w-16 bg-white/10 rounded-full flex items-center justify-center mx-auto text-muted-foreground">
+                                    <Upload className="h-8 w-8" />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-lg">Drag & Drop your file</p>
+                                    <p className="text-sm text-muted-foreground">Supports images, audio, video, documents</p>
+                                </div>
+                                <input
+                                    type="file"
+                                    className="hidden"
+                                    id="file-upload"
+                                    onChange={(e) => handleFileUpload(e.target.files)}
+                                    accept="image/*,audio/*,video/*,.pdf,.doc,.docx"
+                                />
+                                <Button type="button" variant="secondary" asChild className="glass-button">
+                                    <label htmlFor="file-upload" className="cursor-pointer">
+                                        Browse Files
+                                    </label>
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 {/* Remix Details */}
-                <Card className="glass-card">
-                    <CardHeader>
-                        <CardTitle>Remix Details</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                <div className="glass-card p-6 md:p-8 space-y-6">
+                    <div className="space-y-1">
+                        <h3 className="text-lg font-bold flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-primary" />
+                            Remix Details
+                        </h3>
+                    </div>
+
+                    <div className="grid gap-6">
                         <div className="space-y-2">
                             <Label htmlFor="name">Name</Label>
                             <Input
@@ -604,6 +642,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                                 value={formData.name}
                                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                                 placeholder="Enter remix name"
+                                className="bg-white/5 border-white/10 focus:ring-primary/50 h-11"
                             />
                         </div>
 
@@ -615,162 +654,163 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                                 onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                                 placeholder="Describe your remix and how it relates to the original"
                                 rows={4}
+                                className="bg-white/5 border-white/10 focus:ring-primary/50 resize-none"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="tags">Tags (optional)</Label>
+                            <Label htmlFor="tags">Tags <span className="text-muted-foreground font-normal">(comma separated)</span></Label>
                             <Input
                                 id="tags"
                                 value={formData.tags}
                                 onChange={(e) => setFormData((prev) => ({ ...prev, tags: e.target.value }))}
-                                placeholder="remix, derivative, art, music (comma separated)"
+                                placeholder="remix, cyber, abstract..."
+                                className="bg-white/5 border-white/10 focus:ring-primary/50 h-11"
                             />
                         </div>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
 
                 {/* License Configuration */}
-                <Card className="glass-card">
-                    <CardHeader>
-                        <CardTitle>License Configuration</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="space-y-2">
-                            <Label>License Type</Label>
-                            <Select
-                                value={formData.license}
-                                onValueChange={(value) => setFormData((prev) => ({ ...prev, license: value }))}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a license" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {licenseTypes.map((license) => (
-                                        <SelectItem key={license.id} value={license.id}>
-                                            <div>
-                                                <div className="font-medium">{license.name}</div>
-                                                <div className="text-xs text-muted-foreground">{license.description}</div>
-                                            </div>
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                <div className="glass-card p-6 md:p-8 space-y-6">
+                    <div className="space-y-1">
+                        <h3 className="text-lg font-bold flex items-center gap-2">
+                            <Globe className="h-5 w-5 text-primary" />
+                            License Configuration
+                        </h3>
+                        <p className="text-sm text-muted-foreground">Define how others can use your remix.</p>
+                    </div>
 
-                        {/* Geographic Scope */}
-                        <div className="space-y-3">
-                            <Label>Geographic Protection Scope</Label>
-                            <Select
-                                value={formData.geographicScope}
-                                onValueChange={(value) => setFormData((prev) => ({ ...prev, geographicScope: value }))}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select geographic scope" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {geographicScopes.map((scope) => (
-                                        <SelectItem key={scope.value} value={scope.value}>
-                                            {scope.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            {(formData.geographicScope === "other" || formData.geographicScope === "custom" || formData.geographicScope === "eu") && (
-                                <div className="space-y-2">
-                                    <Label htmlFor="territory" className="text-sm font-medium">Specific Territory</Label>
-                                    <Input
-                                        id="territory"
-                                        placeholder="e.g. Germany, France, Japan..."
-                                        value={formData.territory}
-                                        onChange={(e) => setFormData((prev) => ({ ...prev, territory: e.target.value }))}
-                                    />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Field of Use */}
-                        <div className="space-y-2">
-                            <Label htmlFor="fieldOfUse" className="text-base font-medium">Field of Use</Label>
-                            <Textarea
-                                id="fieldOfUse"
-                                placeholder="Specify industries or applications (e.g. Medical devices)..."
-                                value={formData.fieldOfUse}
-                                onChange={(e) => setFormData((prev) => ({ ...prev, fieldOfUse: e.target.value }))}
-                                className="resize-none"
-                            />
-                        </div>
-
-                        {/* Duration */}
-                        <div className="space-y-2">
-                            <Label htmlFor="licenseDuration" className="text-base font-medium">License Duration</Label>
-                            <Input
-                                id="licenseDuration"
-                                placeholder="e.g. Perpetual, 5 years, until 2030..."
-                                value={formData.licenseDuration}
-                                onChange={(e) => setFormData((prev) => ({ ...prev, licenseDuration: e.target.value }))}
-                            />
-                        </div>
-
-                        {/* Advanced Clauses & AI */}
-                        <div className="space-y-4 pt-4 border-t">
-                            <h4 className="font-medium text-base">Advanced Clauses</h4>
+                    <div className="grid gap-6">
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label>License Type</Label>
+                                <Select
+                                    value={formData.license}
+                                    onValueChange={(value) => setFormData((prev) => ({ ...prev, license: value }))}
+                                >
+                                    <SelectTrigger className="bg-white/5 border-white/10 focus:ring-primary/50 h-11">
+                                        <SelectValue placeholder="Select license" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {licenseTypes.map((license) => (
+                                            <SelectItem key={license.id} value={license.id}>
+                                                <span className="font-medium">{license.name}</span>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="grantBack" className="text-base font-medium">Grant-back Clause</Label>
-                                <Input
-                                    id="grantBack"
-                                    placeholder="e.g. Licensee must grant back rights to improvements..."
-                                    value={formData.grantBack}
-                                    onChange={(e) => setFormData((prev) => ({ ...prev, grantBack: e.target.value }))}
-                                />
-                                <p className="text-sm text-muted-foreground">
-                                    Specify conditions for improvements made to the IP.
-                                </p>
-                            </div>
-
-                            <div className="space-y-2 pt-2">
-                                <Label htmlFor="aiRights" className="text-base font-medium">AI & Data Mining Policy</Label>
-                                <Input
-                                    id="aiRights"
-                                    placeholder="e.g. No AI Training allowed, Zero Retention required..."
-                                    value={formData.aiRights}
-                                    onChange={(e) => setFormData((prev) => ({ ...prev, aiRights: e.target.value }))}
-                                />
-                                <p className="text-sm text-muted-foreground">
-                                    Define rights regarding Artificial Intelligence training and data usage.
-                                </p>
+                                <Label>Geographic Scope</Label>
+                                <Select
+                                    value={formData.geographicScope}
+                                    onValueChange={(value) => setFormData((prev) => ({ ...prev, geographicScope: value }))}
+                                >
+                                    <SelectTrigger className="bg-white/5 border-white/10 focus:ring-primary/50 h-11">
+                                        <SelectValue placeholder="Select scope" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {geographicScopes.map((scope) => (
+                                            <SelectItem key={scope.value} value={scope.value}>
+                                                {scope.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
+
+                        {(formData.geographicScope === "other" || formData.geographicScope === "custom" || formData.geographicScope === "eu") && (
+                            <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                                <Label htmlFor="territory">Specific Territory</Label>
+                                <Input
+                                    id="territory"
+                                    placeholder="e.g. Germany, France, Japan..."
+                                    value={formData.territory}
+                                    onChange={(e) => setFormData((prev) => ({ ...prev, territory: e.target.value }))}
+                                    className="bg-white/5 border-white/10 focus:ring-primary/50"
+                                />
+                            </div>
+                        )}
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="fieldOfUse">Field of Use</Label>
+                                <Input
+                                    id="fieldOfUse"
+                                    placeholder="e.g. Medical, Gaming..."
+                                    value={formData.fieldOfUse}
+                                    onChange={(e) => setFormData((prev) => ({ ...prev, fieldOfUse: e.target.value }))}
+                                    className="bg-white/5 border-white/10 focus:ring-primary/50 h-11"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="licenseDuration">Duration</Label>
+                                <Input
+                                    id="licenseDuration"
+                                    placeholder="e.g. Perpetual, 5 years..."
+                                    value={formData.licenseDuration}
+                                    onChange={(e) => setFormData((prev) => ({ ...prev, licenseDuration: e.target.value }))}
+                                    className="bg-white/5 border-white/10 focus:ring-primary/50 h-11"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Collapsible Advanced Section or simple divider */}
+                        <div className="pt-4 border-t border-white/5 space-y-4">
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <Label htmlFor="grantBack" className="text-xs uppercase tracking-wider text-muted-foreground">Grant-back Clause</Label>
+                                    <Input
+                                        id="grantBack"
+                                        placeholder="Conditions for improvements..."
+                                        value={formData.grantBack}
+                                        onChange={(e) => setFormData((prev) => ({ ...prev, grantBack: e.target.value }))}
+                                        className="bg-white/5 border-white/10 focus:ring-primary/50"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="aiRights" className="text-xs uppercase tracking-wider text-muted-foreground">AI & Data Policy</Label>
+                                    <Input
+                                        id="aiRights"
+                                        placeholder="AI Training allowed/prohibited..."
+                                        value={formData.aiRights}
+                                        onChange={(e) => setFormData((prev) => ({ ...prev, aiRights: e.target.value }))}
+                                        className="bg-white/5 border-white/10 focus:ring-primary/50"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Submit Section */}
-                <Card className="glass-card">
-                    <CardContent className="pt-6">
-                        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                            <div className="text-sm text-muted-foreground">
-                                <p>
-                                    Estimated cost: <span className="font-medium">0.001 STRK</span>
-                                </p>
-                                <p>Zero fees</p>
-                            </div>
+                {/* Submit Section */}
+                <div className="glass-card p-6 flex flex-col sm:flex-row gap-6 items-center justify-between z-20 backdrop-blur-xl border-primary/20 shadow-2xl">
+                    <div className="text-sm">
+                        <p className="text-muted-foreground">
+                            <span className="text-green-500">Mediolano Protocol + IP Creator = Zero fees</span>
+                            <br />
+                            Estimated transaction cost: <span className="font-medium text-foreground">0.001 STRK</span>
+                        </p>
+                    </div>
 
-                            <div className="flex gap-2">
-                                <Button type="button" variant="outline" asChild>
-                                    <Link href={`/collections/${nftAddress}`}>Cancel</Link>
-                                </Button>
+                    <div className="flex gap-4 w-full sm:w-auto">
 
-                                <Button onClick={handleSubmit} disabled={!isFormValid()} className="min-w-[120px]">
-                                    <Sparkles className="h-4 w-4 mr-2" />
-                                    Create Remix
-                                </Button>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
+                        <Button
+                            onClick={handleSubmit}
+                            disabled={!isFormValid()}
+                            className="flex-1 sm:flex-none min-w-[160px] shadow-lg hover:shadow-primary/20 transition-all font-semibold"
+                        >
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            Create Remix
+                        </Button>
+                    </div>
+                </div>
+
+            </motion.div>
 
             <MintSuccessDrawer
                 isOpen={isDrawerOpen}
@@ -780,7 +820,7 @@ export function RemixAssetForm({ nftAddress, tokenId }: RemixAssetFormProps) {
                 mintResult={mintResult}
                 assetTitle={formData.name}
                 assetDescription={formData.description}
-                assetType={`Remix of ${originalAsset.id}`}
+                assetType={`Remix of ${originalAsset.id && originalAsset.id.includes('-') ? shortenAddress(originalAsset.id.split('-')[0]) : originalAsset.name}`}
                 error={mintError}
                 onConfirm={handleConfirmTransaction}
                 cost="0.001 STRK"

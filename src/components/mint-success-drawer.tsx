@@ -150,7 +150,7 @@ export function MintSuccessDrawer({
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold truncate text-base">{assetTitle}</h4>
                     <p className="text-sm text-muted-foreground line-clamp-2">{assetDescription}</p>
-                    {assetType && <Badge variant="secondary" className="mt-2 text-xs">{assetType}</Badge>}
+                    {assetType && <Badge variant="secondary" className="mt-2 text-xs max-w-full truncate block w-fit">{assetType}</Badge>}
                   </div>
                 </div>
 
