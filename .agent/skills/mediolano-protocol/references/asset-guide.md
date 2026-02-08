@@ -263,29 +263,53 @@ await sendTransaction([batchBurnCall]);
 
 ## Asset Metadata
 
-### Standard Schema
+Mediolano follows **OpenSea/ERC-721 metadata standards** for marketplace interoperability. All IP-specific metadata is stored in the `attributes` array.
+
+### OpenSea-Compatible Schema
 
 ```json
 {
   "name": "Artwork Title",
   "description": "Description of the artwork",
   "image": "ipfs://QmImageCid",
-  "type": "art",
-  "external_url": "https://example.com/asset",
+  "external_url": "https://mediolano.app/asset/123",
   "attributes": [
-    { "trait_type": "Medium", "value": "Digital" },
-    { "trait_type": "Year", "value": 2024 },
-    { "trait_type": "Edition", "value": "1 of 10" }
-  ],
-  "properties": {
-    "files": [
-      { "uri": "ipfs://QmHighRes", "type": "image/png" }
-    ]
-  },
-  "licenseType": "CC-BY-4.0",
-  "registrationDate": "2024-01-01T00:00:00Z",
-  "tags": ["digital", "abstract", "colorful"]
+    { "trait_type": "Type", "value": "art" },
+    { "trait_type": "Author", "value": "Artist Name" },
+    { "trait_type": "License", "value": "CC-BY-4.0" },
+    { "trait_type": "License-Details", "value": "Attribution required" },
+    { "trait_type": "Commercial", "value": "Yes" },
+    { "trait_type": "Modifications", "value": "Allowed" },
+    { "trait_type": "Attribution", "value": "Required" },
+    { "trait_type": "Format", "value": "PNG" },
+    { "trait_type": "Dimensions", "value": "1920x1080" },
+    { "trait_type": "Created", "value": "2024" },
+    { "trait_type": "Tags", "value": "digital, abstract, colorful" },
+    { "trait_type": "Registration", "value": "2024-01-15" },
+    { "trait_type": "Status", "value": "Registered" },
+    { "trait_type": "Network", "value": "Starknet" }
+  ]
 }
+```
+
+### Reading Attributes
+
+```typescript
+// Find specific attributes
+const licenseAttr = asset.attributes?.find(a => a.trait_type === "License");
+const license = licenseAttr?.value || "Unknown";
+
+const typeAttr = asset.attributes?.find(a => a.trait_type === "Type");
+const type = typeAttr?.value || "Unknown";
+
+// Check specific conditions
+const isRemix = asset.attributes?.some(
+  a => a.trait_type === "Type" && a.value === "Remix"
+);
+
+const allowsCommercial = asset.attributes?.find(
+  a => a.trait_type === "Commercial"
+)?.value === "Yes";
 ```
 
 ### Fetching Metadata
@@ -298,6 +322,7 @@ const cid = extractCID(asset.tokenUri);
 const metadata = await fetchIPFSMetadata(cid);
 
 console.log('Metadata:', metadata);
+console.log('Attributes:', metadata.attributes);
 ```
 
 ---

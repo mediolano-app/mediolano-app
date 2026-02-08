@@ -45,25 +45,36 @@ Tokenization converts intellectual property into on-chain NFTs with:
 
 ### Metadata Preparation
 
+Metadata follows **OpenSea/ERC-721 standards**. All IP-specific fields are stored in the `attributes` array:
+
 ```typescript
 interface TokenizationInput {
-  // Required
+  // Top-level fields (OpenSea standard)
   name: string;           // Asset name
   description: string;    // Description
+  image: string;          // Cover image (IPFS URI)
+  external_url?: string;  // Link back to platform
   
-  // Recommended
-  image: string;          // Cover image (IPFS CID)
-  type: string;           // IP type
-  
-  // Optional
-  licenseType?: string;   // License identifier
-  attributes?: Array<{
+  // All other metadata goes in attributes
+  attributes: Array<{
     trait_type: string;
     value: string | number;
   }>;
-  tags?: string[];
-  externalUrl?: string;
 }
+
+// IP-specific attributes
+const ipAttributes = [
+  { trait_type: "Type", value: "art" },
+  { trait_type: "Author", value: "Creator Name" },
+  { trait_type: "License", value: "CC-BY-4.0" },
+  { trait_type: "License-Details", value: "Attribution required" },
+  { trait_type: "Commercial", value: "Yes" },
+  { trait_type: "Modifications", value: "Allowed" },
+  { trait_type: "Attribution", value: "Required" },
+  { trait_type: "Registration", value: "2024-01-15" },
+  { trait_type: "Status", value: "Registered" },
+  { trait_type: "Tags", value: "digital, art" },
+];
 ```
 
 ---
@@ -90,17 +101,40 @@ async function uploadContent(file: File) {
 ### Create & Upload Metadata
 
 ```typescript
-async function createMetadata(input: TokenizationInput, contentUri: string) {
+async function createMetadata(
+  name: string,
+  description: string, 
+  contentUri: string,
+  options: {
+    type: string;
+    author: string;
+    license: string;
+    licenseDetails?: string;
+    commercialUse?: boolean;
+    modifications?: string;
+    attribution?: string;
+    tags?: string[];
+  }
+) {
+  // Build OpenSea-compatible metadata
   const metadata = {
-    name: input.name,
-    description: input.description,
+    name,
+    description,
     image: contentUri,
-    type: input.type || 'general',
-    registrationDate: new Date().toISOString(),
-    attributes: input.attributes || [],
-    tags: input.tags || [],
-    licenseType: input.licenseType,
-    external_url: input.externalUrl,
+    external_url: `https://mediolano.app/asset/${Date.now()}`,
+    attributes: [
+      { trait_type: "Type", value: options.type },
+      { trait_type: "Author", value: options.author },
+      { trait_type: "License", value: options.license },
+      { trait_type: "License-Details", value: options.licenseDetails || "" },
+      { trait_type: "Commercial", value: options.commercialUse ? "Yes" : "No" },
+      { trait_type: "Modifications", value: options.modifications || "Not specified" },
+      { trait_type: "Attribution", value: options.attribution || "Not specified" },
+      { trait_type: "Tags", value: options.tags?.join(", ") || "" },
+      { trait_type: "Registration", value: new Date().toISOString().split("T")[0] },
+      { trait_type: "Status", value: "Registered" },
+      { trait_type: "Network", value: "Starknet" },
+    ],
   };
   
   const response = await pinata.upload.json(metadata);
@@ -220,6 +254,8 @@ async function tokenizeArtwork(
   file: File,
   name: string,
   description: string,
+  author: string,
+  license: string,
   collectionId: string,
   recipient: `0x${string}`
 ) {
@@ -228,18 +264,24 @@ async function tokenizeArtwork(
   const uploadResponse = await pinata.upload.file(file);
   const imageUri = `ipfs://${uploadResponse.IpfsHash}`;
   
-  // 2. Create metadata
+  // 2. Create OpenSea-compatible metadata
   console.log('📝 Creating metadata...');
   const metadata = {
     name,
     description,
     image: imageUri,
-    type: 'art',
-    registrationDate: new Date().toISOString(),
+    external_url: `https://mediolano.app/asset/${Date.now()}`,
     attributes: [
-      { trait_type: 'Format', value: file.type },
-      { trait_type: 'Size', value: `${(file.size / 1024).toFixed(1)} KB` }
-    ]
+      { trait_type: "Type", value: "art" },
+      { trait_type: "Author", value: author },
+      { trait_type: "License", value: license },
+      { trait_type: "Commercial", value: "Yes" },
+      { trait_type: "Format", value: file.type },
+      { trait_type: "Size", value: `${(file.size / 1024).toFixed(1)} KB` },
+      { trait_type: "Registration", value: new Date().toISOString().split("T")[0] },
+      { trait_type: "Status", value: "Registered" },
+      { trait_type: "Network", value: "Starknet" },
+    ],
   };
   
   // 3. Upload metadata to IPFS
@@ -255,7 +297,7 @@ async function tokenizeArtwork(
     tokenUri,
   });
   
-  // 5. Execute (示例使用 sendAsync)
+  // 5. Execute (using sendAsync from starknet-react)
   console.log('⛓️ Minting on-chain...');
   const result = await sendAsync([mintCall]);
   
@@ -335,14 +377,23 @@ async function batchTokenize(
 | GPL-3.0 | ✅ | ✅ | ✅ |
 | BSD-3 | ✅ | ✅ | ❌ |
 
-### Setting License
+### Setting License in Attributes
 
 ```typescript
 const metadata = {
   name: "My Software",
   description: "Open source library",
-  licenseType: "MIT",
-  // ...
+  image: "ipfs://QmImage",
+  external_url: "https://github.com/user/repo",
+  attributes: [
+    { trait_type: "Type", value: "software" },
+    { trait_type: "License", value: "MIT" },
+    { trait_type: "License-Details", value: "Free to use, modify, and distribute" },
+    { trait_type: "Commercial", value: "Yes" },
+    { trait_type: "Modifications", value: "Allowed" },
+    { trait_type: "Attribution", value: "Required" },
+    // ...
+  ],
 };
 ```
 

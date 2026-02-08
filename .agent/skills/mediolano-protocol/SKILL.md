@@ -331,37 +331,88 @@ const transfers = await fetch(`${BASE_URL}/transfers/token/${tokenId}`).then(r =
 
 ## Metadata Schemas
 
+Mediolano follows **OpenSea/ERC-721 metadata standards** for marketplace interoperability. All IP-specific metadata (type, license, registration, etc.) is stored in the `attributes` array.
+
+### Asset Metadata (IPFS) - OpenSea Standard
+
+```json
+{
+  "name": "My Digital Artwork",
+  "description": "A vibrant digital illustration exploring themes of nature",
+  "image": "ipfs://QmAssetImage",
+  "external_url": "https://mediolano.app/asset/123",
+  "attributes": [
+    { "trait_type": "Type", "value": "art" },
+    { "trait_type": "Author", "value": "Creator Name" },
+    { "trait_type": "License", "value": "CC-BY-4.0" },
+    { "trait_type": "License-Details", "value": "Attribution required" },
+    { "trait_type": "Commercial", "value": "Yes" },
+    { "trait_type": "Modifications", "value": "Allowed with attribution" },
+    { "trait_type": "Attribution", "value": "Required" },
+    { "trait_type": "Format", "value": "PNG" },
+    { "trait_type": "Dimensions", "value": "1920x1080" },
+    { "trait_type": "Created", "value": "2024" },
+    { "trait_type": "Language", "value": "English" },
+    { "trait_type": "Tags", "value": "digital, abstract, colorful" },
+    { "trait_type": "Registration", "value": "2024-01-15" },
+    { "trait_type": "Status", "value": "Registered" },
+    { "trait_type": "Scope", "value": "Worldwide" },
+    { "trait_type": "Duration", "value": "Perpetual" },
+    { "trait_type": "Version", "value": "1.0" },
+    { "trait_type": "Network", "value": "Starknet" },
+    { "trait_type": "Contract Address", "value": "0x..." }
+  ]
+}
+```
+
+### IP Type-Specific Attributes
+
+Different asset types have additional specialized attributes:
+
+| Type | Additional Attributes |
+|------|----------------------|
+| `audio` | Artist, Album, Genre, Composer, Band, Publisher |
+| `video` | Director, Producer, Duration, Resolution |
+| `document` | Author, Pages, Publisher, ISBN |
+| `software` | Repository, Language, Framework, Dependencies |
+| `patent` | Filing Date, Patent Number, Claims, Inventors |
+| `publication` | Journal, Volume, Issue, DOI |
+| `rwa` | Physical Location, Certification, Appraisal |
+
 ### Collection Metadata (IPFS)
 
 ```json
 {
-  "name": "Collection Name",
-  "description": "Description",
-  "image": "ipfs://QmCoverImage",
-  "type": "art",
-  "visibility": "public",
-  "enableVersioning": true,
-  "allowComments": true,
-  "requireApproval": false
+  "name": "My IP Collection",
+  "description": "A curated collection of digital artworks",
+  "image": "ipfs://QmCollectionCover",
+  "external_url": "https://mediolano.app/collections/123",
+  "attributes": [
+    { "trait_type": "Type", "value": "art" },
+    { "trait_type": "Visibility", "value": "public" },
+    { "trait_type": "Category", "value": "Digital Art" }
+  ]
 }
 ```
 
-### Asset Metadata (IPFS)
+### Querying Attributes (SDK)
 
-```json
-{
-  "name": "Asset Name",
-  "description": "Description",
-  "image": "ipfs://QmAssetImage",
-  "type": "art",
-  "licenseType": "CC-BY-4.0",
-  "registrationDate": "2024-01-01T00:00:00Z",
-  "tags": ["art", "digital"],
-  "attributes": [
-    { "trait_type": "Medium", "value": "Digital" }
-  ],
-  "external_url": "https://example.com/asset"
-}
+```typescript
+// Find specific attributes in metadata
+const asset = await sdk.assets.getAsset(nftAddress, tokenId);
+
+// Get license from attributes
+const licenseAttr = asset.attributes?.find(a => a.trait_type === "License");
+const license = licenseAttr?.value || "Unknown";
+
+// Get type from attributes
+const typeAttr = asset.attributes?.find(a => a.trait_type === "Type");
+const type = typeAttr?.value || "Unknown";
+
+// Check if remix
+const isRemix = asset.attributes?.some(
+  a => a.trait_type === "Type" && a.value === "Remix"
+);
 ```
 
 > See [references/tokenization-guide.md](references/tokenization-guide.md) for complete schemas.
