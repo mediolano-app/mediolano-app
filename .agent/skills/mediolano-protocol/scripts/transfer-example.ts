@@ -1,10 +1,10 @@
 /**
  * Transfer Example
  * 
- * Runnable example demonstrating how to transfer an IP asset.
+ * Template script demonstrating how to transfer an IP asset.
  * 
- * Usage:
- *   npx ts-node scripts/transfer-example.ts
+ * NOTE: This script is a TEMPLATE. Copy the logic to your project and adjust
+ * the import path based on your project structure.
  * 
  * Prerequisites:
  * - Set environment variables
@@ -13,7 +13,10 @@
  */
 
 import { Account, RpcProvider } from 'starknet';
-import { getSDK } from '../../../src/sdk';
+// Adjust this import path based on your project structure:
+// import { getSDK } from '@/sdk';  // For Next.js app
+// import { getSDK } from './src/sdk';  // For standalone scripts
+import { getSDK } from '@/sdk';
 
 // ============================================
 // CONFIGURATION
@@ -29,7 +32,7 @@ const CONFIG = {
 
     // Transfer parameters
     transfer: {
-        token: '1:5',  // format: collectionId:tokenId
+        token: 'tokenIdentifier',  // Token identifier string (get from getUserTokensPerCollection)
         to: '0xRecipientAddress',  // Replace with recipient
     },
 };
@@ -50,6 +53,12 @@ async function main() {
 
     if (!CONFIG.transfer.to || CONFIG.transfer.to === '0xRecipientAddress') {
         console.error('❌ Please set a valid recipient address');
+        process.exit(1);
+    }
+
+    if (!CONFIG.transfer.token || CONFIG.transfer.token === 'tokenIdentifier') {
+        console.error('❌ Please set a valid token identifier');
+        console.error('   Get token IDs from sdk.assets.getUserTokensPerCollection()');
         process.exit(1);
     }
 
@@ -74,30 +83,19 @@ async function main() {
     console.log('\n🔧 Initializing SDK...');
     const sdk = getSDK();
 
-    // Parse token identifier
-    const [collectionId, tokenId] = CONFIG.transfer.token.split(':');
+    // Display token info
     console.log(`\n📦 Token Details:`);
-    console.log(`   Collection ID: ${collectionId}`);
-    console.log(`   Token ID: ${tokenId}`);
+    console.log(`   Token: ${CONFIG.transfer.token}`);
 
-    // Verify collection and token
+    // Verify token is valid
     console.log('\n🔍 Verifying token...');
     try {
-        const collection = await sdk.collections.getCollection(collectionId);
-        console.log(`   Collection: ${collection.name}`);
-        console.log(`   NFT Contract: ${collection.nftAddress.slice(0, 20)}...`);
-
-        // Check current owner
-        const currentOwner = await sdk.assets.getTokenOwner(
-            collection.nftAddress,
-            parseInt(tokenId)
-        );
-        console.log(`   Current Owner: ${currentOwner.slice(0, 20)}...`);
-
-        if (currentOwner.toLowerCase() !== CONFIG.accountAddress.toLowerCase()) {
-            console.error('❌ You are not the owner of this token');
+        const isValid = await sdk.assets.isValidToken(CONFIG.transfer.token);
+        if (!isValid) {
+            console.error('❌ Token is not valid');
             process.exit(1);
         }
+        console.log('   Token is valid ✅');
     } catch (error) {
         console.error('❌ Failed to verify token:', error);
         process.exit(1);

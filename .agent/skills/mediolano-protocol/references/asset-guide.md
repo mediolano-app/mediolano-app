@@ -207,9 +207,9 @@ const tokenId = await sdk.assets.getTokenOfOwnerByIndex(
 
 ```typescript
 const transferCall = sdk.assets.buildTransferCall({
-  from: "0xCurrentOwner",
-  to: "0xNewOwner",
-  token: "1:5",  // format: collectionId:tokenId
+  from: "0xCurrentOwner" as `0x${string}`,
+  to: "0xNewOwner" as `0x${string}`,
+  token: "tokenIdentifier",  // String token identifier
 });
 
 await sendTransaction([transferCall]);
@@ -219,19 +219,19 @@ await sendTransaction([transferCall]);
 
 ```typescript
 const batchTransferCall = sdk.assets.buildBatchTransferCall({
-  from: "0xCurrentOwner",
-  to: "0xNewOwner",
-  tokens: ["1:5", "1:6", "1:7"],
+  from: "0xCurrentOwner" as `0x${string}`,
+  to: "0xNewOwner" as `0x${string}`,
+  tokens: ["token1", "token2", "token3"],
 });
 
 await sendTransaction([batchTransferCall]);
 ```
 
-### Token Format
+### Token Identifier
 
-The `token` parameter uses the format `collectionId:tokenId`:
-- `"1:5"` = Collection 1, Token 5
-- `"42:100"` = Collection 42, Token 100
+The `token` parameter is a string identifier. The format depends on the contract:
+- Token identifiers are returned by `sdk.assets.getUserTokensPerCollection()`
+- Check the contract documentation for the expected format
 
 ---
 
@@ -241,7 +241,7 @@ The `token` parameter uses the format `collectionId:tokenId`:
 
 ```typescript
 const burnCall = sdk.assets.buildBurnCall({
-  token: "1:5",
+  token: "tokenIdentifier",
 });
 
 await sendTransaction([burnCall]);
@@ -251,7 +251,7 @@ await sendTransaction([burnCall]);
 
 ```typescript
 const batchBurnCall = sdk.assets.buildBatchBurnCall({
-  tokens: ["1:5", "1:6", "1:7"],
+  tokens: ["token1", "token2", "token3"],
 });
 
 await sendTransaction([batchBurnCall]);
