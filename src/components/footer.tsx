@@ -42,6 +42,7 @@ import {
   Send,
   MessageSquare,
   Sparkles,
+  Flame,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -178,6 +179,7 @@ export function Footer() {
                   <li><Link href="/create/asset" className="flex items-center gap-2 hover:text-primary transition-colors"><Box className="w-3.5 h-3.5" /> Create IP Asset</Link></li>
                   <li><Link href="/create/remix" className="flex items-center gap-2 hover:text-primary transition-colors"><Sparkles className="w-3.5 h-3.5" /> Create Remix</Link></li>
                   <li><Link href="/transfer" className="flex items-center gap-2 hover:text-primary transition-colors"><ArrowRightLeft className="w-3.5 h-3.5" /> Transfer Assets</Link></li>
+                  <li><Link href="/burn" className="flex items-center gap-2 hover:text-primary transition-colors"><Flame className="w-3.5 h-3.5" /> Burn Assets</Link></li>
                   <li><Link href="/activities" className="flex items-center gap-2 hover:text-primary transition-colors"><Scroll className="w-3.5 h-3.5" /> Community Activities</Link></li>
                   <li className="pt-2 border-t border-border/50"></li>
                   <li><Link href="/portfolio" className="flex items-center gap-2 hover:text-primary transition-colors"><User className="w-3.5 h-3.5" /> IP Portfolio</Link></li>

@@ -16,7 +16,8 @@ import {
   Sun,
   Laptop,
   GitBranch,
-  ArrowRightLeft
+  ArrowRightLeft,
+  Flame,
 } from "lucide-react"
 
 import {
@@ -80,6 +81,10 @@ export function CommandMenu() {
           <CommandItem onSelect={() => runCommand(() => router.push("/transfer"))}>
             <ArrowRightLeft className="mr-2 h-4 w-4" />
             <span>Transfer Asset</span>
+          </CommandItem>
+          <CommandItem onSelect={() => runCommand(() => router.push("/burn"))}>
+            <Flame className="mr-2 h-4 w-4" />
+            <span>Burn Asset</span>
           </CommandItem>
           <CommandItem onSelect={() => runCommand(() => router.push("/portfolio"))}>
             <User className="mr-2 h-4 w-4" />

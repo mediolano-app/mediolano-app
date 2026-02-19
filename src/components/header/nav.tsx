@@ -50,6 +50,7 @@ import {
   Activity,
   Boxes,
   BookOpen,
+  Flame,
 } from "lucide-react"
 import { Logo } from "@/components/header/logo"
 
@@ -282,6 +283,21 @@ export function MainNav() {
                     </div>
                     <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
                       Remix IP
+                    </p>
+                  </Link>
+                </NavigationMenuLink>
+
+                <NavigationMenuLink asChild>
+                  <Link
+                    className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                    href="/burn"
+                  >
+                    <div className="text-sm font-medium leading-none flex items-center">
+                      <Flame className="mr-2 h-4 w-4  text-blue-600" />
+                      Burn Assets
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+                      Permanently destroy assets
                     </p>
                   </Link>
                 </NavigationMenuLink>
