@@ -38,10 +38,17 @@ export function getStarkZapSdk(): StarkZap {
   if (_sdk) return _sdk;
 
   const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL;
+  const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_PAYMASTER_API_KEY;
+
+  // Pass the AVNU API key so sponsored (feeMode: "sponsored") deployments
+  // and transactions are accepted by the paymaster.
+  const paymaster = avnuApiKey
+    ? { headers: { "x-paymaster-api-key": avnuApiKey } }
+    : undefined;
 
   _sdk = rpcUrl
-    ? new StarkZap({ rpcUrl, chainId: APP_CHAIN_ID })
-    : new StarkZap({ network: IS_SEPOLIA ? "sepolia" : "mainnet" });
+    ? new StarkZap({ rpcUrl, chainId: APP_CHAIN_ID, paymaster })
+    : new StarkZap({ network: IS_SEPOLIA ? "sepolia" : "mainnet", paymaster });
 
   return _sdk;
 }
