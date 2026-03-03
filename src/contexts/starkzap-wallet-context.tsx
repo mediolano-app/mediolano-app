@@ -93,46 +93,69 @@ export function StarkZapWalletProvider({
     setError(null);
     try {
       const sdk = getStarkZapSdk();
-      const result = await sdk.onboard({
+
+      // Fetch the Privy wallet info once and reuse it across retries.
+      let cachedWallet: { id: string; publicKey: string } | null = null;
+      const resolve = async () => {
+        if (!cachedWallet) {
+          const token = await getAccessToken();
+          if (!token) throw new Error("No Privy access token");
+
+          const res = await fetch("/api/wallet/starknet", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error(
+              (body as { error?: string }).error ?? "Failed to get wallet"
+            );
+          }
+          const { wallet: w } = (await res.json()) as {
+            wallet: { id: string; publicKey: string };
+          };
+          cachedWallet = w;
+        }
+
+        // PrivySigner requires a fully-qualified URL, not a relative path
+        const signUrl = `${window.location.origin}/api/wallet/sign`;
+        return {
+          walletId: cachedWallet.id,
+          publicKey: cachedWallet.publicKey,
+          serverUrl: signUrl,
+          headers: async (): Promise<Record<string, string>> => {
+            const t = await getAccessToken();
+            return t ? { Authorization: `Bearer ${t}` } : {};
+          },
+        };
+      };
+
+      const onboardOpts = {
         strategy: OnboardStrategy.Privy,
         accountPreset: "argentXV050",
-        privy: {
-          resolve: async () => {
-            const token = await getAccessToken();
-            if (!token) throw new Error("No Privy access token");
+        privy: { resolve },
+      } as const;
 
-            const res = await fetch("/api/wallet/starknet", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            if (!res.ok) {
-              const body = await res.json().catch(() => ({}));
-              throw new Error(
-                (body as { error?: string }).error ?? "Failed to get wallet"
-              );
-            }
-            const { wallet: w } = (await res.json()) as {
-              wallet: { id: string; publicKey: string };
-            };
-            // PrivySigner requires a fully-qualified URL, not a relative path
-            const signUrl = `${window.location.origin}/api/wallet/sign`;
-            return {
-              walletId: w.id,
-              publicKey: w.publicKey,
-              serverUrl: signUrl,
-              headers: async (): Promise<Record<string, string>> => {
-                const t = await getAccessToken();
-                return t ? { Authorization: `Bearer ${t}` } : {};
-              },
-            };
-          },
-        },
-        deploy: "if_needed",
-        feeMode: "sponsored",
-      });
+      let result;
+      try {
+        result = await sdk.onboard({
+          ...onboardOpts,
+          deploy: "if_needed",
+          feeMode: "sponsored",
+        });
+      } catch (deployErr) {
+        // The contract may already be deployed on-chain even though
+        // isDeployed() returned false (e.g. prior session, Privy infra).
+        // Retry without deploying so the wallet still connects.
+        if (String(deployErr).includes("already deployed")) {
+          result = await sdk.onboard({ ...onboardOpts, deploy: "never" });
+        } else {
+          throw deployErr;
+        }
+      }
 
       setWallet(result.wallet);
       setWalletType("privy");
