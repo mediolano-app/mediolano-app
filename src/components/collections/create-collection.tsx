@@ -31,6 +31,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useCollection, CollectionFormData } from "@/hooks/use-collection";
 import { useToast } from "@/hooks/use-toast";
 import { useAccount } from "@starknet-react/core";
+import { useUnifiedWallet } from "@/hooks/useUnifiedWallet";
 import {
   CoverImageUploader,
   CoverImageUploaderRef,
@@ -55,7 +56,8 @@ export default function CreateCollectionView({
   const uploaderRef = useRef<CoverImageUploaderRef>(null);
   const { createCollection, isCreating, error: hookError } = useCollection();
   const { toast } = useToast();
-  const { address: walletAddress, chainId } = useAccount();
+  const { address: walletAddress } = useUnifiedWallet();
+  const { chainId } = useAccount();
   const { provider } = useProvider();
   const { networkConfig } = useNetwork();
 

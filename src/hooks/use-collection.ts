@@ -1,12 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
-import {
-  useAccount,
-  useContract,
-  useSendTransaction,
-} from "@starknet-react/core";
+import { useAccount, useContract } from "@starknet-react/core";
 import { Abi } from "starknet";
 import { ipCollectionAbi } from "@/abis/ip_collection";
-import { COLLECTION_CONTRACT_ADDRESS } from "@/lib/constants";
+import { COLLECTION_CONTRACT_ADDRESS, GAS_SPONSORSHIP_CONFIG } from "@/lib/constants";
+import { useUnifiedWallet } from "@/hooks/useUnifiedWallet";
+import {
+  buildSponsoredTypedData,
+  executeSponsoredTransaction,
+} from "@/utils/paymaster";
 import { fetchOneByOne } from "@/lib/utils";
 import { isCollectionReported } from "@/lib/reported-content";
 
@@ -191,17 +192,15 @@ async function processCollectionMetadata(
 }
 
 export function useCollection(): UseCollectionReturn {
-  const { address } = useAccount();
+  const { address, walletType, execute } = useUnifiedWallet();
+  // Raw starknet-react account is needed for AVNU sponsored signing
+  const { account } = useAccount();
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { contract } = useContract({
     abi: COLLECTION_CONTRACT_ABI as Abi,
     address: COLLECTION_CONTRACT_ADDRESS as `0x${string}`,
-  });
-
-  const { sendAsync: createCollectionSend } = useSendTransaction({
-    calls: [],
   });
 
   const createCollection = useCallback(
@@ -232,23 +231,41 @@ export function useCollection(): UseCollectionReturn {
           .replace(/[^a-zA-Z0-9]/g, "")
           .toUpperCase();
 
-        // Use up to 31 characters, or the full cleanSymbol if it's shorter, fallback to 'COLL' if empty
         const symbol = cleanSymbol || "COLL";
 
-
-
-        // Prepare contract call - pass strings directly as ByteArray parameters
+        // Prepare contract call
         const contractCall = contract.populate("create_collection", [
-          formData.name, // name as ByteArray
-          symbol, // symbol as ByteArray
-          formData.base_uri, // base_uri as ByteArray
+          formData.name,
+          symbol,
+          formData.base_uri,
         ]);
 
+        // For injected wallets (Argent / Braavos) with AVNU sponsorship enabled,
+        // attempt the sponsored path first, then fall back to standard execution.
+        if (
+          walletType === "injected" &&
+          GAS_SPONSORSHIP_CONFIG.ENABLED &&
+          GAS_SPONSORSHIP_CONFIG.SPONSOR_MINTING &&
+          account
+        ) {
+          try {
+            const typedData = await buildSponsoredTypedData(address, [contractCall as any]);
+            const sig = await account.signMessage(typedData);
+            const res = await executeSponsoredTransaction({
+              userAddress: address,
+              typedData,
+              signature: Array.isArray(sig) ? sig : [sig],
+            });
+            if (res.success) return res.transactionHash!;
+            throw new Error(res.error || "Sponsored transaction failed");
+          } catch (avnuErr) {
+            // AVNU sponsorship unavailable — fall through to standard execution
+            console.warn("AVNU sponsorship failed, using standard tx:", avnuErr);
+          }
+        }
 
-
-        // Execute the transaction
-        const response = await createCollectionSend([contractCall]);
-        return response.transaction_hash;
+        // Standard path: works for injected (fallback), Privy, and Cartridge
+        return await execute([contractCall as any]);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to create collection";
@@ -259,7 +276,7 @@ export function useCollection(): UseCollectionReturn {
         setIsCreating(false);
       }
     },
-    [address, contract, createCollectionSend]
+    [address, walletType, account, contract, execute]
   );
 
   return {
