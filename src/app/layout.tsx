@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { PrivyProvider } from "@privy-io/react-auth";
-import { StarkZapWalletProvider } from "@/contexts/starkzap-wallet-context";
-import { StarknetProvider } from "@/components/starknet-provider";
-import { ThemeProvider } from "@/components/theme-provider";
+import { Providers } from "@/components/providers";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import AnimatedBackground from "@/components/animated-bg";
 import { Toaster } from "@/components/ui/toaster";
 import { CommandMenu } from "@/components/command-menu";
 
@@ -80,30 +76,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="vivid-gradient-bg min-h-screen text-foreground antialiased">
         <div className="bg-background/75">
-          <PrivyProvider
-            appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
-            config={{
-              loginMethods: ["email", "google", "twitter"],
-              appearance: { theme: "dark" },
-            }}
-          >
-            <StarkZapWalletProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                <StarknetProvider>
-                  <Header />
-                  <CommandMenu />
-                  {children}
-                  <Toaster />
-                  <Footer />
-                </StarknetProvider>
-              </ThemeProvider>
-            </StarkZapWalletProvider>
-          </PrivyProvider>
+          <Providers>
+            <Header />
+            <CommandMenu />
+            {children}
+            <Toaster />
+            <Footer />
+          </Providers>
         </div>
       </body>
     </html>
