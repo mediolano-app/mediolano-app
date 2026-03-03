@@ -117,10 +117,12 @@ export function StarkZapWalletProvider({
             const { wallet: w } = (await res.json()) as {
               wallet: { id: string; publicKey: string };
             };
+            // PrivySigner requires a fully-qualified URL, not a relative path
+            const signUrl = `${window.location.origin}/api/wallet/sign`;
             return {
               walletId: w.id,
               publicKey: w.publicKey,
-              serverUrl: "/api/wallet/sign",
+              serverUrl: signUrl,
               headers: async (): Promise<Record<string, string>> => {
                 const t = await getAccessToken();
                 return t ? { Authorization: `Bearer ${t}` } : {};
