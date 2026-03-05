@@ -67,23 +67,6 @@ export function StarkZapWalletProvider({
   const [isConnecting, setIsConnecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Track whether we should complete a Privy wallet connection after login
-  const pendingPrivyConnect = useRef(false);
-
-  // ---------------------------------------------------------------------------
-  // Privy login with onComplete
-  // ---------------------------------------------------------------------------
-
-  const { login: privyLogin } = useLogin({
-    onComplete: () => {
-      pendingPrivyConnect.current = true;
-    },
-    onError: (err) => {
-      setError(typeof err === "string" ? err : "Privy login failed");
-      setIsConnecting(false);
-    },
-  });
-
   // ---------------------------------------------------------------------------
   // Connect Starknet wallet via Privy after authentication
   // ---------------------------------------------------------------------------
@@ -169,16 +152,31 @@ export function StarkZapWalletProvider({
     }
   }, [getAccessToken]);
 
-  // Fire wallet connection after Privy login completes
+  // Stable ref so useLogin's onComplete always calls the latest version
+  // without a stale closure (useLogin captures the callback at mount time).
+  const connectPrivyWalletRef = useRef(connectPrivyWallet);
   useEffect(() => {
-    if (pendingPrivyConnect.current && authenticated) {
-      pendingPrivyConnect.current = false;
-      connectPrivyWallet();
-    }
-  }, [authenticated, connectPrivyWallet]);
+    connectPrivyWalletRef.current = connectPrivyWallet;
+  }, [connectPrivyWallet]);
 
   // ---------------------------------------------------------------------------
-  // Connect Privy (triggers login modal, wallet connected in effect above)
+  // Privy login — onComplete calls the wallet connection directly.
+  // This avoids a race condition where `authenticated` becomes true BEFORE
+  // onComplete fires, causing the old useEffect approach to miss the trigger.
+  // ---------------------------------------------------------------------------
+
+  const { login: privyLogin } = useLogin({
+    onComplete: () => {
+      connectPrivyWalletRef.current();
+    },
+    onError: (err) => {
+      setError(typeof err === "string" ? err : "Privy login failed");
+      setIsConnecting(false);
+    },
+  });
+
+  // ---------------------------------------------------------------------------
+  // Connect Privy (triggers login modal, wallet connected in onComplete above)
   // ---------------------------------------------------------------------------
 
   const connectPrivy = useCallback(() => {

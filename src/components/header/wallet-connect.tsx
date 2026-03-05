@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useConnect, useAccount, useDisconnect } from "@starknet-react/core";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Wallet, LogOut, AlertCircle, Gamepad2, Mail } from "lucide-react";
+import { Wallet, LogOut, AlertCircle, Gamepad2, Mail, Loader2 } from "lucide-react";
 import { useNetwork } from "@/components/starknet-provider";
 import { StarknetkitConnector, useStarknetkitConnectModal } from "starknetkit";
 import { useStarkZapWallet } from "@/contexts/starkzap-wallet-context";
@@ -107,6 +107,13 @@ export function WalletConnect() {
     BigInt(chainId).toString() !== networkConfig.chainId;
 
   const badge = getBadge(activeWalletType);
+
+  // Close the dialog automatically when wallet connects (e.g. after Privy login)
+  useEffect(() => {
+    if (isConnected && displayAddress) {
+      setOpen(false);
+    }
+  }, [isConnected, displayAddress]);
 
   // ---------------------------------------------------------------------------
   // Handlers
@@ -225,6 +232,17 @@ export function WalletConnect() {
   // ---------------------------------------------------------------------------
   // Not connected — connection modal
   // ---------------------------------------------------------------------------
+
+  // While Privy is authenticating / wallet is being deployed, the dialog is
+  // closed but we still want the button to reflect the pending state.
+  if (isConnecting) {
+    return (
+      <Button variant="outline" className="w-full glass" disabled>
+        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+        Connecting…
+      </Button>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
